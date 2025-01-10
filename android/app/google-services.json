@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "593393856836",
+    "project_id": "pilgrim-staging",
+    "storage_bucket": "pilgrim-staging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:593393856836:android:65b4bde0f1d3f0b1866711",
+        "android_client_info": {
+          "package_name": "com.discoverpilgrimstaging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-LevOKIBoSsczidW8fwYQQyXOLuf91I8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

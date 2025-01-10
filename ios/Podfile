@@ -1,0 +1,176 @@
+require 'json'
+
+def swap_package_json_for_appclip
+  package_json_path = '../package.json'
+  package_backup_path = '../package-backup.json'
+  package_appclip_path = '../package-appclip.json'
+  
+  if File.exist?(package_json_path)
+    puts 'Backing up package.json'
+    File.rename(package_json_path, package_backup_path)
+  else
+    raise 'Error: package.json not found!'
+  end
+  
+  if File.exist?(package_appclip_path)
+    puts 'Enabling appclip package.json'
+    File.rename(package_appclip_path, package_json_path)
+  else
+    raise 'Error: package-appclip.json not found!'
+  end
+    
+  yield
+  
+  if File.exist?(package_json_path) && File.exist?(package_backup_path)
+    puts 'Restoring original package.json'
+    File.rename(package_json_path, package_appclip_path)
+    File.rename(package_backup_path, package_json_path)
+  else
+    raise 'Error: Could not restore original state'
+  end
+end
+
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, 15.6
+prepare_react_native_project!
+# use_modular_headers!
+
+# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
+# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
+#
+# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
+# ```js
+# module.exports = {
+#   dependencies: {
+#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
+# ```
+flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+apptile_config_path = '../apptile.config.json'
+apptile_config = JSON.parse(File.read(apptile_config_path))
+feature_flags = apptile_config.fetch('feature_flags', {})
+FLAGS = feature_flags.select { |_key, value| [true,false].include?(value) }.keys
+
+target 'apptileSeed' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # Enables Flipper.
+    #
+    # Note that if you have use_frameworks! enabled, Flipper will not work and
+    # you should disable the next line.
+    :flipper_configuration => flipper_config,
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    :hermes_enabled => false
+  )
+
+  target 'apptileSeedTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+  # to avoid GoogleUtilities version conflict since firebase analytics and firebase Messaging can have different version of GoogleUtilities
+  pod 'GoogleUtilities'
+  # pod 'Firebase/Analytics', :modular_headers => true
+  pod 'Firebase', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  $RNFirebaseAsStaticFramework = true
+  #END to avoid GoogleUtilities version conflict since firebase analytics and firebase Messaging can have different version of GoogleUtilities
+
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  # pod 'Permission-AppTrackingTransparency', :path => "#{permissions_path}/AppTrackingTransparency"
+#  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+
+  post_install do |installer|
+    puts "trying to add preprocessor flag"
+    xcconfig_paths=[
+      "./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.debug.xcconfig",
+      "./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.release.xcconfig"
+    ]
+
+    xcconfig_paths.each do |path|
+      if File.exist?(path)
+        puts "Modifying #{path}"
+        # Read the current filecontents
+        file_contents = File.read(path)
+    
+        updated_contents = file_contents
+        FLAGS.each do |flag|
+          flag_enabled = feature_flags[flag]
+          puts "Feature flag #{flag}: #{flag_enabled}"
+          if flag_enabled
+            puts "Adding #{flag}=1"
+            #Check if is already present
+            unless updated_contents.include?("#{flag}=1")
+              #Append to the GCC_PREPROCESSOR_DEFINITIONS line or create it
+               updated_contents=updated_contents.gsub(
+                     /^GCC_PREPROCESSOR_DEFINITIONS = (.+)$/i,
+                     'GCC_PREPROCESSOR_DEFINITIONS = \1 ' + flag + '=1'
+               )
+      
+              unless updated_contents.include?("GCC_PREPROCESSOR_DEFINITIONS")
+                #If GCC_PREPROCESSOR_DEFINITIONS is not present, add it
+                updated_contents+="\nGCC_PREPROCESSOR_DEFINITIONS = #{flag}=1\n"
+              end
+
+              puts "Added #{flag}=1 to #{path}"
+            else
+              puts "#{flag}=1 already exists in #{path} "
+            end
+          else
+            puts "Removing #{flag}=1"
+            if updated_contents.include?("#{flag}=1")
+              updated_contents=updated_contents.gsub(/\s*#{flag}=1/, '')
+              #Write the updated contents back to the file
+              puts "Removed from #{path}"
+            end
+          end
+        end
+        
+        File.write(path, updated_contents)
+      else
+        puts "File not found #{path}"
+      end
+    end
+     
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+  end
+end
+
+# target 'apptileSeedClip' do
+#   swap_package_json_for_appclip do
+#     config = use_native_modules!
+#
+#     use_react_native!(
+#       :path => config[:reactNativePath],
+#       # Enables Flipper.
+#       #
+#       # Note that if you have use_frameworks! enabled, Flipper will not work and
+#       # you should disable the next line.
+#       :flipper_configuration => flipper_config,
+#       # An absolute path to your application root.
+#       :app_path => "#{Pod::Config.instance.installation_root}/..",
+#       :hermes_enabled => false
+#     )
+#   end
+# end

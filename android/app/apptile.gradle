@@ -1,0 +1,20 @@
+// Add a preBuild task to run androidProjectSetup
+task runAndroidSetup(type: Exec) {
+    def nodeBinary = System.getenv("NODE_BINARY") ?: "node" 
+    commandLine nodeBinary, "${project.rootDir}/../androidProjectSetup.js"
+}
+
+// Not working for some reason
+// task bundleAndAssembleRelease {
+//     dependsOn "createBundleReleaseJSAndAssets", "assembleRelease"
+// }
+
+preBuild.dependsOn runAndroidSetup
+
+// Make sure javascript bundling happens when apk is built. For aab this
+// task is run automatically.
+tasks.whenTaskAdded { task ->
+    if (task.name == "assembleRelease") {
+        task.dependsOn "runAndroidSetup", "createBundleReleaseJsAndAssets"
+    }
+}
