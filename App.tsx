@@ -10,13 +10,13 @@ import {
   ApptileWrapper, 
   ApptileAppRoot, 
   getAppDispatch,
-  registerCreator
+  registerCreator,
+  getConfigValue
 } from 'apptile-core';
 import { initPlugins } from 'apptile-plugins';
 // import { loadDatasourcePlugins as loadShopifyPlugin } from './apptile-shopify';
 import { loadDatasourcePlugins as loadShopifyPlugin } from 'apptile-shopify';
 import { loadDatasourcePlugins } from 'apptile-datasource';
-import {APP_ID as appId} from './apptile.config';
 import JSSplash from './JSSplash';
 import UpdateModal from './UpdateModal';
 
@@ -44,19 +44,26 @@ const Stack = createNativeStackNavigator<ScreenParams>();
 function App(): React.JSX.Element {
   const dispatch = getAppDispatch();  
   const [showCodepushModal, setShowCodepushModal] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(true);
+  const [startingConf, setStartingConf] = useState({isDownloading: true, appId: undefined});
 
   useEffect(() => {
     // NativeDevSettings.setIsDebuggingRemotely(false);
-    const startP = getAppStartAction(appId)
-      .then(response => {
-        if (response.hasError) {
-          console.error("Error ocurred while trying to get config: ", response);
+    const startP = getConfigValue('APP_ID')
+      .then(appId => {
+        if (appId) {
+          return getAppStartAction(appId).then(startAction => ({startAction, appId}));
+        } else {
+          throw new Error("Cannot launch app without APP_ID. Make sure its present in strings.xml or info.plist. It should get inserted via apptile.config.json");
+        }
+      })
+      .then(({startAction, appId}) => {
+        if (startAction.hasError) {
+          console.error("Error ocurred while trying to get config: ", startAction);
           Alert.alert("Couldn't load app. Please restart.");
         }
-        setIsDownloading(false);
-        dispatch(response.action)
-        return response.updateCheckResult;
+        setStartingConf({isDownloading: false, appId});
+        dispatch(startAction.action)
+        return startAction.updateCheckResult;
       })
       .then(({updateCheckResult}) => {
         if (updateCheckResult) {
@@ -79,7 +86,7 @@ function App(): React.JSX.Element {
 
   let body = <JSSplash />;
 
-  if (!isDownloading) {
+  if (!startingConf.isDownloading) {
     body = (
       <NavigationContainer
         ref={apptileNavigationRef}
@@ -90,13 +97,13 @@ function App(): React.JSX.Element {
             name="NativeUtils" 
             component={UpdateModal} 
             options={{headerShown: true}} 
-            initialParams={{appId: appId}} 
+            initialParams={{appId: startingConf.appId}} 
           />
           <Stack.Screen 
             name="AdminPage" 
             component={AdminPage} 
             options={{headerShown: true}}
-            initialParams={{appId: appId}}
+            initialParams={{appId: startingConf.appId}}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -108,7 +115,7 @@ function App(): React.JSX.Element {
       noNavigatePaths={["NativeUtils", "AdminPage"]} // The nocode layer will not do navigation to these screens so you can handle those navigations in the onNavigationEvent
       onNavigationEvent={(ev) => {
         console.log("handle navigation event", ev)
-        apptileNavigationRef.current.navigate(ev.screenName, {appId});
+        apptileNavigationRef.current.navigate(ev.screenName, {appId: startingConf.appId});
       }}
     >
       {body}
@@ -142,7 +149,7 @@ function App(): React.JSX.Element {
                 <UpdateModal
                   onDismiss={() => setShowCodepushModal(false)}
                   navigation={apptileNavigationRef}
-                  route={{params: {appId}}}
+                  route={{params: {appId: startingConf.appId}}}
                 />
               </View>
             </Pressable>

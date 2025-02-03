@@ -35,6 +35,18 @@ async function main() {
     APPTILE_API_ENDPOINT_ENTRY._ = apptileConfig.APPTILE_BACKEND_URL;
   }
 
+  let APP_ID_ENTRY = stringsObj.resources.string.find(it => it.$.name === 'APP_ID')
+  if (!APP_ID_ENTRY) {
+    stringsObj.resources.string.push({
+      _: apptileConfig.APP_ID,
+      $: {
+        name: 'APP_ID'
+      }
+    });
+  } else {
+    APP_ID_ENTRY._ = apptileConfig.APP_ID
+  }
+
   let APPTILE_UPDATE_ENDPOINT_ENTRY = stringsObj.resources.string.find(it => it.$.name === 'APPTILE_UPDATE_ENDPOINT');
   if (!APPTILE_UPDATE_ENDPOINT_ENTRY) {
     stringsObj.resources.string.push({

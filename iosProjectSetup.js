@@ -23,6 +23,7 @@ async function main() {
     const infoPlistLocation = path.resolve(iosFolderLocation, 'apptileSeed/Info.plist');
     const rawInfoPlist = await readFile(infoPlistLocation, {encoding: 'utf8'});
     const infoPlist = plist.parse(rawInfoPlist);
+    infoPlist.APP_ID = apptileConfig.APP_ID;
     infoPlist.APPTILE_API_ENDPOINT = apptileConfig.APPTILE_BACKEND_URL;
     infoPlist.APPTILE_UPDATE_ENDPOINT = apptileConfig.APPCONFIG_SERVER_URL;
 
