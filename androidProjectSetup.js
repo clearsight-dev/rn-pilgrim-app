@@ -71,6 +71,22 @@ async function main() {
     FacebookClientToken._ = apptileConfig.FacebookClientToken;
   }
 
+  // For onesignal analytics
+  if (apptileConfig.feature_flags.ENABLE_ONESIGNAL) {
+    let onesignalAppId = stringsObj.resources.string.find(it => it.$.name === 'ONESIGNAL_APPID');
+    if (!onesignalAppId) {
+      stringsObj.resources.string.push({
+        _: apptileConfig.ONESIGNAL_APPID,
+        $: {
+          name: 'ONESIGNAL_APPID'
+        }
+      });
+    } else {
+      onesignalAppId._ = apptileConfig.ONESIGNAL_APPID;
+    }
+  } else {
+    stringsObj.resources.string = stringsObj.resources.string.filter(it => it.$.name === 'ONESIGNAL_APPID');
+  }
 
   const updatedValuesXml = builder.buildObject(stringsObj);
   console.log("strings.xml updated: " + updatedValuesXml);

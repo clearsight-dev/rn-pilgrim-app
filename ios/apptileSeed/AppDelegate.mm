@@ -2,6 +2,7 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
+#import <React/RCTI18nUtil.h>
 #import <React/RCTEventEmitter.h>
 
 #if ENABLE_FIREBASE_ANALYTICS
@@ -30,6 +31,9 @@
 {
   self.moduleName = @"apptileSeed";
   self.initialProps = @{};
+  
+  [[RCTI18nUtil sharedInstance] allowRTL:NO];
+  [[RCTI18nUtil sharedInstance] forceRTL:NO];
   
 #if ENABLE_FIREBASE_ANALYTICS
   [FIRApp configure];

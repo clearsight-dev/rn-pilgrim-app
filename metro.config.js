@@ -58,6 +58,12 @@ const config = {
           filePath,
           type: 'sourceFile'
         };
+      } else if (moduleName === 'react-native-appsflyer') {
+        let filePath = path.resolve(__dirname, 'stubs/react-native-appsflyer/index.ts');
+        return {
+          filePath,
+          type: 'sourceFile'
+        };
       }
       return metroResolver.resolve({ ...context, resolveRequest: null }, moduleName, platform);
     },

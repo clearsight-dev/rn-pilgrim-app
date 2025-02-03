@@ -1,3 +1,20 @@
+import groovy.json.JsonSlurper
+
+def configFile = file("$rootDir/apptile.config.json")
+def enableOneSignal = false
+
+if (configFile.exists()) {
+  def config = new JsonSlurper().parseText(configFile.text)
+  enableOneSignal = config.feature_flags?.ENABLE_ONESIGNAL ?: false
+}
+
+if (enableOneSignal) {
+  logger.lifecycle("Adding onesignal dependency")
+  dependencies {
+    implementation 'com.onesignal:OneSignal:[5.0.0, 5.99.99]'
+  }
+}
+
 // Add a preBuild task to run androidProjectSetup
 task runAndroidSetup(type: Exec) {
     def nodeBinary = System.getenv("NODE_BINARY") ?: "node" 

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "593393856836",
-    "project_id": "pilgrim-staging",
-    "storage_bucket": "pilgrim-staging.appspot.com"
+    "project_number": "1097578695917",
+    "project_id": "novhara-8032",
+    "storage_bucket": "novhara-8032.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:593393856836:android:65b4bde0f1d3f0b1866711",
+        "mobilesdk_app_id": "1:1097578695917:android:f06e7f9e17ec75b04690e4",
         "android_client_info": {
-          "package_name": "com.discoverpilgrimstaging"
+          "package_name": "com.novhara.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA-LevOKIBoSsczidW8fwYQQyXOLuf91I8"
+          "current_key": "AIzaSyDEilIEE_soACcCnlSj9Q7JZqplkpQfoys"
         }
       ],
       "services": {

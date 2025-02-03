@@ -26,6 +26,15 @@ async function main() {
     infoPlist.APPTILE_API_ENDPOINT = apptileConfig.APPTILE_BACKEND_URL;
     infoPlist.APPTILE_UPDATE_ENDPOINT = apptileConfig.APPCONFIG_SERVER_URL;
 
+    // For onesignal analytics
+    if (apptileConfig.feature_flags.ENABLE_ONESIGNAL) {
+      infoPlist.ONESIGNAL_APPID = apptileConfig.ONESIGNAL_APPID;
+    } else {
+      if (infoPlist.ONESIGNAL_APPID) {
+        delete infoPlist.ONESIGNAL_APPID;
+      }
+    }
+
     // For facebook analytics
     if (apptileConfig.feature_flags.ENABLE_FBSDK) {
       infoPlist.FacebookAppID = apptileConfig.FacebookAppID;

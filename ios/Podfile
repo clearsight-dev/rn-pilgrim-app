@@ -63,7 +63,21 @@ apptile_config = JSON.parse(File.read(apptile_config_path))
 feature_flags = apptile_config.fetch('feature_flags', {})
 FLAGS = feature_flags.select { |_key, value| [true,false].include?(value) }.keys
 
+target 'ImageNotification' do
+  use_frameworks!
+  pod 'GoogleUtilities'
+  if feature_flags.fetch('ENABLE_MOENGAGE_ANALYTICS', false)
+    puts "Installing MoEngageRichNotification flag in ImageNotification"
+    pod 'MoEngageRichNotification'
+  end
+  if feature_flags.fetch('ENABLE_ONESIGNAL', false)
+    puts "Installing onesignal core in ImageNotification"
+    pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
+  end
+end
+
 target 'apptileSeed' do
+  use_frameworks!
   config = use_native_modules!
 
   use_react_native!(
@@ -72,22 +86,22 @@ target 'apptileSeed' do
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
     # you should disable the next line.
-    :flipper_configuration => flipper_config,
+    :flipper_configuration => FlipperConfiguration.disabled,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
     :hermes_enabled => false
   )
 
-  target 'apptileSeedTests' do
-    inherit! :complete
-    # Pods for testing
-  end
+  # target 'apptileSeedTests' do
+  #   inherit! :complete
+  #   # Pods for testing
+  # end
   # to avoid GoogleUtilities version conflict since firebase analytics and firebase Messaging can have different version of GoogleUtilities
-  pod 'GoogleUtilities'
+  pod 'GoogleUtilities', :modular_headers => true
+  # pod 'GoogleUtilities'
   # pod 'Firebase/Analytics', :modular_headers => true
   pod 'Firebase', :modular_headers => true
   pod 'FirebaseCoreInternal', :modular_headers => true
-  pod 'GoogleUtilities', :modular_headers => true
   pod 'FirebaseCore', :modular_headers => true
   $RNFirebaseAsStaticFramework = true
   #END to avoid GoogleUtilities version conflict since firebase analytics and firebase Messaging can have different version of GoogleUtilities
@@ -100,9 +114,11 @@ target 'apptileSeed' do
     puts "trying to add preprocessor flag"
     xcconfig_paths=[
       "./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.debug.xcconfig",
-      "./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.release.xcconfig"
+      "./Pods/Target Support Files/Pods-ImageNotification/Pods-ImageNotification.debug.xcconfig",
+      "./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.release.xcconfig",
+      "./Pods/Target Support Files/Pods-ImageNotification/Pods-ImageNotification.release.xcconfig",
     ]
-
+    
     xcconfig_paths.each do |path|
       if File.exist?(path)
         puts "Modifying #{path}"
@@ -146,8 +162,9 @@ target 'apptileSeed' do
       else
         puts "File not found #{path}"
       end
+      puts "------------"
     end
-     
+    
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,

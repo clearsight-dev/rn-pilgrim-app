@@ -80,7 +80,7 @@ android {
 
     namespace "com.apptileseed"
     defaultConfig {
-        applicationId "com.discoverpilgrimstaging"
+        applicationId "com.novhara.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

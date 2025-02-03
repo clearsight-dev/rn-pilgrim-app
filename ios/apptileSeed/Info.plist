@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <key>APPTILE_API_ENDPOINT</key>
+    <string>https://api.apptile.io</string>
+    <key>APPTILE_UPDATE_ENDPOINT</key>
+    <string>https://appconfigs.apptile.io</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
@@ -22,6 +26,12 @@
     <string>????</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>FacebookAppID</key>
+    <string/>
+    <key>FacebookClientToken</key>
+    <string/>
+    <key>FacebookDisplayName</key>
+    <string/>
     <key>LSApplicationCategoryType</key>
     <string/>
     <key>LSRequiresIPhoneOS</key>
@@ -76,27 +86,7 @@
     </array>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
-    <key>APPTILE_API_ENDPOINT</key>
-    <string>http://192.168.11.174:3001</string>
-    <key>APPTILE_UPDATE_ENDPOINT</key>
-    <string>https://dev-appconfigs.apptile.io</string>
-    <key>FacebookAdvertiserIDCollectionEnabled</key>
-    <string>NO</string>
-    <key>FacebookAppID</key>
-    <string>570147808995354</string>
-    <key>FacebookClientToken</key>
-    <string>5c95639f9583bc38a9fea5075b04b1cf</string>
-    <key>FacebookDisplayName</key>
-    <string>Pilgrim Staging</string>
-    <key>FacebookAutoLogAppEventsEnabled</key>
-    <string>YES</string>
-    <key>APPSFLYER_DEVKEY</key>
-    <string>xxx</string>
-    <key>APPSFLYER_APPID</key>
-    <string>xxx</string>
-    <key>MOENGAGE_APPID</key>
-    <string>xxx</string>
-    <key>MOENGAGE_DATACENTER</key>
-    <string>xxx</string>
+    <key>ONESIGNAL_APPID</key>
+    <string>2aaedb28-5b4a-4821-ac19-617bdd11221d</string>
   </dict>
 </plist>
