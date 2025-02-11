@@ -1,11 +1,17 @@
 // This file is generated. Do not edit.
-import webviewshoplazza from "./plugins/webviewshoplazza/source/widget";
-import shoplazzads from "./plugins/shoplazzads/source";
-import mysimpleimage from "./plugins/mysimpleimage/source/widget";
+import pligrimtextwidget from "./plugins/pligrimtextwidget/source/widget";
+import pilgrimotplogin from "./plugins/pilgrimotplogin/source/widget";
+import clickpost from "./plugins/clickpost/source/widget";
+import ShopifyCart from "./plugins/ShopifyCart/source/widget";
+import FreeGifts from "./plugins/FreeGifts/source/widget";
+import DynamicImage from "./plugins/DynamicImage/source/widget";
 export function initPlugins() {
 return [
-    mysimpleimage,
-    shoplazzads,
-    webviewshoplazza,
+    DynamicImage,
+    FreeGifts,
+    ShopifyCart,
+    clickpost,
+    pilgrimotplogin,
+    pligrimtextwidget,
   ];
 }
