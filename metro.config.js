@@ -28,6 +28,13 @@ const extraModules = JSON.parse(
   )
 );
 
+const watchPaths = Object.keys(
+  extraModules.reduce((pathObj, modObj) => {
+    pathObj[modObj.watchPath] = 1;
+    return pathObj;
+  }, {})
+);
+
 console.log("sdk path: " + rootPath);
 const sourceExts = defaultConfigs.resolver.sourceExts;
 const config = {
@@ -57,12 +64,7 @@ const config = {
   },
   watchFolders: [
     path.resolve(__dirname, './node_modules'),
-    path.resolve(rootPath, 'apptile-core'),
-    path.resolve(rootPath, 'apptile-plugins'),
-    path.resolve(rootPath, 'apptile-datasource'),
-    path.resolve(rootPath, 'apptile-app/app/assets'),
-    path.resolve(rootPath, 'apptile-shopify'),
-    // __PLACEHOLDER_WATCH__
+    ...watchPaths
   ],
 };
 
