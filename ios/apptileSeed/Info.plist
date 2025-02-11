@@ -3,9 +3,9 @@
 <plist version="1.0">
   <dict>
     <key>APPTILE_API_ENDPOINT</key>
-    <string>https://api.apptile.io</string>
+    <string>http://192.168.11.174:3001</string>
     <key>APPTILE_UPDATE_ENDPOINT</key>
-    <string>https://appconfigs.apptile.io</string>
+    <string>https://dev-appconfigs.apptile.io</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
@@ -27,11 +27,11 @@
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
     <key>FacebookAppID</key>
-    <string/>
+    <string>570147808995354</string>
     <key>FacebookClientToken</key>
-    <string/>
+    <string>5c95639f9583bc38a9fea5075b04b1cf</string>
     <key>FacebookDisplayName</key>
-    <string/>
+    <string>Pilgrim Staging</string>
     <key>LSApplicationCategoryType</key>
     <string/>
     <key>LSRequiresIPhoneOS</key>
@@ -88,5 +88,15 @@
     <false/>
     <key>ONESIGNAL_APPID</key>
     <string>2aaedb28-5b4a-4821-ac19-617bdd11221d</string>
+    <key>FacebookAutoLogAppEventsEnabled</key>
+    <string>YES</string>
+    <key>FacebookAdvertiserIDCollectionEnabled</key>
+    <string>NO</string>
+    <key>MOENGAGE_APPID</key>
+    <string>xxx</string>
+    <key>MOENGAGE_DATACENTER</key>
+    <string>xxx</string>
+    <key>APP_ID</key>
+    <string>4de62a28-c347-4628-b41a-9c88b4b54326</string>
   </dict>
 </plist>

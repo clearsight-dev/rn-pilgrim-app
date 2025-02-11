@@ -5,33 +5,18 @@ import { NavigationContainer } from '@react-navigation/native';
 // import NativeDevSettings from 'react-native/Libraries/NativeModules/specs/NativeDevSettings';
 import { 
   apptileNavigationRef, 
-  initStoreWithRootSagas, 
   getAppStartAction,  
   ApptileWrapper, 
   ApptileAppRoot, 
   getAppDispatch,
-  registerCreator,
   getConfigValue
 } from 'apptile-core';
-import { initPlugins } from 'apptile-plugins';
-// import { loadDatasourcePlugins as loadShopifyPlugin } from './apptile-shopify';
-import { loadDatasourcePlugins as loadShopifyPlugin } from 'apptile-shopify';
-import { loadDatasourcePlugins } from 'apptile-datasource';
+
 import JSSplash from './JSSplash';
 import UpdateModal from './UpdateModal';
 
-import {initPlugins as initRemotePlugins} from './remoteCode';
-import {initNavs} from './remoteCode/indexNav';
 import {init as initAnalytics} from './analytics';
 import AdminPage from './AdminPage';
-// import {registerCallback} from './websocket';
-
-initStoreWithRootSagas();
-loadDatasourcePlugins();
-loadShopifyPlugin();
-initPlugins();
-initRemotePlugins();
-initNavs();
 
 export type ScreenParams = {
   NocodeRoot: undefined;
@@ -47,22 +32,30 @@ function App(): React.JSX.Element {
   const [startingConf, setStartingConf] = useState({isDownloading: true, appId: undefined});
 
   useEffect(() => {
+    logger.info("starting app");
     // NativeDevSettings.setIsDebuggingRemotely(false);
     const startP = getConfigValue('APP_ID')
       .then(appId => {
+        logger.info("starting app with appId", appId);
         if (appId) {
-          return getAppStartAction(appId).then(startAction => ({startAction, appId}));
+          return getAppStartAction(appId)
+            .then(startAction => ({startAction, appId}))
         } else {
+          logger.info('failed to get appstart action');
           throw new Error("Cannot launch app without APP_ID. Make sure its present in strings.xml or info.plist. It should get inserted via apptile.config.json");
         }
       })
       .then(({startAction, appId}) => {
         if (startAction.hasError) {
-          console.error("Error ocurred while trying to get config: ", startAction);
+          logger.info("Error ocurred while trying to get config: ", startAction);
           Alert.alert("Couldn't load app. Please restart.");
         }
         setStartingConf({isDownloading: false, appId});
-        dispatch(startAction.action)
+        setTimeout(() => {
+          // last ditch effort to make the app load everytime
+          logger.info('dispatching appstart action');
+          dispatch(startAction.action)
+        }, 100);
         return startAction.updateCheckResult;
       })
       .then(({updateCheckResult}) => {
@@ -71,6 +64,9 @@ function App(): React.JSX.Element {
         }
         
         // return registerCallback(onCodePush);
+      })
+      .catch((err) => {
+        logger.error("Failure when starting app: ", err);
       })
       .finally(() => {
         initAnalytics();

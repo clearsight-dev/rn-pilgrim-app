@@ -1,22 +1,46 @@
-// This file is generated at build time do not edit
-//
-// import {ApptileAnalytics} from 'apptile-core';
-// import {checkATTPermission, ApptileAnalytics, addCustomEventListener} from 'apptile-core';
-// import {FacebookAnalytics, FirebaseAnalytics, AppsFlyerAnalytics, MoengageAnalytics} from 'apptile-core';
-// import {checkATTPermission, Firebase as FirebaseAnalytics, addCustomEventListener} from 'apptile-core';
-import {checkATTPermission, addCustomEventListener, ApptileAnalytics} from 'apptile-core';
+// This file is generated at build time based on the integrations added to the app
+import {checkATTPermission, ApptileAnalytics, addCustomEventListener} from 'apptile-core';
 import {
-  // Facebook as FacebookAnalytics, 
-  // Firebase as FirebaseAnalytics, 
-  // AppsFlyer as AppsFlyerAnalytics, 
-  // Moengage as MoengageAnalytics,
-  // registerForMoengageNotification,
-  OneSignal as OneSignalAnalytics
+  Firebase as FirebaseAnalytics, 
+  Facebook as FacebookAnalytics,
+  Moengage as MoengageAnalytics,
+  // __ENABLED_ANALYTICS_IMPORTS__
 } from 'apptile-core';
+
+import {
+  initStoreWithRootSagas,
+} from 'apptile-core';
+
+import { loadDatasourcePlugins } from 'apptile-datasource';
+import { initPlugins } from 'apptile-plugins';
+import { loadDatasourcePlugins as loadShopifyPlugins } from 'apptile-shopify';
+// __EXTRA_LEGACY_PLUGIN_IMPORTS__
+
+import { initNavs } from '../remoteCode/indexNav';
+import { initPlugins as initRemotePlugins } from '../remoteCode';
+
+initStoreWithRootSagas();
+loadDatasourcePlugins();
+initPlugins();
+initRemotePlugins();
+initNavs();
+
+// The plugins initialized here will not be available in the web
+// as an addon. This is only meant for toggling exsiting plugins which
+// are tightly integrated with apptile-core. Use remoteCode folder for 
+// everything else
+loadShopifyPlugins();
+// __EXTRA_LEGACY_INITIALIZERS__
+
 export async function init() {
   try {
     await checkATTPermission();
-    await ApptileAnalytics.initialize([OneSignalAnalytics]);
+    await ApptileAnalytics.initialize([
+      FirebaseAnalytics, 
+      FacebookAnalytics,
+      MoengageAnalytics,
+      // __ENABLED_ANALYTICS__
+    ]);
   } catch (err) {
     console.error('Failure in initializing ApptileAnalytics');
   }
@@ -25,19 +49,3 @@ export async function init() {
 addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
   ApptileAnalytics.sendEvent(type, name, params);
 });
-
-// addCustomEventListener('ApptileAnalyticsSendInternalEvent', (type, name, params) => {
-//   ApptileAnalytics.sendInternalEvent(type, name, params);
-// });
-// 
-// addCustomEventListener('registerForMoengageNotification', token => {
-//   registerForMoengageNotification(token);
-// });
-// 
-// addCustomEventListener('markStart', (label: string, meta: any) => {
-//   ApptileAnalytics.markStart(label, meta);
-// });
-// 
-// addCustomEventListener('markEnd', (label: string, meta: any) => {
-//   ApptileAnalytics.markEnd(label, meta);
-// });

@@ -1,3 +1,3 @@
 export default { 
-  onDeepLink: () => console.log('stubbed appsflyer onDeeplink')
+onDeepLink: () => console.log('stubbed appsflyer onDeeplink')
 };

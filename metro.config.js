@@ -1,5 +1,6 @@
 const chalk = require('chalk')
 const path = require('path');
+const fs = require('fs');
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 const metroResolver = require('metro-resolver');
 require("dotenv/config");
@@ -20,52 +21,37 @@ IS_EC2=${process.env.IS_EC2}
 const defaultConfigs = getDefaultConfig(__dirname);
 let rootPath = path.resolve(__dirname, `/Users/gauravgautam/apptile-cli-home/ReactNativeTSProjeect/packages`);
 
+const extraModules = JSON.parse(
+  fs.readFileSync(
+    path.resolve(__dirname, 'extra_modules.json'),
+    {encoding: 'utf8'}
+  )
+);
+
 console.log("sdk path: " + rootPath);
 const sourceExts = defaultConfigs.resolver.sourceExts;
 const config = {
   resolver: {
     sourceExts: [...sourceExts, 'css', 'pcss', 'cjs'],
     resolveRequest: (context, moduleName, platform) => {
-      if (moduleName === 'apptile-core') {
-        let filePath = path.resolve(rootPath, 'apptile-core/sdk.ts');
-
-        return {
-          filePath,
-          type: 'sourceFile'
-        };
-      } else if (moduleName === 'apptile-plugins') {
-        let filePath = path.resolve(rootPath, 'apptile-plugins/index.ts');
-
-        return {
-          filePath,
-          type: 'sourceFile'
-        };
-      } else if (moduleName === 'asset_placeholder-image') {
-        let filePaths = [path.resolve(rootPath, 'apptile-app/app/assets/image-placeholder.png')];
-        return {
-          filePaths,
-          type: 'assetFiles'
-        };
-      } else if (moduleName === 'apptile-shopify') {
-        let filePath = path.resolve(rootPath, 'apptile-shopify/index.ts');
-        return {
-          filePath,
-          type: 'sourceFile'
-        };
-      } else if (moduleName === 'apptile-datasource') {
-        let filePath = path.resolve(rootPath, 'apptile-datasource/index.ts');
-        return {
-          filePath,
-          type: 'sourceFile'
-        };
-      } else if (moduleName === 'react-native-appsflyer') {
-        let filePath = path.resolve(__dirname, 'stubs/react-native-appsflyer/index.ts');
-        return {
-          filePath,
-          type: 'sourceFile'
-        };
+      let result = null;
+      for (let i = 0; i < extraModules.length; ++i) {
+        const mod = extraModules[i];
+        if (mod.name === moduleName) {
+          result = {
+            [mod.returnKey]: mod.path,
+            type: mod.returnType
+          };
+          break;
+        }
       }
-      return metroResolver.resolve({ ...context, resolveRequest: null }, moduleName, platform);
+
+      if (result) {
+        // console.log(result);
+        return result;
+      } else {
+        return metroResolver.resolve({ ...context, resolveRequest: null }, moduleName, platform);
+      }
     },
     nodeModulesPaths: [path.resolve(__dirname, 'node_modules')]
   },
@@ -73,9 +59,10 @@ const config = {
     path.resolve(__dirname, './node_modules'),
     path.resolve(rootPath, 'apptile-core'),
     path.resolve(rootPath, 'apptile-plugins'),
-    path.resolve(rootPath, 'apptile-shopify'),
     path.resolve(rootPath, 'apptile-datasource'),
     path.resolve(rootPath, 'apptile-app/app/assets'),
+    path.resolve(rootPath, 'apptile-shopify'),
+    // __PLACEHOLDER_WATCH__
   ],
 };
 
