@@ -98,5 +98,18 @@
     <string>xxx</string>
     <key>APP_ID</key>
     <string>4de62a28-c347-4628-b41a-9c88b4b54326</string>
+    <key>MoEngageAppDelegateProxyEnabled</key>
+    <false/>
+    <key>MoEngage</key>
+    <dict>
+      <key>ENABLE_LOGS</key>
+      <false/>
+      <key>MOENGAGE_APP_ID</key>
+      <string>xxx</string>
+      <key>DATA_CENTER</key>
+      <string>xxx</string>
+      <key>APP_GROUP_ID</key>
+      <string>group.com.apple.app.notification</string>
+    </dict>
   </dict>
 </plist>

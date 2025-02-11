@@ -66,13 +66,20 @@ FLAGS = feature_flags.select { |_key, value| [true,false].include?(value) }.keys
 target 'ImageNotification' do
   use_frameworks!
   pod 'GoogleUtilities'
-  if feature_flags.fetch('ENABLE_MOENGAGE_ANALYTICS', false)
+  if feature_flags.fetch('ENABLE_MOENGAGE', false)
     puts "Installing MoEngageRichNotification flag in ImageNotification"
     pod 'MoEngageRichNotification'
   end
   if feature_flags.fetch('ENABLE_ONESIGNAL', false)
     puts "Installing onesignal core in ImageNotification"
     pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
+  end
+end
+
+target 'NotificationContentExtension' do
+  use_frameworks!
+  if feature_flags.fetch('ENABLE_MOENGAGE', false)
+    pod 'MoEngageRichNotification'
   end
 end
 
@@ -165,6 +172,57 @@ target 'apptileSeed' do
       puts "------------"
     end
     
+    xcconfig_paths=[
+      "./Pods/Target Support Files/Pods-NotificationContentExtension/Pods-NotificationContentExtension.debug.xcconfig",
+      "./Pods/Target Support Files/Pods-NotificationContentExtension/Pods-NotificationContentExtension.release.xcconfig",
+    ]
+    
+    xcconfig_paths.each do |path|
+      if File.exist?(path)
+        puts "Modifying #{path} for SWIFT_ACTIVE_COMPILATION_CONDITIONS"
+        # Read the current filecontents
+        file_contents = File.read(path)
+    
+        updated_contents = file_contents
+        FLAGS.each do |flag|
+          flag_enabled = feature_flags[flag]
+          puts "Feature flag #{flag}: #{flag_enabled}"
+          if flag_enabled
+            puts "Adding #{flag}"
+            #Check if is already present
+            unless updated_contents.include?("#{flag}")
+              #Append to the SWIFT_ACTIVE_COMPILATION_CONDITIONS line or create it
+               updated_contents=updated_contents.gsub(
+                     /^SWIFT_ACTIVE_COMPILATION_CONDITIONS = (.+)$/i,
+                     'SWIFT_ACTIVE_COMPILATION_CONDITIONS = \1 ' + flag
+               )
+      
+              unless updated_contents.include?("SWIFT_ACTIVE_COMPILATION_CONDITIONS")
+                #If SWIFT_ACTIVE_COMPILATION_CONDITIONS is not present, add it
+                updated_contents+="\SWIFT_ACTIVE_COMPILATION_CONDITIONS = #{flag}\n"
+              end
+
+              puts "Added #{flag} to #{path}"
+            else
+              puts "#{flag} already exists in #{path} "
+            end
+          else
+            puts "Removing #{flag}"
+            if updated_contents.include?("#{flag}")
+              updated_contents=updated_contents.gsub(/\s*#{flag}/, '')
+              #Write the updated contents back to the file
+              puts "Removed from #{path}"
+            end
+          end
+        end
+        
+        File.write(path, updated_contents)
+      else
+        puts "File not found #{path}"
+      end
+      puts "------------"
+    end
+     
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,

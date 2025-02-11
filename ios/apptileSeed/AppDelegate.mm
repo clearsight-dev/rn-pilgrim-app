@@ -15,7 +15,7 @@
 #import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
 #endif
 
-#if ENABLE_MOENGAGE_ANALYTICS
+#if ENABLE_MOENGAGE
 #import <ReactNativeMoEngage/MoEngageInitializer.h>
 #import <MoEngageSDK/MoEngageSDK.h>
 #endif
@@ -44,7 +44,7 @@
   [FBSDKApplicationDelegate.sharedInstance initializeSDK];
 #endif
   
-#if ENABLE_MOENGAGE_ANALYTICS
+#if ENABLE_MOENGAGE
   NSString *moEngageAppId = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MOENGAGE_APPID"];
   NSString *moEngageDataCenterString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MOENGAGE_DATACENTER"];
   MoEngageDataCenter moEngageDataCenter;

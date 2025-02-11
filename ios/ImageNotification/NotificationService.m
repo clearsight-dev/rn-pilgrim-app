@@ -7,7 +7,7 @@
 
 #import "NotificationService.h"
 
-#if ENABLE_MOENGAGE_NOTIFICATIONS
+#if ENABLE_MOENGAGE
 @import MoEngageRichNotification;
 #endif
 
@@ -29,7 +29,7 @@
   self.contentHandler = contentHandler;
   self.bestAttemptContent = [request.content mutableCopy];
   
-#if ENABLE_MOENGAGE_NOTIFICATIONS
+#if ENABLE_MOENGAGE
   @try {
     // TODO(gaurav) get this from info.plist of notification service
     [MoEngageSDKRichNotification setAppGroupID: @"group.com.discoverpilgrimindia.notification"];

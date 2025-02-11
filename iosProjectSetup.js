@@ -148,6 +148,7 @@ async function addForceUnlinkForNativePackage(packageName, extraModules, parsedR
 async function addMoengage(
   analyticsTemplateRef, 
   infoPlist, 
+  notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
   extraModules
@@ -161,17 +162,35 @@ async function addMoengage(
   const moengageIntegration = apptileConfig.integrations.moengage;
   infoPlist.MOENGAGE_APPID = moengageIntegration.appId;
   infoPlist.MOENGAGE_DATACENTER = moengageIntegration.datacenter;
+  infoPlist.MoEngageAppDelegateProxyEnabled = false;
+  infoPlist.MoEngage = {
+    ENABLE_LOGS: false,
+    MOENGAGE_APP_ID: moengageIntegration.appId,
+    DATA_CENTER: moengageIntegration.datacenter,
+    APP_GROUP_ID: `group.${apptileConfig.info.ios.bundle_id}.notification`
+  }
+  notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionCategory =  "MOE_PUSH_TEMPLATE";
+  notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionInitialContentSizeRatio = 1.2;
+  notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionUserInteractionEnabled = true;
+  notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionDefaultContentHidden = true;
   
-  removeForceUnlinkForNativePackage('react-native-moengage', extraModules, parsedReactNativeConfig);
+  await removeForceUnlinkForNativePackage('react-native-moengage', extraModules, parsedReactNativeConfig);
 }
 
 async function removeMoengage(
   infoPlist, 
+  notificationContentInfoPlist,
   extraModules,
   parsedReactNativeConfig
 ) {
   delete infoPlist.MOENGAGE_APPID;
   delete infoPlist.MOENGAGE_DATACENTER;
+  delete infoPlist.MoEngageAppDelegateProxyEnabled;
+  delete infoPlist.MoEngage;
+  delete notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionCategory;
+  delete notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionInitialContentSizeRatio;
+  delete notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionUserInteractionEnabled;
+  delete notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionDefaultContentHidden;
 
   await addForceUnlinkForNativePackage('react-native-moengage', extraModules, parsedReactNativeConfig);
 }
@@ -179,6 +198,7 @@ async function removeMoengage(
 async function addAppsflyer(
   analyticsTemplateRef, 
   infoPlist, 
+  notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
   extraModules
@@ -198,6 +218,7 @@ async function addAppsflyer(
 
 async function removeAppsflyer(
   infoPlist, 
+  notificationContentInfoPlist,
   extraModules,
   parsedReactNativeConfig
 ) {
@@ -210,6 +231,7 @@ async function removeAppsflyer(
 async function addFacebook(
   analyticsTemplateRef, 
   infoPlist, 
+  notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
   extraModules
@@ -231,6 +253,7 @@ async function addFacebook(
 
 async function removeFacebook(
   infoPlist, 
+  notificationContentInfoPlist,
   extraModules,
   parsedReactNativeConfig
 ) {
@@ -375,11 +398,17 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
       ]
     };
 
+    // Notification Content extension Info.plist
+    const notificationContentExtensionInfoPlistLocation = path.resolve(iosFolderLocation, 'NotificationContentExtension/Info.plist');
+    const rawNotificationContentExtensionPlist = await readFile(notificationContentExtensionInfoPlistLocation, {encoding: 'utf8'});
+    const notificationContentExtensionPlist = plist.parse(rawNotificationContentExtensionPlist);
+
 
     // Add Info.plist updates
     const infoPlistLocation = path.resolve(iosFolderLocation, 'apptileSeed/Info.plist');
     const rawInfoPlist = await readFile(infoPlistLocation, {encoding: 'utf8'});
     const infoPlist = plist.parse(rawInfoPlist);
+
     infoPlist.APPTILE_API_ENDPOINT = apptileConfig.APPTILE_BACKEND_URL;
     infoPlist.APPTILE_UPDATE_ENDPOINT = apptileConfig.APPCONFIG_SERVER_URL;
     infoPlist.APP_ID = apptileConfig.APP_ID;
@@ -387,23 +416,23 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
     // For facebook analytics
     const parsedReactNativeConfig = await readReactNativeConfigJs();
     if (apptileConfig.feature_flags.ENABLE_FBSDK) {
-      await addFacebook(analyticsTemplateRef, infoPlist, apptileConfig, parsedReactNativeConfig, extraModules);
+      await addFacebook(analyticsTemplateRef, infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules);
     } else {
-      await removeFacebook(infoPlist, extraModules, parsedReactNativeConfig);
+      await removeFacebook(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     // For appsflyer analytics
     if (apptileConfig.feature_flags.ENABLE_APPSFLYER) {
-      await addAppsflyer(analyticsTemplateRef, infoPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+      await addAppsflyer(analyticsTemplateRef, infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
     } else {
-      await removeAppsflyer(infoPlist, extraModules, parsedReactNativeConfig);
+      await removeAppsflyer(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     // For moengage analytics
     if (apptileConfig.feature_flags.ENABLE_MOENGAGE) {
-      await addMoengage(analyticsTemplateRef, infoPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+      await addMoengage(analyticsTemplateRef, infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
     } else {
-      await removeMoengage(infoPlist, extraModules, parsedReactNativeConfig);
+      await removeMoengage(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     const updatedPlist = plist.build(infoPlist);
