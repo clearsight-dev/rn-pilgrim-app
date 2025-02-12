@@ -36,6 +36,8 @@
     <string/>
     <key>LSRequiresIPhoneOS</key>
     <true/>
+    <key>NSUserTrackingUsageDescription</key>
+    <string>Your privacy matters. We collect usage data to enhance your app experience. Rest assured, your information is handled securely and used solely for improvement</string>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
