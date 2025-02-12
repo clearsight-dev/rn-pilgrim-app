@@ -1,20 +1,17 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { 
   apptileNavigationRef, 
   ApptileWrapper, 
   ApptileAppRoot, 
 } from 'apptile-core';
 
-// Import the generated code. The folder analytics is generated when you run the app.
-import {init as initAnalytics} from './analytics';
-
 import JSSplash from './JSSplash';
 import UpdateModal from './UpdateModal';
-
 import AdminPage from './AdminPage';
 import FloatingUpdateModal from './FloatingUpdateModal';
+
 import {useStartApptile} from './useStartApptile';
 
 export type ScreenParams = {
@@ -22,6 +19,9 @@ export type ScreenParams = {
   NativeUtils: {appId: string};
   AdminPage: {appId: string};
 };
+
+// Import the generated code. The folder analytics is generated when you run the app.
+import {init as initAnalytics} from './analytics';
 
 const Stack = createNativeStackNavigator<ScreenParams>();
 
@@ -33,6 +33,10 @@ function App(): React.JSX.Element {
     body = (
       <NavigationContainer
         ref={apptileNavigationRef}
+        theme={{
+          ...DefaultTheme,
+          colors: status.theme
+        }}
       >
         <Stack.Navigator>
           <Stack.Screen name="NocodeRoot" component={ApptileAppRoot} options={{headerShown: false}} /> 

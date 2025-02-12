@@ -2,9 +2,11 @@ import {useState, useEffect} from 'react';
 import {
   getConfigValue,
   getAppStartAction,
-  numRootSagasStarted
+  numRootSagasStarted,
+  store
 } from 'apptile-core';
 import {Alert} from 'react-native';
+import _ from 'lodash';
 
 export function useStartApptile(initAnalytics) {
   const [localState, setLocalState] = useState({
@@ -12,8 +14,61 @@ export function useStartApptile(initAnalytics) {
     appId: null,
     hasUpdate: "notavailable", // "yes", "no"
     updateDownloaded: "notavailable", // "yes", "no"
+    theme: {
+      primary: "#000000", 
+      background: "#ffffff", 
+      card: "#ffffff", 
+      text: "#000000", 
+      border: "#ffffff",
+      notification: "#000000",
+    }
   });
   useEffect(() => {
+    let lastTheme = {...localState.theme}
+    let updateCount = 0;
+    const unsubscribe = store.subscribe(() => {
+      const state = store.getState()
+      const model = state.apptileTheme
+      if (model.modelInitialized) {
+        const themeValue = model.themeValue;
+        const primary = _.get(themeValue, 'colors.navPrimary');       
+        const background = _.get(themeValue, 'colors.navBackground');
+        const card = _.get(themeValue, 'colors.navCard');
+        const text = _.get(themeValue, 'colors.navText');
+        const border = _.get(themeValue, 'colors.navBorder');
+        const notification = _.get(themeValue, 'colors.navBadge');
+        let hasChanges = false
+        hasChanges = hasChanges || (lastTheme.primary !== primary);
+        hasChanges = hasChanges || (lastTheme.background !== background);
+        hasChanges = hasChanges || (lastTheme.card !== card);
+        hasChanges = hasChanges || (lastTheme.text !== text);
+        hasChanges = hasChanges || (lastTheme.border !== border);
+        hasChanges = hasChanges || (lastTheme.notification !== notification);
+
+        if (hasChanges) {
+          lastTheme = {
+            primary,
+            background,
+            card,
+            text,
+            border,
+            notification
+          }
+          setLocalState(prev => {
+            return {
+              ...prev,
+              theme: lastTheme
+            };
+          })
+          updateCount++;
+        }
+
+        if (updateCount > 15) {
+          unsubscribe()
+        }
+      }
+    });
+
     logger.info("starting app");
     // NativeDevSettings.setIsDebuggingRemotely(false);
     function tryToDispathStart(action) {
@@ -82,7 +137,13 @@ export function useStartApptile(initAnalytics) {
         initAnalytics();
       });
 
-    return () => {};
+    return () => {
+      try {
+        unsubscribe();
+      } catch(err) {
+        console.error("Failed to unsubscribe from store");
+      }
+    };
   }, []);
 
   return localState;
