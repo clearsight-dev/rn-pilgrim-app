@@ -1,14 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {ScrollView, View, Text, Button, Image, Platform, ActivityIndicator} from 'react-native';
 import RNFetchBlob from 'rn-fetch-blob';
 import RNRestart from 'react-native-restart';
-import axios from 'axios';
 import LottieView from 'lottie-react-native';
-import {CLI_BASE_URL} from './apptile.config'
 import {getAppStartAction} from 'apptile-core';
 
-const PLUGIN_SERVER_URL = `http://${CLI_BASE_URL}`;
-export default function UpdateModal({navigation, route, onDismiss}) {
+export default function UpdateModal({route, onDismiss}) {
   const appId = route.params.appId;
   const [logText, setLogText] = useState([]);
   const [isDownloadingUpdate, setIsDownloadingUpdate] = useState(false);
@@ -86,7 +83,7 @@ export default function UpdateModal({navigation, route, onDismiss}) {
           marginBottom: 20,
           borderRadius: 8,
         }}
-        source={require('./assets/logo.png')} 
+        source={require('../assets/logo.png')} 
         resizeMode='contain'
       />
       <Text 
@@ -111,7 +108,7 @@ export default function UpdateModal({navigation, route, onDismiss}) {
           width: '100%',
           height: 200,
         }}
-        source={require('./assets/loadingplane.json')}
+        source={require('../assets/loadingplane.json')}
         autoPlay
         loop
       />

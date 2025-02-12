@@ -7,7 +7,7 @@ export default function JSSplash() {
       <Image 
         resizeMode={"cover"}
         style={{width: '100%', height: '100%'}}
-        source={require('./assets/splash.png')} 
+        source={require('../assets/splash.png')} 
       />
     </View>
   );

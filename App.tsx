@@ -8,10 +8,10 @@ import {
   useStartApptile
 } from 'apptile-core';
 
-import JSSplash from './JSSplash';
-import UpdateModal from './UpdateModal';
-import AdminPage from './AdminPage';
-import FloatingUpdateModal from './FloatingUpdateModal';
+import JSSplash from './components/JSSplash';
+import UpdateModal from './components/UpdateModal';
+import AdminPage from './components/AdminPage';
+import FloatingUpdateModal from './components/FloatingUpdateModal';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
