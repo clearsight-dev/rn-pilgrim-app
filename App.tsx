@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, Modal, View, Button, Pressable } from 'react-native';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-// import NativeDevSettings from 'react-native/Libraries/NativeModules/specs/NativeDevSettings';
 import { 
   apptileNavigationRef, 
-  getAppStartAction,  
   ApptileWrapper, 
   ApptileAppRoot, 
-  getAppDispatch,
-  getConfigValue
 } from 'apptile-core';
+
+// Import the generated code. The folder analytics is generated when you run the app.
+import {init as initAnalytics} from './analytics';
 
 import JSSplash from './JSSplash';
 import UpdateModal from './UpdateModal';
 
-import {init as initAnalytics} from './analytics';
 import AdminPage from './AdminPage';
+import FloatingUpdateModal from './FloatingUpdateModal';
+import {useStartApptile} from './useStartApptile';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
@@ -27,62 +26,10 @@ export type ScreenParams = {
 const Stack = createNativeStackNavigator<ScreenParams>();
 
 function App(): React.JSX.Element {
-  const dispatch = getAppDispatch();  
-  const [showCodepushModal, setShowCodepushModal] = useState(false);
-  const [startingConf, setStartingConf] = useState({isDownloading: true, appId: undefined});
+  const status = useStartApptile(initAnalytics);
 
-  useEffect(() => {
-    logger.info("starting app");
-    // NativeDevSettings.setIsDebuggingRemotely(false);
-    const startP = getConfigValue('APP_ID')
-      .then(appId => {
-        logger.info("starting app with appId", appId);
-        if (appId) {
-          return getAppStartAction(appId)
-            .then(startAction => ({startAction, appId}))
-        } else {
-          logger.info('failed to get appstart action');
-          throw new Error("Cannot launch app without APP_ID. Make sure its present in strings.xml or info.plist. It should get inserted via apptile.config.json");
-        }
-      })
-      .then(({startAction, appId}) => {
-        if (startAction.hasError) {
-          logger.info("Error ocurred while trying to get config: ", startAction);
-          Alert.alert("Couldn't load app. Please restart.");
-        }
-        setStartingConf({isDownloading: false, appId});
-        setTimeout(() => {
-          // last ditch effort to make the app load everytime
-          logger.info('dispatching appstart action');
-          dispatch(startAction.action)
-        }, 100);
-        return startAction.updateCheckResult;
-      })
-      .then(({updateCheckResult}) => {
-        if (updateCheckResult) {
-          setShowCodepushModal(true);
-        }
-        
-        // return registerCallback(onCodePush);
-      })
-      .catch((err) => {
-        logger.error("Failure when starting app: ", err);
-      })
-      .finally(() => {
-        initAnalytics();
-      });
-
-    return () => {
-      startP.then(unregisterSocketListener => {
-        // unregisterSocketListener();
-      })
-    };
-  }, []);
-
-
-  let body = <JSSplash />;
-
-  if (!startingConf.isDownloading) {
+  let body = null;
+  if (!status.isDownloading) {
     body = (
       <NavigationContainer
         ref={apptileNavigationRef}
@@ -93,65 +40,47 @@ function App(): React.JSX.Element {
             name="NativeUtils" 
             component={UpdateModal} 
             options={{headerShown: true}} 
-            initialParams={{appId: startingConf.appId}} 
+            initialParams={{appId: status.appId}} 
           />
           <Stack.Screen 
             name="AdminPage" 
             component={AdminPage} 
             options={{headerShown: true}}
-            initialParams={{appId: startingConf.appId}}
+            initialParams={{appId: status.appId}}
           />
         </Stack.Navigator>
       </NavigationContainer>
     );
+  } else {
+    body = <JSSplash />;
   }
 
+  let updateModal = null;
+  if (status.hasUpdate === "yes") {
+    // Note that you can use status.updateDownloaded === "yes" to show this, 
+    // if you want to wait till the update is fully downloaded. In that case the
+    // app will restart as soon as the modal is dismissed
+    // If you want to show the update modal as soon as you have determined that there
+    // is an update and want the download to happen while the modal is being 
+    // displayed then use the status.hasUpdate
+    updateModal = (<FloatingUpdateModal 
+      navigationRef={apptileNavigationRef}
+      appId={status.appId}
+      updateDownloaded={status.updateDownloaded}
+    />);
+  }
+
+  // The nocode layer will not do navigation to these screens so you can handle those navigations in the onNavigationEvent
   return (
     <ApptileWrapper
-      noNavigatePaths={["NativeUtils", "AdminPage"]} // The nocode layer will not do navigation to these screens so you can handle those navigations in the onNavigationEvent
+      noNavigatePaths={["NativeUtils", "AdminPage"]} 
       onNavigationEvent={(ev) => {
         console.log("handle navigation event", ev)
-        apptileNavigationRef.current.navigate(ev.screenName, {appId: startingConf.appId});
+        apptileNavigationRef.current.navigate(ev.screenName, {appId: status.appId});
       }}
     >
       {body}
-      {
-        showCodepushModal && (
-          <Modal
-            visible={showCodepushModal} 
-            transparent={true}
-            animationType="slide"
-            onRequestClose={() => setShowCodepushModal(false)}
-          >
-            <Pressable
-              style={{
-                width: '100%',
-                height: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: "#000000cc"
-              }}
-              onPress={() => setShowCodepushModal(false)}
-            >
-              <View
-                style={{
-                  width: '90%',
-                  height: '80%',
-                  padding: 12,
-                  backgroundColor: 'white',
-                  borderRadius: 8
-                }}
-              >
-                <UpdateModal
-                  onDismiss={() => setShowCodepushModal(false)}
-                  navigation={apptileNavigationRef}
-                  route={{params: {appId: startingConf.appId}}}
-                />
-              </View>
-            </Pressable>
-          </Modal>
-        )
-      }
+      {updateModal}
     </ApptileWrapper>
   );
 }
