@@ -5,14 +5,13 @@ import {
   apptileNavigationRef, 
   ApptileWrapper, 
   ApptileAppRoot, 
+  useStartApptile
 } from 'apptile-core';
 
 import JSSplash from './JSSplash';
 import UpdateModal from './UpdateModal';
 import AdminPage from './AdminPage';
 import FloatingUpdateModal from './FloatingUpdateModal';
-
-import {useStartApptile} from './useStartApptile';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
@@ -29,7 +28,9 @@ function App(): React.JSX.Element {
   const status = useStartApptile(initAnalytics);
 
   let body = null;
-  if (!status.isDownloading) {
+  if (status.isDownloading) {
+    body = <JSSplash/>;
+  } else {
     body = (
       <NavigationContainer
         ref={apptileNavigationRef}
@@ -55,8 +56,6 @@ function App(): React.JSX.Element {
         </Stack.Navigator>
       </NavigationContainer>
     );
-  } else {
-    body = <JSSplash />;
   }
 
   let updateModal = null;
