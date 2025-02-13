@@ -24,6 +24,7 @@ export function ReactComponent({model}) {
 
 export const WidgetConfig = {
   value: '',
+  reloadOnFocus: false
 };
 
 export const WidgetEditors = {
@@ -35,6 +36,13 @@ export const WidgetEditors = {
         label: 'Value',
       },
     },
+    {
+      type: 'codeInput',
+      name: 'reloadOnFocus',
+      props: {
+        label: 'Reload on focus'
+      }
+    }
   ],
 };
 

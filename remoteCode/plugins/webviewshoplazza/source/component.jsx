@@ -9,32 +9,37 @@ import {Platform} from 'react-native';
 export function ReactComponent({model}) {
   const dispatch = useDispatch();
   const value = model.get('value')?.toString();
+  const reloadOnFocus = model.get('reloadOnFocus') || false;
   const [isLoading, setIsLoading] = useState(true);
   const [webViewKey, setWebViewKey] = useState(1);
   const webviewRef = useRef(null);
+  console.log("webview value: ", value)
   useFocusEffect(
     React.useCallback(() => {
-      setIsLoading(true);
-      setWebViewKey(Date.now());
-      console.log('Screen is focused!');
+      if (reloadOnFocus) {
+        setIsLoading(true);
+        setWebViewKey(Date.now());
+        console.log('Screen is focused!');
+      }
 
       return () => {
         console.log('Screen is unfocused!');
       };
-    }, []),
+    }, [reloadOnFocus]),
   );
 
   const handleNavigationStateChange = navState => {
     const {url} = navState;
     try {
+      console.log("Routing to :", url, navState)
       // Routing logic based on specific path patterns
-      if (
-        Platform.OS !== 'android' &&
-        !navState.isTopFrame &&
-        navState.navigationType != 'click'
-      ) {
-        return true;
-      }
+      // if (
+      //   Platform.OS !== 'android' &&
+      //   !navState.isTopFrame &&
+      //   navState.navigationType != 'click'
+      // ) {
+      //   return true;
+      // }
       if (value === url) {
         return true;
       } else if (/^https?:\/\/[^\/]+\/products\/[^\/]+/.test(url)) {
@@ -141,6 +146,7 @@ const styles = StyleSheet.create({
 
 export const WidgetConfig = {
   value: '',
+  reloadOnFocus: false 
 };
 
 export const WidgetEditors = {
@@ -152,6 +158,13 @@ export const WidgetEditors = {
         label: 'Value',
       },
     },
+    {
+      type: 'codeInput',
+      name: 'reloadOnFocus',
+      props: {
+        label: 'Reload on focus',
+      },
+    }
   ],
 };
 
