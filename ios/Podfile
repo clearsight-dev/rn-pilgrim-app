@@ -94,6 +94,7 @@ end
 apptile_config_path = '../apptile.config.json'
 apptile_config = JSON.parse(File.read(apptile_config_path))
 feature_flags = apptile_config.fetch('feature_flags', {})
+bundle_id = apptile_config.dig('ios', 'bundle_id') || 'com.apptile.apptilepreviewdemo'
 FLAGS = feature_flags.select { |_key, value| [true,false].include?(value) }.keys
 
 target 'ImageNotification' do
@@ -153,13 +154,13 @@ target 'apptileSeed' do
   post_install do |installer|
     puts "trying to add preprocessor flag"
     xcconfig_paths=[
-      "./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.debug.xcconfig",
-      "./Pods/Target Support Files/Pods-ImageNotification/Pods-ImageNotification.debug.xcconfig",
-      "./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.release.xcconfig",
-      "./Pods/Target Support Files/Pods-ImageNotification/Pods-ImageNotification.release.xcconfig",
+      ["./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.debug.xcconfig", bundle_id],
+      ["./Pods/Target Support Files/Pods-ImageNotification/Pods-ImageNotification.debug.xcconfig", bundle_id + '.ImageNotification'],
+      ["./Pods/Target Support Files/Pods-apptileSeed/Pods-apptileSeed.release.xcconfig", bundle_id], 
+      ["./Pods/Target Support Files/Pods-ImageNotification/Pods-ImageNotification.release.xcconfig", bundle_id + '.ImageNotification']
     ]
     
-    xcconfig_paths.each do |path|
+    xcconfig_paths.each do |path, productBundleIdentifier|
       if File.exist?(path)
         puts "Modifying #{path}"
         # Read the current filecontents
@@ -198,6 +199,15 @@ target 'apptileSeed' do
           end
         end
         
+        updated_contents=updated_contents.gsub(
+          /^PRODUCT_BUNDLE_IDENTIFIER = (.+)$/i,
+          'PRODUCT_BUNDLE_IDENTIFIER = ' + productBundleIdentifier 
+        )
+
+        unless updated_contents.include?("PRODUCT_BUNDLE_IDENTIFIER")
+          updated_contents+="\nPRODUCT_BUNDLE_IDENTIFIER = #{productBundleIdentifier}\n"
+        end
+
         File.write(path, updated_contents)
       else
         puts "File not found #{path}"
@@ -206,11 +216,11 @@ target 'apptileSeed' do
     end
     
     xcconfig_paths=[
-      "./Pods/Target Support Files/Pods-NotificationContentExtension/Pods-NotificationContentExtension.debug.xcconfig",
-      "./Pods/Target Support Files/Pods-NotificationContentExtension/Pods-NotificationContentExtension.release.xcconfig",
+      ["./Pods/Target Support Files/Pods-NotificationContentExtension/Pods-NotificationContentExtension.debug.xcconfig", bundle_id + '.NotificationContentExtension'],
+      ["./Pods/Target Support Files/Pods-NotificationContentExtension/Pods-NotificationContentExtension.release.xcconfig", bundle_id + '.NotificationContentExtension'],
     ]
     
-    xcconfig_paths.each do |path|
+    xcconfig_paths.each do |path, productBundleIdentifier|
       if File.exist?(path)
         puts "Modifying #{path} for SWIFT_ACTIVE_COMPILATION_CONDITIONS"
         # Read the current filecontents
@@ -232,7 +242,7 @@ target 'apptileSeed' do
       
               unless updated_contents.include?("SWIFT_ACTIVE_COMPILATION_CONDITIONS")
                 #If SWIFT_ACTIVE_COMPILATION_CONDITIONS is not present, add it
-                updated_contents+="\SWIFT_ACTIVE_COMPILATION_CONDITIONS = #{flag}\n"
+                updated_contents+="\nSWIFT_ACTIVE_COMPILATION_CONDITIONS = #{flag}\n"
               end
 
               puts "Added #{flag} to #{path}"
@@ -248,7 +258,16 @@ target 'apptileSeed' do
             end
           end
         end
-        
+
+        updated_contents=updated_contents.gsub(
+          /^PRODUCT_BUNDLE_IDENTIFIER = (.+)$/i,
+          'PRODUCT_BUNDLE_IDENTIFIER = ' + productBundleIdentifier 
+        )
+
+        unless updated_contents.include?("PRODUCT_BUNDLE_IDENTIFIER")
+          updated_contents+="\nPRODUCT_BUNDLE_IDENTIFIER = #{productBundleIdentifier}\n"
+        end
+
         File.write(path, updated_contents)
       else
         puts "File not found #{path}"

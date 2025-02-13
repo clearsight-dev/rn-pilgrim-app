@@ -16,8 +16,21 @@
 const plist = require('plist');
 const path = require('path');
 const axios = require('axios');
-const {readFile, writeFile, readdir, rmdir, mkdir} = require('node:fs/promises');
+const util = require('util');
+const {exec: exec_} = require('child_process');
+const {readFile, writeFile, readdir, rmdir, mkdir, rename} = require('node:fs/promises');
 const {createWriteStream} = require('fs');
+
+const exec = util.promisify(exec_);
+
+async function generateIconSet(scriptPath) {
+  await exec(`${scriptPath} ${path.resolve(__dirname, 'assets', 'icon.png')} ./`, {cwd: path.resolve(__dirname)});
+  await rmdir(path.resolve(__dirname, 'ios', 'apptileSeed', 'Images.xcassets'), {recursive: true});
+  await rename(
+    path.resolve(__dirname, 'Images.xcassets'), 
+    path.resolve(__dirname, 'ios', 'apptileSeed', 'Images.xcassets')
+  );
+}
 
 async function writeReactNativeConfigJs(parsedReactNativeConfig) {
   const updatedConfig = `module.exports = ${JSON.stringify(parsedReactNativeConfig, null, 2)}`;
@@ -29,6 +42,27 @@ async function readReactNativeConfigJs() {
   const parsable = contents.replace(/module.exports\s?=/, '');
   const parsedConfig = JSON.parse(parsable);
   return parsedConfig;
+}
+
+async function downloadFile(url, fileName) {
+  const outputPath = path.resolve(__dirname, 'assets', fileName); 
+  try {
+    const response = await axios({
+      url, 
+      method: 'GET',
+      responseType: 'stream'
+    });
+
+    const writer = createWriteStream(outputPath);
+    response.data.pipe(writer);
+
+    return new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+  } catch(err) {
+    console.error("Failed to download asset ", fileName, err);
+  }
 }
 
 const packageStubs = {
@@ -167,7 +201,7 @@ async function addMoengage(
     ENABLE_LOGS: false,
     MOENGAGE_APP_ID: moengageIntegration.appId,
     DATA_CENTER: moengageIntegration.datacenter,
-    APP_GROUP_ID: `group.${apptileConfig.info.ios.bundle_id}.notification`
+    APP_GROUP_ID: `group.${apptileConfig.ios.bundle_id}.notification`
   }
   notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionCategory =  "MOE_PUSH_TEMPLATE";
   notificationContentInfoPlist.NSExtension.NSExtensionAttributes.UNNotificationExtensionInitialContentSizeRatio = 1.2;
@@ -357,6 +391,17 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
       {encoding: 'utf8'}
     );
     const apptileConfig = JSON.parse(apptileConfigRaw);
+    for (let i = 0; i < apptileConfig.assets.length; ++i) {
+      const asset = apptileConfig.assets[i];
+      if (asset.assetClass === 'splash') {
+        console.log("Downloading splash");
+        await downloadFile(asset.url, asset.fileName);
+      } else if (asset.assetClass === 'icon') {
+        await downloadFile(asset.url, asset.fileName);
+        await generateIconSet(path.resolve(apptileConfig.SDK_PATH, 'packages/apptile-app/devops/scripts/ios/iconset-generator.sh'));
+      }
+    }
+
     const extraModules = {
       SDK_PATH: apptileConfig.SDK_PATH,
       current: [
@@ -403,6 +448,19 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
     const rawNotificationContentExtensionPlist = await readFile(notificationContentExtensionInfoPlistLocation, {encoding: 'utf8'});
     const notificationContentExtensionPlist = plist.parse(rawNotificationContentExtensionPlist);
 
+    // Entitlements
+    const apptileSeedEntitlementsLocation = path.resolve(iosFolderLocation, 'apptileSeed', 'apptileSeed.entitlements');
+    const rawApptileSeedEntitlements = await readFile(apptileSeedEntitlementsLocation, {encoding: 'utf8'});
+    const apptileSeedEntitlements = plist.parse(rawApptileSeedEntitlements);
+
+    const imageNotificationEntitlementsLocation = path.resolve(iosFolderLocation, 'ImageNotification', 'ImageNotification.entitlements');
+    const rawImageNotifEntitlements = await readFile(imageNotificationEntitlementsLocation, {encoding: 'utf8'});
+    const imageNotificationEntitlements = plist.parse(rawImageNotifEntitlements);
+
+    const notificationContentEntitlementsLocation = path.resolve(iosFolderLocation, 'NotificationContentExtension', 'NotificationContentExtension.entitlements');
+    const rawNotifContentEntitlements = await readFile(notificationContentEntitlementsLocation, {encoding: 'utf8'});
+    const notificationContentEntitlements = plist.parse(rawNotifContentEntitlements);
+
 
     // Add Info.plist updates
     const infoPlistLocation = path.resolve(iosFolderLocation, 'apptileSeed/Info.plist');
@@ -412,6 +470,13 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
     infoPlist.APPTILE_API_ENDPOINT = apptileConfig.APPTILE_BACKEND_URL;
     infoPlist.APPTILE_UPDATE_ENDPOINT = apptileConfig.APPCONFIG_SERVER_URL;
     infoPlist.APP_ID = apptileConfig.APP_ID;
+    infoPlist.CFBundleDisplayName = apptileConfig.app_name || 'Apptile Seed';
+
+    const bundle_id = apptileConfig.ios.bundle_id || 'com.apptile.apptilepreviewdemo';
+
+    apptileSeedEntitlements['com.apple.security.application-groups'] = [`group.${bundle_id}.notification`];
+    imageNotificationEntitlements['com.apple.security.application-groups'] = [`group.${bundle_id}.notification`];
+
 
     // For facebook analytics
     const parsedReactNativeConfig = await readReactNativeConfigJs();
@@ -436,8 +501,17 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
     }
 
     const updatedPlist = plist.build(infoPlist);
-    console.log("Info.plist updated: " + updatedPlist);
     await writeFile(infoPlistLocation, updatedPlist);
+
+    const updatedApptileSeedEntitlements = plist.build(apptileSeedEntitlements);
+    await writeFile(apptileSeedEntitlementsLocation, updatedApptileSeedEntitlements);
+
+    const updatedImagenotifEntitlements = plist.build(imageNotificationEntitlements);
+    await writeFile(imageNotificationEntitlementsLocation, updatedImagenotifEntitlements);
+
+    const updatedNotifContentEntitlements = plist.build(notificationContentEntitlements);
+    await writeFile(notificationContentEntitlementsLocation, updatedNotifContentEntitlements);
+    
 
     // Get the manifest to identify latest appconfig, then write appConfig.json and localBundleTracker.json 
     // TODO(gaurav): use the cdn here as well
