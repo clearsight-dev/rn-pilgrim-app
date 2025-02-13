@@ -2,8 +2,6 @@
 import {checkATTPermission, ApptileAnalytics, addCustomEventListener} from 'apptile-core';
 import {
   Firebase as FirebaseAnalytics, 
-  Facebook as FacebookAnalytics,
-  Moengage as MoengageAnalytics,
   // __ENABLED_ANALYTICS_IMPORTS__
 } from 'apptile-core';
 
@@ -13,7 +11,6 @@ import {
 
 import { loadDatasourcePlugins } from 'apptile-datasource';
 import { initPlugins } from 'apptile-plugins';
-import { loadDatasourcePlugins as loadShopifyPlugins } from 'apptile-shopify';
 // __EXTRA_LEGACY_PLUGIN_IMPORTS__
 
 import { initNavs } from '../remoteCode/indexNav';
@@ -29,7 +26,6 @@ initNavs();
 // as an addon. This is only meant for toggling exsiting plugins which
 // are tightly integrated with apptile-core. Use remoteCode folder for 
 // everything else
-loadShopifyPlugins();
 // __EXTRA_LEGACY_INITIALIZERS__
 
 export async function init() {
@@ -37,8 +33,6 @@ export async function init() {
     await checkATTPermission();
     await ApptileAnalytics.initialize([
       FirebaseAnalytics, 
-      FacebookAnalytics,
-      MoengageAnalytics,
       // __ENABLED_ANALYTICS__
     ]);
   } catch (err) {
