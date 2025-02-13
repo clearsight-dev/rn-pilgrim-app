@@ -1,1 +1,0 @@
-export {default as ImageZoom} from 'react-native-image-pan-zoom';
