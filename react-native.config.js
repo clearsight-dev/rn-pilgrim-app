@@ -11,6 +11,18 @@ module.exports = {
         "android": null,
         "ios": null
       }
+    },
+    "react-native-fbsdk-next": {
+      "platforms": {
+        "android": null,
+        "ios": null
+      }
+    },
+    "react-native-moengage": {
+      "platforms": {
+        "android": null,
+        "ios": null
+      }
     }
   }
 }
