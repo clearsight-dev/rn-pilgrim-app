@@ -33,9 +33,7 @@ try {
   throw err;
 }
 
-const extraModules = JSON.parse(
-  
-);
+const extraModules = JSON.parse(rawExtraModules);
 
 const watchPaths = Object.keys(
   extraModules.reduce((pathObj, modObj) => {
