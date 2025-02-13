@@ -5,15 +5,16 @@ export const queryDetails = {
       apiBaseUrl: '',
     },
     transformer: data => {
-      return data.data.products.map(product => {
-        console.log(product, 'https:' + product?.image?.src);
-        return {
-          ...product,
-          featuredImage: product?.image?.src
-            ? `https:${product?.image?.src}`
-            : '',
-        };
-      });
+      return {
+        data: data.data.products.map(product => {
+          return {
+            ...product,
+            featuredImage: product?.image?.src
+              ? `https:${product?.image?.src}`
+              : '',
+          };
+        }),
+      };
     },
     paginationResolver: null,
     inputResolver: null,

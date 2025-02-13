@@ -33,14 +33,13 @@ export function ReactComponent({model}) {
     try {
       console.log("Routing to :", url, navState)
       // Routing logic based on specific path patterns
-      // if (
-      //   Platform.OS !== 'android' &&
-      //   !navState.isTopFrame &&
-      //   navState.navigationType != 'click'
-      // ) {
-      //   return true;
-      // }
-      if (value === url) {
+      if (
+        Platform.OS !== 'android' &&
+        !navState.isTopFrame &&
+        navState.navigationType != 'click'
+      ) {
+        return true;
+      } else if (value === url) {
         return true;
       } else if (/^https?:\/\/[^\/]+\/products\/[^\/]+/.test(url)) {
         dispatch(navigateToScreen('Product', {url: url}));
@@ -121,7 +120,6 @@ export function ReactComponent({model}) {
           if(window.Apptile) window.Apptile.sendRawMessageAsync({event: 'stopLoading', type: 'get'})
         `}
         onLoadEnd={() => {
-          loadScript();
           setTimeout(() => setIsLoading(false), 100);
         }}
         javaScriptEnabled={true}
