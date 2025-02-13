@@ -21,11 +21,20 @@ IS_EC2=${process.env.IS_EC2}
 const defaultConfigs = getDefaultConfig(__dirname);
 let rootPath = path.resolve(__dirname, `/Users/gauravgautam/apptile-cli-home/ReactNativeTSProjeect/packages`);
 
-const extraModules = JSON.parse(
-  fs.readFileSync(
+let rawExtraModules;
+
+try {
+  rawExtraModules = fs.readFileSync(
     path.resolve(__dirname, 'extra_modules.json'),
     {encoding: 'utf8'}
-  )
+  );
+} catch(err) {
+  console.error(chalk.red('Extra_modules.json was not found! To generate it run the app from xcode or android studio once, then start metro'));
+  throw err;
+}
+
+const extraModules = JSON.parse(
+  
 );
 
 const watchPaths = Object.keys(
