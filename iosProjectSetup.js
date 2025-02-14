@@ -21,6 +21,7 @@ const {exec: exec_} = require('child_process');
 const {readFile, writeFile, rmdir, rename} = require('node:fs/promises');
 
 const {
+  downloadFile,
   analyticsTemplate,
   generateAnalytics,
   removeForceUnlinkForNativePackage,
