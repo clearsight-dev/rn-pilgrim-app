@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const axios = require('axios');
 const path = require('path');
 const {createWriteStream} = require('fs');
@@ -321,7 +322,7 @@ async function downloadIconAndSplash(apptileConfig) {
         await downloadFileToAssets(asset.url, asset.fileName);
       }
     } catch (err) {
-      console.error(chalk.red('Failed to download asset ', asset.assetClass));
+      console.error(chalk.red('Failed to download asset'));
       result = false;
     }
   }
