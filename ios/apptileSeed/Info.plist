@@ -7,11 +7,11 @@
     <key>APPTILE_UPDATE_ENDPOINT</key>
     <string>https://appconfigs.apptile.io</string>
     <key>APP_ID</key>
-    <string></string>
+    <string>2299b5c8-77d8-4500-9723-c0ccfe91694d</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>Apptile Seed</string>
+    <string>Pilgrim SDK staging</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
