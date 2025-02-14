@@ -8,7 +8,8 @@
     "build-android": "react-native run-android --task bundleAndAssembleRelease",
     "build-ios": "react-native build-ios",
     "lint": "eslint .",
-    "start": "react-native start"
+    "start": "react-native start",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@apollo/client": "3.10.7",
