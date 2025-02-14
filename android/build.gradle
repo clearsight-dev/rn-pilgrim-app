@@ -24,10 +24,13 @@ allprojects {
         google()
         mavenCentral()
         maven { url "https://storage.googleapis.com/logrocket-maven/" }
-        jcenter() {
-            content {
-                includeModule("com.yqritc", "android-scalablevideoview")
-            }
+        // jcenter() {
+        //     content {
+        //         includeModule("com.yqritc", "android-scalablevideoview")
+        //     }
+        // }
+        flatDir {
+            dirs "$rootDir/libs"
         }
     }
 }
