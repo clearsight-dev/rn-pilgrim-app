@@ -177,7 +177,8 @@
     "react-test-renderer": "18.2.0",
     "typescript": "5.0.4",
     "unzipper": "^0.12.3",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "xml2js": "^0.6.2"
   },
   "engines": {
     "node": ">=18"

@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 apply plugin: "com.android.application"
 apply plugin: 'com.google.gms.google-services'
 
@@ -73,6 +75,16 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+def configFile = file("../../apptile.config.json")
+def bundleId = "com.apptile.apptilepreviewdemo"
+
+if (configFile.exists()) {
+    def json = new JsonSlurper().parseText(configFile.text)
+    if (json.android && json.android.bundle_id) {
+        bundleId = json.android.bundle_id
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -80,7 +92,7 @@ android {
 
     namespace "com.apptileseed"
     defaultConfig {
-        applicationId "com.novhara.app"
+        applicationId bundleId
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

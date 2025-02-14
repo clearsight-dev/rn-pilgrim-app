@@ -18,8 +18,18 @@ const path = require('path');
 const axios = require('axios');
 const util = require('util');
 const {exec: exec_} = require('child_process');
-const {readFile, writeFile, readdir, rmdir, mkdir, rename} = require('node:fs/promises');
-const {createWriteStream} = require('fs');
+const {readFile, writeFile, rmdir, rename} = require('node:fs/promises');
+
+const {
+  analyticsTemplate,
+  generateAnalytics,
+  removeForceUnlinkForNativePackage,
+  addForceUnlinkForNativePackage,
+  readReactNativeConfigJs,
+  writeReactNativeConfigJs,
+  getExtraModules,
+  downloadIconAndSplash
+} = require('./commonProjectSetup');
 
 const exec = util.promisify(exec_);
 
@@ -32,167 +42,13 @@ async function generateIconSet(scriptPath) {
   );
 }
 
-async function writeReactNativeConfigJs(parsedReactNativeConfig) {
-  const updatedConfig = `module.exports = ${JSON.stringify(parsedReactNativeConfig, null, 2)}`;
-  await writeFile(path.resolve(__dirname, 'react-native.config.js'), updatedConfig);
-}
-
-async function readReactNativeConfigJs() {
-  const contents = await readFile(path.resolve(__dirname, 'react-native.config.js'), {encoding: 'utf8'});
-  const parsable = contents.replace(/module.exports\s?=/, '');
-  const parsedConfig = JSON.parse(parsable);
-  return parsedConfig;
-}
-
-async function downloadFile(url, fileName) {
-  const outputPath = path.resolve(__dirname, 'assets', fileName); 
-  try {
-    const response = await axios({
-      url, 
-      method: 'GET',
-      responseType: 'stream'
-    });
-
-    const writer = createWriteStream(outputPath);
-    response.data.pipe(writer);
-
-    return new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
-  } catch(err) {
-    console.error("Failed to download asset ", fileName, err);
-  }
-}
-
-const packageStubs = {
-  'react-native-fbsdk-next': `
-export const AppEventsLogger = {
-  AppEventParams: {
-    AppEventParams: {},
-    Content: {},
-    Currency: {},
-    NumItems: {},
-    SearchString: {},
-    ContentID: {}
-  }, 
-  AppEvents: {
-    AddedToCart: {},
-    InitiatedCheckout: {},
-    Purchased: {},
-    Searched: {},
-    ViewedContent: {},
-    AddedToWishlist: {}
-  },
-  logEvent: () => console.log('subbed facebook logEvent')
-};
-export default {}
-`,
-  'react-native-moengage': `export default {}`,
-
-  'react-native-appsflyer': `export default { 
-onDeepLink: () => console.log('stubbed appsflyer onDeeplink')
-};`
-
-};
-
-async function removeForceUnlinkForNativePackage(packageName, extraModules, parsedReactNativeConfig) {
-  // remove unlinker from react-native.config.js
-  if (parsedReactNativeConfig.dependencies[packageName]) {
-    delete parsedReactNativeConfig.dependencies[packageName];
-  }
-
-  // remove stub file if it exists
-  let exists = false;
-  try {
-    const entries = await readdir(path.resolve(__dirname, 'stubs'), {withFileTypes: true});
-    for (let i = 0; i < entries.length; ++i) {
-      if (entries[i].isDirectory() && entries[i].name === packageName) {
-        exists = true;
-        break;
-      }
-    }
-  } catch (err) {
-    if (err?.code === 'ENOENT') {
-      exists = false;
-    } else {
-      throw err;
-    }
-  }
-
-  if (exists) {
-    await rmdir(path.resolve(__dirname, 'stubs', packageName), {recursive: true});
-  }
-
-  // remove react-native-fbsdk-next from metro.config.js if it exists
-  extraModules.current = extraModules.current.filter(mod => mod.name !== packageName);
-}
-
-async function addForceUnlinkForNativePackage(packageName, extraModules, parsedReactNativeConfig) {
-  // add unlinker in react-native.config.js
-  parsedReactNativeConfig.dependencies[packageName] = {
-    platforms: {
-      android: null, 
-      ios: null
-    }
-  };
-  
-  // remove stub file if exists
-  let exists = false;
-  try {
-    const entries = await readdir(path.resolve(__dirname, 'stubs'), {withFileTypes: true});
-    for (let i = 0; i < entries.length; ++i) {
-      if (entries[i].isDirectory() && entries[i].name === packageName) {
-        exists = true;
-        break;
-      }
-    }
-  } catch (err) {
-    if (err?.code === 'ENOENT') {
-      exists = false;
-    } else {
-      throw err;
-    }
-  }
-
-  if (!exists) {
-    await mkdir(
-      path.resolve(__dirname, `stubs/${packageName}`),
-      {recursive: true}
-    );
-    await writeFile(
-      path.resolve(__dirname, `stubs/${packageName}/index.ts`), 
-      packageStubs[packageName]
-    );
-  }
-
-  // update metro.config.js
-  const existing = extraModules.current.find(it => it.name == packageName);
-  if (!existing) {
-    extraModules.current.push({
-      "name": packageName,
-      "path": path.resolve(__dirname, `stubs/${packageName}/index.ts`),
-      "watchPath": path.resolve(extraModules.SDK_PATH, "packages/apptile-core"),
-      "returnKey": "filePath",
-      "returnType": "sourceFile"
-    });
-  }
-}
-
 async function addMoengage(
-  analyticsTemplateRef, 
   infoPlist, 
   notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
   extraModules
-) {
-  // Update analytics file
-  analyticsTemplateRef.current = analyticsTemplateRef.current.replace(
-    /\/\/ __ENABLED_ANALYTICS_IMPORTS__/g, 
-    `Moengage as MoengageAnalytics,\n  \/\/ __ENABLED_ANALYTICS_IMPORTS__`
-  );
-   
+) {  
   const moengageIntegration = apptileConfig.integrations.moengage;
   infoPlist.MOENGAGE_APPID = moengageIntegration.appId;
   infoPlist.MOENGAGE_DATACENTER = moengageIntegration.datacenter;
@@ -230,19 +86,12 @@ async function removeMoengage(
 }
 
 async function addAppsflyer(
-  analyticsTemplateRef, 
   infoPlist, 
   notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
   extraModules
 ) {
-  // Update analytics file
-  analyticsTemplateRef.current = analyticsTemplateRef.current.replace(
-    /\/\/ __ENABLED_ANALYTICS_IMPORTS__/g, 
-    `AppsFlyer as AppsFlyerAnalytics,\n  \/\/ __ENABLED_ANALYTICS_IMPORTS__`
-  );
-   
   const appsflyerIntegration = apptileConfig.integrations.appsflyer;
   infoPlist.APPSFLYER_DEVKEY = appsflyerIntegration.devkey;
   infoPlist.APPSFLYER_APPID = appsflyerIntegration.appId;
@@ -263,19 +112,12 @@ async function removeAppsflyer(
 }
 
 async function addFacebook(
-  analyticsTemplateRef, 
   infoPlist, 
   notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
   extraModules
 ) {
-  // Update analytics file
-  analyticsTemplateRef.current = analyticsTemplateRef.current.replace(
-    /\/\/ __ENABLED_ANALYTICS_IMPORTS__/g, 
-    `Facebook as FacebookAnalytics,\n  \/\/ __ENABLED_ANALYTICS_IMPORTS__`
-  );
-   
   const metaIntegration = apptileConfig.integrations.metaAds;
   infoPlist.FacebookAppID = metaIntegration.FacebookAppId;
   infoPlist.FacebookClientToken = metaIntegration.FacebookClientToken;
@@ -299,86 +141,28 @@ async function removeFacebook(
   addForceUnlinkForNativePackage('react-native-fbsdk-next', extraModules, parsedReactNativeConfig);
 }
 
-async function generateAnalytics(analyticsTemplateRef, integrations, featureFlags) {
-  integrations = integrations || {};
-  let enabledAnalytics = '';
-  if (featureFlags.ENABLE_FBSDK) {
-    enabledAnalytics += `FacebookAnalytics,\n      `;
-  }
+async function addOnesignal(
+  infoPlist, 
+  notificationContentInfoPlist,
+  apptileConfig,
+  parsedReactNativeConfig,
+  extraModules) {
+  const onesignalIntegration = apptileConfig.integrations.oneSignal;
+  infoPlist.ONESIGNAL_APPID = onesignalIntegration.onesignal_app_id;
+  removeForceUnlinkForNativePackage('react-native-onesignal', extraModules, parsedReactNativeConfig);
+}
 
-  if (featureFlags.ENABLE_APPSFLYER) {
-    enabledAnalytics += `AppsFlyerAnalytics,\n      `;
-  }
-
-  if (featureFlags.ENABLE_MOENGAGE) {
-    enabledAnalytics += `MoengageAnalytics,\n      `;
-  }
-  enabledAnalytics += `// __ENABLED_ANALYTICS__`;
-
-  analyticsTemplateRef.current = analyticsTemplateRef.current.replace(/\/\/ __ENABLED_ANALYTICS__/g, enabledAnalytics); 
-  if (integrations.shopify) {
-    analyticsTemplateRef.current = analyticsTemplateRef.current.replace(
-      /\/\/ __EXTRA_LEGACY_INITIALIZERS__/, 
-      `loadShopifyPlugins();\n// __EXTRA_LEGACY_INITIALIZERS__`
-    );
-    analyticsTemplateRef.current = analyticsTemplateRef.current.replace(
-      /\/\/ __EXTRA_LEGACY_PLUGIN_IMPORTS__/,
-      `import { loadDatasourcePlugins as loadShopifyPlugins } from 'apptile-shopify';\n// __EXTRA_LEGACY_PLUGIN_IMPORTS__`
-    );
-  }
-  return writeFile(path.resolve(__dirname, 'analytics/index.ts'), analyticsTemplateRef.current);
+async function removeOnesignal(
+  infoPlist, 
+  notificationContentInfoPlist,
+  extraModules,
+  parsedReactNativeConfig) {
+  delete infoPlist.ONESIGNAL_APPID;
+  addForceUnlinkForNativePackage('react-native-onesignal', extraModules, parsedReactNativeConfig);
 }
 
 async function main() {
-  const analyticsTemplateRef = {
-    current: `// This file is generated at build time based on the integrations added to the app
-import {checkATTPermission, ApptileAnalytics, addCustomEventListener} from 'apptile-core';
-import {
-  Firebase as FirebaseAnalytics, 
-  // __ENABLED_ANALYTICS_IMPORTS__
-} from 'apptile-core';
-
-import {
-  initStoreWithRootSagas,
-} from 'apptile-core';
-
-import { loadDatasourcePlugins } from 'apptile-datasource';
-import { initPlugins } from 'apptile-plugins';
-// __EXTRA_LEGACY_PLUGIN_IMPORTS__
-
-import { initNavs } from '../remoteCode/indexNav';
-import { initPlugins as initRemotePlugins } from '../remoteCode';
-
-initStoreWithRootSagas();
-loadDatasourcePlugins();
-initPlugins();
-initRemotePlugins();
-initNavs();
-
-// The plugins initialized here will not be available in the web
-// as an addon. This is only meant for toggling exsiting plugins which
-// are tightly integrated with apptile-core. Use remoteCode folder for 
-// everything else
-// __EXTRA_LEGACY_INITIALIZERS__
-
-export async function init() {
-  try {
-    await checkATTPermission();
-    await ApptileAnalytics.initialize([
-      FirebaseAnalytics, 
-      // __ENABLED_ANALYTICS__
-    ]);
-  } catch (err) {
-    console.error('Failure in initializing ApptileAnalytics');
-  }
-}
-
-addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
-  ApptileAnalytics.sendEvent(type, name, params);
-});`
-  };
-
-  
+  const analyticsTemplateRef = {current: analyticsTemplate};
 
   try {
     // Get location of ios folder in project
@@ -391,57 +175,12 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
       {encoding: 'utf8'}
     );
     const apptileConfig = JSON.parse(apptileConfigRaw);
-    for (let i = 0; i < apptileConfig.assets.length; ++i) {
-      const asset = apptileConfig.assets[i];
-      if (asset.assetClass === 'splash') {
-        console.log("Downloading splash");
-        await downloadFile(asset.url, asset.fileName);
-      } else if (asset.assetClass === 'icon') {
-        await downloadFile(asset.url, asset.fileName);
-        await generateIconSet(path.resolve(apptileConfig.SDK_PATH, 'packages/apptile-app/devops/scripts/ios/iconset-generator.sh'));
-      }
+    const success = await downloadIconAndSplash(apptileConfig);
+    if (success) {
+      await generateIconSet(path.resolve(apptileConfig.SDK_PATH, 'packages/apptile-app/devops/scripts/ios/iconset-generator.sh'));
     }
 
-    const extraModules = {
-      SDK_PATH: apptileConfig.SDK_PATH,
-      current: [
-        {
-          "name": "apptile-core",
-          "path": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-core/sdk.ts"),
-          "watchPath": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-core"),
-          "returnKey": "filePath",
-          "returnType": "sourceFile"
-        },
-        {
-          "name": "apptile-plugins",
-          "path": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-plugins/index.ts"),
-          "watchPath": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-plugins"),
-          "returnKey": "filePath",
-          "returnType": "sourceFile"
-        },
-        {
-          "name": "asset_placeholder-image",
-          "path": [path.resolve(apptileConfig.SDK_PATH, "packages/apptile-app/app/assets/image-placeholder.png")],
-          "watchPath": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-app/app/assets"),
-          "returnKey": "filePaths",
-          "returnType": "assetFiles"
-        },
-        {
-          "name": "apptile-datasource",
-          "path": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-datasource/index.ts"),
-          "watchPath": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-datasource"),
-          "returnKey": "filePath",
-          "returnType": "sourceFile"
-        },
-        {
-          "name": "apptile-shopify",
-          "path": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-shopify/index.ts"),
-          "watchPath": path.resolve(apptileConfig.SDK_PATH, "packages/apptile-shopify"),
-          "returnKey": "filePath",
-          "returnType": "sourceFile"
-        },
-      ]
-    };
+    const extraModules = getExtraModules(apptileConfig);
 
     // Notification Content extension Info.plist
     const notificationContentExtensionInfoPlistLocation = path.resolve(iosFolderLocation, 'NotificationContentExtension/Info.plist');
@@ -481,23 +220,30 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
     // For facebook analytics
     const parsedReactNativeConfig = await readReactNativeConfigJs();
     if (apptileConfig.feature_flags.ENABLE_FBSDK) {
-      await addFacebook(analyticsTemplateRef, infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules);
+      await addFacebook(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules);
     } else {
       await removeFacebook(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     // For appsflyer analytics
     if (apptileConfig.feature_flags.ENABLE_APPSFLYER) {
-      await addAppsflyer(analyticsTemplateRef, infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+      await addAppsflyer(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
     } else {
       await removeAppsflyer(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     // For moengage analytics
     if (apptileConfig.feature_flags.ENABLE_MOENGAGE) {
-      await addMoengage(analyticsTemplateRef, infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+      await addMoengage(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
     } else {
       await removeMoengage(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
+    }
+
+    // Onesignal notifications
+    if (apptileConfig.feature_flags.ENABLE_ONESIGNAL) {
+      await addOnesignal(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+    } else {
+      await removeOnesignal(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     const updatedPlist = plist.build(infoPlist);
@@ -518,7 +264,7 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
     const manifestUrl = `${apptileConfig.APPTILE_BACKEND_URL}/api/v2/app/${apptileConfig.APP_ID}/manifest`;
     console.log('Downloading manifest from ' + manifestUrl);
     const {data: manifest} = await axios.get(manifestUrl);
-    console.log('manifest: ', manifest);
+    // console.log('manifest: ', manifest);
     const publishedCommit = manifest.forks[0].publishedCommitId;
     const iosBundle = manifest.codeArtefacts.find((it) => it.type === 'ios-jsbundle');
 
@@ -526,17 +272,7 @@ addCustomEventListener('ApptileAnalyticsSendEvent', (type, name, params) => {
     console.log('Downloading appConfig from: ' + appConfigUrl);
     if (publishedCommit) {
       const appConfigPath = path.resolve(__dirname, 'ios/appConfig.json');
-      const writer = createWriteStream(appConfigPath);
-      const response = await axios({
-        method: 'get',
-        url: appConfigUrl,
-        responseType: 'stream'
-      });
-      response.data.pipe(writer);
-      await new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-      });
+      await downloadFile(appConfigUrl, appConfigPath);
       console.log('appConfig downloaded');
       const bundleTrackerPath = path.resolve(__dirname, 'ios/localBundleTracker.json');
       await writeFile(bundleTrackerPath, `{"publishedCommitId": ${publishedCommit}, "iosBundleId": ${iosBundle?.id ?? "null"}}`)
