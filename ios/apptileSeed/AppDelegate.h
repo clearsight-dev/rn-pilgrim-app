@@ -1,6 +1,16 @@
 #import <RCTAppDelegate.h>
 #import <UIKit/UIKit.h>
+#import <UserNotifications/UNUserNotificationCenter.h>
+#import <React/RCTImageView.h>
+#import <React/RCTImageSource.h>
+#import <React/RCTImageLoader.h>
 
-@interface AppDelegate : RCTAppDelegate
+@class RCTRootView;
+
+@interface AppDelegate : RCTAppDelegate <UNUserNotificationCenterDelegate>
+
+@property (nonatomic, strong) RCTImageView *splash;
+@property BOOL minDurationPassed;
+@property BOOL jsLoaded;
 
 @end

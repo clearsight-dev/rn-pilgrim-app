@@ -1,4 +1,5 @@
 import React from 'react';
+import {NativeModules} from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { 
@@ -23,6 +24,7 @@ export type ScreenParams = {
 import {init as initAnalytics} from './analytics';
 
 const Stack = createNativeStackNavigator<ScreenParams>();
+const {RNApptile} = NativeModules;
 
 function App(): React.JSX.Element {
   const status = useStartApptile(initAnalytics);
@@ -37,6 +39,9 @@ function App(): React.JSX.Element {
         theme={{
           ...DefaultTheme,
           colors: status.theme
+        }}
+        onReady={() => {
+          RNApptile.notifyJSReady();
         }}
       >
         <Stack.Navigator>

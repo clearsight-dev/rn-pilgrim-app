@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const axios = require('axios');
 const path = require('path');
 const {createWriteStream} = require('fs');
-const {readFile, writeFile, readdir, rmdir, mkdir} = require('node:fs/promises');
+const {readFile, writeFile, readdir, rmdir, mkdir, cp} = require('node:fs/promises');
 
 async function downloadFile(url, destination) {
   const outputPath = destination 
@@ -318,6 +318,7 @@ async function downloadIconAndSplash(apptileConfig) {
       if (asset.assetClass === 'splash') {
         console.log("Downloading splash");
         await downloadFileToAssets(asset.url, asset.fileName);
+        await cp(path.resolve(__dirname, 'assets', asset.fileName), path.resolve(__dirname, ios, asset.fileName));
       } else if (asset.assetClass === 'icon') {
         await downloadFileToAssets(asset.url, asset.fileName);
       }
