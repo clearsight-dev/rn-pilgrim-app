@@ -281,6 +281,10 @@ target 'apptileSeed' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
+
+    setupResult = Pod::Executable.execute_command('node', ['../iosProjectSetup.js'])
+    print(setupResult)
+    print("iosProjectSetup complete\n")
   end
 end
 

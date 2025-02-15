@@ -509,7 +509,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "source $SRCROOT/.xcode.env\necho \"-----------------------------\"\necho \"NODE_BINARY: ${NODE_BINARY}\"\necho \"-----------------------------\"\necho \"\\n\"\n$NODE_BINARY $SRCROOT/../iosProjectSetup.js $SRCROOT\n";
+			shellScript = "source $SRCROOT/.xcode.env\necho \"-----------------------------\"\necho \"NODE_BINARY: ${NODE_BINARY}\"\necho \"-----------------------------\"\necho \"\\n\"\n# $NODE_BINARY $SRCROOT/../iosProjectSetup.js $SRCROOT\n";
 		};
 		51A0414D557D45FE51E5FC4B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

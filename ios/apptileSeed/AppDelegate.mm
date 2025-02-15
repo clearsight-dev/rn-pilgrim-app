@@ -71,7 +71,7 @@
 }
 
 #define ENABLE_NATIVE_SPLASH 1
-#define MIN_SPLASH_DURATION 2
+#define MIN_SPLASH_DURATION 1
 #define MAX_SPLASH_DURATION 7
 
 - (void)showNativeSplash {
