@@ -12,6 +12,7 @@
 		05663EE02D1A84B000040215 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 05663EDF2D1A84B000040215 /* GoogleService-Info.plist */; };
 		057DB15F2D5B3B1F0058398E /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 057DDD3F2D48C3E500945100 /* UserNotifications.framework */; };
 		057DB1612D5B3B1F0058398E /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 057DB1602D5B3B1F0058398E /* UserNotificationsUI.framework */; };
+		057DB67C2D60965900CD76F4 /* RNApptile.m in Sources */ = {isa = PBXBuildFile; fileRef = 057DB67B2D60965900CD76F4 /* RNApptile.m */; };
 		057DDD402D48C3E500945100 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 057DDD3F2D48C3E500945100 /* UserNotifications.framework */; };
 		057DDD6C2D48FA7700945100 /* ImageNotification.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 057DDD352D48C35D00945100 /* ImageNotification.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		057DDD7F2D48FB0C00945100 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 057DDD3F2D48C3E500945100 /* UserNotifications.framework */; };
@@ -84,6 +85,8 @@
 		05663EDF2D1A84B000040215 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		057DB15E2D5B3B1F0058398E /* NotificationContentExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NotificationContentExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		057DB1602D5B3B1F0058398E /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		057DB67B2D60965900CD76F4 /* RNApptile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNApptile.m; path = apptileSeed/RNApptile.m; sourceTree = "<group>"; };
+		057DB67D2D60968E00CD76F4 /* RNApptile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNApptile.h; path = apptileSeed/RNApptile.h; sourceTree = "<group>"; };
 		057DDD352D48C35D00945100 /* ImageNotification.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImageNotification.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		057DDD3F2D48C3E500945100 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		05A846D42CF09C9400784D02 /* RNGetValues.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNGetValues.m; path = apptileSeed/RNGetValues.m; sourceTree = "<group>"; };
@@ -236,6 +239,8 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				05A846D42CF09C9400784D02 /* RNGetValues.m */,
 				05A846D82CF09CD600784D02 /* RNGetValues.h */,
+				057DB67B2D60965900CD76F4 /* RNApptile.m */,
+				057DB67D2D60968E00CD76F4 /* RNApptile.h */,
 			);
 			name = apptileSeed;
 			sourceTree = "<group>";
@@ -615,6 +620,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				057DB67C2D60965900CD76F4 /* RNApptile.m in Sources */,
 				05A846D52CF09C9400784D02 /* RNGetValues.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				055C1EC32CB7C9C600EE8821 /* ShakeEventModule.m in Sources */,
