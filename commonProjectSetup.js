@@ -21,7 +21,7 @@ async function downloadFile(url, destination) {
       writer.on('error', reject);
     });
   } catch(err) {
-    console.error("Failed to download asset ", fileName, err);
+    console.error("Failed to download asset ", err);
   }
 }
 
@@ -318,12 +318,17 @@ async function downloadIconAndSplash(apptileConfig) {
       if (asset.assetClass === 'splash') {
         console.log("Downloading splash");
         await downloadFileToAssets(asset.url, asset.fileName);
-        await cp(path.resolve(__dirname, 'assets', asset.fileName), path.resolve(__dirname, ios, asset.fileName));
+        await cp(path.resolve(__dirname, 'assets', asset.fileName), path.resolve(__dirname, 'ios', asset.fileName));
+        await cp(path.resolve(__dirname, 'assets', asset.fileName), 
+          path.resolve(__dirname, 'android', 'app', 'src', 'main', 'res', 'drawable', asset.fileName)
+        );
       } else if (asset.assetClass === 'icon') {
+        console.log("Downloading icon");
         await downloadFileToAssets(asset.url, asset.fileName);
       }
     } catch (err) {
-      console.error(chalk.red('Failed to download asset'));
+      console.error(chalk.red('Failed to download asset ' + JSON.stringify(apptileConfig.assets[i]), null, 2));
+      console.error(err);
       result = false;
     }
   }

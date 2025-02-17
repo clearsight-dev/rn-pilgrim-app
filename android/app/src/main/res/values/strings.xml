@@ -1,8 +1,6 @@
 <resources>
-  <string name="app_name">apptileSeed</string>
+  <string name="app_name">gauravs app</string>
   <string name="APPTILE_API_ENDPOINT">https://api.apptile.io</string>
   <string name="APPTILE_UPDATE_ENDPOINT">https://appconfigs.apptile.io</string>
-  <string name="facebook_app_id"/>
-  <string name="facebook_client_token"/>
-  <string name="ONESIGNAL_APPID">2aaedb28-5b4a-4821-ac19-617bdd11221d</string>
+  <string name="APP_ID">3863104d-d3d2-475a-9dec-fe761a90bfec</string>
 </resources>
