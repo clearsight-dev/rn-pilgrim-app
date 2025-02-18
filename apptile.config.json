@@ -34,6 +34,13 @@
     "enableMoEngage": false
   },
   "integrations": {
+    "metaAds": {
+	"FacebookAppId": "275209841592926",
+	"FacebookClientToken": "c652a661acf3d9fc9c503d386c00a27b",
+	"FacebookDisplayName": "Pilgrim Staging",
+	"FacebookAutoLogAppEventsEnabled": "YES",
+	"FacebookAdvertiserIDCollectionEnabled": "NO"
+    },
     "moengage": {
        "appId": "WF38NKW2X6FKWGZRC749OAF5",
        "datacenter": "data_center_3"
@@ -56,7 +63,7 @@
   "feature_flags": {
     "ENABLE_ONESIGNAL": false,
     "ENABLE_SEGMENT_ANALYTICS": false,
-    "ENABLE_FBSDK": false,
+    "ENABLE_FBSDK": true,
     "ENABLE_CLEVERTAP": false,
     "ENABLE_KALVIYO": false,
     "ENABLE_MOENGAGE": true,

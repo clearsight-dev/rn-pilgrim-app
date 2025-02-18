@@ -2,6 +2,7 @@
 import {checkATTPermission, ApptileAnalytics, addCustomEventListener} from 'apptile-core';
 import {
   Firebase as FirebaseAnalytics, 
+  Facebook as FacebookAnalytics,
   Moengage as MoengageAnalytics,
   // __ENABLED_ANALYTICS_IMPORTS__
 } from 'apptile-core';
@@ -36,6 +37,7 @@ export async function init() {
     await checkATTPermission();
     await ApptileAnalytics.initialize([
       FirebaseAnalytics, 
+      FacebookAnalytics,
       MoengageAnalytics,
       // __ENABLED_ANALYTICS__
     ]);

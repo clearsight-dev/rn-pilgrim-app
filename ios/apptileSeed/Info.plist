@@ -102,5 +102,15 @@
       <key>APP_GROUP_ID</key>
       <string>group.com.discoverpilgrimindia.notification</string>
     </dict>
+    <key>FacebookAppID</key>
+    <string>275209841592926</string>
+    <key>FacebookClientToken</key>
+    <string>c652a661acf3d9fc9c503d386c00a27b</string>
+    <key>FacebookDisplayName</key>
+    <string>Pilgrim Staging</string>
+    <key>FacebookAutoLogAppEventsEnabled</key>
+    <string>YES</string>
+    <key>FacebookAdvertiserIDCollectionEnabled</key>
+    <string>NO</string>
   </dict>
 </plist>
