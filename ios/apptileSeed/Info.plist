@@ -47,8 +47,6 @@
     <string>Microphone for Live Streaming</string>
     <key>NSUserTrackingUsageDescription</key>
     <string>Your privacy matters. We collect usage data to enhance your app experience. Rest assured, your information is handled securely and used solely for improvement</string>
-    <key>ONESIGNAL_APPID</key>
-    <string>2aaedb28-5b4a-4821-ac19-617bdd11221d</string>
     <key>UIAppFonts</key>
     <array>
       <string>AntDesign.ttf</string>

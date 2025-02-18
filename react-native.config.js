@@ -23,6 +23,12 @@ module.exports = {
         "android": null,
         "ios": null
       }
+    },
+    "react-native-onesignal": {
+      "platforms": {
+        "android": null,
+        "ios": null
+      }
     }
   }
 }
