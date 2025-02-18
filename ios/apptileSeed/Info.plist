@@ -85,5 +85,22 @@
     </array>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    <key>MOENGAGE_APPID</key>
+    <string>WF38NKW2X6FKWGZRC749OAF5</string>
+    <key>MOENGAGE_DATACENTER</key>
+    <string>data_center_3</string>
+    <key>MoEngageAppDelegateProxyEnabled</key>
+    <false/>
+    <key>MoEngage</key>
+    <dict>
+      <key>ENABLE_LOGS</key>
+      <false/>
+      <key>MOENGAGE_APP_ID</key>
+      <string>WF38NKW2X6FKWGZRC749OAF5</string>
+      <key>DATA_CENTER</key>
+      <string>data_center_3</string>
+      <key>APP_GROUP_ID</key>
+      <string>group.com.discoverpilgrimindia.notification</string>
+    </dict>
   </dict>
 </plist>

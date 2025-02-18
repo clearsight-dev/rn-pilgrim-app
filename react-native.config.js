@@ -18,12 +18,6 @@ module.exports = {
         "ios": null
       }
     },
-    "react-native-moengage": {
-      "platforms": {
-        "android": null,
-        "ios": null
-      }
-    },
     "react-native-onesignal": {
       "platforms": {
         "android": null,

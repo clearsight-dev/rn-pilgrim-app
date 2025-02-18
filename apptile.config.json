@@ -34,6 +34,10 @@
     "enableMoEngage": false
   },
   "integrations": {
+    "moengage": {
+       "appId": "WF38NKW2X6FKWGZRC749OAF5",
+       "datacenter": "data_center_3"
+    },
     "shopify": {}
   },
   "assets": [
@@ -55,7 +59,7 @@
     "ENABLE_FBSDK": false,
     "ENABLE_CLEVERTAP": false,
     "ENABLE_KALVIYO": false,
-    "ENABLE_MOENGAGE": false,
+    "ENABLE_MOENGAGE": true,
     "ENABLE_APPSFLYER": false,
     "ENABLE_FIREBASE_ANALYTICS": true
   },

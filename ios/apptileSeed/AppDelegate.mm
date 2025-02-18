@@ -54,6 +54,8 @@
     moEngageDataCenter = MoEngageDataCenterData_center_01;
   } else if ([moEngageDataCenterString isEqualToString:@"data_center_2"]) {
     moEngageDataCenter = MoEngageDataCenterData_center_02;
+  } else if ([moEngageDataCenterString isEqualToString:@"data_center_3"]) {
+    moEngageDataCenter = MoEngageDataCenterData_center_03;
   } else {
     moEngageDataCenter = MoEngageDataCenterData_center_default;
   }
