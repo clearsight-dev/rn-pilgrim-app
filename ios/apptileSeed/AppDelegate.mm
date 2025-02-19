@@ -25,10 +25,21 @@
 #import <AppsFlyerAttribution.h>
 #endif
 
+#if ENABLE_CLEVERTAP
+#import <CleverTapReactManager.h>
+#import <CleverTap.h>
+#endif
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+#if ENABLE_CLEVERTAP
+  [CleverTap autoIntegrate];
+  [[CleverTapReactManager sharedInstance] applicationDidLaunchWithOptions:launchOptions];
+#endif
+  self.jsLoaded = NO;
+  self.minDurationPassed = NO;
   self.moduleName = @"apptileSeed";
   self.initialProps = @{};
   

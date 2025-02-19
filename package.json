@@ -48,6 +48,7 @@
     "apollo3-cache-persist": "0.14.1",
     "axios": "1.7.2",
     "browser-image-compression": "2.0.2",
+    "clevertap-react-native": "1.2.1",
     "clsx": "1.2.1",
     "codemirror": "5.65.17",
     "coloring-palette": "1.0.0",
@@ -91,6 +92,7 @@
     "react-native-console-time-polyfill": "1.2.3",
     "react-native-device-info": "9.0.2",
     "react-native-fast-image": "8.6.3",
+    "react-native-fbsdk-next": "^13.3.0",
     "react-native-firework-sdk": "2.14.0",
     "react-native-fs": "2.20.0",
     "react-native-gesture-handler": "2.17.1",
@@ -149,8 +151,7 @@
     "validator": "13.12.0",
     "video.js": "8.17.1",
     "web-vitals": "3.5.2",
-    "zego-express-engine-reactnative": "3.14.5",
-    "react-native-fbsdk-next": "^13.3.0"
+    "zego-express-engine-reactnative": "3.14.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

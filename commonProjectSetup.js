@@ -21,7 +21,7 @@ async function downloadFile(url, destination) {
       writer.on('error', reject);
     });
   } catch(err) {
-    console.error("Failed to download asset ", err);
+    console.error("Failed to download asset to: ", destination);
   }
 }
 
@@ -112,6 +112,15 @@ async function generateAnalytics(analyticsTemplateRef, integrations, featureFlag
     );
     enabledAnalytics += `OneSignalAnalytics,\n      `;
   }
+
+  if (featureFlags.ENABLE_CLEVERTAP) {
+    // Update analytics file
+    analyticsTemplateRef.current = analyticsTemplateRef.current.replace(
+      /\/\/ __ENABLED_ANALYTICS_IMPORTS__/g, 
+      `CleverTap as CleverTapAnalytics,\n  \/\/ __ENABLED_ANALYTICS_IMPORTS__`
+    );
+    enabledAnalytics += `CleverTapAnalytics,\n      `;
+  }
   enabledAnalytics += `// __ENABLED_ANALYTICS__`;
 
   analyticsTemplateRef.current = analyticsTemplateRef.current.replace(/\/\/ __ENABLED_ANALYTICS__/g, enabledAnalytics); 
@@ -164,8 +173,8 @@ export default {}`,
   'react-native-appsflyer': `export default { 
 onDeepLink: () => console.log('stubbed appsflyer onDeeplink')
 };`,
-  'react-native-onesignal': `export default {};`
-
+  'react-native-onesignal': `export default {};`,
+  'clevertap-react-native': `export default {}`
 };
 
 async function addForceUnlinkForNativePackage(packageName, extraModules, parsedReactNativeConfig) {
@@ -328,7 +337,7 @@ async function downloadIconAndSplash(apptileConfig) {
       }
     } catch (err) {
       console.error(chalk.red('Failed to download asset ' + JSON.stringify(apptileConfig.assets[i]), null, 2));
-      console.error(err);
+      // console.error(err);
       result = false;
     }
   }

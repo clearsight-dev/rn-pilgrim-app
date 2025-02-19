@@ -43,8 +43,39 @@ async function generateIconSet(scriptPath) {
   );
 }
 
+async function addCleverTap(
+  infoPlist,  
+  imageNotificationPlist,
+  notificationContentInfoPlist,
+  apptileConfig,
+  parsedReactNativeConfig,
+  extraModules
+) {
+  const cleverTapIntegration = apptileConfig.integrations.cleverTap;
+  infoPlist.CleverTapAccountID = cleverTapIntegration.cleverTap_id;
+  infoPlist.CleverTapToken = cleverTapIntegration.cleverTap_token;
+  infoPlist.CleverTapRegion = cleverTapIntegration.cleverTap_region;
+  imageNotificationPlist.NSExtension.NSExtensionPrincipalClass = 'CTNotificationServiceExtension';
+}
+
+async function removeCleverTap(
+  infoPlist,  
+  imageNotificationPlist,
+  notificationContentInfoPlist,
+  extraModules,
+  parsedReactNativeConfig
+) {
+  delete infoPlist.CleverTapAccountID;
+  delete infoPlist.CleverTapToken;
+  delete infoPlist.CleverTapRegion;
+  if (imageNotificationPlist.NSExtension.NSExtensionPrincipalClass === 'CTNotificationServiceExtension') {
+    imageNotificationPlist.NSExtension.NSExtensionPrincipalClass = 'NotificationService';
+  }
+}
+
 async function addMoengage(
-  infoPlist, 
+  infoPlist,  
+  imageNotificationPlist,
   notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
@@ -69,7 +100,8 @@ async function addMoengage(
 }
 
 async function removeMoengage(
-  infoPlist, 
+  infoPlist,  
+  imageNotificationPlist,
   notificationContentInfoPlist,
   extraModules,
   parsedReactNativeConfig
@@ -88,6 +120,7 @@ async function removeMoengage(
 
 async function addAppsflyer(
   infoPlist, 
+  imageNotificationPlist,
   notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
@@ -102,6 +135,7 @@ async function addAppsflyer(
 
 async function removeAppsflyer(
   infoPlist, 
+  imageNotificationPlist,
   notificationContentInfoPlist,
   extraModules,
   parsedReactNativeConfig
@@ -114,6 +148,7 @@ async function removeAppsflyer(
 
 async function addFacebook(
   infoPlist, 
+  imageNotificationPlist, 
   notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
@@ -129,7 +164,8 @@ async function addFacebook(
 }
 
 async function removeFacebook(
-  infoPlist, 
+  infoPlist,  
+  imageNotificationPlist,
   notificationContentInfoPlist,
   extraModules,
   parsedReactNativeConfig
@@ -143,7 +179,8 @@ async function removeFacebook(
 }
 
 async function addOnesignal(
-  infoPlist, 
+  infoPlist,  
+  imageNotificationPlist,
   notificationContentInfoPlist,
   apptileConfig,
   parsedReactNativeConfig,
@@ -154,7 +191,8 @@ async function addOnesignal(
 }
 
 async function removeOnesignal(
-  infoPlist, 
+  infoPlist,  
+  imageNotificationPlist,
   notificationContentInfoPlist,
   extraModules,
   parsedReactNativeConfig) {
@@ -187,6 +225,11 @@ async function main() {
     const notificationContentExtensionInfoPlistLocation = path.resolve(iosFolderLocation, 'NotificationContentExtension/Info.plist');
     const rawNotificationContentExtensionPlist = await readFile(notificationContentExtensionInfoPlistLocation, {encoding: 'utf8'});
     const notificationContentExtensionPlist = plist.parse(rawNotificationContentExtensionPlist);
+
+    // ImageNotification Info.plist
+    const imageNotificationInfoPlistLocation = path.resolve(iosFolderLocation, 'ImageNotification/Info.plist');
+    const rawImageNotificationPlist = await readFile(imageNotificationInfoPlistLocation, {encoding: 'utf8'});
+    const imageNotificationPlist = plist.parse(rawImageNotificationPlist);
 
     // Entitlements
     const apptileSeedEntitlementsLocation = path.resolve(iosFolderLocation, 'apptileSeed', 'apptileSeed.entitlements');
@@ -221,34 +264,47 @@ async function main() {
     // For facebook analytics
     const parsedReactNativeConfig = await readReactNativeConfigJs();
     if (apptileConfig.feature_flags.ENABLE_FBSDK) {
-      await addFacebook(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules);
+      await addFacebook(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules);
     } else {
-      await removeFacebook(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
+      await removeFacebook(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
+    }
+
+    // For clevertap analytics
+    if (apptileConfig.feature_flags.ENABLE_CLEVERTAP) {
+      await addCleverTap(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+    } else {
+      await removeCleverTap(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     // For appsflyer analytics
     if (apptileConfig.feature_flags.ENABLE_APPSFLYER) {
-      await addAppsflyer(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+      await addAppsflyer(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
     } else {
-      await removeAppsflyer(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
+      await removeAppsflyer(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     // For moengage analytics
     if (apptileConfig.feature_flags.ENABLE_MOENGAGE) {
-      await addMoengage(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+      await addMoengage(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
     } else {
-      await removeMoengage(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
+      await removeMoengage(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     // Onesignal notifications
     if (apptileConfig.feature_flags.ENABLE_ONESIGNAL) {
-      await addOnesignal(infoPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
+      await addOnesignal(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, apptileConfig, parsedReactNativeConfig, extraModules)
     } else {
-      await removeOnesignal(infoPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
+      await removeOnesignal(infoPlist, imageNotificationPlist, notificationContentExtensionPlist, extraModules, parsedReactNativeConfig);
     }
 
     const updatedPlist = plist.build(infoPlist);
     await writeFile(infoPlistLocation, updatedPlist);
+
+    const updatedImageNotificationPlist = plist.build(imageNotificationPlist);
+    await writeFile(imageNotificationInfoPlistLocation, updatedImageNotificationPlist);
+
+    const udpatedNotificationContentPlist = plist.build(notificationContentExtensionPlist);
+    await writeFile(notificationContentExtensionInfoPlistLocation, udpatedNotificationContentPlist);
 
     const updatedApptileSeedEntitlements = plist.build(apptileSeedEntitlements);
     await writeFile(apptileSeedEntitlementsLocation, updatedApptileSeedEntitlements);
