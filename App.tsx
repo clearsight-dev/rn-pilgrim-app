@@ -40,6 +40,7 @@ function App(): React.JSX.Element {
           ...DefaultTheme,
           colors: status.theme
         }}
+        linking={status.linking}
         onReady={() => {
           RNApptile.notifyJSReady();
         }}

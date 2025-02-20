@@ -97,6 +97,13 @@ feature_flags = apptile_config.fetch('feature_flags', {})
 bundle_id = apptile_config.dig('ios', 'bundle_id') || 'com.apptile.apptilepreviewdemo'
 FLAGS = feature_flags.select { |_key, value| [true,false].include?(value) }.keys
 
+pre_install do |installer|
+  print("running iosProjectSetup")
+  setupResult = Pod::Executable.execute_command('node', ['../iosProjectSetup.js'])
+  print(setupResult)
+  print("iosProjectSetup complete\n")
+end
+
 target 'ImageNotification' do
   use_frameworks!
   pod 'GoogleUtilities'
@@ -108,6 +115,10 @@ target 'ImageNotification' do
     puts "Installing onesignal core in ImageNotification"
     pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
   end
+  if feature_flags.fetch('ENABLE_CLEVERTAP', false)
+    puts "Installing clevertap in ImageNotification"
+    pod 'CTNotificationService'
+  end
 end
 
 target 'NotificationContentExtension' do
@@ -115,11 +126,20 @@ target 'NotificationContentExtension' do
   if feature_flags.fetch('ENABLE_MOENGAGE', false)
     pod 'MoEngageRichNotification'
   end
+  if feature_flags.fetch('ENABLE_CLEVERTAP', false)
+    puts "Installing clevertap in ImageNotification"
+    pod 'CTNotificationService'
+  end
 end
 
 target 'apptileSeed' do
   use_frameworks!
   config = use_native_modules!
+  
+  if feature_flags.fetch('ENABLE_CLEVERTAP', false)
+    puts "Setting clevertap path in apptileSeed"
+    pod 'clevertap-react-native', :path => '../node_modules/clevertap-react-native'
+  end
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -140,7 +160,7 @@ target 'apptileSeed' do
   # to avoid GoogleUtilities version conflict since firebase analytics and firebase Messaging can have different version of GoogleUtilities
   pod 'GoogleUtilities', :modular_headers => true
   # pod 'GoogleUtilities'
-  # pod 'Firebase/Analytics', :modular_headers => true
+  pod 'Firebase/Analytics', :modular_headers => true
   pod 'Firebase', :modular_headers => true
   pod 'FirebaseCoreInternal', :modular_headers => true
   pod 'FirebaseCore', :modular_headers => true
@@ -280,11 +300,7 @@ target 'apptileSeed' do
       installer,
       config[:reactNativePath],
       :mac_catalyst_enabled => false
-    )
-
-    setupResult = Pod::Executable.execute_command('node', ['../iosProjectSetup.js'])
-    print(setupResult)
-    print("iosProjectSetup complete\n")
+    ) 
   end
 end
 

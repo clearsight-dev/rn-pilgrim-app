@@ -80,6 +80,7 @@ def bundleId = "com.apptile.apptilepreviewdemo"
 
 def enable_onesignal = false
 def enable_moengage = false
+def enable_clevertap = false
 
 if (configFile.exists()) {
     def json = new JsonSlurper().parseText(configFile.text)
@@ -93,6 +94,10 @@ if (configFile.exists()) {
 
     if (json.feature_flags.ENABLE_MOENGAGE) {
       enable_moengage = json.feature_flags.ENABLE_ONESIGNAL
+    }
+
+    if (json.feature_flags.ENABLE_CLEVERTAP) {
+      enable_clevertap = json.feature_flags.ENABLE_CLVERTAP
     }
 }
 
@@ -137,10 +142,17 @@ android {
         assets {
           srcDirs "src/main/assets"
         }
+
         if (enable_moengage) {
           java.srcDir 'src/moengage/enabled/java'
         } else {
           java.srcDir 'src/moengage/disabled/java'
+        }
+
+        if (enable_clevertap) {
+          java.srcDir 'src/clevertap/enabled/java'
+        } else {
+          java.srcDir 'src/clevertap/disabled/java'
         }
       }
     }
@@ -183,6 +195,11 @@ dependencies {
 
     if (enable_onesignal) {
       implementation 'com.onesignal:OneSignal:[5.0.0, 5.99.99]'
+    }
+
+    if (enable_clevertap) {
+      implementation 'com.clevertap.android:clevertap-android-sdk:5.0.0'
+      implementation 'com.android.installreferrer:installreferrer:2.2'
     }
 }
 
