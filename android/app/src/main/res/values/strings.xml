@@ -1,6 +1,6 @@
 <resources>
-  <string name="app_name">gauravs app</string>
+  <string name="app_name">Pilgrim SDK staging</string>
   <string name="APPTILE_API_ENDPOINT">https://api.apptile.io</string>
   <string name="APPTILE_UPDATE_ENDPOINT">https://appconfigs.apptile.io</string>
-  <string name="APP_ID">3863104d-d3d2-475a-9dec-fe761a90bfec</string>
+  <string name="APP_ID">2299b5c8-77d8-4500-9723-c0ccfe91694d</string>
 </resources>

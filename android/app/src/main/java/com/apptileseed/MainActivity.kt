@@ -1,5 +1,6 @@
 package com.apptileseed
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -15,6 +16,10 @@ import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.bumptech.glide.Glide
+
+import androidx.lifecycle.lifecycleScope
+import com.apptileseed.src.actions.Actions
+import kotlinx.coroutines.launch
 
 class MainActivity : ReactActivity() {
     private var isJSLoaded = false;
@@ -97,6 +102,12 @@ class MainActivity : ReactActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
+
+    lifecycleScope.launch {
+        val appId = getString(R.string.APP_ID)
+        Actions.startApptileAppProcess(appId, this@MainActivity)
+    }
+
     showNativeSplash();
   }
 }
