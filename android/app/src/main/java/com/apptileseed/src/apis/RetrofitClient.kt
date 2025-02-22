@@ -49,23 +49,3 @@ object ApptileApiClient {
     val service: ApiService
         get() = serviceInstance ?: throw IllegalStateException("Apptile Api Client is not initialized. Call init(context) first.")
 }
-
-
-
-object ApptileAppConfigApiClient {
-    @Volatile
-    private var serviceInstance: AppConfigApiService? = null
-
-    fun init(context: Context) {
-        if (serviceInstance == null) {
-            synchronized(this) {
-                if (serviceInstance == null) {
-                    serviceInstance = RetrofitClient.createService(context.getString(R.string.APPTILE_UPDATE_ENDPOINT), AppConfigApiService::class.java)
-                }
-            }
-        }
-    }
-
-    val service: AppConfigApiService
-        get() = serviceInstance ?: throw IllegalStateException("ApptileAppConfigApiClient is not initialized. Call init(context) first.")
-}

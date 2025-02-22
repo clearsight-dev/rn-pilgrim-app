@@ -1,6 +1,7 @@
 package com.apptileseed.src.utils
 
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
@@ -11,100 +12,133 @@ import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-
-fun copyAssetToDocuments(context: Context, assetFileName: String, destinationFileName: String) {
+suspend fun copyAssetToDocuments(context: Context, assetFileName: String, destinationFileName: String): Boolean {
     val destinationFile = File(context.filesDir, destinationFileName)
 
-    if (!destinationFile.exists()) {
-        try {
-            context.assets.open(assetFileName).use { inputStream ->
-                FileOutputStream(destinationFile).use { outputStream ->
-                    inputStream.copyTo(outputStream)
+    return withContext(Dispatchers.IO) {
+        if (!destinationFile.exists()) {
+            try {
+                context.assets.open(assetFileName).use { inputStream ->
+                    FileOutputStream(destinationFile).use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
                 }
+                Log.d(APPTILE_LOG_TAG, "File copied successfully from asset $assetFileName to ${destinationFile.absolutePath}")
+                true
+            } catch (e: IOException) {
+                Log.e(APPTILE_LOG_TAG, "Error copying file: ${e.message}", e)
+                false
             }
-            println("File copied successfully: $destinationFile")
-        } catch (e: IOException) {
-            e.printStackTrace()
-            println("Error copying file: ${e.message}")
+        } else {
+            Log.d(APPTILE_LOG_TAG, "File already exists: ${destinationFile.absolutePath}")
+            true
         }
-    } else {
-        println("File already exists: $destinationFile")
     }
 }
 
-fun readFileContent(filePath: String): String? {
-    val file = File(filePath)
-    return if (file.exists()) {
-        file.readText()
-    } else {
-        null
+suspend fun readFileContent(filePath: String): String? {
+    return withContext(Dispatchers.IO) {
+        val file = File(filePath)
+        if (file.exists()) {
+            Log.d(APPTILE_LOG_TAG, "Reading file content from: $filePath")
+            file.readText()
+        } else {
+            Log.w(APPTILE_LOG_TAG, "File not found: $filePath")
+            null
+        }
     }
 }
 
 suspend fun saveFile(responseBody: ResponseBody, filePath: String): Boolean {
-    return try {
-        val file = File(filePath)
-        val inputStream: InputStream? = responseBody.byteStream()
-        val outputStream = withContext(Dispatchers.IO) {
-            FileOutputStream(file)
-        }
+    return withContext(Dispatchers.IO) {
+        try {
+            val file = File(filePath)
+            val inputStream: InputStream = responseBody.byteStream()
+            val outputStream = FileOutputStream(file)
 
-        inputStream?.use { input ->
-            outputStream.use { output ->
-                input.copyTo(output)
-            }
-        }
-
-        println("File copied successfully: $filePath")
-        true
-    } catch (e: Exception) {
-        println("File save failed: ${e.message}")
-        false
-    }
-}
-
-fun deleteFile(filePath: String): Boolean {
-    val file = File(filePath)
-    return if (file.exists()) {
-        file.delete()
-    } else {
-        false
-    }
-}
-
-fun moveFile(sourcePath: String, destinationPath: String): Boolean {
-    val sourceFile = File(sourcePath)
-    val destinationFile = File(destinationPath)
-
-    return if (sourceFile.exists()) {
-        println("[Apptile] File Moving from ${sourceFile.absoluteFile} to ${destinationFile.absoluteFile }")
-        sourceFile.renameTo(destinationFile)
-    } else {
-        false
-    }
-}
-
-fun unzip(zipFilePath: String, destDirPath: String) {
-    val destDir = File(destDirPath)
-    if (!destDir.exists()) destDir.mkdirs()
-
-    ZipInputStream(File(zipFilePath).inputStream()).use { zipInputStream ->
-        var entry: ZipEntry? = zipInputStream.nextEntry
-        while (entry != null) {
-            val outputFile = File(destDir, entry.name)
-
-            // Create parent directories if needed
-            if (entry.isDirectory) {
-                outputFile.mkdirs()
-            } else {
-                outputFile.parentFile?.mkdirs()
-                FileOutputStream(outputFile).use { outputStream ->
-                    zipInputStream.copyTo(outputStream)
+            inputStream.use { input ->
+                outputStream.use { output ->
+                    input.copyTo(output)
                 }
             }
+            Log.d(APPTILE_LOG_TAG, "File saved successfully: $filePath")
+            true
+        } catch (e: Exception) {
+            Log.e(APPTILE_LOG_TAG, "File save failed: ${e.message}", e)
+            false
+        }
+    }
+}
 
-            zipInputStream.closeEntry()
-            entry = zipInputStream.nextEntry
+suspend fun deleteFile(filePath: String): Boolean {
+    return withContext(Dispatchers.IO) {
+        val file = File(filePath)
+        if (file.exists()) {
+            val result = file.delete()
+            if (result) {
+                Log.d(APPTILE_LOG_TAG, "File deleted successfully: $filePath")
+            } else {
+                Log.e(APPTILE_LOG_TAG, "Failed to delete file: $filePath")
+            }
+            result
+        } else {
+            Log.w(APPTILE_LOG_TAG, "File not found for deletion: $filePath")
+            false
+        }
+    }
+}
+
+suspend fun moveFile(sourcePath: String, destinationPath: String): Boolean {
+    return withContext(Dispatchers.IO) {
+        val sourceFile = File(sourcePath)
+        val destinationFile = File(destinationPath)
+
+        if (sourceFile.exists()) {
+            val result = sourceFile.renameTo(destinationFile)
+            if (result) {
+                Log.d(APPTILE_LOG_TAG, "File moved from ${sourceFile.absolutePath} to ${destinationFile.absolutePath}")
+            } else {
+                Log.e(APPTILE_LOG_TAG, "Failed to move file from ${sourceFile.absolutePath} to ${destinationFile.absolutePath}")
+            }
+            result
+        } else {
+            Log.w(APPTILE_LOG_TAG, "Source file not found: $sourcePath")
+            false
+        }
+    }
+}
+
+suspend fun unzip(zipFilePath: String, destDirPath: String): Boolean {
+    return withContext(Dispatchers.IO) {
+        val destDir = File(destDirPath)
+        if (!destDir.exists()) destDir.mkdirs()
+
+        try {
+            ZipInputStream(File(zipFilePath).inputStream()).use { zipInputStream ->
+                var entry: ZipEntry? = zipInputStream.nextEntry
+                while (entry != null) {
+                    val outputFile = File(destDir, entry.name)
+
+                    if (entry.isDirectory) {
+                        outputFile.mkdirs()
+                        Log.d(APPTILE_LOG_TAG, "Created directory: ${outputFile.absolutePath}")
+                    } else {
+                        outputFile.parentFile?.mkdirs()
+                        FileOutputStream(outputFile).use { outputStream ->
+                            zipInputStream.copyTo(outputStream)
+                        }
+                        Log.d(APPTILE_LOG_TAG, "Extracted file: ${outputFile.absolutePath}")
+                    }
+
+                    zipInputStream.closeEntry()
+                    entry = zipInputStream.nextEntry
+                }
+            }
+            Log.d(APPTILE_LOG_TAG, "Unzipping completed successfully: $zipFilePath -> $destDirPath")
+            true
+        } catch (e: IOException) {
+            Log.e(APPTILE_LOG_TAG, "Failed to unzip file: ${e.message}", e)
+            false
         }
     }
 }

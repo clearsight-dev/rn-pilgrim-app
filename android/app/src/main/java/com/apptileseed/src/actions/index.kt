@@ -2,8 +2,9 @@ package com.apptileseed.src.actions
 
 import android.content.Context
 import android.util.Log
+import com.apptileseed.R
 import com.apptileseed.src.apis.ApptileApiClient
-import com.apptileseed.src.apis.ApptileAppConfigApiClient
+import com.apptileseed.src.utils.APPTILE_LOG_TAG
 import com.apptileseed.src.utils.copyAssetToDocuments
 import com.apptileseed.src.utils.deleteFile
 import com.apptileseed.src.utils.moveFile
@@ -20,123 +21,101 @@ object Actions {
     private const val APP_CONFIG_FILE_NAME = "appConfig.json"
     private const val BUNDLE_TRACKER_FILE_NAME = "localBundleTracker.json"
 
-    private suspend fun checkForOTA(appId: String, context: Context) = withContext(Dispatchers.IO) {
+    private suspend fun fetchManifest(appId: String) = withContext(Dispatchers.IO) {
         try {
-            val manifest = ApptileApiClient.service.getManifest(appId)
-            val trackerData =
-                readFileContent(File(context.filesDir, BUNDLE_TRACKER_FILE_NAME).absolutePath)
-
-            trackerData?.let { data ->
-                Log.d("[Apptile] tracker Data", data)
-
-                val mapType = object : TypeToken<Map<String, Any>>() {}.type
-                val parsedTrackerData: Map<String, Any>? = Gson().fromJson(data, mapType)
-
-                val localCommitId = parsedTrackerData?.get("publishedCommitId") as? Int
-                val localAndroidBundleId = parsedTrackerData?.get("androidBundleId") as? Int
-
-                val latestCommitId = manifest.forks.getOrNull(0)?.publishedCommitId
-                val androidBundle = manifest.codeArtefacts.find { it.type == "android-jsbundle" }
-                val latestAndroidBundleId = androidBundle?.id
-
-                Log.d(
-                    "[Apptile] constructor", mapOf(
-                        "latestCommitId" to latestCommitId,
-                        "localCommitId" to localCommitId,
-                        "localAndroidBundleId" to localAndroidBundleId,
-                        "latestAndroidBundleId" to latestAndroidBundleId
-                    ).toString()
-                )
-
-
-                if ((localCommitId != latestCommitId) || (latestAndroidBundleId != null && localAndroidBundleId != latestAndroidBundleId)) {
-                    if (localCommitId != latestCommitId) {
-                        // AppConfig download
-                        val downloadUrl = "${appId}/main/main/${latestCommitId}.json";
-                        val downloadResponse = ApptileAppConfigApiClient.service.downloadFile(downloadUrl)
-
-                        val tempAppConfigPath =
-                            File(context.filesDir, "tempConfig.json").absolutePath
-                        val isTempAppConfigSaved = saveFile(downloadResponse, tempAppConfigPath)
-                        val documentAppConfig = File(context.filesDir, "appConfig.json")
-
-                        if (isTempAppConfigSaved) {
-                            val isDocAppConfigDeleted = deleteFile(documentAppConfig.absolutePath)
-                            if (!isDocAppConfigDeleted) {
-                                Log.e("[Apptile] Error", "Failed to delete existing AppConfig file")
-                                return@let
-                            }
-                        }
-                        moveFile(tempAppConfigPath, documentAppConfig.absolutePath)
-                    }
-
-                    if (latestAndroidBundleId != null && localAndroidBundleId != latestAndroidBundleId) {
-                        // Bundle download
-                        val downloadResponse =
-                            ApptileApiClient.service.downloadFile(androidBundle.cdnlink)
-                        val bundlePath = File(context.filesDir, "bundles/bundle.zip")
-
-                        bundlePath.parentFile?.mkdirs()
-
-                        if (bundlePath.exists()) {
-                            val isDeleted = deleteFile(bundlePath.absolutePath)
-                            if (!isDeleted) {
-                                Log.e(
-                                    "[Apptile] Error",
-                                    "Failed to delete existing bundle.zip file"
-                                )
-                                return@let
-                            }
-                        }
-
-                        saveFile(downloadResponse, bundlePath.absolutePath)
-                        val destinationBundlePath = File(context.filesDir, "bundles").absolutePath
-                        unzip(bundlePath.absolutePath, destinationBundlePath)
-
-                        val bundlePathTest = File(context.filesDir, "bundles")
-                        if(bundlePathTest.exists() && bundlePathTest.isDirectory){
-                            Log.d("[Apptile bundles folder]", bundlePathTest.listFiles()?.toList().toString())
-                        }
-                    }
-
-                    val newTrackerConfig = Gson().toJson(
-                        mapOf(
-                            "publishedCommitId" to latestCommitId,
-                            "androidBundleId" to latestAndroidBundleId
-                        )
-                    )
-
-                    println("[Apptile] Writing new config")
-                    File(context.filesDir, BUNDLE_TRACKER_FILE_NAME).writeText(newTrackerConfig)
-
-                }
-            }
+            ApptileApiClient.service.getManifest(appId)
         } catch (e: Exception) {
-            Log.e("[Apptile] Check For OTA Failed", e.message.toString())
+            Log.e(APPTILE_LOG_TAG, "Failed to fetch manifest: ${e.message}", e)
+            null
         }
     }
 
-    suspend fun startApptileAppProcess(appId: String, context: Context) =
-        withContext(Dispatchers.IO) {
-            try {
-                val isDocumentBundleTrackerExist =
-                    File(context.filesDir, BUNDLE_TRACKER_FILE_NAME).exists()
+    private suspend fun updateAppConfig(context: Context, appId: String, latestCommitId: Int) {
+        val fetchUrl = context.getString(R.string.APPTILE_UPDATE_ENDPOINT)
+        val downloadUrl = "$fetchUrl/$appId/main/main/$latestCommitId.json"
+        val tempAppConfigPath = File(context.filesDir, "tempConfig.json").absolutePath
+        val documentAppConfig = File(context.filesDir, APP_CONFIG_FILE_NAME)
 
-                if (!isDocumentBundleTrackerExist) {
-                    copyAssetToDocuments(context, APP_CONFIG_FILE_NAME, APP_CONFIG_FILE_NAME)
-                    copyAssetToDocuments(
-                        context, BUNDLE_TRACKER_FILE_NAME, BUNDLE_TRACKER_FILE_NAME
+        try {
+            val downloadResponse = ApptileApiClient.service.downloadFile(downloadUrl)
+            // Need to validate the file before proceeding like integrety check
+            if (saveFile(downloadResponse, tempAppConfigPath)) {
+                deleteFile(documentAppConfig.absolutePath)
+                moveFile(tempAppConfigPath, documentAppConfig.absolutePath)
+            } else {
+                Log.e(APPTILE_LOG_TAG, "Failed to save temp AppConfig file")
+            }
+        } catch (e: Exception) {
+            Log.e(APPTILE_LOG_TAG, "Error updating AppConfig: ${e.message}", e)
+        }
+    }
+
+    private suspend fun updateBundle(context: Context, bundleId: Int, bundleUrl: String?) {
+        if (bundleUrl == null) return
+
+        val bundlePath = File(context.filesDir, "bundles/bundle.zip").apply { parentFile?.mkdirs() }
+        val destinationBundlePath = File(context.filesDir, "bundles").absolutePath
+
+        try {
+            val downloadResponse = ApptileApiClient.service.downloadFile(bundleUrl)
+            if (saveFile(downloadResponse, bundlePath.absolutePath)) {
+                unzip(bundlePath.absolutePath, destinationBundlePath)
+                Log.d(APPTILE_LOG_TAG, "Bundle updated successfully")
+            } else {
+                Log.e(APPTILE_LOG_TAG, "Failed to save downloaded bundle file")
+            }
+        } catch (e: Exception) {
+            Log.e(APPTILE_LOG_TAG, "Error updating bundle: ${e.message}", e)
+        }
+    }
+
+    private suspend fun checkForOTA(appId: String, context: Context) = withContext(Dispatchers.IO) {
+        val manifest = fetchManifest(appId) ?: return@withContext
+        val trackerData = readFileContent(File(context.filesDir, BUNDLE_TRACKER_FILE_NAME).absolutePath)
+
+        trackerData?.let {
+            val mapType = object : TypeToken<Map<String, Any>>() {}.type
+            val parsedTrackerData: Map<String, Any>? = Gson().fromJson(it, mapType)
+
+            val localCommitId = parsedTrackerData?.get("publishedCommitId") as? Int
+            val latestCommitId = manifest.forks.getOrNull(0)?.publishedCommitId
+
+            val bundle = manifest.codeArtefacts.find { it.type == "android-jsbundle" }
+            val localBundleId = parsedTrackerData?.get("androidBundleId") as? Int
+            val latestBundleId = bundle?.id
+            val latestBundleUrl = bundle?.cdnlink
+
+            Log.d(APPTILE_LOG_TAG, "OTA Check: latestCommitId=$latestCommitId, localCommitId=$localCommitId, " +
+                    "localAndroidBundleId=$localBundleId, latestAndroidBundleId=$latestBundleId")
+
+            if (latestCommitId != null && latestBundleId != null) {
+                val shouldUpdateCommit = latestCommitId != localCommitId
+                val shouldUpdateBundle = latestBundleId != localBundleId
+
+                if (shouldUpdateCommit) updateAppConfig(context, appId, latestCommitId)
+                if (shouldUpdateBundle) updateBundle(context, latestBundleId, latestBundleUrl) // will this bundle url present always
+
+
+                if (shouldUpdateCommit || shouldUpdateBundle) {
+                    val newTrackerConfig = Gson().toJson(
+                        mapOf("publishedCommitId" to latestCommitId, "androidBundleId" to latestBundleId)
                     )
+                    File(context.filesDir, BUNDLE_TRACKER_FILE_NAME).writeText(newTrackerConfig)
                 }
-
-                checkForOTA(appId, context)
-
-            } catch (e: Exception) {
-                Log.e("[Apptile] Starting App Process Failed", e.message.toString())
             }
         }
+    }
+
+    suspend fun startApptileAppProcess(appId: String, context: Context) = withContext(Dispatchers.IO) {
+        try {
+            val trackerFile = File(context.filesDir, BUNDLE_TRACKER_FILE_NAME)
+            if (!trackerFile.exists()) {
+                copyAssetToDocuments(context, APP_CONFIG_FILE_NAME, APP_CONFIG_FILE_NAME)
+                copyAssetToDocuments(context, BUNDLE_TRACKER_FILE_NAME, BUNDLE_TRACKER_FILE_NAME)
+            }
+            checkForOTA(appId, context)
+        } catch (e: Exception) {
+            Log.e(APPTILE_LOG_TAG, "Error starting app process: ${e.message}", e)
+        }
+    }
 }
-
-
-
-

@@ -11,14 +11,9 @@ interface ApiService {
     @GET("api/v2/app/{appId}/manifest")
     suspend fun getManifest(@Path("appId") uuid: String): ManifestResponse
 
+    // since we're give complete url it don't use default base url
     @GET
     @Streaming
     suspend fun downloadFile(@Url fileUrl: String): ResponseBody
 
-}
-
-interface AppConfigApiService {
-    @GET
-    @Streaming
-    suspend fun downloadFile(@Url fileUrl: String): ResponseBody
 }
