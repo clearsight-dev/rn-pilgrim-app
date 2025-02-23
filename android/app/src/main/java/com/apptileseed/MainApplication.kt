@@ -25,12 +25,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class MainApplication : Application(), ReactApplication {
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val initializationDeferred = CompletableDeferred<Unit>()
+    private val apptileStartupProcess = CompletableDeferred<Unit>()
 
     override val reactNativeHost: ReactNativeHost =
         object : DefaultReactNativeHost(this) {
@@ -57,18 +56,18 @@ class MainApplication : Application(), ReactApplication {
                 )
 
             override fun getJSBundleFile(): String? {
-                val startTime = System.currentTimeMillis()
+//                val startTime = System.currentTimeMillis()
+//
+//                if (!initializationDeferred.isCompleted) {
+//                    Log.d(APPTILE_LOG_TAG, "Waiting for startup process to complete...")
+//                    runBlocking {
+//                        initializationDeferred.await() // Wait in a blocking manner (not ideal but safer here)
+//                    }
+//                }
 
-                if (!initializationDeferred.isCompleted) {
-                    Log.d(APPTILE_LOG_TAG, "Waiting for startup process to complete...")
-                    runBlocking {
-                        initializationDeferred.await() // Wait in a blocking manner (not ideal but safer here)
-                    }
-                }
-
-                val endTime = System.currentTimeMillis()
-                val timeSpent = endTime - startTime
-                Log.d(APPTILE_LOG_TAG, "Time spent to complete startup process: $timeSpent ms")
+//                val endTime = System.currentTimeMillis()
+//                val timeSpent = endTime - startTime
+//                Log.d(APPTILE_LOG_TAG, "Time spent to complete startup process: $timeSpent ms")
 
                 val documentsDir = applicationContext.filesDir.absolutePath
                 val bundlesDir = "$documentsDir/bundles"
@@ -81,7 +80,10 @@ class MainApplication : Application(), ReactApplication {
                     super.getJSBundleFile()
                 }
 
-                Log.d(APPTILE_LOG_TAG, "Loading RN App from bundle: $bundlePath")
+                bundlePath?.let {
+                    Log.d(APPTILE_LOG_TAG, "Loading RN App from local bundle: $bundlePath")
+                }
+
                 return bundlePath
             }
         }
@@ -94,11 +96,17 @@ class MainApplication : Application(), ReactApplication {
         ApptileApiClient.init(this)
 
         appScope.launch {
-            Log.i(APPTILE_LOG_TAG, "Starting Startup Process")
-            val appId = getString(R.string.APP_ID)
-            Actions.startApptileAppProcess(appId, this@MainApplication)
-            initializationDeferred.complete(Unit)
-            Log.i(APPTILE_LOG_TAG, "Startup Process completed")
+            try {
+                Log.d(APPTILE_LOG_TAG, "Running in: ${Thread.currentThread().name}")
+                Log.i(APPTILE_LOG_TAG, "Starting Startup Process")
+                val appId = getString(R.string.APP_ID)
+                Actions.startApptileAppProcess(appId, this@MainApplication)
+                Log.i(APPTILE_LOG_TAG, "Startup Process completed")
+            } catch (e: Exception) {
+                Log.e(APPTILE_LOG_TAG, "Startup Process failed", e)
+            } finally {
+                apptileStartupProcess.complete(Unit) // Ensures completion even if an error occurs
+            }
         }
 
 //        createCleverTapIntegration(this).initialize(intent);

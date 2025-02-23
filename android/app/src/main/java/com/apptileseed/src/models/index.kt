@@ -1,7 +1,7 @@
 package com.apptileseed.src.models
 
 data class CodeArtefact(
-    val id: Int, val type: String, val cdnlink: String, val tag: String
+    val id: Long, val type: String, val cdnlink: String, val tag: String
 )
 
 data class Fork(
@@ -10,7 +10,7 @@ data class Fork(
     val frameworkVersion: String,
     val forkName: String,
     val title: String,
-    val publishedCommitId: Int,
+    val publishedCommitId: Long,
     val createdAt: String,
     val updatedAt: String,
     val deletedAt: String?
