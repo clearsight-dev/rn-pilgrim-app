@@ -1,6 +1,8 @@
 package com.apptileseed.src.actions
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.apptileseed.R
 import com.apptileseed.src.apis.ApptileApiClient
@@ -11,11 +13,13 @@ import com.apptileseed.src.utils.moveFile
 import com.apptileseed.src.utils.readFileContent
 import com.apptileseed.src.utils.saveFile
 import com.apptileseed.src.utils.unzip
+import com.facebook.react.ReactApplication
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+
 
 object Actions {
     private const val APP_CONFIG_FILE_NAME = "appConfig.json"
@@ -139,6 +143,41 @@ object Actions {
                     latestBundleId,
                     latestBundleUrl
                 )
+
+                if (shouldUpdateBundle || shouldUpdateCommit) {
+                    restartReactNative(context)
+                }
+
+            }
+        }
+    }
+
+    private suspend fun restartReactNative(context: Context) = withContext(Dispatchers.Main) {
+        val application = context.applicationContext as? ReactApplication
+        if (application == null) {
+            Log.e(APPTILE_LOG_TAG, "Failed to restart React Native: Not a ReactApplication")
+            return@withContext
+        }
+
+        val reactNativeHost = application.reactNativeHost
+        val reactInstanceManager = reactNativeHost.reactInstanceManager
+
+        // need to measure time taken for complete restart
+        Handler(Looper.getMainLooper()).post {
+            try {
+                Log.d(APPTILE_LOG_TAG, "Restarting React Native bundle...")
+                reactInstanceManager.recreateReactContextInBackground()
+                Log.d(
+                    APPTILE_LOG_TAG,
+                    "React Native bundle restarted successfully"
+                )
+            } catch (e: Exception) {
+                Log.e(
+                    APPTILE_LOG_TAG,
+                    "React Native restart failed",
+                    e
+                )
+                // need some fallback mechanism
             }
         }
     }
