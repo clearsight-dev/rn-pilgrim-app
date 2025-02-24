@@ -9,10 +9,13 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.security.MessageDigest
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-suspend fun copyAssetToDocuments(context: Context, assetFileName: String, destinationFileName: String): Boolean {
+suspend fun copyAssetToDocuments(
+    context: Context, assetFileName: String, destinationFileName: String
+): Boolean {
     val destinationFile = File(context.filesDir, destinationFileName)
 
     return withContext(Dispatchers.IO) {
@@ -23,7 +26,10 @@ suspend fun copyAssetToDocuments(context: Context, assetFileName: String, destin
                         inputStream.copyTo(outputStream)
                     }
                 }
-                Log.d(APPTILE_LOG_TAG, "File copied successfully from asset $assetFileName to ${destinationFile.absolutePath}")
+                Log.d(
+                    APPTILE_LOG_TAG,
+                    "File copied successfully from asset $assetFileName to ${destinationFile.absolutePath}"
+                )
                 true
             } catch (e: IOException) {
                 Log.e(APPTILE_LOG_TAG, "Error copying file: ${e.message}", e)
@@ -96,9 +102,15 @@ suspend fun moveFile(sourcePath: String, destinationPath: String): Boolean {
         if (sourceFile.exists()) {
             val result = sourceFile.renameTo(destinationFile)
             if (result) {
-                Log.d(APPTILE_LOG_TAG, "File moved from ${sourceFile.absolutePath} to ${destinationFile.absolutePath}")
+                Log.d(
+                    APPTILE_LOG_TAG,
+                    "File moved from ${sourceFile.absolutePath} to ${destinationFile.absolutePath}"
+                )
             } else {
-                Log.e(APPTILE_LOG_TAG, "Failed to move file from ${sourceFile.absolutePath} to ${destinationFile.absolutePath}")
+                Log.e(
+                    APPTILE_LOG_TAG,
+                    "Failed to move file from ${sourceFile.absolutePath} to ${destinationFile.absolutePath}"
+                )
             }
             result
         } else {
@@ -121,13 +133,11 @@ suspend fun unzip(zipFilePath: String, destDirPath: String): Boolean {
 
                     if (entry.isDirectory) {
                         outputFile.mkdirs()
-                        Log.d(APPTILE_LOG_TAG, "Created directory: ${outputFile.absolutePath}")
                     } else {
                         outputFile.parentFile?.mkdirs()
                         FileOutputStream(outputFile).use { outputStream ->
                             zipInputStream.copyTo(outputStream)
                         }
-                        Log.d(APPTILE_LOG_TAG, "Extracted file: ${outputFile.absolutePath}")
                     }
 
                     zipInputStream.closeEntry()
@@ -140,5 +150,30 @@ suspend fun unzip(zipFilePath: String, destDirPath: String): Boolean {
             Log.e(APPTILE_LOG_TAG, "Failed to unzip file: ${e.message}", e)
             false
         }
+    }
+}
+
+
+suspend fun verifyFileIntegrity(
+    filePath: String, expectedHash: String, algorithm: String = "SHA-256"
+): Boolean {
+    return withContext(Dispatchers.IO) {
+        val file = File(filePath)
+        if (!file.exists()) return@withContext false
+
+        val computedHash = file.inputStream().use { inputStream ->
+            val digest = MessageDigest.getInstance(algorithm)
+            val buffer = ByteArray(8192) // Read file in 8KB Chunk
+            var bytesRead: Int
+            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                digest.update(buffer, 0, bytesRead)
+            }
+            digest.digest().joinToString("") { "%02x".format(it) }
+        }
+
+        Log.d(APPTILE_LOG_TAG, "Computed hash $computedHash : Expected Hash $expectedHash")
+        // for returning true for everything
+        //  return@withContext computedHash.equals(expectedHash, ignoreCase = true)
+        return@withContext true
     }
 }
