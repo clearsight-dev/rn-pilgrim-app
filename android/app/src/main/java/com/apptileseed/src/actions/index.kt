@@ -14,6 +14,7 @@ import com.apptileseed.src.utils.readFileContent
 import com.apptileseed.src.utils.saveFile
 import com.apptileseed.src.utils.unzip
 import com.apptileseed.src.utils.verifyFileIntegrity
+import com.apptileseed.src.utils.copyDirectoryContents
 import com.facebook.react.ReactApplication
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -57,30 +58,6 @@ object Actions {
         }
 
         return true
-    }
-
-    private fun copyDirectoryContents(sourceDir: File, destinationDir: File) {
-        Log.d(
-            APPTILE_LOG_TAG,
-            "Moving contents from ${sourceDir.absolutePath} -> ${destinationDir.absolutePath}"
-        )
-        sourceDir.listFiles()?.forEach { file ->
-            val destFile = File(destinationDir, file.name)
-            if (file.isDirectory) {
-                destFile.mkdirs()
-                copyDirectoryContents(file, destFile)
-            } else {
-                try {
-                    file.copyTo(destFile, overwrite = true)
-                } catch (e: Exception) {
-                    Log.e(
-                        APPTILE_LOG_TAG,
-                        "Failed to move file: ${file.absolutePath} -> ${destFile.absolutePath}",
-                        e
-                    )
-                }
-            }
-        }
     }
 
     private suspend fun updateAppConfig(
@@ -251,7 +228,6 @@ object Actions {
                 Log.e(APPTILE_LOG_TAG, "React Native restart failed", e)
                 Log.d(APPTILE_LOG_TAG, "Fallback: Force-killing app")
                 android.os.Process.killProcess(android.os.Process.myPid())
-
             }
         }
     }

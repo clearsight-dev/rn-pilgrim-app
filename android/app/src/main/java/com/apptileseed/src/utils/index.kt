@@ -177,3 +177,29 @@ suspend fun verifyFileIntegrity(
         return@withContext true
     }
 }
+
+suspend fun copyDirectoryContents(sourceDir: File, destinationDir: File) {
+    return withContext(Dispatchers.IO){
+        Log.d(
+            APPTILE_LOG_TAG,
+            "Moving contents from ${sourceDir.absolutePath} -> ${destinationDir.absolutePath}"
+        )
+        sourceDir.listFiles()?.forEach { file ->
+            val destFile = File(destinationDir, file.name)
+            if (file.isDirectory) {
+                destFile.mkdirs()
+                copyDirectoryContents(file, destFile)
+            } else {
+                try {
+                    file.copyTo(destFile, overwrite = true)
+                } catch (e: Exception) {
+                    Log.e(
+                        APPTILE_LOG_TAG,
+                        "Failed to move file: ${file.absolutePath} -> ${destFile.absolutePath}",
+                        e
+                    )
+                }
+            }
+        }
+    }
+}
