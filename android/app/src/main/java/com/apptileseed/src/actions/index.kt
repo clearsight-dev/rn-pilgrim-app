@@ -7,21 +7,21 @@ import android.util.Log
 import com.apptileseed.R
 import com.apptileseed.src.apis.ApptileApiClient
 import com.apptileseed.src.utils.APPTILE_LOG_TAG
+import com.apptileseed.src.utils.BundleTrackerPrefs
 import com.apptileseed.src.utils.copyAssetToDocuments
+import com.apptileseed.src.utils.copyDirectoryContents
 import com.apptileseed.src.utils.deleteFile
 import com.apptileseed.src.utils.moveFile
 import com.apptileseed.src.utils.readFileContent
 import com.apptileseed.src.utils.saveFile
 import com.apptileseed.src.utils.unzip
 import com.apptileseed.src.utils.verifyFileIntegrity
-import com.apptileseed.src.utils.copyDirectoryContents
 import com.facebook.react.ReactApplication
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-
 
 object Actions {
     private const val APP_CONFIG_FILE_NAME = "appConfig.json"
@@ -61,37 +61,34 @@ object Actions {
     }
 
     private suspend fun updateAppConfig(
-        context: Context,
-        appId: String,
-        latestCommitId: Long
+        context: Context, appId: String, latestCommitId: Long
     ): Boolean {
         val fetchUrl = context.getString(R.string.APPTILE_UPDATE_ENDPOINT)
         val downloadUrl = "$fetchUrl/$appId/main/main/$latestCommitId.json"
         val tempAppConfigPath = File(context.filesDir, "tempConfig.json").absolutePath
-        val documentAppConfig = File(context.filesDir, APP_CONFIG_FILE_NAME)
+        val documentAppConfigPath = File(context.filesDir, APP_CONFIG_FILE_NAME).absolutePath
 
         return try {
             if (!downloadAndVerify(
-                    downloadUrl,
-                    tempAppConfigPath,
-                    "this_is_dummy_hash"
+                    downloadUrl, tempAppConfigPath, "this_is_dummy_hash"
                 )
             ) return false
-            deleteFile(documentAppConfig.absolutePath)
-            moveFile(tempAppConfigPath, documentAppConfig.absolutePath)
+            deleteFile(documentAppConfigPath)
+            moveFile(tempAppConfigPath, documentAppConfigPath)
             updateTrackerFile(context, latestCommitId, null)
             Log.d(APPTILE_LOG_TAG, "AppConfig updated successfully")
             true
         } catch (e: Exception) {
             Log.e(APPTILE_LOG_TAG, "Error updating AppConfig: ${e.message}", e)
             false
+        } finally {
+            Log.d(APPTILE_LOG_TAG, "Cleaning up temp app config path")
+            deleteFile(tempAppConfigPath)
         }
     }
 
     private suspend fun updateBundle(
-        context: Context,
-        bundleId: Long,
-        bundleUrl: String?
+        context: Context, bundleId: Long, bundleUrl: String?
     ): Boolean {
         if (bundleUrl == null) return false
 
@@ -103,9 +100,7 @@ object Actions {
 
         return try {
             if (!downloadAndVerify(
-                    bundleUrl,
-                    tempBundlePath.absolutePath,
-                    "this_is_dummy_hash"
+                    bundleUrl, tempBundlePath.absolutePath, "this_is_dummy_hash"
                 )
             ) return false
 
@@ -189,10 +184,18 @@ object Actions {
 
                 if (shouldUpdateBundle || shouldUpdateCommit) {
                     val updateStatus = mutableListOf<Boolean>()
-                    if (shouldUpdateCommit) updateStatus.add(updateAppConfig(context, appId, latestCommitId))
-                    if (shouldUpdateBundle) updateStatus.add(updateBundle(
-                        context, latestBundleId, latestBundleUrl
-                    ))
+                    if (shouldUpdateCommit) updateStatus.add(
+                        updateAppConfig(
+                            context,
+                            appId,
+                            latestCommitId
+                        )
+                    )
+                    if (shouldUpdateBundle) updateStatus.add(
+                        updateBundle(
+                            context, latestBundleId, latestBundleUrl
+                        )
+                    )
 
                     if (updateStatus.all { status -> status }) {
                         restartReactNative(context)
@@ -229,6 +232,39 @@ object Actions {
                 Log.d(APPTILE_LOG_TAG, "Fallback: Force-killing app")
                 android.os.Process.killProcess(android.os.Process.myPid())
             }
+        }
+    }
+
+    suspend fun rollBackUpdates(context: Context): Boolean {
+        return try {
+            val filesDir = context.filesDir
+
+            val filesToDelete = listOf(
+                File(filesDir, BUNDLE_TRACKER_FILE_NAME),
+                File(filesDir, APP_CONFIG_FILE_NAME),
+                File(filesDir, "bundles")
+            )
+
+            val deletionResults = filesToDelete.map { file ->
+                val success =
+                    if (file.isDirectory) file.deleteRecursively() else deleteFile(file.absolutePath)
+                if (!success) Log.e(APPTILE_LOG_TAG, "Failed to delete: ${file.absolutePath}")
+                success
+            }
+
+            return if (deletionResults.all { it }) {
+                Log.d(APPTILE_LOG_TAG, "✅ Rollback Successfully Completed")
+                BundleTrackerPrefs.resetBundleState()
+                true
+            } else {
+                Log.e(APPTILE_LOG_TAG, "❌ Rollback Failed")
+                BundleTrackerPrefs.markBundleBroken()
+                false
+            }
+        } catch (e: Exception) {
+            Log.e(APPTILE_LOG_TAG, "❌ Error while rolling back: ${e.message}", e)
+            BundleTrackerPrefs.markBundleBroken()
+            false
         }
     }
 
