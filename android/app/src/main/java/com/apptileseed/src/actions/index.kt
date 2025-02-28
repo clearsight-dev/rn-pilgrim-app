@@ -1,8 +1,6 @@
 package com.apptileseed.src.actions
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.apptileseed.R
 import com.apptileseed.src.apis.ApptileApiClient
@@ -16,16 +14,16 @@ import com.apptileseed.src.utils.readFileContent
 import com.apptileseed.src.utils.saveFile
 import com.apptileseed.src.utils.unzip
 import com.apptileseed.src.utils.verifyFileIntegrity
-import com.facebook.react.ReactApplication
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
 object Actions {
-    private const val APP_CONFIG_FILE_NAME = "appConfig.json"
-    private const val BUNDLE_TRACKER_FILE_NAME = "localBundleTracker.json"
+    const val APP_CONFIG_FILE_NAME = "appConfig.json"
+    const val BUNDLE_TRACKER_FILE_NAME = "localBundleTracker.json"
 
     private suspend fun fetchManifest(appId: String) = withContext(Dispatchers.IO) {
         try {
@@ -91,6 +89,11 @@ object Actions {
         context: Context, bundleId: Long, bundleUrl: String?
     ): Boolean {
         if (bundleUrl == null) return false
+
+        if (BundleTrackerPrefs.isBundleBlackListed(bundleId)){
+            Log.d(APPTILE_LOG_TAG, "Skipping updates due to blacklisted bundle")
+            return false
+        }
 
         val tempBundlePath =
             File(context.filesDir, "tempBundles/bundle.zip").apply { parentFile?.mkdirs() }
@@ -197,8 +200,9 @@ object Actions {
                         )
                     )
 
+                    // dev roll to make sure published bundle is always working
                     if (updateStatus.all { status -> status }) {
-                        restartReactNative(context)
+                        applyUpdates(context)
                     } else {
                         Log.e(APPTILE_LOG_TAG, "Update failed. App restart skipped.")
                     }
@@ -208,30 +212,11 @@ object Actions {
         }
     }
 
-    private suspend fun restartReactNative(context: Context) = withContext(Dispatchers.Main) {
-        val application = context.applicationContext as? ReactApplication
-        if (application == null) {
-            Log.e(APPTILE_LOG_TAG, "Failed to restart React Native: Not a ReactApplication")
-            return@withContext
-        }
 
-        val reactNativeHost = application.reactNativeHost
-        val reactInstanceManager = reactNativeHost.reactInstanceManager
-
-        // need to measure time taken for complete restart
-        Handler(Looper.getMainLooper()).post {
-            try {
-                Log.d(APPTILE_LOG_TAG, "Restarting React Native bundle...")
-                reactInstanceManager.recreateReactContextInBackground()
-                Log.d(
-                    APPTILE_LOG_TAG, "React Native bundle restarted successfully"
-                )
-            } catch (e: Exception) {
-                // need some fallback mechanism for now force closing need to discuss in office
-                Log.e(APPTILE_LOG_TAG, "React Native restart failed", e)
-                Log.d(APPTILE_LOG_TAG, "Fallback: Force-killing app")
-                android.os.Process.killProcess(android.os.Process.myPid())
-            }
+    private suspend fun applyUpdates(context: Context) = withContext(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
+            Log.d(APPTILE_LOG_TAG, "Restarting Application")
+            ProcessPhoenix.triggerRebirth(context)
         }
     }
 
@@ -258,12 +243,10 @@ object Actions {
                 true
             } else {
                 Log.e(APPTILE_LOG_TAG, "❌ Rollback Failed")
-                BundleTrackerPrefs.markBundleBroken()
                 false
             }
         } catch (e: Exception) {
             Log.e(APPTILE_LOG_TAG, "❌ Error while rolling back: ${e.message}", e)
-            BundleTrackerPrefs.markBundleBroken()
             false
         }
     }
