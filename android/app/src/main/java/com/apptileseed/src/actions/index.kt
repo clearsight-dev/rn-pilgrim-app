@@ -91,12 +91,6 @@ object Actions {
         context: Context, bundleId: Long, bundleUrl: String?
     ): Boolean {
         if (bundleUrl == null) return false
-
-        if (BundleTrackerPrefs.isBundleBlackListed(bundleId)){
-            Log.d(APPTILE_LOG_TAG, "Skipping updates due to blacklisted bundle")
-            return false
-        }
-
         val tempBundlePath =
             File(context.filesDir, "tempBundles/bundle.zip").apply { parentFile?.mkdirs() }
         val tempBundleExtractPath =

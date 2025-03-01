@@ -6,7 +6,6 @@ import com.apptileseed.src.actions.Actions
 import com.apptileseed.src.apis.ApptileApiClient
 import com.apptileseed.src.utils.APPTILE_LOG_TAG
 import com.apptileseed.src.utils.BundleTrackerPrefs
-import com.apptileseed.src.utils.BundleType
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
@@ -68,11 +67,9 @@ class MainApplication : Application(), ReactApplication {
                             "⚠️ Previous local bundle failed. ✅ Using embedded bundle."
                         )
                         BundleTrackerPrefs.resetBundleState()
-                        BundleTrackerPrefs.setCurrentBundleType(BundleType.EMBEDDED)
                         super.getJSBundleFile()
                     } else {
                         BundleTrackerPrefs.resetBundleState()
-                        BundleTrackerPrefs.setCurrentBundleType(BundleType.LOCAL)
                         jsBundleFile.absolutePath.also { path ->
                             Log.d(APPTILE_LOG_TAG, "✅ Using local bundle: $path")
                         }
@@ -82,7 +79,6 @@ class MainApplication : Application(), ReactApplication {
                 else -> {
                     Log.d(APPTILE_LOG_TAG, "⚠️ No local bundle found. ✅ Using embedded bundle.")
                     BundleTrackerPrefs.resetBundleState()
-                    BundleTrackerPrefs.setCurrentBundleType(BundleType.EMBEDDED)
                     super.getJSBundleFile()
                 }
             }
@@ -99,7 +95,7 @@ class MainApplication : Application(), ReactApplication {
 
         // Capturing unCaught Errors & resetting the bundle & app config
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            BundleTrackerPrefs.markCurrentBundleBroken(this@MainApplication)
+            BundleTrackerPrefs.markCurrentBundleBroken()
             systemDefaultExceptionHandler?.uncaughtException(thread, throwable)
         }
 
