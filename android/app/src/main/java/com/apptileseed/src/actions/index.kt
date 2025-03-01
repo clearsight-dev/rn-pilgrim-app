@@ -1,7 +1,9 @@
 package com.apptileseed.src.actions
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
+import com.apptileseed.MainActivity
 import com.apptileseed.R
 import com.apptileseed.src.apis.ApptileApiClient
 import com.apptileseed.src.utils.APPTILE_LOG_TAG
@@ -16,10 +18,10 @@ import com.apptileseed.src.utils.unzip
 import com.apptileseed.src.utils.verifyFileIntegrity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+
 
 object Actions {
     const val APP_CONFIG_FILE_NAME = "appConfig.json"
@@ -212,11 +214,17 @@ object Actions {
         }
     }
 
+    private fun restartReactNativeApp(context: Context) {
+        Log.d(APPTILE_LOG_TAG, "Restarting React Native app")
+        val intent = Intent(context, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        context.startActivity(intent)
+        Runtime.getRuntime().exit(0)
+    }
 
-    private suspend fun applyUpdates(context: Context) = withContext(Dispatchers.Main) {
-        withContext(Dispatchers.IO) {
-            Log.d(APPTILE_LOG_TAG, "Restarting Application")
-            ProcessPhoenix.triggerRebirth(context)
+    private suspend fun applyUpdates(context: Context) {
+        withContext(Dispatchers.Main) {
+            restartReactNativeApp(context)
         }
     }
 
