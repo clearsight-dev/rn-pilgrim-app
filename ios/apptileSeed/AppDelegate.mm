@@ -1,4 +1,5 @@
 #import "AppDelegate.h"
+#import "apptileSeed-Swift.h"
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
@@ -34,6 +35,17 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  
+  [Actions startApptileAppProcess:^(BOOL success) {
+      if (success) {
+          NSLog(@"ApptileStartupProcess: Apptile app process started successfully.");
+      } else {
+          NSLog(@"ApptileStartupProcess: Failed to start Apptile app process.");
+      }
+  }];
+  
+
+  
 #if ENABLE_CLEVERTAP
   [CleverTap autoIntegrate];
   [[CleverTapReactManager sharedInstance] applicationDidLaunchWithOptions:launchOptions];
