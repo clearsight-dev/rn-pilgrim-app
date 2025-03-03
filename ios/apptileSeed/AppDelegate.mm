@@ -31,19 +31,63 @@
 #import <CleverTap.h>
 #endif
 
+// Need to revise
+
+#include <signal.h>
+#include <execinfo.h>
+
+void handleSignal(int signal) {
+    NSLog(@"⚠️ Caught Signal: %d", signal);
+    
+    // Mark bundle as broken before crashing
+    [BundleTrackerPrefs markCurrentBundleBroken];
+
+    // Restore default handler
+    struct sigaction defaultAction;
+    sigemptyset(&defaultAction.sa_mask);
+    defaultAction.sa_flags = 0;
+    defaultAction.sa_handler = SIG_DFL;
+    sigaction(signal, &defaultAction, NULL);
+
+    // Re-raise the signal to let the system handle it
+    raise(signal);
+}
+
+void setupSignalHandlers() {
+    int signals[] = {SIGABRT, SIGILL, SIGSEGV, SIGFPE, SIGBUS, SIGPIPE};
+    for (int i = 0; i < sizeof(signals) / sizeof(signals[0]); i++) {
+        struct sigaction action;
+        sigemptyset(&action.sa_mask);
+        action.sa_flags = 0;
+        action.sa_handler = handleSignal;
+        sigaction(signals[i], &action, NULL);
+    }
+}
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+   setupSignalHandlers(); // Install crash signal handlers
+   NSLog(@"ApptileStartupProcess: Running in: %@", [NSThread isMainThread] ? @"Main Thread" : @"Background Thread");
+   NSLog(@"ApptileStartupProcess: Starting Startup Process");
   
-  [Actions startApptileAppProcess:^(BOOL success) {
-      if (success) {
-          NSLog(@"ApptileStartupProcess: Apptile app process started successfully.");
-      } else {
-          NSLog(@"ApptileStartupProcess: Failed to start Apptile app process.");
+  if ([BundleTrackerPrefs isBrokenBundle]) {
+      NSLog(@"ApptileStartupProcess: Previous bundle status: failed, starting rollback");
+      [Actions rollBackUpdates];
+  }
+  
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      @try {
+          [Actions startApptileAppProcess:^(BOOL success) {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  NSLog(@"ApptileStartupProcess: Startup Process %@", success ? @"Completed" : @"Failed");
+              });
+          }];
+      } @catch (NSException *exception) {
+          NSLog(@"ApptileStartupProcess: Startup Process failed: %@", exception.reason);
       }
-  }];
-  
+  });
 
   
 #if ENABLE_CLEVERTAP
@@ -185,24 +229,35 @@
 - (NSURL *)getBundleURL
 {
 #if DEBUG
-  NSURL *url = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
-  return url;
+    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
 #else
-  // Get the path to the Documents directory
-  NSArray<NSURL *> *documentDirectories = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-  NSURL *documentsDirectory = [documentDirectories firstObject];
+    // Get the path to the Documents directory
+    NSArray<NSURL *> *documentDirectories = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+    NSURL *documentsDirectory = [documentDirectories firstObject];
 
-  // Create the file URL for main.jsbundle inside the bundles subdirectory
-  NSURL *docBundlesDirectory = [documentsDirectory URLByAppendingPathComponent:@"bundles"];
-  NSURL *mainJSBundleURL = [docBundlesDirectory URLByAppendingPathComponent:@"main.jsbundle"];
+    // Construct the local bundle path
+    NSURL *bundlesDir = [documentsDirectory URLByAppendingPathComponent:@"bundles"];
+    NSURL *jsBundleFile = [bundlesDir URLByAppendingPathComponent:@"main.jsbundle"];
 
-  // Check if the file exists at the specified URL
-  if (![[NSFileManager defaultManager] fileExistsAtPath:[mainJSBundleURL path]]) {
-      mainJSBundleURL = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-  }
-  return mainJSBundleURL;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[jsBundleFile path]]) {
+        if ([BundleTrackerPrefs isBrokenBundle]) {
+            NSLog(@"⚠️ Previous local bundle failed. ✅ Using embedded bundle.");
+            [BundleTrackerPrefs resetBundleState];
+            return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+        } else {
+            [BundleTrackerPrefs resetBundleState];
+            NSLog(@"✅ Using local bundle: %@", [jsBundleFile path]);
+            return jsBundleFile;
+        }
+    }
+
+    NSLog(@"⚠️ No local bundle found. ✅ Using embedded bundle.");
+    [BundleTrackerPrefs resetBundleState];
+
+    return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }
+
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
 {

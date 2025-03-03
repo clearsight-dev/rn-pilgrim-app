@@ -255,6 +255,42 @@ class Actions: NSObject {
     NSLog("\(APPTILE_LOG_TAG) : Applying Updates...")
     loadDownloadedBundleAndRestart()
   }
+  
+  @objc static func rollBackUpdates() -> Bool {
+      do {
+          let filesDir = FileUtils.documentsDirectory
+
+          let filesToDelete = [
+              filesDir.appendingPathComponent(BUNDLE_TRACKER_FILE_NAME),
+              filesDir.appendingPathComponent(APP_CONFIG_FILE_NAME),
+              filesDir.appendingPathComponent("bundles")
+          ]
+
+          let deletionResults = filesToDelete.map { file in
+              do {
+                  if FileManager.default.fileExists(atPath: file.path) {
+                      try FileManager.default.removeItem(at: file)
+                      return true
+                  }
+              } catch {
+                  NSLog("\(APPTILE_LOG_TAG) ❌ Failed to delete: \(file.path), error: \(error.localizedDescription)")
+              }
+              return false
+          }
+
+          if deletionResults.allSatisfy({ $0 }) {
+              NSLog("\(APPTILE_LOG_TAG) ✅ Rollback Successfully Completed")
+              BundleTrackerPrefs.resetBundleState()
+              return true
+          } else {
+              NSLog("\(APPTILE_LOG_TAG) ❌ Rollback Failed")
+              return false
+          }
+      } catch {
+          NSLog("\(APPTILE_LOG_TAG) ❌ Error while rolling back: \(error.localizedDescription)")
+          return false
+      }
+  }
 
   static func checkForOTA(appId: String) async {
     guard let manifest = await fetchManifest(appId: appId) else { return }
@@ -326,10 +362,6 @@ class Actions: NSObject {
     }
   }
 }
-
-
-// Rolling back
-// Global error handling
 
 
 // have to evaluvate the following things
