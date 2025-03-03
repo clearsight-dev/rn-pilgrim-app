@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import React
 
 @objc(Actions)
 class Actions: NSObject {
@@ -23,25 +24,28 @@ class Actions: NSObject {
       let downloadedPath = try await ApptileApiClient.shared.downloadFile(
         from: url
       ).path
-      guard
-        let downloadedData = FileUtils.readFileContent(filePath: downloadedPath)
-      else { return false }
+      
+      
+      NSLog("\(APPTILE_LOG_TAG) : Temp downloaded file from \(url): \(downloadedPath)")
+//      guard
+//        let downloadedData = FileUtils.readFileContent(filePath: downloadedPath)
+//      else { return false }
 
       defer {
         FileUtils.deleteFile(filePath: downloadedPath)
         NSLog("\(APPTILE_LOG_TAG) : Temp file deleted: \(downloadedPath)")
       }
+// Required but commenting for now
+//      let data = downloadedData.data(using: .utf8)!
+//
+//      if data.isEmpty {
+//        NSLog("\(APPTILE_LOG_TAG) : Download failed: Empty response")
+//        return false
+//      }
 
-      let data = downloadedData.data(using: .utf8)!
-
-      if data.isEmpty {
-        NSLog("\(APPTILE_LOG_TAG) : Download failed: Empty response")
-        return false
-      }
-
-      let success = FileUtils.saveFile(data: data, filePath: tempPath)
+      let success = FileUtils.moveFile(sourcePath: downloadedPath, destinationPath: tempPath)
       if !success {
-        NSLog("\(APPTILE_LOG_TAG) : Failed to save downloaded file")
+        NSLog("\(APPTILE_LOG_TAG) : Failed to move downloaded file to temp path")
         return false
       }
 
@@ -245,6 +249,12 @@ class Actions: NSObject {
       }
     }
   }
+  
+  
+  static func applyUpdates() {
+    NSLog("\(APPTILE_LOG_TAG) : Applying Updates...")
+    loadDownloadedBundleAndRestart()
+  }
 
   static func checkForOTA(appId: String) async {
     guard let manifest = await fetchManifest(appId: appId) else { return }
@@ -302,6 +312,12 @@ class Actions: NSObject {
               updateStatus.append(isSucceed)
             }
 
+            if shouldUpdateBundle || shouldUpdateCommit {
+              DispatchQueue.main.async {
+                applyUpdates()
+              }
+            }
+            
           }
         }
       } catch {
@@ -309,4 +325,80 @@ class Actions: NSObject {
       }
     }
   }
+}
+
+
+// Rolling back
+// Global error handling
+
+
+// have to evaluvate the following things
+// I need to that react native launch itself to make it smooth
+func loadDownloadedBundleAndRestart() {
+    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+          let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {
+        NSLog("\(APPTILE_LOG_TAG) :❌ Failed to find the app window")
+        return
+    }
+    
+    guard let bundlePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("bundles/main.jsbundle"),
+          FileManager.default.fileExists(atPath: bundlePath.path) else {
+        NSLog("\(APPTILE_LOG_TAG) :⚠️ Downloaded bundle not found, falling back to default")
+        loadDefaultBundleAndRestart()
+        return
+    }
+    
+    NSLog("\(APPTILE_LOG_TAG) :✅ Loading downloaded bundle from: \(bundlePath.path)")
+    
+    // Set up a new RCTRootView with the downloaded bundle
+    let rootView = RCTRootView(
+        bundleURL: bundlePath,
+        moduleName: "apptileSeed",
+        initialProperties: nil,
+        launchOptions: nil
+    )
+
+    restartReactNativeApp(with: rootView, window: window)
+}
+
+func loadDefaultBundleAndRestart() {
+    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+          let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {
+        NSLog("\(APPTILE_LOG_TAG) :❌ Failed to find the app window")
+        return
+    }
+    
+    let defaultBundleURL: URL
+    #if DEBUG
+    defaultBundleURL = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)
+    #else
+    defaultBundleURL = Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
+    #endif
+    
+    let rootView = RCTRootView(
+        bundleURL: defaultBundleURL,
+        moduleName: "apptileSeed",
+        initialProperties: nil,
+        launchOptions: nil
+    )
+
+    restartReactNativeApp(with: rootView, window: window)
+}
+
+func restartReactNativeApp(with rootView: RCTRootView, window: UIWindow) {
+    NSLog("\(APPTILE_LOG_TAG) :🔄 Restarting React Native app")
+
+    // Create a new rootViewController with the new RCTRootView
+    let newViewController = UIViewController()
+    newViewController.view = rootView
+
+    // Update the app's rootViewController
+    window.rootViewController = newViewController
+    window.makeKeyAndVisible()
+
+    // Force a slight delay to ensure UI updates correctly
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        window.rootViewController = newViewController
+    }
 }
