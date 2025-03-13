@@ -11,27 +11,26 @@
 @implementation StartupHandler
 
 + (void)handleStartupProcess {
-  NSString *tag = [ApptileConstants APPTILE_LOG_TAG];
-  NSLog(@"%@: Running in: %@", tag, [NSThread isMainThread] ? @"Main Thread" : @"Background Thread");
-  NSLog(@"%@: Starting Startup Process", tag);
- 
- if ([BundleTrackerPrefs isBrokenBundle]) {
-     NSLog(@"%@: Previous bundle status: failed, starting rollback", tag);
-     [Actions rollBackUpdates];
- }
- 
-// Launching apptile startup process in background thread
- dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-     @try {
-         [Actions startApptileAppProcess:^(BOOL success) {
-             dispatch_async(dispatch_get_main_queue(), ^{
-               NSLog(@"%@: Startup Process %@", tag, success ? @"Completed" : @"Failed");
-             });
-         }];
-     } @catch (NSException *exception) {
-         NSLog(@"%@: Startup Process failed: %@", tag, exception.reason);
-     }
- });
+    [Logger info:[NSString stringWithFormat:@"Running in: %@", [NSThread isMainThread] ? @"Main Thread" : @"Background Thread"]];
+    [Logger info:@"Starting Startup Process"];
+
+    if ([BundleTrackerPrefs isBrokenBundle]) {
+        [Logger warn:@"Previous bundle status: failed, starting rollback"];
+        [Actions rollBackUpdates];
+    }
+
+    // Launching apptile startup process in background thread
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        @try {
+            [Actions startApptileAppProcess:^(BOOL success) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [Logger success:[NSString stringWithFormat:@"Startup Process %@", success ? @"Completed" : @"Failed"]];
+                });
+            }];
+        } @catch (NSException *exception) {
+            [Logger error:[NSString stringWithFormat:@"Startup Process failed: %@", exception.reason]];
+        }
+    });
 }
 
 @end

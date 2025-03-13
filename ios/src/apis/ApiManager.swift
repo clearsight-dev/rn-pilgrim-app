@@ -11,15 +11,15 @@ final class NetworkLogger: EventMonitor, @unchecked Sendable {
     let queue = DispatchQueue(label: "com.apptile.networklogger", qos: .background)
 
     func requestDidResume(_ request: Request) {
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG) : 🚀 Request Started: \(request.cURLDescription())")
+        Logger.info("Request Started: \(request.cURLDescription())")
     }
 
     func requestDidFinish(_ request: Request) {
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG) : ✅ Request Finished: \(request.description)")
+        Logger.info("Request Finished: \(request.description)")
     }
 
     func request(_: DataRequest, didParseResponse response: DataResponse<Data?, AFError>) {
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG) : 📡 Response Received: \(response.response?.statusCode ?? 0)")
+        Logger.info("Response Received: \(response.response?.statusCode ?? 0)")
     }
 }
 

@@ -6,18 +6,16 @@
 //
 import Foundation
 
-@objc public class ApptileConstants: NSObject {
-    @objc public static let APPTILE_LOG_TAG: String = "ApptileStartupProcess"
-}
-
 enum LogLevel: String {
     case debug = "🐛 DEBUG"
     case info = "ℹ️ INFO"
     case warn = "⚠️ WARN"
     case error = "❌ ERROR"
+    case success = "✅ SUCCESS"
 }
 
-class Logger {
+@objcMembers
+class Logger: NSObject {
     static func debug(_ message: String) {
         log(message, level: .debug)
     }
@@ -30,12 +28,16 @@ class Logger {
         log(message, level: .warn)
     }
 
+    static func success(_ message: String) {
+        log(message, level: .success)
+    }
+
     static func error(_ message: String) {
         log(message, level: .error)
     }
 
     private static func log(_ message: String, level: LogLevel) {
-        let formattedMessage = "[\(ApptileConstants.APPTILE_LOG_TAG)] \(level.rawValue): \(message)"
+        let formattedMessage = "[ApptileStartupProcess] \(level.rawValue): \(message)"
         NSLog(formattedMessage)
     }
 }

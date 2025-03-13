@@ -9,28 +9,26 @@ import Foundation
 import React
 
 class RestartHandler {
-    // MARK: - Public API
-
     static func loadDownloadedBundleAndRestart() {
         guard let window = getAppWindow() else {
-            logError("❌ Failed to find the app window")
+            Logger.error("Failed to find the app window")
             return
         }
 
         if let bundlePath = getDownloadedBundlePath(),
            FileManager.default.fileExists(atPath: bundlePath.path)
         {
-            logSuccess("✅ Loading downloaded bundle from: \(bundlePath.path)")
+            Logger.success("Loading downloaded bundle from: \(bundlePath.path)")
             restartReactNativeApp(bundleURL: bundlePath, window: window)
         } else {
-            logWarning("⚠️ Downloaded bundle not found, falling back to default")
+            Logger.warn("Downloaded bundle not found, falling back to default")
             loadDefaultBundleAndRestart()
         }
     }
 
     static func loadDefaultBundleAndRestart() {
         guard let window = getAppWindow() else {
-            logError("❌ Failed to find the app window")
+            Logger.error("Failed to find the app window")
             return
         }
 
@@ -38,10 +36,8 @@ class RestartHandler {
         restartReactNativeApp(bundleURL: defaultBundleURL, window: window)
     }
 
-    // MARK: - Helper Methods
-
     private static func restartReactNativeApp(bundleURL: URL, window: UIWindow) {
-        logInfo("🔄 Restarting React Native app")
+        Logger.info("Restarting React Native app")
 
         let rootView = RCTRootView(
             bundleURL: bundleURL,
@@ -76,23 +72,5 @@ class RestartHandler {
         #else
             return Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
         #endif
-    }
-
-    // MARK: - Logger
-
-    private static func logInfo(_ message: String) {
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG): \(message)")
-    }
-
-    private static func logSuccess(_ message: String) {
-        logInfo("✅ \(message)")
-    }
-
-    private static func logWarning(_ message: String) {
-        logInfo("⚠️ \(message)")
-    }
-
-    private static func logError(_ message: String) {
-        logInfo("❌ \(message)")
     }
 }

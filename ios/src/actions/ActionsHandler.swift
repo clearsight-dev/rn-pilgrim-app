@@ -13,6 +13,8 @@ class Actions: NSObject {
     static let APP_CONFIG_FILE_NAME = "appConfig.json"
     static let BUNDLE_TRACKER_FILE_NAME = "localBundleTracker.json"
 
+    // MARK: - Startup Process Entry Point
+
     @objc static func startApptileAppProcess(
         _ completion: @escaping @convention(block) (Bool) -> Void
     ) {
@@ -22,16 +24,16 @@ class Actions: NSObject {
             guard let appId = getAppId(),
                   !appId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             else {
-                logError("APP_ID is missing or empty in Info.plist")
+                Logger.error("APP_ID is missing or empty in Info.plist")
                 completion(false)
                 return
             }
 
-            logInfo("Using App ID: \(appId)")
+            Logger.info("Using App ID: \(appId)")
 
             if !isTrackerFilePresent() {
                 guard copyInitialAssets() else {
-                    logError("Failed to copy initial assets.")
+                    Logger.error("Failed to copy initial assets.")
                     completion(false)
                     return
                 }
@@ -61,14 +63,16 @@ class Actions: NSObject {
         return operations.allSatisfy { $0 }
     }
 
+    // MARK: OTA Handlers
+
     private static func performOTAUpdate(appId: String) async -> Bool {
         guard let manifest = await fetchManifest(appId: appId) else {
-            logError("Failed to fetch manifest.")
+            Logger.error("Failed to fetch manifest.")
             return false
         }
 
         guard let trackerData = readTrackerFile() else {
-            logError("Failed to read tracker file.")
+            Logger.error("Failed to read tracker file.")
             return false
         }
 
@@ -79,9 +83,7 @@ class Actions: NSObject {
         do {
             return try await ApptileApiClient.shared.getManifest(appId: appId)
         } catch {
-            NSLog(
-                "\(ApptileConstants.APPTILE_LOG_TAG): Failed to fetch manifest: \(error.localizedDescription)"
-            )
+            Logger.error("Failed to fetch manifest: \(error.localizedDescription)")
             return nil
         }
     }
@@ -95,7 +97,7 @@ class Actions: NSObject {
         do {
             return try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any]
         } catch {
-            logError("Error parsing tracker data: \(error)")
+            Logger.error("Error parsing tracker data: \(error)")
             return nil
         }
     }
@@ -116,12 +118,12 @@ class Actions: NSObject {
         var updateResults: [Bool] = []
 
         if shouldUpdateCommit {
-            logInfo("Starting App Config update...")
+            Logger.info("Starting App Config update...")
             updateResults.append(await Actions.updateAppConfig(appId: appId, latestCommitId: latestCommitId!))
         }
 
         if shouldUpdateBundle {
-            logInfo("Starting Bundle update...")
+            Logger.info("Starting Bundle update...")
             updateResults.append(await Actions.updateBundle(bundleId: latestBundleId!, bundleUrl: latestBundleUrl))
         }
 
@@ -147,32 +149,32 @@ class Actions: NSObject {
 
         // Step 1: Download & Verify
         guard await downloadAndVerify(url: downloadUrl, tempPath: tempAppConfigPath, expectedHash: "this_is_dummy_hash") else {
-            logError("App Config download or verification failed.")
+            Logger.error("App Config download or verification failed.")
             return false
         }
 
         // Step 2: Delete Old AppConfig
         guard FileUtils.deleteFile(filePath: documentAppConfigPath) else {
-            logError("Failed to delete old app config file.")
+            Logger.error("Failed to delete old app config file.")
             return false
         }
 
         // Step 3: Move Temp to AppConfig
         guard FileUtils.moveFile(sourcePath: tempAppConfigPath, destinationPath: documentAppConfigPath) else {
-            logError("Failed to move app config from temp to document path.")
+            Logger.error("Failed to move app config from temp to document path.")
             return false
         }
 
         // Step 4: Update Tracker File
         await updateTrackerFile(latestCommitId: latestCommitId, latestBundleId: nil)
 
-        logInfo("App Config updated successfully ✅")
+        Logger.info("App Config updated successfully ✅")
         return true
     }
 
     private static func updateBundle(bundleId: Int64, bundleUrl: String?) async -> Bool {
         guard let bundleUrl = bundleUrl, let url = URL(string: bundleUrl) else {
-            logError("Invalid bundle URL")
+            Logger.error("Invalid bundle URL")
             return false
         }
 
@@ -183,7 +185,7 @@ class Actions: NSObject {
 
         // Cleanup temp files in case of failure
         defer {
-            logInfo("Cleaning up temp bundle and extraction paths.")
+            Logger.info("Cleaning up temp bundle and extraction paths.")
             FileUtils.deleteFile(filePath: tempBundlePath.path)
             FileUtils.deleteFile(filePath: tempBundleExtractPath.path)
         }
@@ -192,31 +194,31 @@ class Actions: NSObject {
         guard FileUtils.createDirectoryIfNeeded(at: tempBundlePath.deletingLastPathComponent()) &&
             FileUtils.createDirectoryIfNeeded(at: tempBundleExtractPath)
         else {
-            logError("Failed to create temp directories.")
+            Logger.error("Failed to create temp directories.")
             return false
         }
 
         // Step 2: Download and Verify
         guard await downloadAndVerify(url: bundleUrl, tempPath: tempBundlePath.path, expectedHash: "this_is_dummy_hash") else {
-            logError("Bundle download or verification failed.")
+            Logger.error("Bundle download or verification failed.")
             return false
         }
 
         // Step 3: Unzip the Bundle
         guard FileUtils.unzip(zipFilePath: tempBundlePath.path, destinationPath: tempBundleExtractPath.path) else {
-            logError("Failed to unzip bundle.")
+            Logger.error("Failed to unzip bundle.")
             return false
         }
 
         // Step 4: Delete Existing Bundle Folder
         guard FileUtils.deleteFile(filePath: destinationBundlesPath.path) else {
-            logError("Failed to delete existing bundle path.")
+            Logger.error("Failed to delete existing bundle path.")
             return false
         }
 
         // Step 5: Move Unzipped Contents to Destination
         guard FileUtils.createDirectoryIfNeeded(at: destinationBundlesPath) else {
-            logError("Failed to create destination bundle path.")
+            Logger.error("Failed to create destination bundle path.")
             return false
         }
         FileUtils.copyDirectoryContents(sourcePath: tempBundleExtractPath.path, destinationPath: destinationBundlesPath.path)
@@ -224,7 +226,7 @@ class Actions: NSObject {
         // Step 6: Update Tracker File
         await updateTrackerFile(latestCommitId: nil, latestBundleId: bundleId)
 
-        logInfo("Bundle updated successfully ✅")
+        Logger.info("Bundle updated successfully ✅")
         return true
     }
 
@@ -234,23 +236,23 @@ class Actions: NSObject {
 
             defer {
                 FileUtils.deleteFile(filePath: downloadedPath)
-                logInfo("Temp file deleted: \(downloadedPath)")
+                Logger.info("Temp file deleted: \(downloadedPath)")
             }
 
             guard FileUtils.moveFile(sourcePath: downloadedPath, destinationPath: tempPath) else {
-                logError("Failed to move downloaded file to temp path")
+                Logger.error("Failed to move downloaded file to temp path")
                 return false
             }
 
             guard FileUtils.verifyFileIntegrity(filePath: tempPath, expectedHash: expectedHash) else {
-                logError("Integrity check failed")
+                Logger.error("Integrity check failed")
                 FileUtils.deleteFile(filePath: tempPath)
                 return false
             }
 
             return true
         } catch {
-            logError("Download error: \(error.localizedDescription)")
+            Logger.error("Download error: \(error.localizedDescription)")
             return false
         }
     }
@@ -263,7 +265,7 @@ class Actions: NSObject {
               let data = trackerContent.data(using: .utf8),
               var trackerData = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
         else {
-            logInfo("Tracker file is empty or unreadable. Skipping update.")
+            Logger.info("Tracker file is empty or unreadable. Skipping update.")
             return
         }
 
@@ -273,19 +275,21 @@ class Actions: NSObject {
 
         // Step 3: Serialize and Save Updated Data
         guard let jsonData = try? JSONSerialization.data(withJSONObject: trackerData, options: .prettyPrinted) else {
-            logError("Failed to serialize updated tracker data.")
+            Logger.error("Failed to serialize updated tracker data.")
             return
         }
 
         guard FileUtils.saveFile(data: jsonData, filePath: trackerFilePath) else {
-            logError("Failed to save updated tracker data.")
+            Logger.error("Failed to save updated tracker data.")
             return
         }
-        logInfo("Tracker file updated successfully ✅ : \(trackerData)")
+        Logger.info("Tracker file updated successfully ✅ : \(trackerData)")
     }
 
+    // MARK: Update Handlers
+
     static func applyUpdates() {
-        logInfo("Applying Updates...")
+        Logger.info("Applying Updates...")
         RestartHandler.loadDownloadedBundleAndRestart()
     }
 
@@ -299,21 +303,12 @@ class Actions: NSObject {
         let isDeletedSuccessfully = filesToDelete.allSatisfy { FileUtils.deleteFile(filePath: $0) }
 
         if isDeletedSuccessfully {
-            logInfo("✅ Rollback Successfully Completed")
+            Logger.info("✅ Rollback Successfully Completed")
             BundleTrackerPrefs.resetBundleState()
             return true
         } else {
-            logError("❌ Rollback Failed")
+            Logger.error("❌ Rollback Failed")
             return false
         }
-    }
-
-    // Need to move to logger file
-    private static func logInfo(_ message: String) {
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG): \(message)")
-    }
-
-    private static func logError(_ message: String) {
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG) [ERROR]: \(message)")
     }
 }
