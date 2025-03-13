@@ -1,4 +1,7 @@
 #import "AppDelegate.h"
+
+#import "CrashHandler.h"
+#import "StartupHandler.h"
 #import "apptileSeed-Swift.h"
 
 #import <React/RCTBundleURLProvider.h>
@@ -31,65 +34,14 @@
 #import <CleverTap.h>
 #endif
 
-// Need to revise
-
-#include <signal.h>
-#include <execinfo.h>
-
-void handleSignal(int signal) {
-    NSLog(@"⚠️ Caught Signal: %d", signal);
-    
-    // Mark bundle as broken before crashing
-    [BundleTrackerPrefs markCurrentBundleBroken];
-
-    // Restore default handler
-    struct sigaction defaultAction;
-    sigemptyset(&defaultAction.sa_mask);
-    defaultAction.sa_flags = 0;
-    defaultAction.sa_handler = SIG_DFL;
-    sigaction(signal, &defaultAction, NULL);
-
-    // Re-raise the signal to let the system handle it
-    raise(signal);
-}
-
-void setupSignalHandlers() {
-    int signals[] = {SIGABRT, SIGILL, SIGSEGV, SIGFPE, SIGBUS, SIGPIPE};
-    for (int i = 0; i < sizeof(signals) / sizeof(signals[0]); i++) {
-        struct sigaction action;
-        sigemptyset(&action.sa_mask);
-        action.sa_flags = 0;
-        action.sa_handler = handleSignal;
-        sigaction(signals[i], &action, NULL);
-    }
-}
-
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-   setupSignalHandlers(); // Install crash signal handlers
-   NSLog(@"ApptileStartupProcess: Running in: %@", [NSThread isMainThread] ? @"Main Thread" : @"Background Thread");
-   NSLog(@"ApptileStartupProcess: Starting Startup Process");
-  
-  if ([BundleTrackerPrefs isBrokenBundle]) {
-      NSLog(@"ApptileStartupProcess: Previous bundle status: failed, starting rollback");
-      [Actions rollBackUpdates];
-  }
-  
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      @try {
-          [Actions startApptileAppProcess:^(BOOL success) {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  NSLog(@"ApptileStartupProcess: Startup Process %@", success ? @"Completed" : @"Failed");
-              });
-          }];
-      } @catch (NSException *exception) {
-          NSLog(@"ApptileStartupProcess: Startup Process failed: %@", exception.reason);
-      }
-  });
-
-  
+  // Codepush & OTA Handling
+   [CrashHandler setupSignalHandlers];
+   [StartupHandler handleStartupProcess];
+    
 #if ENABLE_CLEVERTAP
   [CleverTap autoIntegrate];
   [[CleverTapReactManager sharedInstance] applicationDidLaunchWithOptions:launchOptions];
