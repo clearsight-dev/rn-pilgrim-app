@@ -14,7 +14,8 @@
 @implementation CrashHandler
 
 void handleSignal(int signal) {
-  NSLog(@"⚠️ Caught Signal: %d", signal);
+  NSString *tag = [ApptileConstants APPTILE_LOG_TAG];
+  NSLog(@"%@: ⚠️ Caught Signal: %d", tag, signal);
   
   // Mark bundle as broken before crashing
   [BundleTrackerPrefs markCurrentBundleBroken];

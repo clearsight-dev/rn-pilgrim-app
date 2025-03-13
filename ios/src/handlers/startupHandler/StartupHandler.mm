@@ -11,11 +11,12 @@
 @implementation StartupHandler
 
 + (void)handleStartupProcess {
-  NSLog(@"ApptileStartupProcess: Running in: %@", [NSThread isMainThread] ? @"Main Thread" : @"Background Thread");
-  NSLog(@"ApptileStartupProcess: Starting Startup Process");
+  NSString *tag = [ApptileConstants APPTILE_LOG_TAG];
+  NSLog(@"%@: Running in: %@", tag, [NSThread isMainThread] ? @"Main Thread" : @"Background Thread");
+  NSLog(@"%@: Starting Startup Process", tag);
  
  if ([BundleTrackerPrefs isBrokenBundle]) {
-     NSLog(@"ApptileStartupProcess: Previous bundle status: failed, starting rollback");
+     NSLog(@"%@: Previous bundle status: failed, starting rollback", tag);
      [Actions rollBackUpdates];
  }
  
@@ -23,11 +24,11 @@
      @try {
          [Actions startApptileAppProcess:^(BOOL success) {
              dispatch_async(dispatch_get_main_queue(), ^{
-                 NSLog(@"ApptileStartupProcess: Startup Process %@", success ? @"Completed" : @"Failed");
+               NSLog(@"%@: Startup Process %@", tag, success ? @"Completed" : @"Failed");
              });
          }];
      } @catch (NSException *exception) {
-         NSLog(@"ApptileStartupProcess: Startup Process failed: %@", exception.reason);
+         NSLog(@"%@: Startup Process failed: %@", tag, exception.reason);
      }
  });
 }

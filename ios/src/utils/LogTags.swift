@@ -4,5 +4,8 @@
 //
 //  Created by Vadivazhagan on 02/03/25.
 //
+import Foundation
 
-let APPTILE_LOG_TAG = "ApptileStartupProcess"
+@objc public class ApptileConstants: NSObject {
+    @objc public static let APPTILE_LOG_TAG: String = "ApptileStartupProcess"
+}

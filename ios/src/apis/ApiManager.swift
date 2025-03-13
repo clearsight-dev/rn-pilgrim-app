@@ -4,68 +4,68 @@
 //
 //  Created by Vadivazhagan on 02/03/25.
 //
-import Foundation
 import Alamofire
-
+import Foundation
 
 final class NetworkLogger: EventMonitor, @unchecked Sendable {
     let queue = DispatchQueue(label: "com.apptile.networklogger", qos: .background)
 
     func requestDidResume(_ request: Request) {
-        NSLog("\(APPTILE_LOG_TAG) : 🚀 Request Started: \(request.cURLDescription())")
+        NSLog("\(ApptileConstants.APPTILE_LOG_TAG) : 🚀 Request Started: \(request.cURLDescription())")
     }
 
     func requestDidFinish(_ request: Request) {
-        NSLog("\(APPTILE_LOG_TAG) : ✅ Request Finished: \(request.description)")
+        NSLog("\(ApptileConstants.APPTILE_LOG_TAG) : ✅ Request Finished: \(request.description)")
     }
 
-    func request(_ request: DataRequest, didParseResponse response: DataResponse<Data?, AFError>) {
-        NSLog("\(APPTILE_LOG_TAG) : 📡 Response Received: \(response.response?.statusCode ?? 0)")
+    func request(_: DataRequest, didParseResponse response: DataResponse<Data?, AFError>) {
+        NSLog("\(ApptileConstants.APPTILE_LOG_TAG) : 📡 Response Received: \(response.response?.statusCode ?? 0)")
     }
 }
 
 // MARK: - API Error Handling
+
 enum APIError: Error {
     case missingBaseURL
     case invalidResponse
 }
 
 // MARK: - APIClient (Singleton)
+
 class APIClient {
     static let shared = APIClient()
-    
+
     private var baseURL: String?
-    
-    // Add the session with Event Monitor
+
     private let session: Session
-    
+
     private init() {
         let logger = NetworkLogger()
         let configuration = URLSessionConfiguration.default
-        self.session = Session(configuration: configuration, eventMonitors: [logger])
+        session = Session(configuration: configuration, eventMonitors: [logger])
     }
-    
+
     func initialize(baseURL: String) {
         self.baseURL = baseURL
     }
-    
+
     private var defaultHeaders: HTTPHeaders {
         ["Content-Type": "application/json"]
     }
-    
+
     func request<T: Decodable>(
         endpoint: String,
         method: HTTPMethod = .get,
         parameters: [String: Any]? = nil,
         headers: HTTPHeaders? = nil,
-        responseType: T.Type
+        responseType _: T.Type
     ) async throws -> T {
         guard let baseURL = baseURL, !baseURL.isEmpty else {
             throw APIError.missingBaseURL
         }
-        
+
         let url = baseURL + endpoint
-        
+
         return try await withCheckedThrowingContinuation { continuation in
             session.request(
                 url, method: method, parameters: parameters,
@@ -74,9 +74,9 @@ class APIClient {
             .validate()
             .responseDecodable(of: T.self) { response in
                 switch response.result {
-                case .success(let data):
+                case let .success(data):
                     continuation.resume(returning: data)
-                case .failure(let error):
+                case let .failure(error):
                     continuation.resume(throwing: error)
                 }
             }
@@ -85,34 +85,36 @@ class APIClient {
 }
 
 // MARK: - ApiService Protocol
+
 protocol ApiService {
     func getManifest(appId: String) async throws -> ManifestResponse
     func downloadFile(from url: String) async throws -> URL
 }
 
 // MARK: - ApptileApiClient Singleton
+
 class ApptileApiClient: ApiService {
     static let shared = ApptileApiClient()
     private let apiClient: APIClient
-    
+
     private init(apiClient: APIClient = .shared) {
         self.apiClient = apiClient
     }
-    
+
     func getManifest(appId: String) async throws -> ManifestResponse {
         return try await apiClient.request(
             endpoint: "/api/v2/app/\(appId)/manifest",
             responseType: ManifestResponse.self
         )
     }
-    
+
     func downloadFile(from url: String) async throws -> URL {
         return try await withCheckedThrowingContinuation { continuation in
             let destination: DownloadRequest.Destination = { _, _ in
                 let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
                 return (tempURL, [.removePreviousFile, .createIntermediateDirectories])
             }
-            
+
             AF.download(url, to: destination)
                 .validate()
                 .response { response in
@@ -127,6 +129,7 @@ class ApptileApiClient: ApiService {
 }
 
 // MARK: - Data Models
+
 struct CodeArtefact: Codable {
     let id: Int64
     let type: String
