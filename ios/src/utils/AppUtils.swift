@@ -188,4 +188,16 @@ class FileUtils {
             return false
         }
     }
+  
+  
+   // MARK: - Create Parent Dirs
+   static func createDirectoryIfNeeded(at path: URL) -> Bool {
+      do {
+          try FileUtils.fileManager.createDirectory(at: path, withIntermediateDirectories: true)
+          return true
+      } catch {
+          NSLog("\(ApptileConstants.APPTILE_LOG_TAG): ❌ Failed to create directory at: \(path.path): \(error.localizedDescription)")
+          return false
+      }
+  }
 }

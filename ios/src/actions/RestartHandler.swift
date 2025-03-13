@@ -4,79 +4,95 @@
 //
 //  Created by Vadivazhagan on 13/03/25.
 //
+
 import Foundation
 import React
 
 class RestartHandler {
+    // MARK: - Public API
+
     static func loadDownloadedBundleAndRestart() {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow })
-        else {
-            NSLog("\(ApptileConstants.APPTILE_LOG_TAG): ❌ Failed to find the app window")
+        guard let window = getAppWindow() else {
+            logError("❌ Failed to find the app window")
             return
         }
 
-        guard let bundlePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
-            .appendingPathComponent("bundles/main.jsbundle"),
-            FileManager.default.fileExists(atPath: bundlePath.path)
-        else {
-            NSLog("\(ApptileConstants.APPTILE_LOG_TAG): ⚠️ Downloaded bundle not found, falling back to default")
+        if let bundlePath = getDownloadedBundlePath(),
+           FileManager.default.fileExists(atPath: bundlePath.path)
+        {
+            logSuccess("✅ Loading downloaded bundle from: \(bundlePath.path)")
+            restartReactNativeApp(bundleURL: bundlePath, window: window)
+        } else {
+            logWarning("⚠️ Downloaded bundle not found, falling back to default")
             loadDefaultBundleAndRestart()
-            return
         }
-
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG): ✅ Loading downloaded bundle from: \(bundlePath.path)")
-
-        // Set up a new RCTRootView with the downloaded bundle
-        let rootView = RCTRootView(
-            bundleURL: bundlePath,
-            moduleName: "apptileSeed",
-            initialProperties: nil,
-            launchOptions: nil
-        )
-
-        RestartHandler.restartReactNativeApp(with: rootView, window: window)
     }
 
     static func loadDefaultBundleAndRestart() {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow })
-        else {
-            NSLog("\(ApptileConstants.APPTILE_LOG_TAG): ❌ Failed to find the app window")
+        guard let window = getAppWindow() else {
+            logError("❌ Failed to find the app window")
             return
         }
 
-        let defaultBundleURL: URL
-        #if DEBUG
-            defaultBundleURL = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)
-        #else
-            defaultBundleURL = Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
-        #endif
+        let defaultBundleURL = getDefaultBundleURL()
+        restartReactNativeApp(bundleURL: defaultBundleURL, window: window)
+    }
+
+    // MARK: - Helper Methods
+
+    private static func restartReactNativeApp(bundleURL: URL, window: UIWindow) {
+        logInfo("🔄 Restarting React Native app")
 
         let rootView = RCTRootView(
-            bundleURL: defaultBundleURL,
+            bundleURL: bundleURL,
             moduleName: "apptileSeed",
             initialProperties: nil,
             launchOptions: nil
         )
 
-        RestartHandler.restartReactNativeApp(with: rootView, window: window)
+        let newRootVC = UIViewController()
+        newRootVC.view = rootView
+
+        // Smooth UI update to avoid flickering
+        window.rootViewController = newRootVC
+        window.makeKeyAndVisible()
     }
 
-    static func restartReactNativeApp(with rootView: RCTRootView, window: UIWindow) {
-        NSLog("\(ApptileConstants.APPTILE_LOG_TAG): 🔄 Restarting React Native app")
+    private static func getAppWindow() -> UIWindow? {
+        return UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+    }
 
-        // Create a new rootViewController with the new RCTRootView
-        let newViewController = UIViewController()
-        newViewController.view = rootView
+    private static func getDownloadedBundlePath() -> URL? {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("bundles/main.jsbundle")
+    }
 
-        // Update the app's rootViewController
-        window.rootViewController = newViewController
-        window.makeKeyAndVisible()
+    private static func getDefaultBundleURL() -> URL {
+        #if DEBUG
+            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)
+        #else
+            return Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
+        #endif
+    }
 
-        // Force a slight delay to ensure UI updates correctly
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            window.rootViewController = newViewController
-        }
+    // MARK: - Logger
+
+    private static func logInfo(_ message: String) {
+        NSLog("\(ApptileConstants.APPTILE_LOG_TAG): \(message)")
+    }
+
+    private static func logSuccess(_ message: String) {
+        logInfo("✅ \(message)")
+    }
+
+    private static func logWarning(_ message: String) {
+        logInfo("⚠️ \(message)")
+    }
+
+    private static func logError(_ message: String) {
+        logInfo("❌ \(message)")
     }
 }

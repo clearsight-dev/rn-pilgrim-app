@@ -20,6 +20,7 @@
      [Actions rollBackUpdates];
  }
  
+// Launching apptile startup process in background thread
  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
      @try {
          [Actions startApptileAppProcess:^(BOOL success) {
