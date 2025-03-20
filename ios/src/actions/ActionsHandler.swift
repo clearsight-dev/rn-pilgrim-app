@@ -75,7 +75,9 @@ class Actions: NSObject {
             Logger.error("Failed to read tracker file.")
             return false
         }
-
+      
+        Logger.info("Current Local tracker data ✅ : \(trackerData)")
+      
         return await handleUpdateIfNeeded(manifest: manifest, trackerData: trackerData, appId: appId)
     }
 
@@ -111,7 +113,8 @@ class Actions: NSObject {
 
         let latestBundleId = latestBundle?.id
         let latestBundleUrl = latestBundle?.cdnlink
-
+  
+      
         let shouldUpdateCommit = latestCommitId != localCommitId
         let shouldUpdateBundle = latestBundleId != localBundleId && !(latestBundleUrl?.isEmpty ?? true)
 
@@ -154,10 +157,7 @@ class Actions: NSObject {
         }
 
         // Step 2: Delete Old AppConfig
-        guard FileUtils.deleteFile(filePath: documentAppConfigPath) else {
-            Logger.error("Failed to delete old app config file.")
-            return false
-        }
+        FileUtils.deleteFile(filePath: documentAppConfigPath)
 
         // Step 3: Move Temp to AppConfig
         guard FileUtils.moveFile(sourcePath: tempAppConfigPath, destinationPath: documentAppConfigPath) else {
@@ -211,10 +211,7 @@ class Actions: NSObject {
         }
 
         // Step 4: Delete Existing Bundle Folder
-        guard FileUtils.deleteFile(filePath: destinationBundlesPath.path) else {
-            Logger.error("Failed to delete existing bundle path.")
-            return false
-        }
+        FileUtils.deleteFile(filePath: destinationBundlesPath.path)
 
         // Step 5: Move Unzipped Contents to Destination
         guard FileUtils.createDirectoryIfNeeded(at: destinationBundlesPath) else {

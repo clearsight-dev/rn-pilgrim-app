@@ -193,17 +193,17 @@
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:[jsBundleFile path]]) {
         if ([BundleTrackerPrefs isBrokenBundle]) {
-            NSLog(@"⚠️ Previous local bundle failed. ✅ Using embedded bundle.");
+            NSLog(@"[ApptileStartupProcess] ⚠️ Previous local bundle failed. ✅ Using embedded bundle.");
             [BundleTrackerPrefs resetBundleState];
             return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
         } else {
             [BundleTrackerPrefs resetBundleState];
-            NSLog(@"✅ Using local bundle: %@", [jsBundleFile path]);
+            NSLog(@"[ApptileStartupProcess] ✅ Using local bundle: %@", [jsBundleFile path]);
             return jsBundleFile;
         }
     }
 
-    NSLog(@"⚠️ No local bundle found. ✅ Using embedded bundle.");
+    NSLog(@"[ApptileStartupProcess] ⚠️ No local bundle found. ✅ Using embedded bundle.");
     [BundleTrackerPrefs resetBundleState];
 
     return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
