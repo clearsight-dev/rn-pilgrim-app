@@ -68,7 +68,7 @@ export function ReactComponent({ model }) {
             
             // Extract key benefits title and list for BenefitsCard
             const keyBenefitsTitle = productMetafields.find(field => 
-              field?.key?.includes('key_benefits') && field?.type === 'single_line_text_field'
+              field?.key?.includes('key_benefits_heading') 
             );
             
             const keyBenefitsList = productMetafields
@@ -92,7 +92,7 @@ export function ReactComponent({ model }) {
             if (carouselData.length > 0) {
               setBenefits({
                 carouselItems: carouselData,
-                title: keyBenefitsTitle?.value || "Why you'll love it?",
+                title: keyBenefitsTitle?.value,
                 benefitsList: keyBenefitsList,
                 ingredients: {
                   title: ingredientsHeading,

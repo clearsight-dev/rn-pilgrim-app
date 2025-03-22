@@ -9,7 +9,7 @@ const ThreeDCarousel = ({
   cardAspectRatio, 
   width,
   backgroundColor = '#C5FAFF4D',
-  title = 'Key Benefits'
+  title = ''
 }) => {
   // Create internal scrollX state
   const scrollX = useRef(new Animated.Value(0)).current;

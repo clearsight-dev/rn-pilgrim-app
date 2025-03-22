@@ -4,7 +4,7 @@ import { Icon } from 'apptile-core';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 
 // Separate UI component that takes props
-export default function BenefitsCard({ title = "Why you'll love it?", benefits = [], style = {} }) {
+export default function BenefitsCard({ title = "", benefits = [], style = {} }) {
   const [boxDims, setBoxDims] = useState({width: 500, height: 200});
   
   // Title to display
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     top: -15, // Position to overlap the border
     left: 16, // Align with left padding
     alignItems: 'center', // Center the text horizontally
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
   },
   title: {
     color: BORDER_COLOR,
