@@ -1,187 +1,236 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { 
+  View, 
+  Image,
+  Animated,
+  FlatList
+} from 'react-native';
 import { useSelector } from 'react-redux';
-import { datasourceTypeModelSel, Icon } from 'apptile-core';
+import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
-import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 
-// Separate UI component that takes props
-function BenefitsCard({ title = "Why you'll love it?", benefits = [], style = {} }) {
-  const [boxDims, setBoxDims] = useState({width: 500, height: 200});
-  
-  // Title to display
-  const titleText = title;
-  
-  // Estimated title width for the cutout (this is an approximation)
-  const estimatedTitleWidth = titleText.length * 10 + 20; // 10px per character + 20px padding
+// Carousel component that takes images as props
+export function Carousel({ images, width }) {
+  const scrollView = useRef();
+  const handleIndexChange = useCallback((index) => {
+    if (scrollView.current && index < images?.length) {
+      scrollView.current.scrollToIndex({
+        index: index,
+        animated: true
+      })
+    }
+  }, [images?.length]);
+
+  if (!images || images.length === 0) {
+    return null;
+  }
 
   return (
-    <View style={[styles.outerContainer, style]}>
-      {/* Main container with border */}
-      <View 
-        style={styles.container}
-        onLayout={ev => {
-          if (Math.abs(ev.nativeEvent.layout.height - boxDims.height) > 1 || 
-              Math.abs(ev.nativeEvent.layout.width - boxDims.width) > 1
-          ) {
-            setBoxDims({height: ev.nativeEvent.layout.height, width: ev.nativeEvent.layout.width});
-          }
+    <View
+      style={{
+        position: 'relative'
+      }}
+    >
+      <FlatList
+        ref={scrollView}
+        data={images}
+        style={{
+          width: width,
+        }}
+        horizontal={true}
+        keyExtractor={item => item.id || item.url}
+        renderItem={({item}) => {
+          return (
+            <Image 
+              source={{uri: item.url}}
+              resizeMode="contain"
+              style={{
+                width: width,
+                aspectRatio: 1
+              }}
+            />   
+          )
+        }}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      />
+      <View
+        style={{
+          position: "absolute",
+          height: 20,
+          width: 0.5 * width,
+          bottom: 0,
+          left: 0.25 * width,
         }}
       >
-        {/* SVG Gradient Background */}
-        <Svg 
-          style={{
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            bottom: 0, 
-            right: 0
-          }} 
-          width={boxDims.width}
-          height={boxDims.height}
-        >
-          <Defs>
-            <LinearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <Stop offset="0%" stopColor="rgba(255, 255, 255, 1)" stopOpacity={0.5} />
-              <Stop offset="80%" stopColor="rgba(55, 238, 255, 1)" stopOpacity={0.2} />
-              <Stop offset="100%" stopColor="rgba(55, 238, 255, 1)" stopOpacity={0.2}/>
-            </LinearGradient>
-          </Defs>
-          <Rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            rx="8"
-            ry="8"
-            fill="url(#gradient)"
-          />
-        </Svg>
-
-        {/* Title cutout (white background to hide the border) */}
-        <View style={[styles.titleCutout, { width: estimatedTitleWidth }]} />
-        
-        {/* Title container with the same width as the cutout */}
-        <View style={[styles.titleContainer, { width: estimatedTitleWidth }]}>
-          <Text style={styles.title}>{titleText}</Text>
-        </View>
-        
-        {/* Content container */}
-        <View style={styles.contentContainer}>
-          {/* Benefits list */}
-          {benefits.map((benefit, index) => (
-            <View key={index} style={styles.benefitRow}>
-              <Icon 
-                iconType={'Ionicons'} 
-                name={'sparkles-sharp'} 
-                style={{
-                  marginRight: 8,
-                  fontSize: 20,
-                  color: BORDER_COLOR
-                }}
-              />
-              <Text style={styles.benefitText}>{benefit.trim()}</Text>
-            </View>
-          ))}
-        </View>
+        <ScrollBubbles numBubbles={images.length} onIndexChange={handleIndexChange}/> 
       </View>
     </View>
   );
-};
+}
+
+export function ScrollBubbles({numBubbles, onIndexChange, style}) {
+  const BUBBLE_DURATION = 300;
+  const PROGRESS_DURATION = 2000;
+  const animationProgress = useRef(
+    new Array(numBubbles).fill(0).map(() => new Animated.Value(1))
+  ).current;
+  const progressBarAnimation = useRef(new Animated.Value(0)).current;
+  const bubbles = new Array(numBubbles).fill(0)
+
+  const animationIndex = useRef(0);
+  useEffect(() => {
+    let cleanup = false;
+    function runAnimation() {
+      
+      let i = animationIndex.current;
+      const animationNode = animationProgress[i];
+      Animated.sequence([
+        Animated.timing(animationNode, {
+          toValue: 2,
+          duration: BUBBLE_DURATION,
+          useNativeDriver: false
+        }),
+        Animated.timing(progressBarAnimation, {
+          toValue: 1,
+          duration: PROGRESS_DURATION,
+          useNativeDriver: false
+        })
+      ])
+      .start((finished) => {
+        let nextIndex = (animationIndex.current + 1) % numBubbles
+        if (onIndexChange) {
+          onIndexChange(nextIndex)
+        }
+        if (finished) {
+          let nextNodeIndex = (i + 1) % numBubbles
+          let nextNode = animationProgress[nextNodeIndex]
+          // After animation for expansion is done,
+          // collapse the expanded node back to original width
+          // and simultaneously expand the next node to expanded width
+          Animated.parallel([
+            Animated.timing(progressBarAnimation, {
+              toValue: 0,
+              duration: BUBBLE_DURATION,
+              useNativeDriver: false
+            }),
+            Animated.timing(animationNode,
+              {
+                toValue: 1,
+                duration: BUBBLE_DURATION,
+                useNativeDriver: false
+              }
+            ),
+            Animated.timing(nextNode,
+              {
+                toValue: 2,
+                duration: BUBBLE_DURATION,
+                useNativeDriver: false
+              }
+            )
+          ])
+          .start(({finished}) => {
+            if (finished && !cleanup) {
+              animationIndex.current = nextIndex;
+              // once the next node has been expanded, 
+              // start over if effect hasn't been cleaned up
+              runAnimation()
+            } else if (cleanup) {
+              animationIndex.current = 0;
+              animationProgress.map(node => {
+                node.setValue(1)
+              })
+            }
+          })     
+        }
+      })
+    }
+
+    runAnimation()
+    return () => {
+      cleanup = true;
+    }
+  }, [animationIndex.current, animationProgress, onIndexChange])
+
+  return (
+    <View style={{flexDirection: 'row', justifyContent: 'center', paddingBottom: 8}}>
+      { 
+        bubbles.map((_, i) => {
+          return (
+            <Animated.View 
+              style={{
+                margin: 3,
+                width: Animated.add(7, 
+                  Animated.multiply(1, 
+                    animationProgress[i].interpolate({
+                      inputRange: [1, 2],
+                      outputRange: [1, 18]
+                    })
+                  )
+                ), 
+                height: 8, 
+                borderRadius: 5,
+                borderColor: "#ffffff", 
+                backgroundColor: "#ffffff", // Changed from semi-transparent to solid white
+                borderWidth: 2,
+                // Add shadow for visibility on white backgrounds
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.6,
+                shadowRadius: 4,
+                elevation: 3 // For Android
+              }}
+            >
+              <Animated.View
+                style={{
+                  backgroundColor: 'gray',
+                  width: progressBarAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [4, 20]
+                  }),
+                  height: 4,
+                  borderRadius: 5,
+                  opacity: animationProgress[i].interpolate({
+                    inputRange: [1, 2],
+                    outputRange: [0, 1]
+                  })
+                }}
+              >
+              </Animated.View>
+            </Animated.View>
+          )
+        })
+      }
+    </View>);
+}
+
 
 // Main component that handles data fetching
 export function ReactComponent({ model }) {
+  const {width: screenWidth} = useApptileWindowDims();
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
-  const [benefits, setBenefits] = useState({
-    title: "",
-    benefits: []
-  });
+  const [images, setImages] = useState(null);
 
   useEffect(() => {
     const queryRunner = shopifyDSModel?.get('queryRunner');
     fetchProductData(queryRunner, "3-redensyl-4-anagain-hair-growth-serum")
       .then(res => {
-        const keyBenefits = res.data.productByHandle.metafields.filter(field => {
-          return field?.key?.includes('key_benefits') && field?.type === 'multi_line_text_field'
-        });
-        const title = res.data.productByHandle.metafields.filter(field => {
-          return field?.key?.includes('key_benefits') && field?.type === 'single_line_text_field'
-        });
-        const lines = keyBenefits.flatMap(item => item.value.split('•'));
-        setBenefits({
-          title: title[0].value,
-          benefits: lines.filter(line => line.trim() !== '') // Filter out empty lines
-        });
+        const images = res.data.productByHandle.images.edges.map((it, i) => {
+          return {
+            id: i.toString(),
+            url: it.node.url
+          };
+        })
+        setImages(images)
       })
       .catch(err => {
         console.error(err.toString());
       })
   }, [shopifyDSModel]);
 
-  // Pass the fetched data to the BenefitsCard component
-  return <BenefitsCard title={benefits.title} benefits={benefits.benefits} />;
+  // Use the Carousel component with the fetched images
+  return <Carousel images={images} width={screenWidth} />;
 }
-
-const BORDER_COLOR = '#00909E';
-const BORDER_WIDTH = 1;
-const BORDER_RADIUS = 8;
-
-const styles = StyleSheet.create({
-  outerContainer: {
-    padding: 16,
-    width: '100%',
-  },
-  container: {
-    borderWidth: BORDER_WIDTH,
-    borderColor: BORDER_COLOR,
-    borderRadius: BORDER_RADIUS,
-    position: 'relative',
-  },
-  titleCutout: {
-    position: 'absolute',
-    height: BORDER_WIDTH,
-    backgroundColor: 'white',
-    top: -BORDER_WIDTH,
-    left: 16, // Align with left padding
-  },
-  titleContainer: {
-    position: 'absolute',
-    top: -15, // Position to overlap the border
-    left: 16, // Align with left padding
-    alignItems: 'center', // Center the text horizontally
-    backgroundColor: 'white',
-  },
-  title: {
-    color: BORDER_COLOR,
-    fontSize: 23,
-    fontWeight: "bold",
-    letterSpacing: -0.08, // -0.4% of 20px
-    paddingHorizontal: 4,
-  },
-  contentContainer: {
-    marginTop: 20, // Space from title to content
-    padding: 16
-  },
-  benefitRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  bulletPoint: {
-    color: BORDER_COLOR,
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 8,
-    marginTop: 2,
-  },
-  benefitText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#333333',
-    flex: 1,
-    lineHeight: 20,
-  },
-});
 
 export const WidgetConfig = {
 };

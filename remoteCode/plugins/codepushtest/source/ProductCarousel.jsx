@@ -1,8 +1,228 @@
-import React, {useState} from 'react';
-import {View, Text, Image, ScrollView, StyleSheet} from 'react-native';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { 
+  View, 
+  Text,
+  Image,
+  Animated,
+  FlatList,
+  StyleSheet
+} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
-export default function ImageCarousel({ images, screenWidth, productLabel }) {
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+// ScrollBubbles component for animated pagination
+export function ScrollBubbles({numBubbles, onIndexChange, style}) {
+  const BUBBLE_DURATION = 300;
+  const PROGRESS_DURATION = 2000;
+  const animationProgress = useRef(
+    new Array(numBubbles).fill(0).map(() => new Animated.Value(1))
+  ).current;
+  const progressBarAnimation = useRef(new Animated.Value(0)).current;
+  const bubbles = new Array(numBubbles).fill(0)
+
+  const animationIndex = useRef(0);
+  useEffect(() => {
+    let cleanup = false;
+    function runAnimation() {
+      
+      let i = animationIndex.current;
+      const animationNode = animationProgress[i];
+      Animated.sequence([
+        Animated.timing(animationNode, {
+          toValue: 2,
+          duration: BUBBLE_DURATION,
+          useNativeDriver: false
+        }),
+        Animated.timing(progressBarAnimation, {
+          toValue: 1,
+          duration: PROGRESS_DURATION,
+          useNativeDriver: false
+        })
+      ])
+      .start((finished) => {
+        let nextIndex = (animationIndex.current + 1) % numBubbles
+        if (onIndexChange) {
+          onIndexChange(nextIndex)
+        }
+        if (finished) {
+          let nextNodeIndex = (i + 1) % numBubbles
+          let nextNode = animationProgress[nextNodeIndex]
+          // After animation for expansion is done,
+          // collapse the expanded node back to original width
+          // and simultaneously expand the next node to expanded width
+          Animated.parallel([
+            Animated.timing(progressBarAnimation, {
+              toValue: 0,
+              duration: BUBBLE_DURATION,
+              useNativeDriver: false
+            }),
+            Animated.timing(animationNode,
+              {
+                toValue: 1,
+                duration: BUBBLE_DURATION,
+                useNativeDriver: false
+              }
+            ),
+            Animated.timing(nextNode,
+              {
+                toValue: 2,
+                duration: BUBBLE_DURATION,
+                useNativeDriver: false
+              }
+            )
+          ])
+          .start(({finished}) => {
+            if (finished && !cleanup) {
+              animationIndex.current = nextIndex;
+              // once the next node has been expanded, 
+              // start over if effect hasn't been cleaned up
+              runAnimation()
+            } else if (cleanup) {
+              animationIndex.current = 0;
+              animationProgress.map(node => {
+                node.setValue(1)
+              })
+            }
+          })     
+        }
+      })
+    }
+
+    runAnimation()
+    return () => {
+      cleanup = true;
+    }
+  }, [animationIndex.current, animationProgress, onIndexChange])
+
+  return (
+    <View style={{flexDirection: 'row', justifyContent: 'center', paddingBottom: 8}}>
+      { 
+        bubbles.map((_, i) => {
+          return (
+            <Animated.View 
+              key={`bubble-${i}`}
+              style={{
+                margin: 3,
+                width: Animated.add(7, 
+                  Animated.multiply(1, 
+                    animationProgress[i].interpolate({
+                      inputRange: [1, 2],
+                      outputRange: [1, 18]
+                    })
+                  )
+                ), 
+                height: 8, 
+                borderRadius: 5,
+                borderColor: "#ffffff", 
+                backgroundColor: "#ffffff", // Changed from semi-transparent to solid white
+                borderWidth: 2,
+                // Add shadow for visibility on white backgrounds
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.6,
+                shadowRadius: 4,
+                elevation: 3 // For Android
+              }}
+            >
+              <Animated.View
+                style={{
+                  backgroundColor: 'gray',
+                  width: progressBarAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [4, 20]
+                  }),
+                  height: 4,
+                  borderRadius: 5,
+                  opacity: animationProgress[i].interpolate({
+                    inputRange: [1, 2],
+                    outputRange: [0, 1]
+                  })
+                }}
+              >
+              </Animated.View>
+            </Animated.View>
+          )
+        })
+      }
+    </View>);
+}
+
+// Carousel component that takes images as props
+export function ImageCarousel({ images, width }) {
+  const scrollView = useRef();
+  const handleIndexChange = useCallback((index) => {
+    if (scrollView.current && index < images?.length) {
+      scrollView.current.scrollToIndex({
+        index: index,
+        animated: true
+      })
+    }
+  }, [images?.length]);
+
+  if (!images || images.length === 0) {
+    return null;
+  }
+
+  return (
+    <View
+      style={{
+        position: 'relative'
+      }}
+    >
+      <FlatList
+        ref={scrollView}
+        data={images}
+        style={{
+          width: width,
+        }}
+        horizontal={true}
+        keyExtractor={item => item.id || item.url}
+        renderItem={({item}) => {
+          return (
+            <Image 
+              source={{uri: item.url}}
+              resizeMode="contain"
+              style={{
+                width: width,
+                aspectRatio: 1
+              }}
+            />   
+          )
+        }}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      />
+      <View
+        style={{
+          position: "absolute",
+          height: 20,
+          width: 0.5 * width,
+          bottom: 0,
+          left: 0.25 * width,
+        }}
+      >
+        <ScrollBubbles numBubbles={images.length} onIndexChange={handleIndexChange}/> 
+      </View>
+    </View>
+  );
+}
+
+// Main ProductCarousel component
+export default function ProductCarousel({ images, screenWidth, productLabel }) {
+  // Format images for Carousel component if they're just URLs
+  const formattedImages = images && images.length > 0 
+    ? images.map((item, index) => {
+        // If item is already an object with url property, return it as is
+        if (typeof item === 'object' && item.url) {
+          return item;
+        }
+        // If item is a string (URL), convert to object format
+        return {
+          id: `image-${index}`,
+          url: item
+        };
+      })
+    : [];
+  
   if (!images || images.length === 0) {
     return (
       <View style={[styles.carouselContainer, { width: screenWidth }]}>
@@ -15,38 +235,8 @@ export default function ImageCarousel({ images, screenWidth, productLabel }) {
 
   return (
     <View style={styles.carouselWrapper}>
-      <ScrollView
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(event) => {
-          const newIndex = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
-          setActiveImageIndex(newIndex);
-        }}
-        style={styles.carouselContainer}
-      >
-        {images.map((imageUrl, index) => (
-          <Image
-            key={`image-${index}`}
-            source={{ uri: imageUrl }}
-            style={[styles.carouselImage, { width: screenWidth }]}
-            resizeMode="contain"
-          />
-        ))}
-      </ScrollView>
-      
-      {/* Pagination dots */}
-      <View style={styles.paginationContainer}>
-        {images.map((_, index) => (
-          <View
-            key={`dot-${index}`}
-            style={[
-              styles.paginationDot,
-              index === activeImageIndex ? styles.paginationDotActive : {}
-            ]}
-          />
-        ))}
-      </View>
+      {/* Use the ImageCarousel component */}
+      <ImageCarousel images={formattedImages} width={screenWidth} />
       
       {/* Overlay label */}
       {productLabel && (
@@ -62,7 +252,7 @@ export default function ImageCarousel({ images, screenWidth, productLabel }) {
               d="M103.5 25L0 25L0 1L103.5 1L93.3197 13L103.5 25Z" 
               fill="#00726C" 
               stroke="#00726C" 
-              stroke-width="1.5"
+              strokeWidth="1.5"
             />
           </Svg>
           <Text style={styles.labelText}>{productLabel}</Text>
