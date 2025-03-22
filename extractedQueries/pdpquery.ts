@@ -137,7 +137,7 @@ export const fetchProductData = async (queryRunner, productHandle) => {
         {key: 'pd_page_offer_2', namespace: 'custom'},
         {key: 'pd_page_offer_3', namespace: 'custom'},
         {key:'featured_product_concern_based_kit_1_',namespace:'custom'}, 
-        { key: "after_atc_single_line_text", namespace: "my_fields" }, 
+        {key: "after_atc_single_line_text", namespace: "my_fields"}, 
         {key: 'subtitle', namespace: 'descriptors'},
         {key: 'key_benefits_heading', namespace: 'custom'},
         {key:'after_atc_benefit_heading', namespace:'custom'},
@@ -156,6 +156,5 @@ export const fetchProductData = async (queryRunner, productHandle) => {
       cachePolicy: 'cache-first'
     }
   );
-  console.log("[AGENT]: ", data)
   return data;
 }
