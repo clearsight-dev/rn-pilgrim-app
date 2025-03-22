@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, ActivityIndicator, StyleSheet, Animated, Text as RNText } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, StyleSheet, Text as RNText } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useSelector } from 'react-redux';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
-import { Svg, Defs, LinearGradient, Stop, Text } from 'react-native-svg';
 import BenefitsCard from './BenefitsCard';
+import ThreeDCarousel from './threeDCarousel';
+import GradientText from '../../../../extractedQueries/GradientText';
 
 export function ReactComponent({ model }) {
   const productHandle = '3-redensyl-4-anagain-hair-growth-serum'; // Hardcoded product handle
@@ -16,13 +17,15 @@ export function ReactComponent({ model }) {
   const [benefits, setBenefits] = useState({
     carouselItems: [],
     title: "",
-    benefitsList: []
+    benefitsList: [],
+    ingredients: {
+      title: "",
+      images: []
+    }
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { width } = useApptileWindowDims();
-  const flatListRef = useRef(null);
-  const scrollX = useRef(new Animated.Value(0)).current;
   
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const queryRunner = shopifyDSModel?.get('queryRunner') || null;
@@ -72,12 +75,29 @@ export function ReactComponent({ model }) {
               .filter(field => field?.key?.includes('key_benefits') && field?.type === 'multi_line_text_field')
               .flatMap(item => item.value.split('•'))
               .filter(line => line.trim() !== ''); // Filter out empty lines
+
+            const ingredients = productMetafields.filter(field => {
+              return field?.key?.startsWith('ingredients') && 
+                field?.key?.endsWith('_url')
+            })
+            .map(it => {
+              return {
+                imageUrl: it.value
+              };
+            });
+
+            const ingredientsHeading = productMetafields
+              .find(it => it?.key === "ingredients_heading")?.value ?? "";
             
             if (carouselData.length > 0) {
               setBenefits({
                 carouselItems: carouselData,
                 title: keyBenefitsTitle?.value || "Why you'll love it?",
-                benefitsList: keyBenefitsList
+                benefitsList: keyBenefitsList,
+                ingredients: {
+                  title: ingredientsHeading,
+                  images: ingredients
+                }
               });
             } else {
               // Fallback if no benefit data is found
@@ -99,18 +119,6 @@ export function ReactComponent({ model }) {
     }
   }, [queryRunner]);
 
-  useEffect(() => {
-    // Center the carousel on the middle item initially
-    if (flatListRef.current && benefits.carouselItems.length > 0) {
-      const centerIndex = Math.floor(benefits.carouselItems.length / 2);
-      const offset = centerIndex * (ITEM_WIDTH + SPACING);
-      flatListRef.current.scrollToOffset({
-        offset,
-        animated: false,
-      });
-      scrollX.setValue(offset);
-    }
-  }, [benefits, ITEM_WIDTH, SPACING]);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#4DB6AC" style={styles.loader} />;
@@ -118,29 +126,16 @@ export function ReactComponent({ model }) {
 
   if (error) {
     return (
-      <View style={[styles.container, { backgroundColor }]}>
-        <View style={styles.svgContainer}>
-          <Svg width="100%" height="60">
-            <Defs>
-              <LinearGradient id="titleGradient" x1="0" y1="0" x2="100%" y2="0">
-                <Stop offset="0%" stopColor="#009FAD" />
-                <Stop offset="25%" stopColor="#00707A" />
-                <Stop offset="50%" stopColor="#009FAD" />
-                <Stop offset="75%" stopColor="#00707A" />
-                <Stop offset="100%" stopColor="#009FAD" />
-              </LinearGradient>
-            </Defs>
-            <Text
-              fill="url(#titleGradient)"
-              fontSize="32"
-              fontWeight="bold"
-              x="50%"
-              y="40"
-              textAnchor="middle"
-            >
-              Key Benefits
-            </Text>
-          </Svg>
+      <View style={{ backgroundColor, paddingVertical: 20 }}>
+        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
+          <GradientText
+            text="Key Benefits"
+            fontSize={32}
+            fontWeight="bold"
+            width="100%"
+            height={60}
+            y="40"
+          />
         </View>
         <RNText style={styles.errorText}>Error: {error.message || JSON.stringify(error)}</RNText>
       </View>
@@ -149,29 +144,16 @@ export function ReactComponent({ model }) {
 
   if (!benefits.carouselItems || benefits.carouselItems.length === 0) {
     return (
-      <View style={[styles.container, { backgroundColor }]}>
-        <View style={styles.svgContainer}>
-          <Svg width="100%" height="60">
-            <Defs>
-              <LinearGradient id="titleGradient" x1="0" y1="0" x2="100%" y2="0">
-                <Stop offset="0%" stopColor="#009FAD" />
-                <Stop offset="25%" stopColor="#00707A" />
-                <Stop offset="50%" stopColor="#009FAD" />
-                <Stop offset="75%" stopColor="#00707A" />
-                <Stop offset="100%" stopColor="#009FAD" />
-              </LinearGradient>
-            </Defs>
-            <Text
-              fill="url(#titleGradient)"
-              fontSize="32"
-              fontWeight="bold"
-              x="50%"
-              y="40"
-              textAnchor="middle"
-            >
-              Key Benefits
-            </Text>
-          </Svg>
+      <View style={{ backgroundColor, paddingVertical: 20 }}>
+        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
+          <GradientText
+            text="Key Benefits"
+            fontSize={32}
+            fontWeight="bold"
+            width="100%"
+            height={60}
+            y="40"
+          />
         </View>
         <RNText style={styles.errorText}>No benefits data available</RNText>
       </View>
@@ -189,102 +171,25 @@ export function ReactComponent({ model }) {
         />
       )}
       
-      {/* Key Benefits Section with background color */}
-      <View style={[styles.container, { backgroundColor }]}>
-        {/* SVG Gradient Title */}
-        <View style={styles.svgContainer}>
-          <Svg width="100%" height="60">
-            <Defs>
-              <LinearGradient id="titleGradient" x1="0" y1="0" x2="100%" y2="0">
-                <Stop offset="0%" stopColor="#009FAD" />
-                <Stop offset="25%" stopColor="#00707A" />
-                <Stop offset="50%" stopColor="#009FAD" />
-                <Stop offset="75%" stopColor="#00707A" />
-                <Stop offset="100%" stopColor="#009FAD" />
-              </LinearGradient>
-            </Defs>
-            <Text
-              fill="url(#titleGradient)"
-              fontSize="32"
-              fontWeight="bold"
-              x="50%"
-              y="40"
-              textAnchor="middle"
-            >
-              Key Benefits
-            </Text>
-          </Svg>
-        </View>
-        
-        <Animated.FlatList
-          ref={flatListRef}
-          data={benefits.carouselItems}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: (width - ITEM_WIDTH) / 2,
-          }}
-          snapToInterval={ITEM_WIDTH + SPACING}
-          decelerationRate="fast"
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: false }
-          )}
-          scrollEventThrottle={16}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item, index }) => {
-            // Calculate the input range for animations
-            const inputRange = [
-              (index - 1) * (ITEM_WIDTH + SPACING),
-              index * (ITEM_WIDTH + SPACING),
-              (index + 1) * (ITEM_WIDTH + SPACING)
-            ];
-            
-            // Calculate dynamic scale based on scroll position
-            const scale = scrollX.interpolate({
-              inputRange,
-              outputRange: [0.7, 1, 0.7],
-              extrapolate: 'clamp'
-            });
-            
-            // Calculate dynamic translateY based on scroll position
-            const translateY = scrollX.interpolate({
-              inputRange,
-              outputRange: [20, 0, 20],
-              extrapolate: 'clamp'
-            });
-            
-            // Calculate dynamic opacity based on scroll position
-            const opacity = scrollX.interpolate({
-              inputRange,
-              outputRange: [0.7, 1, 0.7],
-              extrapolate: 'clamp'
-            });
-            
-            return (
-              <Animated.View 
-                style={[
-                  styles.slideContainer,
-                  {
-                    width: ITEM_WIDTH,
-                    marginHorizontal: SPACING / 4,
-                    transform: [{ scale }, { translateY }],
-                    opacity,
-                  }
-                ]}
-              >
-                <View style={[styles.benefitCard, { aspectRatio: cardAspectRatio }]}>
-                  <Animated.Image 
-                    source={{ uri: item.imageUrl }} 
-                    style={styles.benefitImage} 
-                    resizeMode="contain" 
-                  />
-                </View>
-              </Animated.View>
-            );
-          }}
-        />
-      </View>
+      <ThreeDCarousel
+        carouselItems={benefits.carouselItems}
+        itemWidth={ITEM_WIDTH}
+        spacing={SPACING}
+        cardAspectRatio={cardAspectRatio}
+        width={width}
+        backgroundColor={backgroundColor}
+        title="Key Benefits"
+      />
+
+      <ThreeDCarousel
+        carouselItems={benefits.ingredients.images}
+        itemWidth={ITEM_WIDTH}
+        spacing={SPACING}
+        cardAspectRatio={cardAspectRatio}
+        width={width}
+        backgroundColor={backgroundColor}
+        title={benefits.ingredients.title}
+      />
     </View>
   );
 }
@@ -292,37 +197,6 @@ export function ReactComponent({ model }) {
 const styles = StyleSheet.create({
   mainContainer: {
     width: '100%',
-  },
-  container: {
-    paddingVertical: 20,
-  },
-  svgContainer: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 30,
-  },
-  slideContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  benefitCard: {
-    overflow: 'hidden',
-    width: '100%',
-    position: 'relative',
-    backgroundColor: 'transparent',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.34,
-    shadowRadius: 6.27,
-    elevation: 10,
-  },
-  benefitImage: {
-    width: '100%',
-    height: '100%',
   },
   loader: {
     flex: 1,
