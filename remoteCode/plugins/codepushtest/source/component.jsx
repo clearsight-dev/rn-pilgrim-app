@@ -1,10 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useSelector } from 'react-redux';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
-import { OfferCard } from './OfferCard';
+import OfferCard from './OfferCard';
 import VariantCard from './VariantCard';
 import ImageCarousel from './ProductCarousel';
 

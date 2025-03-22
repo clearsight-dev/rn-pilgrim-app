@@ -74,7 +74,7 @@ function CouponTicket({ code, isAutoApplied = false, onCopy }) {
   );
 };
 
-export function OfferCard({ title, description, code }) {
+export default function OfferCard({ title, description, code }) {
 // Check both "Auto Applied" and "Auto-applied" variations
   const isAutoApplied = code === "Auto Applied" || code === "Auto-applied";
 

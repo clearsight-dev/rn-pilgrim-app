@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
-import { datasourceTypeModelSel, Icon } from 'apptile-core';
-import { fetchProductData } from '../../../../extractedQueries/pdpquery';
+import { Icon } from 'apptile-core';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 
 // Separate UI component that takes props
-function BenefitsCard({ title = "Why you'll love it?", benefits = [], style = {} }) {
+export default function BenefitsCard({ title = "Why you'll love it?", benefits = [], style = {} }) {
   const [boxDims, setBoxDims] = useState({width: 500, height: 200});
   
   // Title to display
@@ -89,39 +87,6 @@ function BenefitsCard({ title = "Why you'll love it?", benefits = [], style = {}
   );
 };
 
-// Main component that handles data fetching
-export function ReactComponent({ model }) {
-  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
-  const [benefits, setBenefits] = useState({
-    title: "",
-    benefits: []
-  });
-
-  useEffect(() => {
-    const queryRunner = shopifyDSModel?.get('queryRunner');
-    fetchProductData(queryRunner, "3-redensyl-4-anagain-hair-growth-serum")
-      .then(res => {
-        const keyBenefits = res.data.productByHandle.metafields.filter(field => {
-          return field?.key?.includes('key_benefits') && field?.type === 'multi_line_text_field'
-        });
-        const title = res.data.productByHandle.metafields.filter(field => {
-          return field?.key?.includes('key_benefits') && field?.type === 'single_line_text_field'
-        });
-        const lines = keyBenefits.flatMap(item => item.value.split('•'));
-        setBenefits({
-          title: title[0].value,
-          benefits: lines.filter(line => line.trim() !== '') // Filter out empty lines
-        });
-      })
-      .catch(err => {
-        console.error(err.toString());
-      })
-  }, [shopifyDSModel]);
-
-  // Pass the fetched data to the BenefitsCard component
-  return <BenefitsCard title={benefits.title} benefits={benefits.benefits} />;
-}
-
 const BORDER_COLOR = '#00909E';
 const BORDER_WIDTH = 1;
 const BORDER_RADIUS = 8;
@@ -182,18 +147,3 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
-
-export const WidgetConfig = {
-};
-
-export const WidgetEditors = {
-  basic: [],
-};
-
-export const PropertySettings = {};
-
-export const WrapperTileConfig = {
-  name: 'Rating Summary Card',
-  defaultProps: {
-  },
-};
