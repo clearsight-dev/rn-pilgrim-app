@@ -2,6 +2,7 @@
 import workpage from "./plugins/workpage/source/widget";
 import pligrimtextwidget from "./plugins/pligrimtextwidget/source/widget";
 import pilgrimotplogin from "./plugins/pilgrimotplogin/source/widget";
+import pdpratingsreviews from "./plugins/pdpratingsreviews/source/widget";
 import keybenefits from "./plugins/keybenefits/source/widget";
 import faqs from "./plugins/faqs/source/widget";
 import descriptioncard from "./plugins/descriptioncard/source/widget";
@@ -20,6 +21,7 @@ return [
     descriptioncard,
     faqs,
     keybenefits,
+    pdpratingsreviews,
     pilgrimotplogin,
     pligrimtextwidget,
     workpage,
