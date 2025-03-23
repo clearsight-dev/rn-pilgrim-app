@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import {Icon} from 'apptile-core';
-import Star from './Star';
+import Star from '../../../../extractedQueries/Star';
 
 const StarRating = ({ rating = 0, size = 16, maxRating = 5, ratingCount }) => {
   // Ensure rating is between 0 and maxRating

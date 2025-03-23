@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { navigateToScreen } from 'apptile-core';
 import { useDispatch } from 'react-redux';
+import Star from '../../../../extractedQueries/Star';
+import ProductFlag from '../../../../extractedQueries/ProductFlag';
 
 const RelatedProductCard = ({ product, style }) => {
   // Extract product details
@@ -16,12 +18,7 @@ const RelatedProductCard = ({ product, style }) => {
     ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) 
     : 0;
   
-  // Get product label from metafield
-  const productLabel = metafield?.value || '';
   const dispatch = useDispatch();
-
-  // Determine if product is a bestseller (this could be based on a tag or metafield)
-  const isBestseller = true; // For demo purposes, marking all as bestsellers
 
   return (
     <TouchableOpacity 
@@ -31,9 +28,14 @@ const RelatedProductCard = ({ product, style }) => {
       }}
     >
       {/* Promo Tag */}
-      <View style={styles.promoTagContainer}>
-        <Text style={styles.promoTagText}>Buy 3@999</Text>
-      </View>
+      <ProductFlag 
+        label={product.metafield?.value || "Buy 3@999"} 
+        color="#00726C" 
+        style={styles.promoTagContainer}
+        textStyle={styles.promoTagText}
+        height={18}
+        width={95}
+      />
 
       {/* Product Image */}
       <View style={styles.imageContainer}>
@@ -42,22 +44,18 @@ const RelatedProductCard = ({ product, style }) => {
           style={styles.image}
           resizeMode="contain"
         />
-      </View>
-      
-      {/* Rating */}
-      <View style={styles.ratingContainer}>
-        <Text style={styles.ratingText}>{rating || '4.8'} ★</Text>
+        {/* Rating */}
+        <View style={styles.ratingContainer}>
+          <Text style={styles.ratingText}>{rating || '4.8'}</Text>
+          <Star color={'#00909E'} size={12} fillPercentage={1} />
+        </View>
       </View>
 
-      {/* Bestseller Label */}
-      {isBestseller && (
-        <Text style={styles.bestsellerLabel}>BESTSELLER</Text>
-      )}
-      
       {/* Product Details */}
       <View style={styles.detailsContainer}>
+        <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>BESTSELLER</Text>
         <Text style={styles.title} numberOfLines={2}>{title}</Text>
-        <Text style={styles.subtitle}>{productLabel}</Text>
+        <Text style={styles.subtitle}>2 Sizes</Text>
         
         {/* Price Section */}
         <View style={styles.priceContainer}>
@@ -71,35 +69,47 @@ const RelatedProductCard = ({ product, style }) => {
           )}
         </View>
       </View>
+      <View
+        style={{
+          paddingHorizontal: 8
+        }}
+      >
+        <TouchableOpacity
+          onPress={e => e.stopPropagation()}
+          style={{
+            height: 33, 
+            backgroundColor: '#FACA0C',
+            borderRadius: 8,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: '500'
+            }}
+          >
+            Add to Cart
+          </Text>
+        </TouchableOpacity>
+      </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: 160,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    width: 184,
     backgroundColor: '#FFFFFF',
-    borderRadius: 8,
     overflow: 'hidden',
     marginRight: 12,
-    elevation: 2,
-    shadowColor: '#000000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.1,
-    shadowRadius: 2
   },
   promoTagContainer: {
     position: 'absolute',
     top: 8,
     left: 0,
-    backgroundColor: '#00909E',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    zIndex: 1,
-    borderTopRightRadius: 4,
-    borderBottomRightRadius: 4
+    zIndex: 1
   },
   promoTagText: {
     color: '#FFFFFF',
@@ -108,41 +118,48 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: 160,
-    backgroundColor: '#F8F8F8',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 8
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#F3F3F3',
   },
   image: {
     width: '100%',
-    height: '100%'
+    aspectRatio: 1,
+    borderRadius: 8
   },
   ratingContainer: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingTop: 8
+    justifyContent: 'center',
+    borderWidth: 1,
+    paddingHorizontal: 5,
+    paddingVertical: 3,
+    borderRadius: 24,
+    borderColor: '#F3F3F3',
+    backgroundColor: 'white'
   },
   ratingText: {
     fontSize: 12,
-    color: '#00909E',
-    fontWeight: '600'
-  },
-  bestsellerLabel: {
-    fontSize: 10,
-    color: '#FF6B00',
+    color: '#1A1A1A',
     fontWeight: '600',
-    paddingHorizontal: 12,
-    paddingTop: 4
+    marginRight: 4
   },
   detailsContainer: {
+    fontSize: 12,
+    color: '#767676',
+    fontWeight: '400',
     padding: 12,
     paddingTop: 4
   },
   title: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
+    lineHeight: 18,
     color: '#333333',
     marginBottom: 4,
     lineHeight: 18
@@ -154,13 +171,13 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     flexWrap: 'wrap',
     marginTop: 4
   },
   price: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '500',
     color: '#333333',
     marginRight: 4,
   },

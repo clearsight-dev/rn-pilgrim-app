@@ -7,7 +7,7 @@ import {
   FlatList,
   StyleSheet
 } from 'react-native';
-import Svg, {Path} from 'react-native-svg';
+import ProductFlag from '../../../../extractedQueries/ProductFlag';
 
 // ScrollBubbles component for animated pagination
 export function ScrollBubbles({numBubbles, onIndexChange, style}) {
@@ -240,23 +240,13 @@ export default function ProductCarousel({ images, screenWidth, productLabel }) {
       
       {/* Overlay label */}
       {productLabel && (
-        <View style={styles.labelWrapper}>
-          <Svg 
-            width={106} 
-            height={26} 
-            viewBox="0 0 106 26" 
-            fill="none" 
-            style={{position: 'absolute'}}
-          >
-            <Path 
-              d="M103.5 25L0 25L0 1L103.5 1L93.3197 13L103.5 25Z" 
-              fill="#00726C" 
-              stroke="#00726C" 
-              strokeWidth="1.5"
-            />
-          </Svg>
-          <Text style={styles.labelText}>{productLabel}</Text>
-        </View>
+        <ProductFlag 
+          label={productLabel} 
+          color="#00726C" 
+          style={styles.labelWrapper}
+          fontSize={12}
+          baseLineOffset={9}
+        />
       )}
     </View>
   );

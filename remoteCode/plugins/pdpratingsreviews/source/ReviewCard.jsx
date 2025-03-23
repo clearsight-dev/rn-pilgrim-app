@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import Star from './Star';
+import Star from '../../../../extractedQueries/Star';
 import moment from 'moment';
 
 const ReviewCard = ({ review }) => {

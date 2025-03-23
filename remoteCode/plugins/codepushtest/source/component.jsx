@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useSelector } from 'react-redux';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
@@ -204,10 +204,68 @@ export function ReactComponent({ model }) {
   return (
     <View style={styles.container}>
       {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text style={styles.loadingText}>Loading product data...</Text>
-        </View>
+        <ScrollView style={styles.scrollContainer}>
+          {/* Skeleton loader for product carousel */}
+          <View style={styles.skeletonCarousel}>
+            <View style={styles.skeletonImageContainer}>
+              <View style={styles.skeletonLabel} />
+              <View style={styles.skeletonPagination}>
+                {[...Array(4)].map((_, i) => (
+                  <View 
+                    key={`dot-${i}`} 
+                    style={[
+                      styles.skeletonPaginationDot, 
+                      i === 0 && styles.skeletonPaginationDotActive
+                    ]} 
+                  />
+                ))}
+              </View>
+            </View>
+          </View>
+          
+          {/* Skeleton for product info */}
+          <View style={styles.productInfoContainer}>
+            {/* Bestseller tag skeleton */}
+            <View style={styles.skeletonBestseller} />
+            
+            {/* Product Title skeleton */}
+            <View style={styles.skeletonTitle} />
+            
+            {/* Product Subtitle skeleton */}
+            <View style={styles.skeletonSubtitle} />
+            
+            {/* Price skeleton */}
+            <View style={styles.skeletonPrice} />
+            <View style={styles.skeletonTaxInfo} />
+            
+            {/* Rating skeleton */}
+            <View style={styles.ratingContainer}>
+              <View style={styles.skeletonRatingBadge} />
+              <View style={styles.skeletonReviewCount} />
+            </View>
+            
+            {/* Variant Selector skeleton */}
+            <View style={styles.skeletonVariantTitle} />
+            <View style={styles.skeletonVariantsContainer}>
+              {[...Array(3)].map((_, i) => (
+                <View key={`variant-${i}`} style={styles.skeletonVariantCard} />
+              ))}
+            </View>
+            
+            {/* Offers Section skeleton */}
+            <View style={styles.skeletonOfferTitle} />
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              style={styles.offersScrollView}
+              contentContainerStyle={styles.offersScrollContent}
+            >
+              {[...Array(3)].map((_, i) => (
+                <View key={`offer-${i}`} style={styles.skeletonOfferCard} />
+              ))}
+            </ScrollView>
+          </View>
+        </ScrollView>
       ) : error ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Error: {error}</Text>
@@ -301,15 +359,125 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
+  // Skeleton styles
+  skeletonCarousel: {
+    height: 450,
+    backgroundColor: '#ffffff',
+    position: 'relative',
+  },
+  skeletonImageContainer: {
+    height: 450,
+    backgroundColor: '#ffffff',
+    position: 'relative',
+  },
+  skeletonLabel: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    width: 80,
+    height: 30,
+    backgroundColor: '#e0e0e0',
+    borderTopRightRadius: 4,
+    borderBottomRightRadius: 4,
+  },
+  skeletonPagination: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    bottom: 20,
+    width: '100%',
   },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#666',
+  skeletonPaginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#e0e0e0',
+    marginHorizontal: 3,
+  },
+  skeletonPaginationDotActive: {
+    backgroundColor: '#c0c0c0',
+  },
+  skeletonBestseller: {
+    width: 80,
+    height: 20,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 8,
+    borderRadius: 4,
+  },
+  skeletonTitle: {
+    width: '80%',
+    height: 28,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 8,
+    borderRadius: 4,
+  },
+  skeletonSubtitle: {
+    width: '90%',
+    height: 16,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 16,
+    borderRadius: 4,
+  },
+  skeletonPrice: {
+    width: 100,
+    height: 32,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 4,
+    borderRadius: 4,
+  },
+  skeletonTaxInfo: {
+    width: 180,
+    height: 14,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 16,
+    borderRadius: 4,
+  },
+  skeletonRatingBadge: {
+    width: 50,
+    height: 24,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  skeletonReviewCount: {
+    width: 120,
+    height: 14,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 4,
+  },
+  skeletonVariantTitle: {
+    width: 200,
+    height: 20,
+    backgroundColor: '#f0f0f0',
+    marginTop: 24,
+    marginBottom: 16,
+    borderRadius: 4,
+  },
+  skeletonVariantsContainer: {
+    flexDirection: 'row',
+    marginBottom: 24,
+  },
+  skeletonVariantCard: {
+    width: 100,
+    height: 120,
+    backgroundColor: '#f0f0f0',
+    marginRight: 12,
+    borderRadius: 8,
+  },
+  skeletonOfferTitle: {
+    width: 120,
+    height: 24,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 16,
+    borderRadius: 4,
+  },
+  skeletonOfferCard: {
+    width: 280,
+    height: 100,
+    backgroundColor: '#f0f0f0',
+    marginRight: 12,
+    borderRadius: 8,
   },
   errorContainer: {
     padding: 16,
