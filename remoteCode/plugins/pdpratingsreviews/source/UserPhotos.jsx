@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { ImageSkeleton } from './SkeletonLoaders';
 
-const UserPhotos = ({ photos = [], onSeeAllPress }) => {
+const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
 
   return (
     <View style={styles.container}>
@@ -15,17 +16,26 @@ const UserPhotos = ({ photos = [], onSeeAllPress }) => {
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.photosContainer}
       >
-        {photos.map((photo) => (
-          <View key={photo.id} style={styles.photoWrapper}>
-            <Image 
-              source={{ uri: photo.url }} 
-              style={styles.photo} 
-              resizeMode="cover"
-            />
-          </View>
-        ))}
+        {isLoading ? (
+          // Show skeleton loaders when loading
+          Array.from({ length: 4 }).map((_, index) => (
+            <View key={`skeleton-${index}`} style={styles.photoWrapper}>
+              <ImageSkeleton />
+            </View>
+          ))
+        ) : (
+          // Show actual photos when loaded
+          photos.map((photo) => (
+            <View key={photo.id} style={styles.photoWrapper}>
+              <Image 
+                source={{ uri: photo.url }} 
+                style={styles.photo} 
+                resizeMode="cover"
+              />
+            </View>
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -40,7 +50,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
-    paddingHorizontal: 16,
   },
   title: {
     fontSize: 16,
@@ -51,9 +60,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     fontWeight: '500',
-  },
-  photosContainer: {
-    paddingHorizontal: 12,
   },
   photoWrapper: {
     width: 100,

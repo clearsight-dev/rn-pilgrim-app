@@ -1,10 +1,11 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Pressable, FlatList } from 'react-native';
 import { Portal } from '@gorhom/portal';
-import { ScrollView, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useApptileWindowDims } from 'apptile-core';
+import ReviewCard from './ReviewCard';
 
-const PhotosBottomSheet = forwardRef(function (props, ref) {
+const PhotosBottomSheet = forwardRef(function ({ reviews = [] }, ref) {
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
   const [sheetIsRendered, setSheetIsRendered] = useState(false);
   const sheetVisibility = useRef(new Animated.Value(0)).current;
@@ -78,19 +79,27 @@ const PhotosBottomSheet = forwardRef(function (props, ref) {
           }}
         >
           <View style={styles.header}>
-            <Text style={styles.title}>Customer Photos</Text>
+            <Text style={styles.title}>Customer Reviews</Text>
             <TouchableOpacity onPress={handleClose}>
               <Text style={styles.closeButton}>Close</Text>
             </TouchableOpacity>
           </View>
           
-          <ScrollView style={{ flex: 1 }}>
+          {reviews.length > 0 ? (
+            <FlatList
+              data={reviews}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => <ReviewCard review={item} />}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
             <View style={styles.content}>
               <Text style={styles.placeholderText}>
-                All reviews will be shown here
+                No reviews available
               </Text>
             </View>
-          </ScrollView>
+          )}
         </Animated.View>
       </GestureHandlerRootView>
     </Portal>
@@ -114,6 +123,9 @@ const styles = StyleSheet.create({
   closeButton: {
     fontSize: 16,
     color: '#666666',
+  },
+  scrollContent: {
+    padding: 16,
   },
   content: {
     padding: 16,

@@ -1,22 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import {Icon} from 'apptile-core';
-import Svg, { Path } from 'react-native-svg';
-
-const Star = ({ filled, size = 16, color = '#FFB800' }) => {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-        fill={filled ? color : 'none'}
-        stroke={color}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Svg>
-  );
-};
+import Star from './Star';
 
 const StarRating = ({ rating = 0, size = 16, maxRating = 5, ratingCount }) => {
   // Ensure rating is between 0 and maxRating
@@ -25,14 +10,27 @@ const StarRating = ({ rating = 0, size = 16, maxRating = 5, ratingCount }) => {
   return (
     <View styles={{flexDirection: "column"}}>
       <View style={styles.container}>
-        {[...Array(maxRating)].map((_, index) => (
-          <Star 
-            key={index} 
-            filled={index < normalizedRating} 
-            size={size} 
-            color={'#00909E'}
-          />
-        ))}
+        {[...Array(maxRating)].map((_, index) => {
+          // Calculate fill percentage for each star
+          let fillPercentage = 0;
+          
+          if (index < Math.floor(normalizedRating)) {
+            // Full star
+            fillPercentage = 1;
+          } else if (index === Math.floor(normalizedRating)) {
+            // Partial star
+            fillPercentage = normalizedRating - Math.floor(normalizedRating);
+          }
+          
+          return (
+            <Star 
+              key={index} 
+              fillPercentage={fillPercentage} 
+              size={size} 
+              color={'#00909E'}
+            />
+          );
+        })}
       </View>
       <View style={{flexDirection: 'row', marginTop: 2}}>
         <Text style={styles.dark}>29,000 Ratings</Text>
