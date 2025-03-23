@@ -59,7 +59,7 @@ export function ReactComponent({ model }) {
 
   // Check if we have both the main product and complementary recommendations
   const mainProduct = data?.data?.productByHandle;
-  const complementaryProducts = data?.data?.complementaryRecommendations;
+  const complementaryProducts = data?.data?.relatedRecommendations;
   
   if (!mainProduct) {
     return (

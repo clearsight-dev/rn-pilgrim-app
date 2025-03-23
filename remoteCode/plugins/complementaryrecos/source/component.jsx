@@ -33,7 +33,7 @@ export function ReactComponent({ model }) {
           setLoading(false);
         });
     }
-  }, [shopifyDSModel]);
+  }, [shopifyDSModel, productHandle]);
 
   // Handle add to cart action
   const handleAddToCart = () => {
@@ -87,7 +87,7 @@ export function ReactComponent({ model }) {
       featuredImage: mainProduct.images?.edges[0]?.node,
       priceRange: mainProduct.priceRange,
       compareAtPriceRange: mainProduct.compareAtPriceRange,
-      metafield: mainProduct.metafields?.find(m => m.key === 'product_label_1' && m.namespace === 'custom')
+      metafield: mainProduct.metafields?.find(m => m?.key === 'product_label_1' && m?.namespace === 'custom')
     },
     // First complementary product
     complementaryProducts[0]

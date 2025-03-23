@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { navigateToScreen } from 'apptile-core';
+import { useDispatch } from 'react-redux';
 
 const ProductCard = ({ product, style }) => {
   // Extract product details
-  const { title, featuredImage, priceRange, compareAtPriceRange, metafield } = product;
+  const { title, featuredImage, priceRange, compareAtPriceRange, metafield, handle } = product;
   
   // Get price information
   const price = priceRange?.minVariantPrice?.amount || '0';
@@ -16,9 +18,15 @@ const ProductCard = ({ product, style }) => {
   
   // Get product label from metafield
   const productLabel = metafield?.value || '';
+  const dispatch = useDispatch();
 
   return (
-    <View style={[styles.container, style]}>
+    <TouchableOpacity 
+      style={[styles.container, style]}
+      onPress={() => {
+        dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
+      }}
+    >
       {/* Product Image */}
       <View style={styles.imageContainer}>
         <Image 
@@ -46,7 +54,7 @@ const ProductCard = ({ product, style }) => {
           )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

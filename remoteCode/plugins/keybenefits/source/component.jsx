@@ -47,6 +47,7 @@ export function ReactComponent({ model }) {
   const cardAspectRatio = parseAspectRatio(aspectRatio);
   
   useEffect(() => {
+    debugger
     if (queryRunner && productHandle) {
       fetchProductData(queryRunner, productHandle)
         .then((res) => {
@@ -99,6 +100,7 @@ export function ReactComponent({ model }) {
                   images: ingredients
                 }
               });
+              setError(null);
             } else {
               // Fallback if no benefit data is found
               setError("No benefit data found");
@@ -114,7 +116,7 @@ export function ReactComponent({ model }) {
           setLoading(false);
         });
     } else {
-      setError("Query runner not available", queryRunner, productHandle);
+      setError("Query runner not available queryRunner: " + queryRunner + ", handle: " + productHandle);
       setLoading(false);
     }
   }, [queryRunner, productHandle]);
