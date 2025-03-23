@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel } from 'apptile-core';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import FrequentlyBoughtTogether from './FrequentlyBoughtTogether';
+import RelatedProductsCarousel from './RelatedProductsCarousel';
 
 export function ReactComponent({ model }) {
   const productHandle = model.get('productHandle');
@@ -62,9 +63,10 @@ export function ReactComponent({ model }) {
     );
   }
 
-  // Check if we have both the main product and complementary recommendations
+  // Check if we have the main product, complementary recommendations, and related recommendations
   const mainProduct = data?.data?.productByHandle;
   const complementaryProducts = data?.data?.complementaryRecommendations;
+  const relatedProducts = data?.data?.relatedRecommendations;
   
   if (!mainProduct) {
     return (
@@ -103,6 +105,13 @@ export function ReactComponent({ model }) {
         products={productsToShow}
         onAddToCart={handleAddToCart}
       />
+      
+      {/* Related Products Carousel */}
+      {relatedProducts && relatedProducts.length > 0 && (
+        <RelatedProductsCarousel 
+          products={relatedProducts}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -130,4 +139,3 @@ export const WrapperTileConfig = {
   defaultProps: {
   },
 };
-
