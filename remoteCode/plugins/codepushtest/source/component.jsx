@@ -9,6 +9,7 @@ import VariantCard from './VariantCard';
 import ImageCarousel from './ProductCarousel';
 
 export function ReactComponent({ model }) {
+  const productHandle = model.get('productHandle');
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +23,7 @@ export function ReactComponent({ model }) {
       setLoading(true);
       try {
         const queryRunner = shopifyDSModel?.get('queryRunner');
-        const result = await fetchProductData(queryRunner, "3-redensyl-4-anagain-hair-growth-serum");
+        const result = await fetchProductData(queryRunner, productHandle);
         setProductData(result);
         setLoading(false);
       } catch (err) {
@@ -32,10 +33,10 @@ export function ReactComponent({ model }) {
       }
     };
 
-    if (shopifyDSModel) {
+    if (shopifyDSModel && productHandle) {
       loadProductData();
     }
-  }, [shopifyDSModel]);
+  }, [shopifyDSModel, productHandle]);
 
   // Extract and format product label
   const formatProductLabel = (metafields) => {
@@ -475,10 +476,20 @@ const styles = StyleSheet.create({
   },
 });
 
-export const WidgetConfig = {};
+export const WidgetConfig = {
+  productHandle: ''
+};
 
 export const WidgetEditors = {
-  basic: [],
+  basic: [
+    {
+      type: 'codeInput',
+      name: 'productHandle',
+      props: {
+        label: 'Product Handle'
+      }
+    }
+  ],
 };
 
 export const PropertySettings = {};

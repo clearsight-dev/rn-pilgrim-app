@@ -11,6 +11,7 @@ import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import FrequentlyBoughtTogether from './FrequentlyBoughtTogether';
 
 export function ReactComponent({ model }) {
+  const productHandle = model.get('productHandle');
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,9 +20,9 @@ export function ReactComponent({ model }) {
   useEffect(() => {
     const queryRunner = shopifyDSModel?.get('queryRunner');
     
-    if (queryRunner) {
+    if (queryRunner && productHandle) {
       setLoading(true);
-      fetchProductData(queryRunner, "3-redensyl-4-anagain-hair-growth-serum")
+      fetchProductData(queryRunner, productHandle)
         .then(res => {
           setData(res);
           setLoading(false);
@@ -103,10 +104,19 @@ export function ReactComponent({ model }) {
 }
 
 export const WidgetConfig = {
+  productHandle: ''
 };
 
 export const WidgetEditors = {
-  basic: [],
+  basic: [
+    {
+      type: 'codeInput',
+      name: 'productHandle',
+      props: {
+        label: 'Product Handle'
+      }
+    }
+  ],
 };
 
 export const PropertySettings = {};

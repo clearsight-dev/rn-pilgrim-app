@@ -5,6 +5,7 @@ import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import RatingCard from './RatingCard';
 
 export function ReactComponent({ model }) {
+  const productHandle = model.get('productHandle');
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [rating, setRating] = useState(2); // Default rating is 2
   const [ratingCount, setRatingCount] = useState(0);
@@ -50,7 +51,7 @@ export function ReactComponent({ model }) {
       // Get product ID
       const getProduct = judgeMeQueries.getProduct;
       let endpoint = getProduct.endpointResolver(getProduct.endpoint, {
-        handle: '3-redensyl-4-anagain-hair-growth-serum',
+        handle: productHandle,
       });
       endpoint = formatEndpoint(endpoint);
       const productRes = await judgeMeQueryRunner.runQuery('get', endpoint, null);
@@ -154,8 +155,10 @@ export function ReactComponent({ model }) {
         setIsLoading(false);
       }
     }
-    getReviews();
-  }, [judgemeDSModel])
+    if (productHandle) {
+      getReviews();
+    }
+  }, [judgemeDSModel, productHandle])
 
   useEffect(() => {
     const queryRunner = shopifyDSModel?.get('queryRunner');
@@ -207,10 +210,19 @@ export function ReactComponent({ model }) {
 }
 
 export const WidgetConfig = {
+  productHandle: ''
 };
 
 export const WidgetEditors = {
-  basic: [],
+  basic: [
+    {
+      type: 'codeInput',
+      name: 'productHandle',
+      props: {
+        label: 'Product Handle'
+      }
+    }
+  ],
 };
 
 export const PropertySettings = {};

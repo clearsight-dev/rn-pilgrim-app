@@ -16,7 +16,7 @@ export function ReactComponent({ model }) {
   const [sheetIsRendered, setSheetIsRendered] = useState(false);
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
   const sheetVisibility = useRef(new Animated.Value(0)).current;
-  const productHandle = '3-redensyl-4-anagain-hair-growth-serum';
+  const productHandle = model.get('productHandle');
   
   // Get shopify query runner
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
@@ -26,7 +26,7 @@ export function ReactComponent({ model }) {
     const loadData = async () => {
       try {
         const queryRunner = shopifyDSModel?.get('queryRunner');
-        if (!queryRunner) {
+        if (!queryRunner || !productHandle) {
           console.error("[APPTILE_AGENT] No query runner available");
           return;
         }

@@ -8,7 +8,7 @@ import ThreeDCarousel from './threeDCarousel';
 import GradientText from '../../../../extractedQueries/GradientText';
 
 export function ReactComponent({ model }) {
-  const productHandle = '3-redensyl-4-anagain-hair-growth-serum'; // Hardcoded product handle
+  const productHandle = model.get('productHandle');
   const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
   const aspectRatio = model.get('aspectRatio') || '1/1.5'; // Get aspect ratio from props
   const cardWidthPercentage = parseFloat(model.get('cardWidthPercentage') || '70'); // Get card width as percentage of screen
@@ -47,7 +47,7 @@ export function ReactComponent({ model }) {
   const cardAspectRatio = parseAspectRatio(aspectRatio);
   
   useEffect(() => {
-    if (queryRunner) {
+    if (queryRunner && productHandle) {
       fetchProductData(queryRunner, productHandle)
         .then((res) => {
           if (res?.data?.productByHandle?.metafields) {
@@ -114,10 +114,10 @@ export function ReactComponent({ model }) {
           setLoading(false);
         });
     } else {
-      setError("Query runner not available");
+      setError("Query runner not available", queryRunner, productHandle);
       setLoading(false);
     }
-  }, [queryRunner]);
+  }, [queryRunner, productHandle]);
 
 
   if (loading) {
@@ -216,10 +216,18 @@ export const WidgetConfig = {
   aspectRatio: '',
   cardWidthPercentage: '',
   cardSpacing: '',
+  productHandle: ''
 };
 
 export const WidgetEditors = {
   basic: [
+    {
+      type: 'codeInput',
+      name: 'productHandle',
+      props: {
+        label: 'Product Handle'
+      }
+    },
     {
       type: 'colorInput',
       name: 'backgroundColor',
