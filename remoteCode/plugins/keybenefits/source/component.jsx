@@ -47,78 +47,82 @@ export function ReactComponent({ model }) {
   const cardAspectRatio = parseAspectRatio(aspectRatio);
   
   useEffect(() => {
-    debugger
+    let timeout;
+    
     if (queryRunner && productHandle) {
-      fetchProductData(queryRunner, productHandle)
-        .then((res) => {
-          if (res?.data?.productByHandle?.metafields) {
-            const productMetafields = res.data.productByHandle.metafields;
-            
-            // Extract carousel benefit data from metafields
-            const carouselData = productMetafields
-              .filter(mf => mf && (
-                mf.key === 'test_benefit_url' ||
-                mf.key === 'after_atc_benefit2_url' ||
-                mf.key === 'after_atc_benefit3_url'
-              ))
-              .map((mf, index) => {
+      timeout = setTimeout(() => {
+        fetchProductData(queryRunner, productHandle)
+          .then((res) => {
+            if (res?.data?.productByHandle?.metafields) {
+              const productMetafields = res.data.productByHandle.metafields;
+              
+              // Extract carousel benefit data from metafields
+              const carouselData = productMetafields
+                .filter(mf => mf && (
+                  mf.key === 'test_benefit_url' ||
+                  mf.key === 'after_atc_benefit2_url' ||
+                  mf.key === 'after_atc_benefit3_url'
+                ))
+                .map((mf, index) => {
+                  return {
+                    imageUrl: mf.value
+                  };
+                });
+              
+              // Extract key benefits title and list for BenefitsCard
+              const keyBenefitsTitle = productMetafields.find(field => 
+                field?.key?.includes('key_benefits_heading') 
+              );
+              
+              const keyBenefitsList = productMetafields
+                .filter(field => field?.key?.includes('key_benefits') && field?.type === 'multi_line_text_field')
+                .flatMap(item => item.value.split('•'))
+                .filter(line => line.trim() !== ''); // Filter out empty lines
+
+              const ingredients = productMetafields.filter(field => {
+                return field?.key?.startsWith('ingredients') && 
+                  field?.key?.endsWith('_url')
+              })
+              .map(it => {
                 return {
-                  imageUrl: mf.value
+                  imageUrl: it.value
                 };
               });
-            
-            // Extract key benefits title and list for BenefitsCard
-            const keyBenefitsTitle = productMetafields.find(field => 
-              field?.key?.includes('key_benefits_heading') 
-            );
-            
-            const keyBenefitsList = productMetafields
-              .filter(field => field?.key?.includes('key_benefits') && field?.type === 'multi_line_text_field')
-              .flatMap(item => item.value.split('•'))
-              .filter(line => line.trim() !== ''); // Filter out empty lines
 
-            const ingredients = productMetafields.filter(field => {
-              return field?.key?.startsWith('ingredients') && 
-                field?.key?.endsWith('_url')
-            })
-            .map(it => {
-              return {
-                imageUrl: it.value
-              };
-            });
-
-            const ingredientsHeading = productMetafields
-              .find(it => it?.key === "ingredients_heading")?.value ?? "";
-            
-            if (carouselData.length > 0) {
-              setBenefits({
-                carouselItems: carouselData,
-                title: keyBenefitsTitle?.value,
-                benefitsList: keyBenefitsList,
-                ingredients: {
-                  title: ingredientsHeading,
-                  images: ingredients
-                }
-              });
-              setError(null);
+              const ingredientsHeading = productMetafields
+                .find(it => it?.key === "ingredients_heading")?.value ?? "";
+              
+              if (carouselData.length > 0) {
+                setBenefits({
+                  carouselItems: carouselData,
+                  title: keyBenefitsTitle?.value,
+                  benefitsList: keyBenefitsList,
+                  ingredients: {
+                    title: ingredientsHeading,
+                    images: ingredients
+                  }
+                });
+                setError(null);
+              } else {
+                // Fallback if no benefit data is found
+                setError("No benefit data found");
+              }
             } else {
-              // Fallback if no benefit data is found
-              setError("No benefit data found");
+              setError("No metafields found");
             }
-          } else {
-            setError("No metafields found");
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("[APPTILE_AGENT] Query error:", err);
-          setError(err);
-          setLoading(false);
-        });
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error("[APPTILE_AGENT] Query error:", err);
+            setError(err);
+            setLoading(false);
+          });
+      }, 500);
     } else {
       setError("Query runner not available queryRunner: " + queryRunner + ", handle: " + productHandle);
       setLoading(false);
     }
+    return () => clearTimeout(timeout);
   }, [queryRunner, productHandle]);
 
 

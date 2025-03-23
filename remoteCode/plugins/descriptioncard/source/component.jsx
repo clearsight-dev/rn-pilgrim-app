@@ -40,9 +40,14 @@ export function ReactComponent({ model }) {
       }
     };
     
-    if (shopifyDSModel) {
-      loadData();
+    let timeout;
+    if (shopifyDSModel && productHandle) {
+      timeout = setTimeout(() => {
+        loadData();
+      }, 500);
     }
+
+    return () => clearTimeout(timeout);
   }, [shopifyDSModel, productHandle]);
   
   const openModal = () => {

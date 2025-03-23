@@ -19,20 +19,24 @@ export function ReactComponent({ model }) {
 
   useEffect(() => {
     const queryRunner = shopifyDSModel?.get('queryRunner');
-    
+    let timeout;
     if (queryRunner && productHandle) {
-      setLoading(true);
-      fetchProductData(queryRunner, productHandle)
-        .then(res => {
-          setData(res);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error(err.toString());
-          setError(err.toString());
-          setLoading(false);
-        });
+      timeout = setLoading(true);
+        setTimeout(() => {
+          fetchProductData(queryRunner, productHandle)
+            .then(res => {
+              setData(res);
+              setLoading(false);
+            })
+            .catch(err => {
+              console.error(err.toString());
+              setError(err.toString());
+              setLoading(false);
+            });
+        }, 500)
+      
     }
+    return () => {clearTimeout(timeout)}
   }, [shopifyDSModel, productHandle]);
 
   // Handle add to cart action

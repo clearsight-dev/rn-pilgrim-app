@@ -155,8 +155,14 @@ export function ReactComponent({ model }) {
         setIsLoading(false);
       }
     }
+    let timeout;
     if (productHandle) {
-      getReviews();
+      timeout = setTimeout(() => {
+        getReviews();
+      }, 500)
+    }
+    return () => {
+      clearTimeout(timeout)
     }
   }, [judgemeDSModel, productHandle])
 
