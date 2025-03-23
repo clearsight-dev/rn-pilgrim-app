@@ -4,7 +4,7 @@ import ProductCard from './ProductCard';
 
 const FrequentlyBoughtTogether = ({ 
   title = "Frequently bought together",
-  description = "Bundle your purchase with a product frequently bought with this one.",
+  description = "Bundle your purchase with a product frequently bought with this one. ",
   products = [],
   onAddToCart,
   style

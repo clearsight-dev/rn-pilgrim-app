@@ -72,7 +72,7 @@ export function ReactComponent({ model }) {
   
   // Find the how_to_use metafield
   const howToUseMetafield = productData?.metafields?.find(
-    meta => meta.key === 'how_to_use' && meta.namespace === 'my_fields'
+    meta => meta?.key === 'how_to_use' && meta?.namespace === 'my_fields'
   );
   
   const howToUseContent = howToUseMetafield?.value || "No usage instructions available.";
