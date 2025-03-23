@@ -1,13 +1,26 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { navigateToScreen } from 'apptile-core';
 import { useDispatch } from 'react-redux';
 import Star from '../../../../extractedQueries/Star';
 import ProductFlag from '../../../../extractedQueries/ProductFlag';
 
-const RelatedProductCard = ({ product, style }) => {
-  // Extract product details
-  const { title, featuredImage, priceRange, compareAtPriceRange, metafield, handle, rating } = product;
+const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
+  // Extract product details - use fullData if available (from lazy loading)
+  const fullData = product.fullData || {};
+  const { 
+    title, 
+    featuredImage, 
+    priceRange, 
+    compareAtPriceRange, 
+    metafield, 
+    handle, 
+    rating 
+  } = {
+    ...product,
+    // Override with fullData if available
+    ...fullData
+  };
   
   // Get price information
   const price = priceRange?.minVariantPrice?.amount || '0';
@@ -29,7 +42,7 @@ const RelatedProductCard = ({ product, style }) => {
     >
       {/* Promo Tag */}
       <ProductFlag 
-        label={product.metafield?.value || "Buy 3@999"} 
+        label={metafield?.value || "Buy 3@999"} 
         color="#00726C" 
         style={styles.promoTagContainer}
         textStyle={styles.promoTagText}
@@ -46,9 +59,11 @@ const RelatedProductCard = ({ product, style }) => {
         />
         {/* Rating */}
         <View style={styles.ratingContainer}>
-          <Text style={styles.ratingText}>{rating || '4.8'}</Text>
+          <Text style={styles.ratingText}>{rating || fullData?.rating || '4.8'}</Text>
           <Star color={'#00909E'} size={12} fillPercentage={1} />
         </View>
+        
+        {/* No loading indicator - optimistic loading */}
       </View>
 
       {/* Product Details */}
@@ -191,6 +206,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#00909E',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8
   },
 });
 

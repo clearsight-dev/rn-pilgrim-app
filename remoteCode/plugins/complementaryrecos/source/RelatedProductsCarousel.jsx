@@ -1,12 +1,82 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
+import { datasourceTypeModelSel } from 'apptile-core';
+import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import RelatedProductCard from './RelatedProductCard';
+import { debounce } from 'lodash-es';
 
 const RelatedProductsCarousel = ({ 
   title = "Customers also liked",
   products = [],
   style
 }) => {
+  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [loadedProductHandles, setLoadedProductHandles] = useState(new Set());
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollViewRef = useRef(null);
+  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+  
+  // Function to fetch product data
+  const fetchProductDetails = async (productHandle) => {
+    if (!shopifyDSModel || loadedProductHandles.has(productHandle)) return;
+    
+    try {
+      const queryRunner = shopifyDSModel?.get('queryRunner');
+      const result = await fetchProductData(queryRunner, productHandle);
+      
+      // Mark this product as loaded
+      setLoadedProductHandles(prev => new Set([...prev, productHandle]));
+      
+      // Update the product in the visibleProducts array
+      setVisibleProducts(prev => 
+        prev.map(product => 
+          product.handle === productHandle 
+            ? { ...product, fullData: result.data.productByHandle }
+            : product
+        )
+      );
+    } catch (error) {
+      console.error(`Error fetching product ${productHandle}:`, error);
+    }
+  };
+  
+  // Create a debounced version of the fetch function
+  const debouncedFetchProducts = useRef(
+    debounce((productsToFetch) => {
+      productsToFetch.forEach(product => {
+        fetchProductDetails(product.handle);
+      });
+    }, 1000)
+  ).current;
+  
+  // Handle scroll events
+  const handleScroll = (event) => {
+    setIsScrolling(true);
+    
+    // When scroll ends, trigger the debounced fetch
+    debouncedFetchProducts(visibleProducts);
+  };
+  
+  // Initialize with the first 2 products
+  useEffect(() => {
+    if (!products || products.length === 0) return;
+    
+    // Initialize with all products but only mark the first 2 for loading
+    setVisibleProducts(products);
+    
+    // Set a timeout to fetch the first 2 products after 1 second
+    const timer = setTimeout(() => {
+      const initialProductsToLoad = products.slice(0, Math.min(2, products.length));
+      debouncedFetchProducts(initialProductsToLoad);
+    }, 1000);
+    
+    return () => {
+      clearTimeout(timer);
+      debouncedFetchProducts.cancel();
+    };
+  }, [products]);
+  
   if (!products || products.length === 0) {
     return null;
   }
@@ -18,14 +88,20 @@ const RelatedProductsCarousel = ({
 
       {/* Horizontal Scrollable List */}
       <ScrollView 
+        ref={scrollViewRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        onScroll={handleScroll}
+        onScrollEndDrag={() => setIsScrolling(false)}
+        onMomentumScrollEnd={() => setIsScrolling(false)}
+        scrollEventThrottle={16}
       >
-        {products.map((product, index) => (
+        {visibleProducts.map((product, index) => (
           <RelatedProductCard 
             key={product.handle || index} 
-            product={product} 
+            product={product}
+            loadedProductHandles={loadedProductHandles}
           />
         ))}
       </ScrollView>

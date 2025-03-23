@@ -1,5 +1,8 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
+import { datasourceTypeModelSel } from 'apptile-core';
+import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import ProductCard from './ProductCard';
 
 const FrequentlyBoughtTogether = ({ 
@@ -9,13 +12,52 @@ const FrequentlyBoughtTogether = ({
   onAddToCart,
   style
 }) => {
+  const [secondProductData, setSecondProductData] = useState(null);
+  const [isLoadingSecondProduct, setIsLoadingSecondProduct] = useState(false);
+  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+  
+  useEffect(() => {
+    // Only fetch if we have a second product and shopifyDSModel is available
+    if (products.length > 1 && shopifyDSModel) {
+      const secondProduct = products[1];
+      const queryRunner = shopifyDSModel?.get('queryRunner');
+      
+      // Set a timeout to fetch the second product data after 1 second
+      const timer = setTimeout(() => {
+        setIsLoadingSecondProduct(true);
+        fetchProductData(queryRunner, secondProduct.handle)
+          .then(res => {
+            setSecondProductData(res.data.productByHandle);
+            setIsLoadingSecondProduct(false);
+          })
+          .catch(err => {
+            console.error("Error fetching second product:", err);
+            setIsLoadingSecondProduct(false);
+          });
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [products, shopifyDSModel]);
+  
+  // If we have fetched second product data, enhance the second product with additional data
+  const enhancedProducts = [...products];
+  if (secondProductData && products.length > 1) {
+    enhancedProducts[1] = {
+      ...enhancedProducts[1],
+      // Add any additional data from secondProductData that might be useful
+      metafields: secondProductData.metafields,
+      description: secondProductData.description,
+      // Add other fields as needed
+    };
+  }
   // Calculate total price and savings
-  const totalOriginalPrice = products.reduce((sum, product) => {
+  const totalOriginalPrice = enhancedProducts.reduce((sum, product) => {
     const compareAtPrice = product.compareAtPriceRange?.minVariantPrice?.amount || 0;
     return sum + parseFloat(compareAtPrice || product.priceRange?.minVariantPrice?.amount || 0);
   }, 0);
 
-  const totalDiscountedPrice = products.reduce((sum, product) => {
+  const totalDiscountedPrice = enhancedProducts.reduce((sum, product) => {
     return sum + parseFloat(product.priceRange?.minVariantPrice?.amount || 0);
   }, 0);
 
@@ -29,7 +71,7 @@ const FrequentlyBoughtTogether = ({
 
       {/* Products Row */}
       <View style={styles.productsContainer}>
-        {products.map((product, index) => (
+        {enhancedProducts.map((product, index) => (
           <Fragment key={product.handle || index}>
             {/* Add plus sign between products */}
             {index > 0 && (
