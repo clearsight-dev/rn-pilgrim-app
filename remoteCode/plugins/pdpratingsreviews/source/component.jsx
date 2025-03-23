@@ -11,6 +11,7 @@ export function ReactComponent({ model }) {
   const [ratingCount, setRatingCount] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [consumerStudyResults, setConsumerStudyResults] = useState([]);
   const judgemeDSModel = useSelector(state => datasourceTypeModelSel(state, 'judgeMe'));
 
   useEffect(() => {
@@ -170,7 +171,7 @@ export function ReactComponent({ model }) {
     const queryRunner = shopifyDSModel?.get('queryRunner');
     fetchProductData(queryRunner, "3-redensyl-4-anagain-hair-growth-serum")
       .then(res => {
-        // Extract rating and rating_count from metafields
+        // Extract rating, rating_count, and consumer study results from metafields
         if (res?.data?.productByHandle?.metafields) {
           const metafields = res.data.productByHandle.metafields;
           
@@ -182,6 +183,19 @@ export function ReactComponent({ model }) {
           // Find rating_count metafield
           const ratingCountMetafield = metafields.find(
             metafield => metafield.key === 'rating_count' && metafield.namespace === 'reviews'
+          );
+          
+          // Find consumer study results metafields
+          const consumerStudyResults1 = metafields.find(
+            metafield => metafield.key === 'consumer_study_results_1' && metafield.namespace === 'custom'
+          );
+          
+          const consumerStudyResults2 = metafields.find(
+            metafield => metafield.key === 'consumer_study_results_2' && metafield.namespace === 'custom'
+          );
+          
+          const consumerStudyResults3 = metafields.find(
+            metafield => metafield.key === 'consumer_study_results_3' && metafield.namespace === 'custom'
           );
           
           // Update state with metafield values if they exist
@@ -197,6 +211,23 @@ export function ReactComponent({ model }) {
           if (ratingCountMetafield && ratingCountMetafield.value) {
             setRatingCount(parseInt(ratingCountMetafield.value, 10));
           }
+          
+          // Collect consumer study results
+          const studyResults = [];
+          
+          if (consumerStudyResults1 && consumerStudyResults1.value) {
+            studyResults.push(consumerStudyResults1.value);
+          }
+          
+          if (consumerStudyResults2 && consumerStudyResults2.value) {
+            studyResults.push(consumerStudyResults2.value);
+          }
+          
+          if (consumerStudyResults3 && consumerStudyResults3.value) {
+            studyResults.push(consumerStudyResults3.value);
+          }
+          
+          setConsumerStudyResults(studyResults);
         }
       })
       .catch(err => {
@@ -211,6 +242,7 @@ export function ReactComponent({ model }) {
       photos={reviews.filter(review => review.has_published_pictures).flatMap(review => review.pictures)}
       reviews={reviews}
       isLoading={isLoading}
+      consumerStudyResults={consumerStudyResults}
     />
   );
 }
@@ -238,4 +270,3 @@ export const WrapperTileConfig = {
   defaultProps: {
   },
 };
-

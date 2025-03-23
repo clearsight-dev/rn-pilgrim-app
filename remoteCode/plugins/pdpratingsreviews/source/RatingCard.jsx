@@ -8,7 +8,58 @@ import PhotosBottomSheet from './PhotosBottomSheet';
 import ReviewCard from './ReviewCard';
 import { ReviewCardSkeleton } from './SkeletonLoaders';
 
-const RatingCard = ({ rating = 2, ratingCount = 0, photos = [], reviews = [], isLoading = false }) => {
+// Component for displaying consumer study results
+const ConsumerStudyResults = ({ results = [] }) => {
+  if (results.length === 0) return null;
+  
+  // Function to extract percentage and text from the result string
+  const parseResult = (result) => {
+    // Extract percentage using regex
+    const percentageMatch = result.match(/^(\d+)%/);
+    if (!percentageMatch) return { percentage: 0, text: result };
+    
+    const percentage = parseInt(percentageMatch[1], 10);
+    // Remove percentage from the beginning and capitalize first letter
+    const remainingText = result.replace(/^\d+%\s*/, '');
+    const capitalizedText = remainingText.charAt(0).toUpperCase() + remainingText.slice(1);
+    
+    return { percentage, text: capitalizedText };
+  };
+  
+  return (
+    <View style={styles.consumerStudyContainer}>
+      <Text style={styles.sectionTitle}>Customer Insights</Text>
+      
+      {results.map((result, index) => {
+        const { percentage, text } = parseResult(result);
+        
+        return (
+          <View key={index} style={styles.insightRow}>
+            <Text style={styles.insightText}>{text}</Text>
+            <View style={styles.progressBarContainer}>
+              <View 
+                style={[
+                  styles.progressBar, 
+                  { width: `${percentage}%` }
+                ]} 
+              />
+            </View>
+            <Text style={styles.percentageText}>{percentage}%</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+};
+
+const RatingCard = ({ 
+  rating = 2, 
+  ratingCount = 0, 
+  photos = [], 
+  reviews = [], 
+  isLoading = false,
+  consumerStudyResults = []
+}) => {
   const reviewsBottomSheet = useRef(null);
   const photosBottomSheet = useRef(null);
 
@@ -49,6 +100,9 @@ const RatingCard = ({ rating = 2, ratingCount = 0, photos = [], reviews = [], is
         <Text style={styles.writeReviewText}>Write a review</Text>
       </TouchableOpacity>
       
+      {/* Consumer Study Results */}
+      <ConsumerStudyResults results={consumerStudyResults} />
+      
       {/* Customer Photos */}
       <UserPhotos 
         photos={photos} 
@@ -60,7 +114,7 @@ const RatingCard = ({ rating = 2, ratingCount = 0, photos = [], reviews = [], is
       {isLoading || reviews.length > 0 ? (
         <View style={styles.reviewsSection}>
           <View style={styles.reviewsHeader}>
-            <Text style={styles.sectionTitle}>Recent Reviews</Text>
+            <Text style={styles.sectionTitle}>Customer Reviews</Text>
             
           </View>
           
@@ -106,6 +160,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     paddingVertical: 16,
     paddingHorizontal: 16
+  },
+  consumerStudyContainer: {
+    marginBottom: 16,
+  },
+  insightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  insightText: {
+    flex: 2,
+    fontSize: 14,
+    color: '#1A1A1A',
+  },
+  progressBarContainer: {
+    flex: 2,
+    height: 8,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginHorizontal: 12,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#00726C',
+    borderRadius: 4,
+  },
+  percentageText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    width: 40,
+    textAlign: 'right',
   },
   sectionTitle: {
     fontSize: 15,
