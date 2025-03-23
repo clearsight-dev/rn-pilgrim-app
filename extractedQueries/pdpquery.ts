@@ -144,7 +144,8 @@ export const fetchProductData = async (queryRunner, productHandle) => {
         {key:'ingredients_heading', namespace:'custom'},
         {key: 'product_label_3', namespace: 'custom'},
         {key: 'product_maximum_quantity', namespace: 'custom'},
-        {key: 'hidden', namespace: 'seo'}
+        {key: 'hidden', namespace: 'seo'},
+        {key: 'after_atc_test_ingredients', namespace: 'my_fields'}
       ],
       variantMetafields: [
         { key: "variant_subtitle", namespace: "custom" },
