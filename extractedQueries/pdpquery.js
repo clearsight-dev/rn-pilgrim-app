@@ -8,7 +8,67 @@ const PRODUCT_QUERY = gql`
     $countryCode: CountryCode, 
     $languageCode: LanguageCode
   ) @inContext(country: $countryCode, language: $languageCode) {
-    productByHandle(handle: $productHandle) {
+    relatedRecommendations: productRecommendations(productHandle: $productHandle, intent: RELATED) {
+      featuredImage {
+        url
+        height
+        width
+      }
+      handle
+      title
+      priceRange {
+        maxVariantPrice {
+          amount
+        }
+        minVariantPrice {
+          amount
+        }
+      }
+      compareAtPriceRange {
+        maxVariantPrice {
+          amount
+        }
+        minVariantPrice {
+          amount
+        }
+      }
+      metafield(key: "product_label_1", namespace: "custom") {
+        key
+        namespace
+        value
+      }
+    }
+    complementaryRecommendations: productRecommendations(productHandle: $productHandle, intent: COMPLEMENTARY) {
+      featuredImage {
+        url
+        height
+        width
+      }
+      handle
+      title
+      priceRange {
+        maxVariantPrice {
+          amount
+        }
+        minVariantPrice {
+          amount
+        }
+      }
+      compareAtPriceRange {
+        maxVariantPrice {
+          amount
+        }
+        minVariantPrice {
+          amount
+        }
+      }
+      metafield(key: "product_label_1", namespace: "custom") {
+        key
+        namespace
+        value
+      }
+    }
+    product(handle: $productHandle) {
       id
       handle
       title
@@ -60,6 +120,14 @@ const PRODUCT_QUERY = gql`
               value
               namespace
             }
+            image {
+              url
+              id
+              height
+              width
+            }
+            weight
+            weightUnit
           }
         }
       }
@@ -157,5 +225,13 @@ export const fetchProductData = async (queryRunner, productHandle) => {
       cachePolicy: 'cache-first'
     }
   );
-  return data;
+  
+  return {
+    data: {
+      ...data.data,
+      productByHandle: data.data.product,
+      complementaryRecommendations: data.data.complementaryRecommendations,
+      relatedRecommendations: data.data.relatedRecommendations
+    }
+  };
 }
