@@ -46,7 +46,7 @@ export function ExternalLinks({staticImages}) {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        {staticImages?.girl[0] && staticImages.girl[0] && (<Image 
+        {staticImages?.girl?.[0] && (<Image 
           style={{
             width: 100, 
             aspectRatio: 1,
@@ -55,7 +55,7 @@ export function ExternalLinks({staticImages}) {
             left: 0,
             zIndex: 1
           }}
-          source={{uri: staticImages.girl[0]}}
+          source={{uri: staticImages?.girl?.[0]}}
         >
         </Image>)}
         <GradientBackground 
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   column: {
     marginHorizontal: 8,
-    maxWidth: 80
+    maxWidth: 180
   },
   columnTitle: {
     fontSize: 16,
