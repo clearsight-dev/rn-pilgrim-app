@@ -9,6 +9,7 @@ import descriptioncard from "./plugins/descriptioncard/source/widget";
 import complementaryrecos from "./plugins/complementaryrecos/source/widget";
 import codepushtest from "./plugins/codepushtest/source/widget";
 import clickpost from "./plugins/clickpost/source/widget";
+import bottomcontent from "./plugins/bottomcontent/source/widget";
 import ShopifyCart from "./plugins/ShopifyCart/source/widget";
 import FreeGifts from "./plugins/FreeGifts/source/widget";
 import DynamicImage from "./plugins/DynamicImage/source/widget";
@@ -17,6 +18,7 @@ return [
     DynamicImage,
     FreeGifts,
     ShopifyCart,
+    bottomcontent,
     clickpost,
     codepushtest,
     complementaryrecos,

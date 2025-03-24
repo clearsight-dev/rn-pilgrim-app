@@ -204,7 +204,7 @@ export function ReactComponent({ model }) {
   return (
     <View style={styles.container}>
       {loading ? (
-        <ScrollView style={styles.scrollContainer}>
+        <View style={styles.scrollContainer}>
           {/* Skeleton loader for product carousel */}
           <View style={styles.skeletonCarousel}>
             <View style={styles.skeletonImageContainer}>
@@ -265,13 +265,13 @@ export function ReactComponent({ model }) {
               ))}
             </ScrollView>
           </View>
-        </ScrollView>
+        </View>
       ) : error ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Error: {error}</Text>
         </View>
       ) : (
-        <ScrollView style={styles.scrollContainer}>
+        <View style={styles.scrollContainer}>
           <ImageCarousel 
             images={productImages} 
             screenWidth={screenWidth} 
@@ -345,7 +345,7 @@ export function ReactComponent({ model }) {
               </ScrollView>
             </View>
           </View>
-        </ScrollView>
+        </View>
       )}
     </View>
   );
@@ -353,11 +353,11 @@ export function ReactComponent({ model }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
+    flexShrink: 1,
+    backgroundColor: '#ffffff'
   },
   scrollContainer: {
-    flex: 1,
+    flexGrow: 1
   },
   // Skeleton styles
   skeletonCarousel: {
@@ -469,8 +469,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 24,
     backgroundColor: '#f0f0f0',
-    marginBottom: 16,
-    borderRadius: 4,
+    marginBottom: 16
   },
   skeletonOfferCard: {
     width: 280,
@@ -613,7 +612,7 @@ const styles = StyleSheet.create({
   },
   // Variant selector styles
   variantSelectorContainer: {
-    marginBottom: 24,
+    marginBottom: 24
   },
   variantTitle: {
     fontSize: 18,
@@ -628,7 +627,7 @@ const styles = StyleSheet.create({
   },
   // Offers section styles
   offersSection: {
-    marginTop: 16,
+    marginTop: 16
   },
   offersSectionTitle: {
     fontSize: 20,
