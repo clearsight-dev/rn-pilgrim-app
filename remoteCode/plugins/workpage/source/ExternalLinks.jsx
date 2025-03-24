@@ -4,7 +4,7 @@ import {
   Text, 
   TouchableOpacity, 
   StyleSheet,
-  ScrollView
+  Image
 } from 'react-native';
 
 // Link Item component
@@ -17,7 +17,7 @@ const LinkItem = ({ title }) => {
 };
 
 // External Links Component
-export function ExternalLinks() {
+export function ExternalLinks({girlImages}) {
   // Information links data
   const informationLinks = [
     "Track your order",
@@ -43,8 +43,22 @@ export function ExternalLinks() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>THE SECRET IS SCIENCE</Text>
+      <View style={styles.headerContainer}>
+        {girlImages && girlImages[0] && (<Image 
+          style={{
+            width: 100, 
+            aspectRatio: 1,
+            position: 'absolute',
+            bottom: 24,
+            left: 0,
+            zIndex: 1
+          }}
+          source={{uri: girlImages[0]}}
+        >
+        </Image>)}
+        <View style={styles.header}>
+          <Text style={styles.headerText}>THE SECRET IS IN THE MIX</Text>
+        </View>
       </View>
       
       <View style={styles.linksContainer}>
@@ -70,14 +84,28 @@ export function ExternalLinks() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     backgroundColor: '#FFFFFF',
   },
+  headerContainer: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    height: 130,
+  },
   header: {
+    width: '120%',
     backgroundColor: '#00A19A', // Teal color from the design
     padding: 12,
     marginBottom: 16,
     borderRadius: 4,
+    transform: [
+      {
+        rotateZ: '-8deg'
+      },
+      {
+        translateY: 35 
+      }
+    ]
   },
   headerText: {
     color: '#FFFFFF',
@@ -86,6 +114,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   linksContainer: {
+    padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

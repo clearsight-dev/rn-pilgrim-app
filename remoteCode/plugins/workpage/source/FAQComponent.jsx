@@ -5,6 +5,7 @@ import {
   TouchableOpacity, 
   StyleSheet
 } from 'react-native';
+import {Icon} from 'apptile-core';
 import Accordion from './Accordion';
 
 // FAQ Item component with accordion functionality
@@ -18,7 +19,27 @@ const FAQItem = ({ question, answer }) => {
         onPress={() => setExpanded(!expanded)}
       >
         <Text style={styles.questionText}>{question}</Text>
-        <Text style={styles.chevron}>{expanded ? '▲' : '▼'}</Text>
+        {
+          expanded ? 
+            (<Icon 
+              iconType={'Material Icon'} 
+              name={'chevron-up'} 
+              style={{
+                marginRight: 8,
+                fontSize: 18,
+                color: '#1A1A1A'
+              }}
+            />):
+            (<Icon 
+              iconType={'Material Icon'} 
+              name={'chevron-down'} 
+              style={{
+                marginRight: 8,
+                fontSize: 18,
+                color: '#1A1A1A'
+              }}
+            />)
+        }
       </TouchableOpacity>
       
       {expanded && (
@@ -87,7 +108,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#F5F5F5',
   },
   questionText: {
     fontSize: 14,

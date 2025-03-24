@@ -5,18 +5,20 @@ import FAQComponent from './FAQComponent';
 import ExternalLinks from './ExternalLinks';
 export function ReactComponent({ model }) {
   const content = model.get('labelledIcons') || [];
+  const staticImages = model.get('staticImages') || {};
   
   return (
     <View>
       <PilgrimCode content={content} />
       <FAQComponent />
-      <ExternalLinks />
+      <ExternalLinks girlImages={staticImages.girl}/>
     </View>
   );
 }
 
 export const WidgetConfig = {
-  labelledIcons: []
+  labelledIcons: [],
+  staticImages: {}
 };
 
 export const WidgetEditors = {
@@ -34,6 +36,19 @@ export const WidgetEditors = {
               blurb: {type: 'string'},
               urls: {type: 'image'}
             }
+          }
+        }
+      }
+    },
+    {
+      type: 'customData',
+      name: 'staticImages',
+      props: {
+        label: 'Static Images',
+        schema: {
+          type: 'object',
+          fields: {
+            girl: {type: 'image'}
           }
         }
       }

@@ -4,8 +4,8 @@ import {
   Text, 
   TouchableOpacity, 
   StyleSheet,
-  Animated
 } from 'react-native';
+import {Icon} from 'apptile-core';
 
 export function Accordion({ title, children, initiallyExpanded = true }) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -22,7 +22,27 @@ export function Accordion({ title, children, initiallyExpanded = true }) {
         activeOpacity={0.7}
       >
         <Text style={styles.titleText}>{title}</Text>
-        <Text style={styles.chevron}>{expanded ? '▲' : '▼'}</Text>
+        {
+          expanded ? 
+            (<Icon 
+              iconType={'Material Icon'} 
+              name={'chevron-up'} 
+              style={{
+                marginRight: 8,
+                fontSize: 20,
+                color: '#1A1A1A'
+              }}
+            />):
+            (<Icon 
+              iconType={'Material Icon'} 
+              name={'chevron-down'} 
+              style={{
+                marginRight: 8,
+                fontSize: 20,
+                color: '#1A1A1A'
+              }}
+            />)
+        }
       </TouchableOpacity>
       
       {expanded && (
@@ -37,9 +57,6 @@ export function Accordion({ title, children, initiallyExpanded = true }) {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
     overflow: 'hidden',
   },
   titleContainer: {
@@ -47,7 +64,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#F5F5F5',
   },
   titleText: {
     fontSize: 16,
