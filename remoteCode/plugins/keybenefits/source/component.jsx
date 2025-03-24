@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, StyleSheet, Text as RNText } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Text as RNText, Image } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useSelector } from 'react-redux';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
@@ -12,6 +12,7 @@ export function ReactComponent({ model }) {
   const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
   const aspectRatio = model.get('aspectRatio') || '1/1.5'; // Get aspect ratio from props
   const cardWidthPercentage = parseFloat(model.get('cardWidthPercentage') || '70'); // Get card width as percentage of screen
+  const imageBand = model.get('imageBand') || [];
   const cardSpacing = parseInt(model.get('cardSpacing') || '10', 10); // Get spacing between cards
   
   const [benefits, setBenefits] = useState({
@@ -176,7 +177,7 @@ export function ReactComponent({ model }) {
           style={{ marginBottom: 30 }}
         />
       )}
-      
+
       <ThreeDCarousel
         carouselItems={benefits.carouselItems}
         itemWidth={ITEM_WIDTH}
@@ -196,6 +197,42 @@ export function ReactComponent({ model }) {
         backgroundColor={backgroundColor}
         title={benefits.ingredients.title}
       />
+      {imageBand.length > 0 && (
+        <View 
+          style={{
+            flexDirection: 'row', 
+            justifyContent: 'space-between', 
+            padding: 16
+          }}
+        >
+          {imageBand.map(item => {
+            return (
+              <View style={{flexDirection: 'row'}}>
+                <Image 
+                  style={{
+                    height: 40, 
+                    aspectRatio: 1,
+                    marginRight: 8,
+                  }}
+                  source={{uri: item.urls?.[0]}}
+                ></Image>
+                <View style={{flexDirection: 'column'}}>
+                  <RNText
+                    style={{
+                      fontSize: 13,
+                      fontWeight: '800'
+                    }}
+                  >
+                    {item.heading}
+                  </RNText>
+                  <RNText>{item.subtitle}</RNText>
+                </View>
+              </View>
+            );
+          })}
+          
+        </View>
+      )}
     </View>
   );
 }
@@ -218,11 +255,10 @@ const styles = StyleSheet.create({
 });
 
 export const WidgetConfig = {
-  backgroundColor: '',
-  aspectRatio: '',
   cardWidthPercentage: '',
   cardSpacing: '',
-  productHandle: ''
+  productHandle: '',
+  imageBand: []
 };
 
 export const WidgetEditors = {
@@ -232,20 +268,6 @@ export const WidgetEditors = {
       name: 'productHandle',
       props: {
         label: 'Product Handle'
-      }
-    },
-    {
-      type: 'colorInput',
-      name: 'backgroundColor',
-      props: {
-        label: 'Background Color'
-      }
-    },
-    {
-      type: 'codeInput',
-      name: 'aspectRatio',
-      props: {
-        label: 'Card Aspect Ratio (width/height)'
       }
     },
     {
@@ -260,6 +282,23 @@ export const WidgetEditors = {
       name: 'cardSpacing',
       props: {
         label: 'Spacing Between Cards'
+      }
+    },
+    {
+      type: 'customData',
+      name: 'imageBand',
+      props: {
+        schema: {
+          type: 'array',
+          items: {
+            type: 'object',
+            fields: {
+              urls: {type: 'image'},
+              heading: {type: 'string'},
+              subtitle: {type: 'string'}
+            }
+          }
+        }
       }
     }
   ]
