@@ -7,6 +7,7 @@ import {
   Image
 } from 'react-native';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
+import RadialGradientBackground from '../../../../extractedQueries/RadialGradientBackground';
 
 // Link Item component
 const LinkItem = ({ title }) => {
@@ -18,7 +19,7 @@ const LinkItem = ({ title }) => {
 };
 
 // External Links Component
-export function ExternalLinks({girlImages}) {
+export function ExternalLinks({staticImages}) {
   // Information links data
   const informationLinks = [
     "Track your order",
@@ -45,16 +46,16 @@ export function ExternalLinks({girlImages}) {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        {girlImages && girlImages[0] && (<Image 
+        {staticImages?.girl[0] && staticImages.girl[0] && (<Image 
           style={{
             width: 100, 
             aspectRatio: 1,
             position: 'absolute',
-            bottom: 32,
+            bottom: 18,
             left: 0,
             zIndex: 1
           }}
-          source={{uri: girlImages[0]}}
+          source={{uri: staticImages.girl[0]}}
         >
         </Image>)}
         <GradientBackground 
@@ -70,13 +71,30 @@ export function ExternalLinks({girlImages}) {
         </GradientBackground>
       </View>
       
-      <View style={styles.linksContainer}>
+      <RadialGradientBackground 
+        gradientColors={[
+          { offset: "0%", color: "#009FAD1A", opacity: 0.3 },
+          { offset: "100%", color: "#FFFFFF", opacity: 0.2 }
+        ]}
+        gradientCenter={{ x: '50%', y: '50%' }}
+        gradientRadius="70%"
+        containerStyles={styles.linksContainerContent}
+        style={styles.linksContainer}
+      >
         {/* Information Links Column */}
         <View style={styles.column}>
           <Text style={styles.columnTitle}>Information</Text>
           {informationLinks.map((link, index) => (
             <LinkItem key={`info-${index}`} title={link} />
           ))}
+          <Image
+            source={{uri: staticImages?.pilgrim?.[0]}}
+            style={{
+              marginTop: 30,
+              height: 30,
+              width: 120,
+            }}
+          ></Image>
         </View>
         
         {/* Important Links Column */}
@@ -85,21 +103,42 @@ export function ExternalLinks({girlImages}) {
           {importantLinks.map((link, index) => (
             <LinkItem key={`imp-${index}`} title={link} />
           ))}
+          <View>
+            <Text style={styles.socialMediaHeader}>You'll love us here</Text>
+            <View style={{flexDirection: 'row'}}>
+              <Image
+                source={{uri: staticImages?.fb?.[0]}}
+                style={styles.socialMediaImage}
+              ></Image>
+              <Image
+                source={{uri: staticImages?.insta?.[0]}}
+                style={styles.socialMediaImage}
+              ></Image>
+              <Image
+                source={{uri: staticImages?.youtube?.[0]}}
+                style={styles.socialMediaImage}
+              ></Image>
+              <Image
+                source={{uri: staticImages?.linkedin?.[0]}}
+                style={styles.socialMediaImage}
+              ></Image>
+            </View>
+          </View>
         </View>
-      </View>
+      </RadialGradientBackground>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
   },
   headerContainer: {
     width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
     height: 130,
+    zIndex: 2
   },
   header: {
     width: '120%',
@@ -113,21 +152,32 @@ const styles = StyleSheet.create({
       {
         translateY: 35 
       }
-    ]
+    ],
+    height: 60,
+    backgroundColor: 'transparent',
   },
   headerText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: '600',
     textAlign: 'center',
+    position: 'relative',
+    right: -20,
+    top: 4
   },
   linksContainer: {
+    position: 'relative', 
+    paddingTop: 60,
+    bottom: 60, 
+  },
+  linksContainerContent: {
     padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    position: 'relative',
+    zIndex: 1
   },
   column: {
-    flex: 1,
     marginHorizontal: 8,
   },
   columnTitle: {
@@ -143,6 +193,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333333',
     lineHeight: 22,
+  },
+  socialMediaImage: {
+    height: 30,
+    aspectRatio: 1,
+    marginTop: 11,
+    marginRight: 11
+  },
+  socialMediaHeader: {
+    paddingTop: 30,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#01838E'
   }
 });
 

@@ -11,14 +11,21 @@ export function ReactComponent({ model }) {
     <View>
       <PilgrimCode content={content} />
       <FAQComponent />
-      <ExternalLinks girlImages={staticImages.girl}/>
+      <ExternalLinks staticImages={staticImages}/>
     </View>
   );
 }
 
 export const WidgetConfig = {
   labelledIcons: [],
-  staticImages: {}
+  staticImages: {
+    girl: [],
+    fb: [], 
+    insta: [],
+    youtube: [],
+    linkedin: [],
+    pilgrim: []
+  }
 };
 
 export const WidgetEditors = {
@@ -48,7 +55,12 @@ export const WidgetEditors = {
         schema: {
           type: 'object',
           fields: {
-            girl: {type: 'image'}
+            girl: {type: 'image'},
+            fb: {type: 'image'},
+            insta: {type: 'image'},
+            youtube: {type: 'image'},
+            linkedin: {type: 'image'},
+            pilgrim: {type: 'image'}
           }
         }
       }

@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
+import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 
 /**
- * A reusable SVG gradient background component
+ * A reusable SVG radial gradient background component
  * 
  * @param {Object} props - Component props
  * @param {Object} props.style - Additional styles for the container
  * @param {Array} props.gradientColors - Array of gradient color objects with offset and color properties
- * @param {string} props.gradientDirection - Direction of gradient ('vertical' or 'horizontal')
+ * @param {Object} props.gradientCenter - Center point of the radial gradient (default: {x: '50%', y: '50%'})
+ * @param {string} props.gradientRadius - Radius of the radial gradient (default: '50%')
  * @param {number} props.borderRadius - Border radius for the gradient background
  * @param {Object} props.children - Child components to render on top of the gradient
  */
-const GradientBackground = ({ 
+const RadialGradientBackground = ({ 
   style = {}, 
   gradientColors = [], 
-  gradientDirection = 'vertical',
+  gradientCenter = { x: '50%', y: '50%' },
+  gradientRadius = '50%',
   borderRadius = 0,
+  containerStyles,
   children 
 }) => {
   // State to track the dimensions of the container
@@ -28,14 +31,9 @@ const GradientBackground = ({
     { offset: "100%", color: "#007F89", opacity: 1 }
   ];
 
-  // Set gradient coordinates based on direction
-  const gradientProps = gradientDirection === 'vertical' 
-    ? { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }
-    : { x1: "0%", y1: "0%", x2: "100%", y2: "0%" };
-
   return (
     <View 
-      style={[{ position: 'relative'}, style]}
+      style={[{ position: 'relative' }, style]}
       onLayout={ev => {
         const { width, height } = ev.nativeEvent.layout;
         if (Math.abs(width - dimensions.width) > 1 || Math.abs(height - dimensions.height) > 1) {
@@ -43,7 +41,7 @@ const GradientBackground = ({
         }
       }}
     >
-      {/* SVG Gradient Background */}
+      {/* SVG Radial Gradient Background */}
       {dimensions.width > 0 && dimensions.height > 0 && (
         <Svg 
           style={{
@@ -58,7 +56,14 @@ const GradientBackground = ({
           height={dimensions.height}
         >
           <Defs>
-            <LinearGradient id="gradient" {...gradientProps}>
+            <RadialGradient 
+              id="radialGradient" 
+              cx={gradientCenter.x} 
+              cy={gradientCenter.y} 
+              rx={gradientRadius} 
+              ry={gradientRadius} 
+              gradientUnits="userSpaceOnUse"
+            >
               {colors.map((stop, index) => (
                 <Stop 
                   key={index} 
@@ -67,7 +72,7 @@ const GradientBackground = ({
                   stopOpacity={stop.opacity || 1} 
                 />
               ))}
-            </LinearGradient>
+            </RadialGradient>
           </Defs>
           <Rect
             x="0"
@@ -76,17 +81,17 @@ const GradientBackground = ({
             height="100%"
             rx={borderRadius}
             ry={borderRadius}
-            fill="url(#gradient)"
+            fill="url(#radialGradient)"
           />
         </Svg>
       )}
       
       {/* Child components */}
-      <View style={{ zIndex: 1 }}>
+      <View style={[containerStyles, {zIndex: 1}]}>
         {children}
       </View>
     </View>
   );
 };
 
-export default GradientBackground;
+export default RadialGradientBackground;
