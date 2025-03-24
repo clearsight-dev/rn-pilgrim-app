@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image
 } from 'react-native';
+import GradientBackground from '../../../../extractedQueries/GradientBackground';
 
 // Link Item component
 const LinkItem = ({ title }) => {
@@ -49,16 +50,24 @@ export function ExternalLinks({girlImages}) {
             width: 100, 
             aspectRatio: 1,
             position: 'absolute',
-            bottom: 24,
+            bottom: 32,
             left: 0,
             zIndex: 1
           }}
           source={{uri: girlImages[0]}}
         >
         </Image>)}
-        <View style={styles.header}>
+        <GradientBackground 
+          style={styles.header}
+          gradientColors={[
+            { offset: "0%", color: "#007F89" },
+            { offset: "100%", color: "#00AEBD" }
+          ]}
+          gradientDirection="vertical"
+          borderRadius={4}
+        >
           <Text style={styles.headerText}>THE SECRET IS IN THE MIX</Text>
-        </View>
+        </GradientBackground>
       </View>
       
       <View style={styles.linksContainer}>
@@ -94,13 +103,12 @@ const styles = StyleSheet.create({
   },
   header: {
     width: '120%',
-    backgroundColor: '#00A19A', // Teal color from the design
     padding: 12,
     marginBottom: 16,
     borderRadius: 4,
     transform: [
       {
-        rotateZ: '-8deg'
+        rotateZ: '-5deg'
       },
       {
         translateY: 35 

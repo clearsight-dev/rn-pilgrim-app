@@ -1,60 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Icon } from 'apptile-core';
-import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
+import GradientBackground from '../../../../extractedQueries/GradientBackground';
 
 // Separate UI component that takes props
 export default function BenefitsCard({ title = "", benefits = [], style = {} }) {
-  const [boxDims, setBoxDims] = useState({width: 500, height: 200});
-  
   // Title to display
   const titleText = title;
   
   // Estimated title width for the cutout (this is an approximation)
   const estimatedTitleWidth = titleText.length * 10 + 20; // 10px per character + 20px padding
 
+  // Custom gradient colors for the benefits card
+  const gradientColors = [
+    { offset: "0%", color: "rgba(255, 255, 255, 1)", opacity: 0.5 },
+    { offset: "80%", color: "rgba(55, 238, 255, 1)", opacity: 0.2 },
+    { offset: "100%", color: "rgba(55, 238, 255, 1)", opacity: 0.2 }
+  ];
+
   return (
     <View style={[styles.outerContainer, style]}>
       {/* Main container with border */}
-      <View 
+      <GradientBackground 
         style={styles.container}
-        onLayout={ev => {
-          if (Math.abs(ev.nativeEvent.layout.height - boxDims.height) > 1 || 
-              Math.abs(ev.nativeEvent.layout.width - boxDims.width) > 1
-          ) {
-            setBoxDims({height: ev.nativeEvent.layout.height, width: ev.nativeEvent.layout.width});
-          }
-        }}
+        gradientColors={gradientColors}
+        gradientDirection="vertical"
+        borderRadius={BORDER_RADIUS}
       >
-        {/* SVG Gradient Background */}
-        <Svg 
-          style={{
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            bottom: 0, 
-            right: 0
-          }} 
-          width={boxDims.width}
-          height={boxDims.height}
-        >
-          <Defs>
-            <LinearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <Stop offset="0%" stopColor="rgba(255, 255, 255, 1)" stopOpacity={0.5} />
-              <Stop offset="80%" stopColor="rgba(55, 238, 255, 1)" stopOpacity={0.2} />
-              <Stop offset="100%" stopColor="rgba(55, 238, 255, 1)" stopOpacity={0.2}/>
-            </LinearGradient>
-          </Defs>
-          <Rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            rx="8"
-            ry="8"
-            fill="url(#gradient)"
-          />
-        </Svg>
 
         {/* Title cutout (white background to hide the border) */}
         <View style={[styles.titleCutout, { width: estimatedTitleWidth }]} />
@@ -82,7 +54,7 @@ export default function BenefitsCard({ title = "", benefits = [], style = {} }) 
             </View>
           ))}
         </View>
-      </View>
+      </GradientBackground>
     </View>
   );
 };

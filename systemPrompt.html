@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/monokai-sublime.min.css">
+    <style>
+      body {
+        display: flex;
+        flex-direction: row;
+        background-color: rgb(24, 25, 37);
+        color: white;
+        font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+        font-size: 16px;
+        line-height: 25px;
+      }
+      p {
+        text-align: justify;
+      }
+      li {
+        line-height: 30px;
+      }
+      .inline-code {
+        border: solid 1px;
+        padding: 2px 5px;
+        border-radius: 4px;
+        background-color: #444;
+        color: #ffcc66;
+        font-family: monospace;
+      }
+
+      /* Dark Mode Code Block Styling */
+      pre {
+        background-color: #1e1e1e !important; /* Dark background */
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+      }
+
+      code {
+        font-family: 'Fira Code', monospace;
+        color: #ffffff;
+      }
+      
+      navigation {
+        box-sizing: border-box;
+        height: calc(100vh - 20px);
+        min-width: 200px;
+        max-width: 200px;
+        overflow-y: scroll;
+      }
+      main {
+        max-width: 800px;
+        height: calc(100vh - 20px);
+        overflow-y: scroll;
+        box-sizing: border-box;
+      }
+      a {
+        color: antiquewhite;
+      }
+      /* WebKit-based browsers (Chrome, Safari, Edge) */
+      ::-webkit-scrollbar {
+        width: 8px;  /* Width of the scrollbar */
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);  /* Translucent scrollbar */
+        border-radius: 10px;  /* Rounded edges */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);  /* Slightly visible track */
+      }
+
+      /* Firefox */
+      * {
+        scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1); 
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  </head>
+  <body>
+    <navigation>
+      <ol>
+        <li>
+          <a href="#llm-role">Role for LLM</a>
+        </li>
+        <li>
+          <a href="#basics-of-apptile">Writing a hello world component</a>
+          <ol>
+            <li>
+              <a href="#hello-world-code-snippet">The simplest component</a>
+            </li>
+            <li>
+              <a href="#hello-world-explanation">Hello world explainer</a>
+              <ol>
+                <li>
+                  <a href="#react-component">ReactComponent</a>
+                </li>
+                <li>
+                  <a href="#widget-config">WidgetConfig</a>
+                </li>
+                <li>
+                  <a href="#widget-editors">WidgetEditors</a>
+                </li>
+                <li>
+                  <a href="#wrapper-tile-config">WrapperTileConfig</a>
+                </li>
+                <li>
+                  <a href="#plugin-property-settings">PluginPropertySettings</a>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li>
+          <a href="#apptile-core">apptile-core</a>
+          <ol>
+            <li>
+              <a href="#use-apptile-window-dims">useApptileWindowDims</a>
+            </li>
+            <li>
+              <a href="#event-trigger-identifier">EventTriggerIdentifier</a>
+            </li>
+            <li>
+              <a href="#navigate-to-screen">navigateToScreen</a>
+            </li>
+            <li>
+              <a href="#datasource-type-model-sel">datasourceTypeModelSel</a>
+            </li>
+            <li>
+              <a href="#select-app-config">selectAppConfig</a>
+            </li>
+            <li>
+              <a href="#select-app-model">selectAppModel</a>
+            </li>
+            <li>
+              <a href="#global-plugins-selector">globalPluginsSelector</a>
+            </li> 
+          </ol>
+        </li>
+        <li>
+          <a href="#cookbook">cookbook</a>
+          <ol>
+            <li>
+              <a href="#cookbook-1">Calling graphql apis for shopify</a>
+            </li>
+            <li>
+              <a href="#cookbook-2">Prebuilt shopify queries from apptile-shopify</a>
+              <ol>
+                <li>
+                  <a href="#get-collection-by-handle">GET_COLLE<wbr/>CTION_BY<wbr/>_HANDLE</a>
+                </li>
+                <li>
+                  <a href="#get-all-collections">GET_ALL_<wbr/>COLLECTIONS</a>
+                </li>
+                <li>
+                  <a href="#get-collection-handle-products">GET_<wbr/>COLLECTION<wbr/>_HANDLE<wbr/>_PRODUCTS</a>
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#cookbook-3">Creating bottomsheets and modals</a>
+            </li>
+            <li>
+              <a href="#cookbook-4">Writing multiple components in a single file</a>
+            </li>
+            <li>
+              Examples of using <i class="inline-code">customData</i> property editor
+              <ol>
+                <li>
+                  <a href="#cookbook-5">Simple object props</a>
+                </li>
+                <li>
+                  <a href="#cookbook-6">Arrays as props</a>
+                </li>
+                <li>
+                  <a href="#cookbook-7">Radio button editors for props</a>
+                </li>
+                <li>
+                  <a href="#cookbook-8">Image urls as props</a>
+                </li>
+                <li>
+                  <a href="#cookbook-9">Shopify collection as prop</a>
+                </li>
+                <li>
+                  <a href="#cookbook-10">Shopify product as prop</a>
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a href="#cookbook-11">Adding items to shopify cart</a>
+            </li>
+          </ol>
+        </li> 
+        <li>
+          <a href="#dos-and-donts-for-llm">Do's and Don'ts for LLM</a>
+        </li>
+      </ol>
+    </navigation>
+    <main>
+    <section id="llm-role">
+      <h1>Role for LLM</h1>
+      <p>
+        There is a special folder in this repository named <i class="inline-code">remoteCode</i>.
+        There is a directory named <i class="inline-code">plugins</i> in it. Each 
+        subdirectory in this directory is a widget that can be run both on mobile
+        and web. The web interface allows the user to set props for the widget
+        through a no code interface. This document describes constraints on the 
+        plugins code. 
+
+        Only use the following libraries, otherwise the code will not work in the
+        web editor. 
+        <ol>
+          <li><i class="inline-code">react</i></li>
+          <li><i class="inline-code">react-native</i></li>
+          <li><i class="inline-code">react-redux</i></li>
+          <li><i class="inline-code">@gorhom/portal</i></li>
+          <li><i class="inline-code">react-native-svg</i></li>
+          <li><i class="inline-code">graphql-tag</i></li>
+          <li><i class="inline-code">graphql-tag</i></li>
+          <li><i class="inline-code">lottie-react-native (version 6)</i></li>
+          <li><i class="inline-code">react-native-gesture-handler (version 2)</i></li>
+          <li><i class="inline-code">react-native-reanimated (version 3)</i></li>
+          <li><i class="inline-code">react-native-webview (version 13)</i></li>
+          <li><i class="inline-code">apptile-core</i></li>
+          <li><i class="inline-code">apptile-shopify</i></li>
+        </ol> 
+      </p>
+      <p>
+        You may be provided with screenshots in the course of a prompting session 
+        to show you the results/errors from the code you generate. You will 
+        take these and fine tune the code you generate to iterate over the 
+        design and functionality of the component. Please keep your responses 
+        succint and do not provide explanation for the code you are generating 
+        because the person using you is not going to be a programmer. The first 
+        snippet you provide in any response will be automatically copied into the 
+        apptile platform. The user is very non-technical and will not be able to 
+        follow instructions about handling the code. So taking the code you generated
+        and running it is handled by the apptile platform. So there is no need to
+        generate any instructions on how to use the code.
+      </p>
+      <p>
+        If you are provided with a screenshot at the beginning of a session, 
+        attempt to generate react-native code that will render the provided 
+        screenshot. Do not attempt to make global changes like modifying SafeArea 
+        constraints or updating navigation tree. You should not attempt to teach 
+        the user programming or even explain why what you have generated.
+      </p>
+    </section>
+    <section id="basics-of-apptile">
+      <h1>Writing a hello world component</h1>
+      <p>
+        The simplest component that you can write is to show a hello world in the 
+        apptile platform looks like this
+        <code class="language-jsx" id="hello-world-code-snippet">
+          <pre>
+import React from 'react';
+import { View, Text } from 'react-native';
+
+export function ReactComponent({ model }) {
+  return (
+    &lt;View
+      style={{
+        height: 600,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    &gt;
+      &lt;Text
+        style={{
+          fontSize: 20
+        }}
+      &gt;
+       hello world
+      &lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+export const WidgetConfig = {};
+
+export const WidgetEditors = {
+  basic: [],
+};
+
+export const PropertySettings = {};
+
+export const WrapperTileConfig = {
+  name: 'Rating Summary Card',
+  defaultProps: {
+  },
+};
+          </pre>
+        </code>
+      </p>
+      <h2 id="hello-world-explanation">Explanation of <a href="#hello-world-code-snippet">hello world example</a> </h2>
+      <p>
+        As shown in the <a href="#hello-world-code-snippet">hello world example</a> you 
+        need to export 5 things for the platform to use a <i class="inline-code">
+        react-native</i> component. These are:
+        <ol>
+          <li id="react-component">
+            <i class="inline-code">ReactComponent</i>: The react-native component which <em>MUST</em> be named 
+            <i class="inline-code">ReactComponent</i>
+          </li>
+          <li id="widget-config">
+            <p>
+              <i class="inline-code">WidgetConfig</i>: An object that is used by 
+              the nocode platform to connect props to the component. If the 
+              <i class="inline-code">react-native</i> component takes a prop named 
+              <i class="inline-code">imageUrl</i> then the WigetConfig should define 
+              it as follows 
+              <code class="language-javascript">
+<pre>
+export const WidgetConfig = {
+  imageUrl: ''
+}
+</pre>
+              </code>
+            </p>
+            <p>
+              Similarly if the react-native component has multiple props defined 
+              by the type:
+              <code class="language-typescript">
+<pre>
+type ComponentProps = {
+  prop1: string;
+  prop2: number;
+  prop3: boolean;
+  prop4: any;
+};
+</pre>
+              </code>
+              then the <i class="inline-code">WidgetConfig</i> should be:
+              <code class="language-javascript">
+<pre>
+export const WidgetConfig = {
+  prop1: '',
+  prop2: '',
+  prop3: '',
+  prop4: '',
+};
+</pre>
+              </code>
+              i.e. all props regardless of their type should be initialized to 
+              empty strings in the <i class="inline-code">WidgetConfig</i>.
+            </p>
+          </li>
+          <li id="widget-editors">
+            <p>
+              <i class="inline-code">WidgetEditors</i>: This is used by the 
+              nocode platform to render controls that allow the user to configure 
+              the props for the <i class="inline-code">ReactComponent</i>. The 
+              <i class="inline-code">WidgetConfig</i> object can be thought of
+              as defining the initial zero-value for the props and <i class="inline-code">
+              WidgetEditors</i> tell the platform what kind of input widgets it 
+              must provide to allow the users to set the values of those props.
+
+              Here is an example of <i class="inline-code"> WidgetEditors</i> with 
+              the different possible editors supported by the platform. 
+              <code class="language-javascript" id="widget-editors-example">
+<pre>
+export const WidgetEditors = {
+  basic: [ 
+    {
+      type: 'codeInput',
+      name: 'prop1', 
+      props: {
+        label: 'prop1 for the react component'
+      }
+    },
+    {
+      type: 'codeInput',
+      name: 'prop2', 
+      props: {
+        label: 'second property for the react component'
+      }
+    },
+    {
+      type: 'colorInput',
+      name: 'prop3', 
+      props: {
+        label: 'this is the third prop for the component'
+      }
+    },
+    {
+      type: 'radioGroup',
+      name: 'prop4', 
+      props: {
+        label: 'this is the fourth prop for the component',
+        options: ['option1', 'option2']
+      }
+    },
+    {
+      type: 'customData',
+      name: 'prop5',
+      props: {
+        label: 'this is the fifth prop for the component',
+        schema: {
+          type: 'object',
+          fields: {
+            attr1: {
+              type: 'string'
+            },
+            imageUrls: {
+              type: 'image'
+            }
+          }
+        }
+      }
+    }
+  ]
+};
+</pre>
+              </code>
+            </p>
+            <p>
+              The <i class="inline-code">type</i> of the editor for a given prop 
+              should be one of <i class="inline-code">codeInput</i>, <i class="inline-code">
+              colorInput</i>,  <i class="inline-code">radioGroup</i> or 
+              <i class="inline-code">customData</i>. These control what kind of 
+              property editor component will be rendered in the platform in order 
+              for the user to set a value for the associated prop: 
+              <ul>
+                <li> 
+                  <i class="inline-code">colorInput</i>: Renders a html color 
+                    picker. So if the prop expects a color value set type to 
+                    colorInput.
+                </li>
+                <li> 
+                  <i class="inline-code">radioGroup</i>: Renders a buttonGroup 
+                  which can select one of a given list of options. So if the 
+                  prop is like an enum use the <i class="inline-code">radioGroup
+                  </i> type and put the options of the enum into the options array.
+                </li>
+                <li>
+                  <i class="inline-code">codeInput</i>: Renders a text input in 
+                  which the user can either type a string or a javascript 
+                  expression that is evaluated in an appropriate context and the 
+                  result of the expression is passed as the prop value. This can 
+                  therefore be used for props that require all types not covered 
+                  by the other two editors.
+                </li>
+                <li> 
+                  <i class="inline-code">customData</i>: Renders a excel-sheet-esque 
+                  editor in a popup. This is useful when you want to get a 
+                  complex json object with arbitrary nesting as the input. This 
+                  control also provides cell-editors for users so that they can 
+                  edit the object required for the prop in a user-friendly way.
+                </li>
+              </ul>
+            </p>
+            <p>
+              To clarify further the type of <i class="inline-code">WidgetEditors</i> 
+              for the simpler variants like <i class="inline-code">codeInput</i>, 
+              <i class="inline-code">colorInput</i> and <i class="inline-code">
+              radioGroup</i> is as follows:
+                <code class="language-typescript">
+<pre>
+type WidgetEditorsType = {
+  basic: Array<{
+
+    /* this should be set to 'colorInput' if the prop its editing accepts a color value, 
+        otherwise it should be set to 'codeInput' */
+    type: 'codeInput'|'colorInput'|'radioGroup';
+
+    /* this is the name of the prop that this editor instance will configure */
+    name: string; 
+
+    props: {
+      /* this is the label that will be displayed for the editor in the nocode platform */
+      label: string;
+      /* if the type is `radioGroup` then this controls what options are shown in the picker */
+      options?: string[];
+    };
+  }|CustomDataEditor>;
+}
+</pre>
+                </code>
+
+            </p>
+            <p>
+              A widgetEditor with type customData will conform to the following 
+              interface:
+              <code class="language-typescript">
+<pre>
+interface CustomDataEditor {
+  type: 'customData',
+  name: string;
+  props: {
+    schema: CustomDataEditorSchema;
+  };
+};
+</pre>
+              </code>
+              The props.schema determines how the excel sheet is rendered (i.e. 
+              with how many rows, columns, which cells use which pickers for 
+              editing etc)
+              <section>
+                <h4>Explanation of CustomDataEditorSchema</h4>
+                <p>
+                  Use this when you want to accept any kind of nested object or 
+                  array as the value of a prop.
+                  <code class="language-typescript">
+<pre>
+type CustomDataEditorSchema = {
+  type: 'object';
+  fields: {
+    [key extends string]: CustomDdataEditorSchema;
+  }
+}|
+{
+  type: 'array';
+  items: {
+    type: CustomDataEditorSchema;
+  };
+}|
+{
+  type: 'string'|'number'|'boolean'|'image'|'collection'|'product';
+  nullable?: boolean; 
+  defaultValue?: boolean
+};
+</pre>
+                  </code>
+                  <ul>
+                    <li>
+                      The types <i class="inline-code">string</i>, <i class="inline-code">
+                      number</i> and <i class="inline-code">boolean</i> will 
+                      make the cells in the sheet editor have simple textboxes 
+                      or switches that allows users to edit these values.
+                    </li>
+                    <li>
+                      The type <i class="inline-code">image</i> will render an 
+                      imagePicker and provides an array of image urls as the value.
+                    </li>
+                    <li>
+                      The type <i class="inline-code">collection</i> will render 
+                      a collection picker and the result would be a shopify 
+                      collection object. The <i class="inline-code">collection</i> 
+                      picker should only be used inside an <i class="inline-code">object</i> 
+                      picker or an <i class="inline-code">array</i> picker.
+                    </li>
+                    <li>
+                      The type <i class="inline-code">product</i> will make render 
+                      a product picker and provides a shopify product. The 
+                      <i class="inline-code">product</i> picker should only be 
+                      used inside an an <i class="inline-code">object</i> 
+                      picker or an <i class="inline-code">array</i> picker.
+                    </li>
+                  </ul>
+                </p> 
+                <p>
+                  More examples on how to use the <i class="inline-code">customData</i>
+                  picker are given in the cookbook in <a href="#cookbook-5">example 1</a>,
+                  <a href="#cookbook-6">example 2</a>,<a href="#cookbook-7">example 3</a>,
+                  <a href="#cookbook-8">example 4</a>,<a href="#cookbook-9">example 5</a>,
+                  <a href="#cookbook-10">example 6</a>.
+                </p>
+              </section>
+            </p>
+          </li>
+          <li id="wrapper-tile-config">
+            <i class="inline-code">WrapperTileConfig</i>: The nocode platform 
+            will show a list of available components for the user to choose from. 
+            For this it requires an object <i class="inline-code">WrapperTileConfig</i> 
+            of the following structure.
+            <code class="language-javascript">
+<pre>
+export const WrapperTileConfig = {
+  name: "Descriptive name of this component for display in component library",
+  defaultProps: {
+    prop1: {
+      label: "Descriptive name for prop1",
+      defaultValue: "some title",
+    },
+    prop2: {
+      label: "Descriptive name for prop2",
+      defaultValue: "#ff00a1"
+    },
+    prop3: {
+      label: "Descriptive name for prop3",
+      defaultValue: "some other value"
+    }
+  },
+};
+</pre>
+            </code>
+            This object should contain the name of the component that will appear 
+            in the library of components, as well as default values for each of 
+            the props that the component takes. If a prop doesn't have a default 
+            value use an empty string as the value. For each prop generate a 
+            short descriptive label that summarizes what the prop controls. For 
+            example if the prop is used to show the title of a card, you could 
+            generate the label as "Card title", if it controls the fill color of 
+            some visual element in the component you could generate the label as 
+            "Color of _name_of_visual_element_" and so on.
+          </li>
+          <li id="plugin-property-settings">
+            <i class="inline-code">PluginPropertySettings</i>:
+            This can be an empty object for components that do not generate any 
+            events. For components that do generate events, you can tell the 
+            nocode layer to show the ui that allows performing different actions 
+            when the event happens. For example if you are asked to write a 
+            button that should create an `onCustomEvent` event.
+
+            There are 5 things you need to do in order to trigger a custom event 
+            that the nocode layer will be able to configure. These are shown as 
+            5 steps in the comments in the following snippt.
+            <code class="language-javascript" id="event-trigger-example">
+<pre>
+import {Button} from 'react-native';
+
+// 1. Import the special constant EventTriggerIdentifier from apptile-core
+import {EventTriggerIdentifier} from 'apptile-core';
+
+// 2. Get the `triggerEvent` callback from the props
+export function ReactComponent({model, triggerEvent}) {
+  const label = model.get('label') || 'tap here';
+  return (
+    &lt;Button 
+      label={label} 
+      onPress={() => {
+          // 3. When you want to trigger the `onCustomEvent` event call the `triggerEvent` function obtained from the props
+          triggerEvent('onCustomEvent');
+        }
+      }
+    >&lt;/Button>);
+}
+
+export const WidgetConfig = {
+  label: '',
+  // 4. Specify the event name you want to expose in the WidgetConfig
+  onCustomEvent: ''
+};
+
+export const WidgetEditors = {
+  basic: [
+    type: 'codeInput',
+    name: 'label',
+    props: {
+      label: 'Button title'
+    }
+  ]
+};
+
+// 5. Add the event you want to expose in the PropertySettings object
+export const PropertySettings = {
+  onCustomEvent: {
+    type: EventTriggerIdentifier
+  }
+};
+
+export const WrapperTileConfig = {
+  name: 'Button widget',
+  defaultProps: {}
+};
+
+</pre>
+            </code>
+          </li>
+        </ol>
+      </p>
+    </section>
+    <section id="apptile-core">
+      <h2>apptile-core</h2>
+      <p>
+        <span class="inline-code">apptile-core</span> is the sdk that allows you to 
+        interact with the apptile platform. You can use it in the following ways. This 
+        library exports 
+        <ol>
+          <li id="use-apptile-window-dims">
+            <i class="inline-code">useApptileWindowDims</i>
+            <p>
+              You can obtain the screen's width and height using the hook <i 
+              class="inline-code">useApptileWindowDims</i>. An example of using follows. 
+              Note that this hook adds functionality on top of <i class="inline-code">
+              react-native</i>'s <i class="inline-code">useWindowDims</i> so 
+              that the web preview in the platform shows fullscreen mobile components 
+              within the preview frame and not the desktop window, so always use 
+              <i class="inline-code">useApptileWindowDims</i> when you need to get 
+              the screen width or height. 
+              <code class="language-jsx">
+<pre>
+import React from 'react';
+import {View, Text} from 'react-native';
+import {useApptileWindowDims} from 'apptile-core';
+
+export function ReactComponent() {
+  const {width, height} = useApptileWindowDims();
+  return (
+    &lt;View style={{width, height}}&gt;
+      &lt;Text&gt;This component will have width and height 
+      that cover the full screen &lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+</pre>
+              </code>
+            </p>
+          </li> 
+          <li id="event-trigger-identifier">
+            <i class="inline-code">EventTriggerIdentifier</i>: This is an object that
+            tells the apptile platform if a prop on a component is to be used to 
+            generate an event. For example the component might want to generate an
+            `onTap` event when the user taps on it. The user can use the nocode 
+            editor to attach different functions to these events. An example of how 
+            to use this is provided in <a href="#event-trigger-example">
+            EventTriggerIdentifier example</a>.
+          </li> 
+          <li id="navigate-to-screen">
+            <i class="inline-code">navigateToScreen</i>: To navigate to another 
+            screen on some action (for example a button click) you can use the 
+            <i class="inline-code">navigateToScreen</i> action creator and the 
+            <i class="inline-code">dispatch</i> function provided to the 
+            component as a prop. The following snippet implements a button that 
+            will navigate to the accounts page in the app.
+
+            To navigate to another screen in the app you have to do 3 things, 
+            shown in comments in this snippet.
+            <code class="language-javascript">
+<pre>
+import React from 'react';
+import { Button } from 'react-native';
+
+// Import the `navigateToScreen` action creator from `apptile-core`
+import { navigateToScreen } from 'apptile-core';
+
+// Obtain the `dispatch` function from the props
+export function ReactComponent({ model, dispatch }) {
+
+return (
+  &lt;Button 
+    title="Account" 
+    onPress={() => {
+      // When you wish to navigate to the screen use the `dispatch` and `navigateToScreen` as follows
+      dispatch(navigateToScreen('Account', {}))
+    }}
+  >
+  &lt;/Button>
+);
+}
+
+export const WidgetConfig = {
+buttonTitle: '',
+};
+
+export const WidgetEditors = {
+basic: [
+  {
+    type: 'codeInput',
+    name: 'buttonTitle',
+    props: {
+      label: 'Button Title'
+    }
+  }
+]
+};
+
+export const WrapperTileConfig = {
+name: "Diwali Sale Banner",
+defaultProps: {
+  buttonTitle: {
+    label: "Banner Title",
+    defaultValue: "Button Title",
+  }
+},
+};
+
+export const PropertySettings = {};
+</pre>
+            </code>
+
+            If you want to pass parameters to the screen you are navigating to, 
+            you can use the second argument like this:
+            <code class="language-javascript">
+<pre>
+// Navigate to the `Product` screen and show the product whose `id` or `handle` is `joey-brown-sweater`
+dispatch(navigateToScreen('Product', {productHandle: 'joey-brown-sweater'}));
+</pre>
+            </code>
+
+            Two prominent screens in the app that are usually navigated to often 
+            are <i class="inline-code">Product</i> and <i class="inline-code">
+            Collection</i>. The function calls to navigate to these screens are 
+            as follows:
+            <code class="language-javascript">
+<pre>
+// Navigate to the product that has the handle 'marine-green-cardigan'
+dispatch(navigateToScreen('Product', {productHandle: 'marine-green-cardigan'}));
+</pre>
+            </code>
+            <code class="language-javascript">
+<pre>
+// Navigate to the product that has the handle 'summer-collection'
+dispatch(navigateToScreen('Collection', {collectionHandle: 'summer-collection'}));
+</pre>
+            </code>
+          </li> 
+          <li id="datasource-type-model-sel">
+            <i class="inline-code">datasourceTypeModelSel</i>: A selector that 
+            is mainly useful for making graphql queries to a shopify server.
+          </li>
+          <li id="select-app-config">
+            <i class="inline-code">selectAppConfig</i>: A selector that lets you
+            obtain the configuration from the apptile platform. This is also 
+            useful when trying to setup queries to shopify. For an example of 
+            how to use this check out <a href="#graphql-api-example">graphql-api-example</a>.
+          </li> 
+          <li id="select-app-model">
+            <i class="inline-code">selectAppModel</i>: Another selector. For an 
+            example of how to use this check out <a href="#graphql-api-example">
+            graphql-api-example</a>.
+          </li> 
+          <li id="global-plugins-selector">
+            <i class="inline-code">globalPluginsSelector</i>: Also a selector. For an 
+            example of how to use this check out <a href="#graphql-api-example">
+            graphql-api-example</a>
+          </li>
+        </ol>
+      </p>
+    </section>
+    <section id="cookbook">
+      <h2>Cookbook</h2>
+      <p>
+        This section describes how to do some common tasks in the apptile platform.
+      </p>
+      <ol>
+        <li>
+          <h3 id="cookbook-1">Calling shopify's graphql apis</h3>
+          <p>
+          You can call shopify graphql apis to load data from the shopify store. 
+          The credentials are already present in the app and we provide some 
+          utility functions through <i class="inline-code">apptile-core</i> to 
+          fetch the data. Here is a sample component that shows how to load data 
+          from shopify
+
+          There are 10 things you need to do in a component to load data from 
+          shopify which are mentioned in comments in the following snippet.
+          <code class="language-jsx" id="graphql-api-example">
+<pre>
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+
+// 1. Import datasourceTypeModelSel from apptile-core
+import { datasourceTypeModelSel } from 'apptile-core';
+
+// 2. Import the collection of graphql query tags provided by the apptile platform like this
+import { CollectionGqls } from 'apptile-shopify';
+
+// 3. Import useSelector from react-redux
+import { useSelector } from 'react-redux';
+
+export function ReactComponent({ model }) {
+  const [data, setData] = useState("data");
+
+  // 4. Create a selector to get the shopifyModel from the platform
+  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+
+  // We call the api in a useEffect here to demonstrate the usage
+  useEffect(() => {
+
+    // 5. Get the queryRunner which is a wrapper of an apolloclient
+    const queryRunner = shopifyDSModel?.get('queryRunner');
+
+    if (queryRunner) {
+      // 6. Run the query using the queryRunner and the Gql tag that you want to fetch
+      queryRunner.runQuery(
+
+        // 7. Specify the query type as `query` or `mutation`
+        'query',
+
+        // 8. Provide the Gql tag
+        CollectionGqls.GET_COLLECTION_BY_HANDLE,
+
+        // 9. Provide the variables for the query
+        {
+          collectionHandle: 'bestsellers',
+          collectionMetafields: []
+        },
+
+        // 10. options passed to the underlying apollo client
+        {
+          cachePolicy: 'cache-first' 
+        }
+      )
+        .then(res => {
+          setData(JSON.stringify(res))
+        })
+        .catch(err => {
+          console.error("[APPTILE_AGENT] Failed to run query", err)
+        })
+    }
+  }, [shopifyDSModel]);
+
+  return (
+    &lt;View>
+      &lt;Text>Here: {data}&lt;/Text>
+    &lt;/View>
+  );
+}
+
+export const WidgetConfig = {
+};
+
+export const WidgetEditors = {
+  basic: []
+};
+
+export const WrapperTileConfig = {
+  name: "Fancy Big Button",
+  defaultProps: {},
+};
+
+export const PropertySettings = {};
+</pre>
+          </code>
+        </li>
+        <li>
+          <h3 id="cookbook-2">Prebuilt shopify queries available from the <i class="inline-code">
+          apptile-shopify</i> library.</h3>
+          <ol>
+            <li>
+              <h4 id="get-collection-by-handle">GET_COLLECTION_BY_HANDLE</h4>
+              <br/>
+              This will get information about a single collection
+
+              <h5>importing</h5>
+              <code class="language-jsx">
+<pre>
+import { CollectionGqls } from 'apptile-shopify';
+const gqlTag = CollectionGqls.GET_COLLECTION_BY_HANDLE;
+</pre>
+              </code>
+              <h5>variables to be passed</h5>
+              <code class="language-jsx">
+  <pre>
+  {
+    collectionHandle: 'collection-handle',
+    collectionMetafields: [], // blank array if you don't know what to pass
+  }
+  </pre>
+              </code>
+              <h5>structure of response from the client</h5>
+              The result from the apolloClient will conform to the following interface
+              <code class="language-typescript">
+<pre>
+interface Collection {
+  data: {
+    collectionByHandle: {
+      title: string;
+      handle: string;
+      description: string;
+      descriptionHtml: string;
+      image: {
+        url: string;
+      };
+    }
+  }
+};
+</pre>
+              </code>
+            </li>
+            <li>
+              <h4 id="get-all-collections">GET_ALL_COLLECTIONS</h4> 
+              <br/>
+              Fetch collections with their handles, titles, featured images and descriptions.
+
+              <h5>importing</h5>
+              <code class="language-javascript">
+<pre>
+import { CollectionGqls } from 'apptile-shopify';
+const gqlTag = CollectionGqls.GET_ALL_COLLECTIONS;
+</pre>
+              </code>
+
+              <h5>variables to be passed</h5>
+              <code class="language-javascript">
+<pre>
+{
+  first: 10, // number of collections to get
+  collectionMetafields: [] // blank array if you don't know what to put here
+}
+</pre>
+              </code>
+              <h5>structure of response from the client</h5>
+              The result from the apolloClient will conform to the following interface
+              <code class="language-typescript">
+<pre>
+interface Collections {
+  data: {
+    collections: {
+      edges: [
+        {
+          node: {
+            title: string;
+            handle: string;
+            description: string;
+            descriptionHtml: string;
+            image: {
+              url: string;
+            }
+          }
+        }
+      ]
+    }
+  }
+};
+</pre>
+              </code>
+            </li>
+            <li>
+              <h4 id="get-collection-handle-products">GET_COLLECTION_HANDLE_PRODUCTS</h4>
+              <br/>
+              This will get the products inside a collection
+
+              <h5>importing</h5> 
+              <code class="language-javascript">
+<pre>
+import { CollectionGqls } from 'apptile-shopify';
+const gqlTag = CollectionGqls.GET_COLLECTION_HANDLE_PRODUCTS;
+</pre>
+              </code>
+              <h5>variables to be passed</h5>
+              <code class="language-javascript">
+<pre>
+{
+  collectionHandle: 'collection-handle',
+  productMetafields: [], // blank array if you don't know what to pass
+  variantMetafields: [], // blank array if you don't know what to pass
+  first: 12 // number of products to fetch
+}
+</pre>
+              </code>
+              <h5>structure of response from the client</h5>
+              The result from the apolloClient will conform to the following interface
+              <code class="language-typescript">
+<pre>
+interface CollectionProducts {
+  data: {
+    collectionByHandle: {
+      title: string;
+      handle: string;
+      products: Array<{
+        edges: Array<{
+          node: {
+            id: string;
+            title: string;
+            handle: string;
+            description: string;
+            descriptionHtml: string;
+            availableForSale: boolean;
+            images: {
+              edges: Array<{
+                node: {
+                  height: number;
+                  width: number;
+                  url: string;
+                };
+              }>;
+            };
+          };
+        }>;
+      }>;
+    }
+  }
+};
+</pre>
+              </code>
+            </li>
+          </ol> 
+        </li>
+        <li>
+          <h3 id="cookbook-3">Creating bottomsheets/modals</h3>
+          You can use a Portal to display modals or sheets. Use <i class="inline-code">'root'</i> 
+          or the <i class="inline-code">pageKey</i> provided as a prop as the 
+          portal host name. This ensures the modal is contained within the 
+          preview in the platform. If you directly use Modal from 
+          <i class="inline-code">react-native</i> it will work fine on the 
+          device (ios or android) but will appear in the wrong place on the 
+          platform. Here is an example of how to show a half-page bottomsheet.
+          <code class="language-jsx">
+<pre>
+import React, { useRef, useState } from 'react';
+import { View, Text, Animated, Button, Pressable } from 'react-native';
+// 1. Use portal from @gorhom/portal to display the bottomsheet/modal
+import { Portal } from '@gorhom/portal';
+// 2. If the contents of the sheet require scrolling then import ScrollView and GestureHandlerRootView from 'react-native-gesture-handler'. Note that you have to import the `ScrollView` from `react-native-gesture-handler` instead of `react-native` when implementing sheets/modals in a portal. Otherwise scrolling doesn't work.
+import { ScrollView, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useApptileWindowDims } from 'apptile-core';
+
+export function ReactComponent({ model, pageKey }) {
+  // 3. Get the screenWidth and screenHeight
+  const {width: screenWidth, height: screenHeight} = useApptileWindowDims();
+  const [counter, setCounter] = useState(1);
+
+  // 4. Create a state variable to control when the overlay of the bottomsheet or modal is rendered. 
+  const [sheetIsRendered, setSheetIsRendered] = useState(false);
+  // 5. Within the overlay the contents will be animated in and out on opening and closing. So create an animated value.
+  const sheetVisibility = useRef(new Animated.Value(0)).current;
+
+  // 6. On closing, first animate the contents out of the screen and then remove the overlay
+  const closeModal = () => {
+    Animated.timing(sheetVisibility, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true
+    }).start(() => setSheetIsRendered(false));
+  };
+
+  let sheet = null;
+  if (sheetIsRendered) {
+    // 7. Create a portal to display the overlay and contents
+    sheet = (
+      &lt;Portal hostName={'root'}> {/* // this can be set the prop pageKey to show the modal within the screen instead of the entire app. For example in a tabNavigation, passing pageKey will make the modal will not cover the tabs */}
+        
+        {/* 8. Wrap the entire content into a GestureHandlerRootView so that scrolling works in ScrollView. This is only needed if your sheet has a ScrollView. We set a translucent background color on this so contents behind the modal are visible but tinted. */}
+        &lt;GestureHandlerRootView style={{
+            width: screenWidth, 
+            height: screenHeight, 
+            position: 'absolute', 
+            backgroundColor: '#00000088',
+          }}
+        > 
+          {/* 9. Here we create a sheet that covers the bottom half. So we create a pressable in the top half of the screen and dismiss the modal/sheet when its pressed */}
+          &lt;Pressable 
+            style={{
+              width: screenWidth, 
+              height: 0.5 * screenHeight,
+              position: 'absolute',
+              top: 0,
+            }}
+            onPress={closeModal}
+          />
+          {/* 10. Here we create the contents of the sheet that are animated. */}
+          &lt;Animated.View
+            style={{
+              width: screenWidth,
+              height: 0.5 * screenHeight,
+              position: 'absolute',
+              bottom: 0,
+              backgroundColor: 'white',
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+              padding: 10,
+              transform: [
+                {
+                  translateY: sheetVisibility.interpolate({
+                    inputRange: [0, 1], 
+                    outputRange: [0.5 * screenHeight, 0]
+                  })
+                }
+              ]
+            }}
+          >
+            &lt;View
+              style={{
+                width: '100%',
+                flexDirection: "row",
+                justifyContent: "flex-end"
+              }}
+            >
+              &lt;Button
+                title="x"
+                onPress={closeModal}
+              >&lt;/Button>
+            &lt;/View>
+            &lt;ScrollView
+              style={{
+                width: '100%',
+                height: 0.5 * screenHeight
+              }}
+            >
+              &lt;Text>{counter}&lt;/Text>
+              &lt;Button 
+                title="increment"
+                onPress={() => { 
+                  setCounter(prev => prev + 1);
+                }}
+              />
+            &lt;/ScrollView>
+          &lt;/Animated.View>
+        &lt;/GestureHandlerRootView>
+      &lt;/Portal>
+    );
+  }
+
+
+  // 11. Finally we add a button to open the modal for testing
+  return (
+    &lt;View style={{borderWidth: 1, borderColor: 'red', minHeight: 20, width: 100}}>
+      &lt;Button 
+        title="show sheet" 
+        onPress={
+          () => {
+            setSheetIsRendered(true);
+            setTimeout(() => {
+              Animated.timing(sheetVisibility, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true
+              }).start();
+            })
+          }
+        }
+      />
+      {sheet}
+    &lt;/View>
+  );
+}
+
+export const WidgetConfig = {};
+
+export const WidgetEditors = {
+  basic: []
+};
+
+export const WrapperTileConfig = {
+  name: "Bottom sheet example",
+  defaultProps: {},
+};
+
+export const PropertySettings = {};
+</pre>
+          </code>
+        </li>
+        <li>
+          <h3 id="cookbook-4">About writing multiple components in a single file</h3>
+          <p>
+            You can write multiple components to break down the logic better, or 
+            to save on the amount of renders react has to do. But all the code 
+            you generate will go in a single file using an automated workflow so, 
+            have one set of imports at the top. The entry point will always be 
+            the component you export as the <i class="inline-code">ReactComponent</i>. 
+            The platform as a whole will be unaware of any subsidiary components 
+            you write to use inside the <i class="inline-code">ReactComponent</i> 
+            i.e. it cannot supply any props to them. You have to make sure you 
+            pass the correct props when you use them.
+
+          </p>
+          <p>
+            Make sure all the components are written in the same jsx snippet. Do 
+            not provide multiple snippets because the code you produce is 
+            automatically written to files and the program cannot handle two 
+            separate snippets. Also do not explain how to use the component or 
+            provide any extra explanatory snippets at the end of your response. 
+            Add them as comments in the code if you think it will help your 
+            context window.
+          </p>
+        </li>
+        <li>
+          <h3 id="cookbook-5">Using<i class="inline-code">customData</i> picker Example 1 (simple objects).</h3>
+          <sub>
+            For a prop that requires a simple object of the form
+            <i class="inline-code">{name: string; age: number|null; active: boolean;}</i>
+          </sub>
+          <p>
+            <ul>
+              <li>Definition of editor: 
+                <code class="language-javascript">
+<pre>
+  const WidgetEditors = {
+    basic: [
+      {
+        type: 'customData',
+        name: 'userInfo',
+        schema: {
+          type: 'object',
+          fields: {
+            name: { type: 'string' },
+            age: { type: 'number', nullable: true },
+            active: { type: 'boolean', defaultValue: true }
+          }
+        }
+      }
+    ]
+  };
+</pre>
+                </code>
+              </li>
+              <li>Usage of prop inside the component:
+                <code class="language-javascript">
+<pre>
+const userInfo = model.get('userInfo') || {name: 'Anon', age: 0, active: false};
+</pre>
+                </code>
+              </li>
+            </ul>
+          </p>
+        </li>
+        <li>
+          <h3 id="cookbook-6">Using <i class="inline-code">customData</i> picker Example 2 (arrays).</h3>
+          <sub>
+            For a prop that requires an object of the form 
+            <i class="inline-code">{products: Array<{id: string; price: number; tags: Array<'sale'|'new'>}>;}</i>
+          </sub>
+          <ul>
+            <li>Definition of editor:
+              <code class="language-javascript">
+<pre>
+const WidgetEditors = {
+  basic: [
+    {
+      type: 'customData',
+      name: 'products',
+      schema: {
+        type: 'object',
+        fields: {
+          products: { 
+            type: 'array',
+            items: {
+              type: 'object',
+              fields: {
+                id: {type: 'string'},
+                price: {type: 'number'},
+                tags: {
+                  type: 'array',
+                  items: {type: 'string', enum: ['sale', 'new']}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+};
+</pre>
+              </code>
+            </li>
+            <li>Usage of prop inside the component
+              <code class="language-javascript">
+<pre>
+const userInfo = model.get('userInfo') || {
+  products: [
+    {
+      id: 'abcd',
+      price: 20,
+      tags: ['sale', 'new']
+    }
+  ]
+};
+</pre>
+              </code>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h3 id="cookbook-7">Using <i class="inline-code">customData</i> picker Example 3.</h3>
+          <sub>
+            For a prop that requires an object of the form <i class="inline-code">
+              {status: 'draft'|'published'; metadata: null|{author: string; revision: number;}; variants: Array<{sku: string; stock: null|number;}>;}
+            </i>
+          </sub>
+          <ul>
+            <li>Definition of editor
+              <code class="language-javascript">
+<pre>
+const WidgetEditors = {
+  basic: [
+    {
+      type: 'customData',
+      name: 'products',
+      schema: {
+        type: 'object',
+        fields: {
+          status: {
+            type: 'string',
+            enum: ['draft', 'published'],
+            defaultValue: 'draft'
+          },
+          metadata: {
+            type: 'object',
+            nullable: true,
+            fields: {
+              author: { type: 'string' },
+              revision: { type: 'number' }
+            }
+          },
+          variants: {
+            type: 'array',
+            items: {
+              type: 'object',
+              fields: {
+                sku: { type: 'string' },
+                stock: { 
+                  type: 'number',
+                  nullable: true,
+                  defaultValue: null
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+};
+</pre>
+              </code>
+            </li>
+            <li>Usage of prop inside the component
+              <code class="language-javascript">
+<pre>
+const products = model.get('products') || {
+  status: 'draft', 
+  metadata: {author: 'Gaurav Gautam', revision: 3}, 
+  variants: [sku: 'abcd', stock: 4]
+};
+</pre>
+              </code>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h3 id="cookbook-8">Using <i class="inline-code">customData</i> picker Example 4 (images).</h3>
+          <sub>
+            Prop that requires a simple object of the form <i class="inline-code">
+              {collections: Array<{title: string; imageUrls: string[];}>;}
+            </i>
+          </sub>
+          <ul>
+            <li>Definition of editor
+              <code class="language-javascript">
+<pre>
+const WidgetEditors = {
+  basic: [
+    {
+      type: 'customData',
+      name: 'collections',
+      props: {
+        label: 'Collections',
+        schema: {
+          type: 'array',
+          items: {
+            type: 'object',
+            fields: {
+              title: { type: 'string' },
+              imageUrls: { type: 'image' }
+            }
+          }
+        }
+      }
+    }
+  ]
+};
+</pre>
+              </code>
+            </li>
+            <li>
+              Usage of prop inside the component
+              <code class="language-javascript">
+<pre>
+const collections = model.get('collections') || {
+  products: [
+    {
+      title: 'summer',
+      imageUrls: ['https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60']
+    },
+    {
+      title: 'winter',
+      imageUrls: ['https://images.unsplash.com/photo-1548536246-09c9046a5312?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60']
+    }
+  ]
+};
+</pre>
+              </code>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h3 id="cookbook-9">Using <i class="inline-code">customData</i> picker Example 5 (shopify collection).</h3>
+          <sub>
+            Getting a shopify collection as a prop. The expected prop in this 
+            case implements the following interface
+          </sub>
+          <code class="language-typescript">
+<pre>
+interface ShopifyCollection {
+title: string;
+handle: string;
+featuredImage: null|string;
+description: null|string;
+descriptionHtml: null|string;
+image: {
+  url: string|null;
+};
+products: Array<{
+  title: string;
+  handle: string;
+  featuredImage: string|null;
+  minPrice: null|string|number;
+  maxPrice: null|string|number;
+}>;
+}
+</pre>
+          </code>
+          <ul>
+            <li>
+              Definition of editor
+              <code class="language-javascript">
+<pre>
+const WidgetEditors = {
+basic: [
+  {
+    type: 'customData',
+    name: 'collectionObject',
+    props: {
+      label: 'Collection',
+      schema: {
+        type: 'object',
+        fields: {
+          collectionData: {
+            type: 'collection',
+            dataFormat: 'all'
+          }
+        }
+      }
+    }
+  }
+]
+};
+</pre>
+              </code>
+            </li>
+            <li>
+              Usage of prop inside the component. Here the collections variable 
+              will have the type <i class="inline-code">{collectionObject: ShopifyCollection}</i>.
+              <code class="language-javascript">
+<pre>
+const collectionObject = model.get('collectionObject') || null;
+</pre>
+              </code> 
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h3 id="cookbook-10">Using <i class="inline-code">customData</i> picker Example 6 (shopify product).</h3>
+          <sub>
+            Getting a shopify product as a prop. The expected prop in this case 
+            implements the following interface
+          </sub>
+          <code class="language-typescript">
+<pre>
+interface ShopifyProduct {
+  title: string;
+  handle: string;
+  featuredImage: null|string;
+  description: null|string;
+  descriptionHtml: null|string;
+  image: {
+    url: string|null;
+  };
+}
+</pre>
+          </code>
+          <ul>
+            <li>
+              Definition of editor
+              <code class="language-javascript">
+<pre>
+const WidgetEditors = {
+  basic: [
+    {
+      type: 'customData',
+      name: 'productObject',
+      props: {
+        label: 'Product',
+        schema: {
+          type: 'object',
+          fields: {
+            productData: {
+              type: 'product',
+              dataFormat: 'all'
+            }
+          }
+        }
+      }
+    }
+  ]
+};
+</pre>
+              </code>
+            </li>
+            <li>
+              Usage of prop inside the component. Here the collections variable 
+              will have the type <i class="inline-code"> {productObject: ShopifyProduct}</i>
+              <code class="language-javascript">
+<pre>
+const productObject = model.get('productObject') || null;
+</pre>
+              </code>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <h3 id="cookbook-11">Adding items to shopify cart</h3>
+          <p>
+            Here is an example of how to add a product to shopify cart you have 
+            to call the <i class="inline-code">addCartLineItem</i> function. This function takes several 
+            arguments, most of which remain the same across every usecase. The 
+            only thing that changes is the <i class="inline-code">merchandiseId</i>. But it depends on values 
+            obtained from hooks so you have to do the following to get the function 
+            and the rest of the parameters. The following snippet is an example 
+            of a button that adds a fixed item to the shopify cart.
+          </p>
+          <code class="language-javascript">
+<pre>
+import React, {useCallback} from 'react';
+import {Button} from 'react-native';
+
+// 1. Import these 
+import { 
+  datasourceTypeModelSel, 
+  selectAppConfig, 
+  selectAppModel, 
+  globalPluginsSelector 
+} from 'apptile-core';
+import { useSelector, useDispatch } from 'react-redux';
+
+export function ReactComponent({model}) {
+  const dispatch = useDispatch();
+  // 2. Get the shopifyCartDSModel
+  const shopifyCartDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyCart'));
+
+  // 3. Get these objects from the platform so you can pass them into the function
+  const appConfig = useSelector(selectAppConfig);
+  const appModel = useSelector(selectAppModel); 
+  const globalPluginsConfigs = useSelector(globalPluginsSelector);
+
+  // 4. Define a function like this to handle adding a product to cart
+  const handleAddToCart = useCallback((product) => {
+    const addCartLineItem = shopifyCartDSModel.get('addCartLineItem');
+    if (addCartLineItem) {
+      // 5. Call the asynchronous function to add to cart
+      addCartLineItem(
+        dispatch, 
+        globalPluginsConfigs.get('shopifyCart'),
+        shopifyCartDSModel,
+        ['shopifyCart'],
+        {
+          quantity: 1,
+          syncWithShopify: true, 
+          successToastText: '', 
+          merchandiseId: product.id // 6. Send the product id. Everything else remains the same in every implementation
+        },
+        appConfig,
+        appModel
+      )
+      .then(() => {
+        console.log("Added to cart!");
+      })
+      .catch(err => {
+        console.error("Failed to add to cart!");
+      });
+    } else {
+      console.error("no function found for adding to cart!");
+    }
+  }, [shopifyCartDSModel]);
+  return (
+    &lt;Button 
+      title="add to cart"
+      onPress={() => handleAddToCart({id: 'gid://shopify/ProductVariant/45869693010149'})}
+    />
+  );
+}
+</pre>
+          </code>
+        </li>
+      </ol>
+    </section>
+    <section id="dos-and-donts-for-llm">
+      <h2>DOs and DONTs for LLM</h2>
+      
+      <h3>DOs</h3>
+      <ul>
+        <li> 
+          When making a horizontal <i class="inline-code">ScrollView</i> for 
+          something like a carousel, make sure you set the width of the 
+          <i class="inline-code">ScrollView</i> to the full screen or the width
+          you want the scroll to happen within. Forgetting this can make the 
+          <i class="inline-code">ScrollView</i> grow to have enough width to 
+          fit all the children and then it won't scroll at all.
+        </li>
+        <li>
+          In case you want to log some error to the console prefix the error with
+          [APPTILE_AGENT]. This will allow the user to find and paste it into your
+          context so you can correct it.
+        </li>
+        <li>
+          When generating code for use by the platform, put the code between the 
+          tags &lt;plugin-code&gt;&lt;/plugin-code&gt;. You should still use the 
+          markdown jsx tag you use normally but wrap that whole thing within these 
+          tags.
+        </li>
+      </ul>
+      <h3>DONTs</h3>
+      <ul>
+        <li>
+          Don't try to <i class="inline-code">import(some_path)</i> a static image
+          resource of some kind. The apptile platform doesn't support that ability 
+          yet.
+        </li>
+      </ul>
+    </section>
+    </main>
+  </body>
+</html>
