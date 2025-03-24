@@ -167,16 +167,16 @@ const styles = StyleSheet.create({
   insightRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   insightText: {
     flex: 2,
-    fontSize: 14,
-    color: '#1A1A1A',
+    fontSize: 15,
+    color: '#2A2A2A',
   },
   progressBarContainer: {
     flex: 2,
-    height: 8,
+    height: 6,
     backgroundColor: '#E0E0E0',
     borderRadius: 4,
     marginHorizontal: 12,
@@ -184,13 +184,13 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#00726C',
+    backgroundColor: '#009FAD',
     borderRadius: 4,
   },
   percentageText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#2A2A2A',
     width: 40,
     textAlign: 'right',
   },

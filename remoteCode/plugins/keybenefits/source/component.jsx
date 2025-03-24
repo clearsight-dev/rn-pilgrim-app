@@ -202,7 +202,8 @@ export function ReactComponent({ model }) {
           style={{
             flexDirection: 'row', 
             justifyContent: 'space-between', 
-            padding: 16
+            paddingVertical: 16,
+            paddingHorizontal: 20
           }}
         >
           {imageBand.map(item => {
