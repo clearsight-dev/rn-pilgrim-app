@@ -43,15 +43,7 @@ public class RNApptileModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void notifyJSReady() {
-    MainActivity activity = (MainActivity) reactContext.getCurrentActivity();
-    if (activity != null) {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          activity.removeSplash();
-        }
-      });
-    }
+    SplashManager.INSTANCE.removeSplash();
   }
 
   // @ReactMethod

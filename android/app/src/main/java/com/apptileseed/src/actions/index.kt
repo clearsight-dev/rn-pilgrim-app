@@ -198,7 +198,7 @@ object Actions {
 
                     // dev roll to make sure published bundle is always working
                     if (updateStatus.all { status -> status }) {
-                        applyUpdates(context)
+//                        applyUpdates(context)
                     } else {
                         Log.e(APPTILE_LOG_TAG, "Update failed. App restart skipped.")
                     }
@@ -256,6 +256,13 @@ object Actions {
     suspend fun startApptileAppProcess(appId: String, context: Context) =
         withContext(Dispatchers.IO) {
             try {
+                if (BundleTrackerPrefs.isBrokenBundle()) {
+                    Log.d(
+                        APPTILE_LOG_TAG, "Previous bundle status: failed, starting rollback"
+                    )
+                    rollBackUpdates(context)
+                }
+
                 val trackerFile = File(context.filesDir, BUNDLE_TRACKER_FILE_NAME)
                 if (!trackerFile.exists()) {
                     if (!listOf(

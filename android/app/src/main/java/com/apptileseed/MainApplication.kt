@@ -100,25 +100,18 @@ class MainApplication : Application(), ReactApplication {
         }
 
 
-        appScope.launch {
-            try {
-                Log.d(APPTILE_LOG_TAG, "Running in: ${Thread.currentThread().name}")
-                Log.i(APPTILE_LOG_TAG, "Starting Startup Process")
-                val appId = getString(R.string.APP_ID)
-
-                if (BundleTrackerPrefs.isBrokenBundle()) {
-                    Log.d(
-                        APPTILE_LOG_TAG, "Previous bundle status: failed, starting rollback"
-                    )
-                    Actions.rollBackUpdates(this@MainApplication)
-                }
-
-                Actions.startApptileAppProcess(appId, this@MainApplication)
-                Log.i(APPTILE_LOG_TAG, "Startup Process completed")
-            } catch (e: Exception) {
-                Log.e(APPTILE_LOG_TAG, "Startup Process failed", e)
-            }
-        }
+//        appScope.launch {
+//            try {
+//                Log.d(APPTILE_LOG_TAG, "Running in: ${Thread.currentThread().name}")
+//                Log.i(APPTILE_LOG_TAG, "Starting Startup Process")
+//                val appId = getString(R.string.APP_ID)
+//
+//                Actions.startApptileAppProcess(appId, this@MainApplication)
+//                Log.i(APPTILE_LOG_TAG, "Startup Process completed")
+//            } catch (e: Exception) {
+//                Log.e(APPTILE_LOG_TAG, "Startup Process failed", e)
+//            }
+//        }
 
 //        createCleverTapIntegration(this).initialize(intent);
         SoLoader.init(this, false)
@@ -141,6 +134,15 @@ class MainApplication : Application(), ReactApplication {
         appScope.cancel() // Cancel coroutines when the app is shutting down
     }
 
+    fun resetReactNativeHost() {
+        reactNativeHost.clear()
+        Log.i(APPTILE_LOG_TAG, "Cleared ReactNativeHost")
+
+        // Force reinitialization by accessing the instance again
+        val newInstanceManager = reactNativeHost.reactInstanceManager
+        Log.i(APPTILE_LOG_TAG, "Recreated ReactInstanceManager: $newInstanceManager")
+
+    }
 //    fun onNewIntent(intent: Intent) {
 //        super.onNewIntent(intent)
 //
