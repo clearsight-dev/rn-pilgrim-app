@@ -42,7 +42,7 @@ export function ReactComponent({ model }) {
         body,
         id: judgeMeProductId,
       });
-      console.log('[AGENT]: review submitted ', productRes);
+      console.log("[AGENT] Review submitted: ", productRes);
     } else {
       throw new Error("Cannot submit review without logging in first!");
     }

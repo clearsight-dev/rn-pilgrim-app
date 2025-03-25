@@ -402,29 +402,37 @@ export function ReactComponent({ model }) {
   // Function to convert selected filters to Shopify filter format
   const getShopifyFilters = useCallback(() => {
     return selectedFilters.map(filter => {
-      // Split the ID by dots
-      const parts = filter.id.split('.');
-      
-      const namespace = parts[parts.length - 2];
-      const key = parts[parts.length - 1];
-      
-      // For metafield filters, we need to use the label as the value
-      // and create a filter for each selected value
-      return filter.values.map(valueId => {
-        // Find the corresponding filter value object to get the label
-        const filterDataItem = filterData.find(f => f.id === filter.id);
-        const valueObj = filterDataItem?.values?.find(v => v.id === valueId);
+      // Check if this is a metafield filter (contains 'p.m' in the ID)
+      if (filter.id.includes('p.m')) {
+        // Split the ID by dots
+        const parts = filter.id.split('.');
         
-        console.log(`Creating metafield filter: namespace=${namespace}, key=${key}, value=${valueObj?.label || valueId}`);
-        
-        return {
-          productMetafield: {
-            namespace,
-            key,
-            value: valueObj?.label || valueId
-          }
-        };
-      });
+        // For metafield filters, the format is typically:
+        // filter.p.m.[namespace].[key].[value-identifier]
+        // We need to extract the namespace and key
+        if (parts.length >= 4) {
+          const namespace = parts[parts.length - 2];
+          const key = parts[parts.length - 1];
+          
+          // For metafield filters, we need to use the label as the value
+          // and create a filter for each selected value
+          return filter.values.map(valueId => {
+            // Find the corresponding filter value object to get the label
+            const filterDataItem = filterData.find(f => f.id === filter.id);
+            const valueObj = filterDataItem?.values?.find(v => v.id === valueId);
+            
+            console.log(`Creating metafield filter: namespace=${namespace}, key=${key}, value=${valueObj?.label || valueId}`);
+            
+            return {
+              productMetafield: {
+                namespace,
+                key,
+                value: valueObj?.label || valueId
+              }
+            };
+          });
+        }
+      }
       
       // Default case: use the standard product filter format
       return {

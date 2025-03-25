@@ -37,7 +37,6 @@ const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
     <TouchableOpacity 
       style={[styles.container, style]}
       onPress={() => {
-        console.log("[AGENT] Going to NewPDP: ", handle)
         dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
       }}
     >
