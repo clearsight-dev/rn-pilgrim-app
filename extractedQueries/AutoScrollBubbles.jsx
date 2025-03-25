@@ -82,7 +82,7 @@ export default function AutoScrollBubbles({ numBubbles, onIndexChange, style, st
 
     const timeout = setTimeout(() => {
       runAnimation();
-    }, BUBBLE_DURATION);
+    }, 2 * BUBBLE_DURATION);
 
     return () => {
       clearTimeout(timeout);

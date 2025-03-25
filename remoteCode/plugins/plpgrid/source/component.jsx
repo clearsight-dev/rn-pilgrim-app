@@ -205,6 +205,59 @@ export function ReactComponent({ model }) {
     }
   }, [pdpData]);
 
+  // Function to fetch PDP data for visible products
+  const fetchVisibleProductsPdpData = useCallback(async (visibleIndices) => {
+    if (!products || products.length === 0 || loadingPdpData) return;
+    
+    // Get the products that are currently visible
+    const visibleProducts = visibleIndices.map(index => products[index])
+      .filter(product => product && product.handle);
+    
+    if (visibleProducts.length === 0) return;
+    
+    // Filter out products that already have PDP data
+    const productsToFetch = visibleProducts.filter(product => !pdpData[product.handle]);
+    
+    if (productsToFetch.length === 0) return;
+    
+    console.log('Fetching PDP data for visible products:', productsToFetch.map(p => p.handle));
+    setLoadingPdpData(true);
+    
+    try {
+      // Create an object to store the PDP data
+      const newPdpDataObj = { ...pdpData };
+      
+      // Fetch PDP data for each product
+      await Promise.all(
+        productsToFetch.map(async (product) => {
+          const data = await fetchProductPdpData(product.handle);
+          if (data) {
+            newPdpDataObj[product.handle] = data;
+          }
+        })
+      );
+      
+      // Update the PDP data state
+      setPdpData(newPdpDataObj);
+      console.log('Fetched PDP data for visible products:', productsToFetch.map(p => p.handle));
+    } catch (error) {
+      console.error('Error fetching PDP data for visible products:', error);
+    } finally {
+      setLoadingPdpData(false);
+    }
+  }, [products, pdpData, loadingPdpData, fetchProductPdpData]);
+  
+  // Track visible items and fetch their PDP data
+  const handleViewableItemsChanged = useCallback(({ viewableItems }) => {
+    if (viewableItems.length === 0) return;
+    
+    // Get the indices of the visible items
+    const visibleIndices = viewableItems.map(item => item.index);
+    
+    // Fetch PDP data for visible products
+    fetchVisibleProductsPdpData(visibleIndices);
+  }, [fetchVisibleProductsPdpData]);
+  
   // Handle loading more products when reaching the end of the list
   const handleLoadMore = () => {
     if (hasNextPage && !loadingMore && !loading) {
@@ -277,11 +330,18 @@ export function ReactComponent({ model }) {
           keyExtractor={(item, index) => item.handle || `product-${index}`}
           numColumns={2}
           initialNumToRender={4}
+          maxToRenderPerBatch={8}
+          windowSize={5}
           contentContainerStyle={styles.gridContainer}
           columnWrapperStyle={styles.row}
           showsVerticalScrollIndicator={false}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3} // Trigger when 30% from the end
+          onViewableItemsChanged={handleViewableItemsChanged}
+          viewabilityConfig={{
+            itemVisiblePercentThreshold: 50, // Item is considered visible when 50% of it is visible
+            minimumViewTime: 300 // Item must be visible for at least 300ms
+          }}
           ListFooterComponent={renderFooter}
           ListEmptyComponent={
             <Text style={styles.emptyText}>No products found</Text>
