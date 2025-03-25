@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useRef } from 'react';
+import React, { forwardRef, useState, useRef, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -13,10 +13,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';
 import Star from '../../../../extractedQueries/Star';
 
-const WriteReviewBottomSheet = forwardRef(function (props, ref) {
+const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
   const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   
   const titleInputRef = useRef(null);
   const reviewInputRef = useRef(null);
@@ -26,13 +27,17 @@ const WriteReviewBottomSheet = forwardRef(function (props, ref) {
     validateForm(selectedRating, titleInputRef.current?.value, reviewInputRef.current?.value);
   };
 
-  const validateForm = (currentRating, titleText, reviewText) => {
+  const validateForm = useCallback((currentRating, titleText, reviewText) => {
     const ratingValid = currentRating > 0;
     const titleValid = titleText && titleText.trim().length > 0;
     const reviewValid = reviewText && reviewText.trim().length > 0;
     
-    setIsFormValid(ratingValid && titleValid && reviewValid);
-  };
+    const currentValidity = ratingValid && titleValid && reviewValid;
+    if (isFormValid !== currentValidity) {
+      setIsFormValid(currentValidity);
+    }
+    
+  }, [isFormValid]);
 
   const handleTitleChange = (text) => {
     if (titleInputRef.current) {
@@ -48,19 +53,20 @@ const WriteReviewBottomSheet = forwardRef(function (props, ref) {
     validateForm(rating, titleInputRef.current?.value, text);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isFormValid) return;
     
     const titleText = titleInputRef.current?.value || '';
     const reviewText = reviewInputRef.current?.value || '';
     
     setIsSubmitting(true);
+    setErrorMessage('');
     
-    // Mock API call with timeout
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Call the onSubmitReview function passed from parent
+      await onSubmitReview(rating, titleText, reviewText);
       
-      // Reset form after submission
+      // Reset form after successful submission
       setRating(0);
       if (titleInputRef.current) {
         titleInputRef.current.clear();
@@ -71,7 +77,22 @@ const WriteReviewBottomSheet = forwardRef(function (props, ref) {
         reviewInputRef.current.value = '';
       }
       setIsFormValid(false);
-    }, 2000);
+      
+      // Close the bottom sheet on success
+      if (ref && ref?.current && ref?.current?.hide) {
+        ref.current?.hide();
+      }
+    } catch (error) {
+      // Show error message
+      if ((error?.message ?? "").startsWith('Cannot submit')) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('Submission failed. Please try again.');
+      }
+      console.error('Review submission error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStars = () => {
@@ -135,6 +156,11 @@ const WriteReviewBottomSheet = forwardRef(function (props, ref) {
                 maxLength={1000}
               />
             </View>
+            
+            {/* Error Message */}
+            {errorMessage ? (
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            ) : null}
             
             {/* Submit Button */}
             <TouchableOpacity 
@@ -215,6 +241,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  errorMessage: {
+    color: '#D32F2F',
+    fontSize: 14,
+    marginBottom: 10,
+    textAlign: 'center',
   },
 });
 

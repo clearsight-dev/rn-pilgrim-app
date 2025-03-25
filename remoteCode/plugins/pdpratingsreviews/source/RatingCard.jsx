@@ -58,7 +58,8 @@ const RatingCard = ({
   photos = [], 
   reviews = [], 
   isLoading = false,
-  consumerStudyResults = []
+  consumerStudyResults = [],
+  onSubmitReview = async (rating, title, body) => {console.log("no submit review function provided");}
 }) => {
   const reviewsBottomSheet = useRef(null);
   const photosBottomSheet = useRef(null);
@@ -147,7 +148,7 @@ const RatingCard = ({
       ) : null}
       
       {/* Write Review Bottom Sheet */}
-      <WriteReviewBottomSheet ref={reviewsBottomSheet} />
+      <WriteReviewBottomSheet ref={reviewsBottomSheet} onSubmitReview={onSubmitReview} />
       
       {/* Photos Bottom Sheet */}
       <PhotosBottomSheet ref={photosBottomSheet} reviews={reviews} />

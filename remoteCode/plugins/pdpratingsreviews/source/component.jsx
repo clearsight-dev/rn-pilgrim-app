@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel, GetRegisteredPlugin } from 'apptile-core';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
@@ -7,12 +7,46 @@ import RatingCard from './RatingCard';
 export function ReactComponent({ model }) {
   const productHandle = model.get('productHandle');
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+  const [judgeMeProductId, setJudgeMeProductId] = useState();
   const [rating, setRating] = useState(2); // Default rating is 2
   const [ratingCount, setRatingCount] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [consumerStudyResults, setConsumerStudyResults] = useState([]);
   const judgemeDSModel = useSelector(state => datasourceTypeModelSel(state, 'judgeMe'));
+
+  const onSubmitReview = useCallback(async (rating, title, body) => {
+    const judgeMeQueryRunner = judgemeDSModel?.get('queryRunner');
+    const judgeMeDs = GetRegisteredPlugin('judgeMe');
+    const apiToken = judgemeDSModel.get('apiToken');
+    const shopDomain = judgemeDSModel.get('shopDomain');
+    const judgeMeQueries = judgeMeDs.getQueries();
+
+    const formatEndpoint = (endpoint) => {
+      return endpoint.includes('?')
+        ? `${endpoint}&api_token=${apiToken}&shop_domain=${shopDomain}`
+        : `${endpoint}?api_token=${apiToken}&shop_domain=${shopDomain}`;
+    }
+
+    const postProductReview = judgeMeQueries.postProductReview;
+    const endpoint = formatEndpoint(postProductReview.endpoint);
+    const loggedInUser = shopifyDSModel.get('loggedInUser');
+    if (loggedInUser) {
+      const productRes = await judgeMeQueryRunner.runQuery('post', endpoint, {
+        test: shopifyDSModel.get('description'),
+        platform: 'shopify',
+        name: loggedInUser?.firstName + " " + loggedInUser?.lastName,
+        email: loggedInUser?.email,
+        rating,
+        title,
+        body,
+        id: judgeMeProductId,
+      });
+      console.log('[AGENT]: review submitted ', productRes);
+    } else {
+      throw new Error("Cannot submit review without logging in first!");
+    }
+  }, [judgemeDSModel, judgeMeProductId, shopifyDSModel])
 
   useEffect(() => {
     async function getReviews() {
@@ -151,7 +185,7 @@ export function ReactComponent({ model }) {
         
         // 6. Limit to 200 reviews
         finalReviews = finalReviews.slice(0, 200);
-        
+        setJudgeMeProductId(judgeMeId);
         setReviews(finalReviews);
         setIsLoading(false);
       }
@@ -243,6 +277,7 @@ export function ReactComponent({ model }) {
       reviews={reviews}
       isLoading={isLoading}
       consumerStudyResults={consumerStudyResults}
+      onSubmitReview={onSubmitReview}
     />
   );
 }
