@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import GradientText from '../../../../extractedQueries/GradientText';
-import everyDayUnderline from '../../../../assets/every-day-underline.png';
+import Underline from '../../../../extractedQueries/Underline';
 
 const CelebPicks = ({celebs = []}) => {
   // Empty onPress handler to be implemented later
@@ -45,15 +45,7 @@ const CelebPicks = ({celebs = []}) => {
               flexDirection: 'column',
             }}>
             <Text style={styles.subtitle}>Essentials You Can't Miss!</Text>
-            <Image
-              source={everyDayUnderline}
-              style={{
-                width: 65,
-                height: 10,
-                resizeMode: 'stretch',
-                alignSelf: 'flex-end',
-              }}
-            />
+            <Underline style={{height: 12, alignSelf: 'flex-end'}} />
           </View>
         </View>
         <View style={styles.celebsContainer}>
