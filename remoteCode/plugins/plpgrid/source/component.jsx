@@ -709,7 +709,7 @@ export function ReactComponent({ model }) {
         >
           <Icon 
             iconType={'Material Icon'} 
-            name={'filter-list'} 
+            name={'filter-outline'} 
             style={styles.buttonIcon}
           />
           <Text style={styles.buttonText}>Filter</Text>
