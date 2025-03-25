@@ -44,18 +44,18 @@ const COLLECTION_PRODUCTS_QUERY = gql`
 `;
 
 // Function to fetch collection data using the GraphQL query with pagination support
-export const fetchCollectionData = async (queryRunner, collectionHandle, first = 50, afterCursor = null) => {
+export const fetchCollectionData = async (queryRunner, collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false) => {
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
   
-  // Modify the query to include pagination parameters
+  // Modify the query to include pagination parameters and sorting
   const paginationQuery = gql`
-    query CollectionProducts($handle: String, $identifiers: [HasMetafieldsIdentifier!]!, $first: Int!, $after: String) {
+    query CollectionProducts($handle: String, $identifiers: [HasMetafieldsIdentifier!]!, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean) {
       collection(handle: $handle) {
         handle
         title
-        products(first: $first, after: $after) {
+        products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse) {
           pageInfo {
             hasNextPage
             hasPreviousPage
@@ -117,7 +117,9 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
         }
       ],
       first: first,
-      after: afterCursor
+      after: afterCursor,
+      sortKey: sortKey,
+      reverse: reverse
     },
     {
       cachePolicy: 'cache-first'
