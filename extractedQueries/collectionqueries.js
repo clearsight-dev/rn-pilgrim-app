@@ -4,6 +4,7 @@ const COLLECTION_PRODUCTS_QUERY = gql`
   query CollectionProducts($handle: String, $identifiers: [HasMetafieldsIdentifier!]!) {
     collection(handle: $handle) {
       handle
+      title
       products(first: 50) {
         edges {
           node {

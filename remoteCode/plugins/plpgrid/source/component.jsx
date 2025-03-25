@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { 
   View, 
   Text,
-  TouchableOpacity,
   StyleSheet,
-  FlatList
+  FlatList,
+  ActivityIndicator
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel } from 'apptile-core';
@@ -13,22 +13,29 @@ import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard'
 
 export function ReactComponent({ model }) {
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
-  const [data, setData] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [currentCursor, setCurrentCursor] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [hasPreviousPage, setHasPreviousPage] = useState(false);
-  const [cursors, setCursors] = useState([]); // Store cursors for previous pages
+  const [collectionTitle, setCollectionTitle] = useState('Collection Products');
+  const flatListRef = useRef(null);
 
-  const fetchData = useCallback((cursor = null) => {
-    setLoading(true);
+  const fetchData = useCallback((cursor = null, isLoadingMore = false) => {
+    if (isLoadingMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+    
     const queryRunner = shopifyDSModel?.get('queryRunner');
     
-    fetchCollectionData(queryRunner, "hair-care", 10, cursor)
+    fetchCollectionData(queryRunner, "hair-care", 50, cursor)
       .then(res => {
-        setData(res);
+        // Set collection title
+        if (res.data.collection?.title) {
+          setCollectionTitle(res.data.collection.title);
+        }
         
         // Extract products from the collection data
         const productEdges = res.data.collection?.products?.edges || [];
@@ -64,18 +71,28 @@ export function ReactComponent({ model }) {
           };
         });
         
-        setProducts(formattedProducts);
+        if (isLoadingMore) {
+          // Append new products to existing ones
+          setProducts(prevProducts => [...prevProducts, ...formattedProducts]);
+        } else {
+          // Replace products with new ones
+          setProducts(formattedProducts);
+        }
+        
         setHasNextPage(res.data.pagination.hasNextPage);
-        setHasPreviousPage(res.data.pagination.hasPreviousPage || cursors.length > 0);
         setCurrentCursor(res.data.pagination.lastCursor);
       })
       .catch(err => {
         console.error(err.toString());
       })
       .finally(() => {
-        setLoading(false);
+        if (isLoadingMore) {
+          setLoadingMore(false);
+        } else {
+          setLoading(false);
+        }
       });
-  }, [shopifyDSModel, cursors]);
+  }, [shopifyDSModel]);
 
   useEffect(() => {
     if (shopifyDSModel) {
@@ -83,28 +100,10 @@ export function ReactComponent({ model }) {
     }
   }, [shopifyDSModel, fetchData]);
 
-  const handleNextPage = () => {
-    if (hasNextPage) {
-      // Store current cursor for going back
-      setCursors(prev => [...prev, currentCursor]);
-      fetchData(currentCursor);
-      setPageNumber(prev => prev + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (hasPreviousPage) {
-      // Get the previous cursor
-      const newCursors = [...cursors];
-      const prevCursor = newCursors.length > 1 ? newCursors[newCursors.length - 2] : null;
-      
-      // Remove the last cursor
-      newCursors.pop();
-      setCursors(newCursors);
-      
-      // Fetch with the previous cursor
-      fetchData(prevCursor);
-      setPageNumber(prev => prev - 1);
+  // Handle loading more products when reaching the end of the list
+  const handleLoadMore = () => {
+    if (hasNextPage && !loadingMore && !loading) {
+      fetchData(currentCursor, true);
     }
   };
 
@@ -116,38 +115,34 @@ export function ReactComponent({ model }) {
     />
   );
 
+  // Render footer with loading indicator when loading more products
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    
+    return (
+      <View style={styles.footerContainer}>
+        <ActivityIndicator size="small" color="#007bff" />
+        <Text style={styles.loadingMoreText}>Loading more products...</Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Collection Products</Text>
+      <Text style={styles.title}>{collectionTitle}</Text>
       
       <View style={styles.headerContainer}>
-        <Text style={styles.pageInfo}>Page {pageNumber}</Text>
-        
-        <View style={styles.paginationContainer}>
-          <TouchableOpacity 
-            style={[styles.button, !hasPreviousPage && styles.disabledButton]} 
-            onPress={handlePreviousPage}
-            disabled={!hasPreviousPage}
-          >
-            <Text style={styles.buttonText}>Previous</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.button, !hasNextPage && styles.disabledButton]} 
-            onPress={handleNextPage}
-            disabled={!hasNextPage}
-          >
-            <Text style={styles.buttonText}>Next</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.productsCount}>{products.length} Products</Text>
       </View>
       
       {loading ? (
         <View style={styles.loadingContainer}>
-          <Text style={styles.loading}>Loading...</Text>
+          <ActivityIndicator size="large" color="#007bff" />
+          <Text style={styles.loading}>Loading products...</Text>
         </View>
       ) : (
         <FlatList
+          ref={flatListRef}
           data={products}
           renderItem={renderProductItem}
           keyExtractor={(item, index) => item.handle || `product-${index}`}
@@ -155,6 +150,9 @@ export function ReactComponent({ model }) {
           contentContainerStyle={styles.gridContainer}
           columnWrapperStyle={styles.row}
           showsVerticalScrollIndicator={false}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.3} // Trigger when 30% from the end
+          ListFooterComponent={renderFooter}
           ListEmptyComponent={
             <Text style={styles.emptyText}>No products found</Text>
           }
@@ -171,7 +169,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 8,
   },
@@ -181,35 +179,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  pageInfo: {
+  productsCount: {
     fontSize: 16,
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  button: {
-    backgroundColor: '#007bff',
-    padding: 8,
-    borderRadius: 4,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#cccccc',
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
+    color: '#666',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 20,
   },
   loading: {
     fontSize: 16,
     textAlign: 'center',
+    marginTop: 8,
+  },
+  footerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  loadingMoreText: {
+    fontSize: 14,
+    marginLeft: 8,
   },
   gridContainer: {
     paddingBottom: 16,
@@ -241,8 +234,7 @@ export const WidgetEditors = {
 export const PropertySettings = {};
 
 export const WrapperTileConfig = {
-  name: 'Rating Summary Card',
+  name: 'Collection Products Grid',
   defaultProps: {
   },
 };
-
