@@ -1,7 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
+import { datasourceTypeModelSel, useApptileWindowDims, Icon } from 'apptile-core';
+import RatingPill from '../../../../extractedQueries/RatingPill';
 import { useSelector } from 'react-redux';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
 import OfferCard from './OfferCard';
@@ -306,15 +307,22 @@ export function ReactComponent({ model }) {
             
             {/* Rating - Using parsed JSON value */}
             <View style={styles.ratingContainer}>
-              <View style={styles.ratingBadge}>
-                <Text style={styles.ratingText}>
-                  {rating} ★
+              <RatingPill rating={rating} size={16} backgroundColor="#25a69a" />
+              <View style={styles.reviewCount}>
+                <Text style={{marginRight: 5}}>
+                  {product?.metafields?.find(m => m?.key === "rating_count")?.value || "7,332"} 
                 </Text>
-              </View>
-              <Text style={styles.reviewCount}>
-                {product?.metafields?.find(m => m.key === "rating_count")?.value || "7,332"} 
+                <Icon 
+                  iconType={'Material Icon'} 
+                  name={'check-decagram'} 
+                  style={{
+                    marginRight: 2,
+                    fontSize: 15,
+                    color: '#00AEEF'
+                  }}
+                />
                 <Text style={styles.verifiedText}> Verified reviews</Text>
-              </Text>
+              </View>
             </View>
             
             {/* Variant Selector */}
@@ -552,9 +560,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   productTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 19,
+    fontWeight: '600',
+    color: '#2A2A2A',
     marginBottom: 8,
   },
   productSubtitle: {
@@ -576,8 +584,8 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   price: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
     color: '#333',
   },
   taxInfo: {
@@ -590,25 +598,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  ratingBadge: {
-    backgroundColor: '#25a69a',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4,
-    marginRight: 8,
-  },
-  ratingText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
   reviewCount: {
+    flexDirection: 'row',
+    marginLeft: 8,
     fontSize: 14,
     color: '#333',
   },
   verifiedText: {
-    color: '#666',
-    textDecorationLine: 'underline',
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#2A2A2A',
   },
   // Variant selector styles
   variantSelectorContainer: {

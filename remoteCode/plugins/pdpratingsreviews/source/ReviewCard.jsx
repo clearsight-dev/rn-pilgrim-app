@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import Star from '../../../../extractedQueries/Star';
+import RatingPill from '../../../../extractedQueries/RatingPill';
 import moment from 'moment';
 
 const ReviewCard = ({ review }) => {
@@ -37,10 +37,7 @@ const ReviewCard = ({ review }) => {
       {/* Review Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={styles.ratingPill}>
-            <Star fillPercentage={1} size={16} color={'#FFFFFF'} />
-            <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
-          </View>
+          <RatingPill rating={rating} size={16} />
           <Text style={styles.date}>{timeAgo}</Text>
         </View>
       </View>
@@ -93,20 +90,6 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  ratingPill: {
-    flexDirection: 'row',
-    backgroundColor: '#00909E',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    alignItems: 'center',
-  },
-  ratingText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 14,
-    marginLeft: 4,
   },
   date: {
     fontSize: 12,
