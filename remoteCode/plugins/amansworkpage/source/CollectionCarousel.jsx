@@ -6,7 +6,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import everyDayUnderline from '../../../../assets/every-day-underline.png';
+// import everyDayUnderline from '../../../../assets/every-day-underline.png';
 import {useState} from 'react';
 
 const CollectionCarousel = ({carouselData}) => {
@@ -22,7 +22,7 @@ const CollectionCarousel = ({carouselData}) => {
           }}>
           <Text style={[styles.subtitle]}>{carouselData.subtitle}</Text>
           <Image
-            source={everyDayUnderline}
+            source={{uri: ""}}
             style={{
               width: 65,
               height: 10,

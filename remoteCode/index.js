@@ -1,5 +1,6 @@
 // This file is generated. Do not edit.
 import workpage from "./plugins/workpage/source/widget";
+import plpgrid from "./plugins/plpgrid/source/widget";
 import pligrimtextwidget from "./plugins/pligrimtextwidget/source/widget";
 import pilgrimotplogin from "./plugins/pilgrimotplogin/source/widget";
 import pdpratingsreviews from "./plugins/pdpratingsreviews/source/widget";
@@ -30,6 +31,7 @@ return [
     pdpratingsreviews,
     pilgrimotplogin,
     pligrimtextwidget,
+    plpgrid,
     workpage,
   ];
 }

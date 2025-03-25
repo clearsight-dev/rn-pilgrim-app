@@ -17,22 +17,6 @@ const BottomSheet = forwardRef(function ({
   // Threshold for considering a swipe as dismissal (1/5 of the screen height)
   const SWIPE_THRESHOLD = screenHeight * 0.2;
 
-  useImperativeHandle(ref, () => {
-    return {
-      show: () => {
-        setSheetIsRendered(true);
-        translateY.setValue(0);
-        Animated.timing(sheetVisibility, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true
-        }).start();
-      }
-    }
-  }, [setSheetIsRendered, sheetVisibility.current]);
-
-  if (!sheetIsRendered) return null;
-
   const handleClose = () => {
     Animated.timing(sheetVisibility, {
       toValue: 0,
@@ -44,6 +28,23 @@ const BottomSheet = forwardRef(function ({
       }
     });
   }
+
+  useImperativeHandle(ref, () => {
+    return {
+      show: () => {
+        setSheetIsRendered(true);
+        translateY.setValue(0);
+        Animated.timing(sheetVisibility, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true
+        }).start();
+      },
+      hide: handleClose
+    }
+  }, [setSheetIsRendered, sheetVisibility.current]);
+
+  if (!sheetIsRendered) return null;
 
   const onPanGestureEvent = Animated.event(
     [{ nativeEvent: { translationY: translateY } }],

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel } from 'apptile-core';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
-import RelatedProductCard from './RelatedProductCard';
+import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import { debounce } from 'lodash-es';
 
 const RelatedProductsCarousel = ({ 
