@@ -14,8 +14,8 @@ const BottomSheet = forwardRef(function ({
   const sheetVisibility = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
 
-  // Threshold for considering a swipe as dismissal (in points)
-  const SWIPE_THRESHOLD = 50;
+  // Threshold for considering a swipe as dismissal (1/5 of the screen height)
+  const SWIPE_THRESHOLD = screenHeight * 0.2;
 
   useImperativeHandle(ref, () => {
     return {
@@ -56,14 +56,15 @@ const BottomSheet = forwardRef(function ({
       const { translationY } = event.nativeEvent;
       
       if (translationY > SWIPE_THRESHOLD) {
-        // If swiped down past threshold, close the sheet
+        // If swiped down past threshold (1/5 of screen height), close the sheet
         handleClose();
       } else {
-        // Otherwise, snap back to open position
+        // Otherwise, snap back to open position with a spring animation
         Animated.spring(translateY, {
           toValue: 0,
           useNativeDriver: true,
-          bounciness: 10
+          bounciness: 10,
+          speed: 12
         }).start();
       }
     }
