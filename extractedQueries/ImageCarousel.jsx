@@ -115,6 +115,7 @@ export default function ImageCarousel({ images, width }) {
         pagingEnabled={true}
         keyExtractor={item => item.id || item.url}
         getItemLayout={getItemLayout}
+        initialNumToRender={3}
         onScrollToIndexFailed={(info) => {
           // Handle scroll failure - wait a bit and try again
           const wait = new Promise(resolve => setTimeout(resolve, 500));
