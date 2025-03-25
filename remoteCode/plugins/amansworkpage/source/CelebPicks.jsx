@@ -1,17 +1,14 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import GradientText from '../../../../extractedQueries/GradientText';
 import Underline from '../../../../extractedQueries/Underline';
+import {useApptileWindowDims} from 'apptile-core';
 
 const CelebPicks = ({celebs = []}) => {
+  const {width} = useApptileWindowDims();
+  const itemWidth = width / 3.5;
+
   // Empty onPress handler to be implemented later
   const handleCelebPress = celeb => {
     console.log(`Celeb pressed: ${celeb.title}`);
@@ -52,9 +49,17 @@ const CelebPicks = ({celebs = []}) => {
           {celebs.map((celeb, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.celebItem}
+              style={[styles.celebItem, {width: itemWidth}]}
               onPress={() => handleCelebPress(celeb)}>
-              <View style={styles.imageContainer}>
+              <View
+                style={[
+                  styles.imageContainer,
+                  {
+                    width: itemWidth,
+                    height: itemWidth,
+                    borderRadius: itemWidth / 2,
+                  },
+                ]}>
                 <Image
                   source={{uri: celeb.image}}
                   style={styles.celebImage}
@@ -69,9 +74,6 @@ const CelebPicks = ({celebs = []}) => {
     </GradientBackground>
   );
 };
-
-const {width} = Dimensions.get('window');
-const itemWidth = width / 3.5;
 
 const styles = StyleSheet.create({
   container: {
@@ -96,12 +98,8 @@ const styles = StyleSheet.create({
   celebItem: {
     alignItems: 'center',
     marginBottom: 16,
-    width: itemWidth,
   },
   imageContainer: {
-    width: itemWidth,
-    height: itemWidth,
-    borderRadius: itemWidth / 2,
     overflow: 'hidden',
     borderWidth: 2,
     borderColor: '#E6F7FA',

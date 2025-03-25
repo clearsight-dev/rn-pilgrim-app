@@ -6,10 +6,13 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Dimensions,
 } from 'react-native';
+import {useApptileWindowDims} from 'apptile-core';
 
 const BlogCarousel = ({carouselData}) => {
+  const {width} = useApptileWindowDims();
+  const cardWidth = width * 0.85;
+
   // Handle "See all" button press
   const handleSeeAllPress = () => {
     console.log(`Navigate to: ${carouselData.redirectPage}`);
@@ -43,10 +46,15 @@ const BlogCarousel = ({carouselData}) => {
         {carouselData.blogs.map((blog, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.blogCard}
+            style={[styles.blogCard, {width: cardWidth}]}
             onPress={() => handleBlogPress(blog)}>
             <View style={styles.blogContent}>
-              <View style={styles.textContainer}>
+              <Image
+                source={{uri: blog.image}}
+                style={styles.blogImage}
+                resizeMode="contain"
+              />
+              {/* <View style={styles.textContainer}>
                 <Text style={styles.blogTitle}>{blog.title}</Text>
                 <Text style={styles.blogDescription}>{blog.description}</Text>
                 <TouchableOpacity
@@ -54,12 +62,7 @@ const BlogCarousel = ({carouselData}) => {
                   onPress={() => handleBlogPress(blog)}>
                   <Text style={styles.knowMoreText}>Know More -&gt;</Text>
                 </TouchableOpacity>
-              </View>
-              <Image
-                source={{uri: blog.image}}
-                style={styles.blogImage}
-                resizeMode="contain"
-              />
+              </View> */}
             </View>
           </TouchableOpacity>
         ))}
@@ -67,9 +70,6 @@ const BlogCarousel = ({carouselData}) => {
     </View>
   );
 };
-
-const {width} = Dimensions.get('window');
-const cardWidth = width * 0.85;
 
 const styles = StyleSheet.create({
   container: {
@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   blogCard: {
-    width: cardWidth,
     height: 220,
     marginRight: 16,
     borderRadius: 12,

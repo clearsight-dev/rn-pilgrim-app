@@ -1,9 +1,9 @@
 import React from 'react';
-import {useWindowDimensions} from 'react-native';
+import {useApptileWindowDims} from 'apptile-core';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 
 const CollectionsGridSquare = ({collections = []}) => {
-  const {width} = useWindowDimensions();
+  const {width} = useApptileWindowDims();
   const itemWidth = (width - 48 - 24) / 3; // (device_width - margin - gap) / columns
 
   const handleCollectionPress = collectionHandle => {
