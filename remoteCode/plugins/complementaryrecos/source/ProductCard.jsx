@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { navigateToScreen } from 'apptile-core';
+import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import { useDispatch } from 'react-redux';
 
 const ProductCard = ({ product, style }) => {
   // Extract product details
   const { title, featuredImage, priceRange, compareAtPriceRange, metafield, handle } = product;
+  const {width: screenWidth} = useApptileWindowDims();
   
   // Get price information
   const price = priceRange?.minVariantPrice?.amount || '0';
@@ -22,7 +23,7 @@ const ProductCard = ({ product, style }) => {
 
   return (
     <TouchableOpacity 
-      style={[styles.container, style]}
+      style={[styles.container, style, { width: screenWidth / 2.4 }]}
       onPress={() => {
         dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
       }}
@@ -60,7 +61,6 @@ const ProductCard = ({ product, style }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: 160,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     backgroundColor: '#F3F3F3CC',
