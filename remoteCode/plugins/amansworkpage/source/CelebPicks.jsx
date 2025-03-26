@@ -1,9 +1,10 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image, Button} from 'react-native';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import GradientText from '../../../../extractedQueries/GradientText';
 import Underline from '../../../../extractedQueries/Underline';
-import {useApptileWindowDims} from 'apptile-core';
+import {useApptileWindowDims, navigateToScreen} from 'apptile-core';
+import { useDispatch } from 'react-redux';
 
 const CelebPicks = ({celebs = []}) => {
   const {width} = useApptileWindowDims();
@@ -14,6 +15,8 @@ const CelebPicks = ({celebs = []}) => {
     console.log(`Celeb pressed: ${celeb.title}`);
     // Will be implemented later
   };
+
+  const dispatch = useDispatch();
 
   return (
     <GradientBackground
@@ -42,6 +45,12 @@ const CelebPicks = ({celebs = []}) => {
               flexDirection: 'column',
             }}>
             <Text style={styles.subtitle}>Essentials You Can't Miss!</Text>
+            <Button 
+              title="Go"
+              onPress={() => {
+                dispatch(navigateToScreen('NewCollection', {productHandle: "3-redensyl-4-anagain-hair-growth-serum"}))             
+              }}
+            />
             <Underline style={{height: 12, alignSelf: 'flex-end'}} />
           </View>
         </View>
