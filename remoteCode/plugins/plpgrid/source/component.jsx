@@ -31,7 +31,6 @@ export function ReactComponent({ model }) {
   const [filterData, setFilterData] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [appliedFilters, setAppliedFilters] = useState([]); // Track applied filters separately
-  const [activeFilterTab, setActiveFilterTab] = useState(0);
   const [filteredProductsCount, setFilteredProductsCount] = useState(0);
   const [isLoadingFilteredCount, setIsLoadingFilteredCount] = useState(false);
   const [isMaxFilteredCount, setIsMaxFilteredCount] = useState(false);
@@ -345,6 +344,7 @@ export function ReactComponent({ model }) {
 
   // Function to handle filter selection
   const handleFilterSelect = useCallback((filterId, valueId) => {
+    console.log("[AGENT]: Filter selected")
     setSelectedFilters(prev => {
       // Check if this filter is already selected
       const existingFilterIndex = prev.findIndex(f => f.id === filterId);
@@ -487,7 +487,10 @@ export function ReactComponent({ model }) {
   
   // Function to fetch filtered products count
   const fetchFilteredCount = useCallback(async () => {
+    console.log("[AGENT] fetchFilteredCount called with selectedFilters:", selectedFilters);
+    
     if (!shopifyDSModel || selectedFilters.length === 0) {
+      console.log("[AGENT] No filters or shopifyDSModel, setting count to 0");
       setFilteredProductsCount(0);
       setIsMaxFilteredCount(false);
       return;
@@ -498,8 +501,10 @@ export function ReactComponent({ model }) {
     try {
       const queryRunner = shopifyDSModel.get('queryRunner');
       const filters = getShopifyFilters();
+      console.log("[AGENT] Fetching filtered count with filters:", filters);
       
       const result = await fetchFilteredProductsCount(queryRunner, "hair-care", filters);
+      console.log("[AGENT] Filtered count result:", result);
       
       setFilteredProductsCount(result.count);
       setIsMaxFilteredCount(result.isMaxCount);
@@ -532,6 +537,7 @@ export function ReactComponent({ model }) {
   
   // Update filtered products count when selected filters change
   useEffect(() => {
+    console.log("[AGENT] selectedFilters changed, calling fetchFilteredCount");
     fetchFilteredCount();
   }, [selectedFilters, fetchFilteredCount]);
   
@@ -543,28 +549,69 @@ export function ReactComponent({ model }) {
   }, [shopifyDSModel, fetchTotalProductsCount]);
   
   // Function to apply filters
-  const applyFilters = () => {
+  const applyFilters = (newSelectedFilters) => {
     // Hide the filter bottom sheet
     if (footerRef.current) {
       footerRef.current.hideFilterBottomSheet();
     }
     
-    // Set applied filters to current selected filters
-    setAppliedFilters([...selectedFilters]);
+    // Update the selected filters state with the new filters from the Footer component
+    setSelectedFilters(newSelectedFilters);
+    
+    // Set applied filters to the new selected filters
+    setAppliedFilters(newSelectedFilters);
     
     // Reload products with selected filters
     setProducts([]);
     setCurrentCursor(null);
     setPdpData({});
     
-    // Get the Shopify filters format
-    const shopifyFilters = getShopifyFilters();
+    // Get the Shopify filters format based on the new selected filters
+    const shopifyFilters = newSelectedFilters.map(filter => {
+      // Check if this is a metafield filter (contains 'p.m' in the ID)
+      if (filter.id.includes('p.m')) {
+        // Split the ID by dots
+        const parts = filter.id.split('.');
+        
+        // For metafield filters, the format is typically:
+        // filter.p.m.[namespace].[key].[value-identifier]
+        // We need to extract the namespace and key
+        if (parts.length >= 4) {
+          const namespace = parts[parts.length - 2];
+          const key = parts[parts.length - 1];
+          
+          // For metafield filters, we need to use the label as the value
+          // and create a filter for each selected value
+          return filter.values.map(valueId => {
+            // Find the corresponding filter value object to get the label
+            const filterDataItem = filterData.find(f => f.id === filter.id);
+            const valueObj = filterDataItem?.values?.find(v => v.id === valueId);
+            
+            return {
+              productMetafield: {
+                namespace,
+                key,
+                value: valueObj?.label || valueId
+              }
+            };
+          });
+        }
+      }
+      
+      // Default case: use the standard product filter format
+      return {
+        productFilter: {
+          filterType: filter.id,
+          values: filter.values
+        }
+      };
+    }).flat();
     
     // Fetch data with filters
     fetchDataWithFilters(null, false, sortOption, sortReverse, shopifyFilters);
     
     // If no filters are applied, refresh the total count
-    if (selectedFilters.length === 0) {
+    if (newSelectedFilters.length === 0) {
       fetchTotalProductsCount();
     }
   };
@@ -661,30 +708,6 @@ export function ReactComponent({ model }) {
     setSelectedFilters([]);
   };
   
-  // Render filter value item
-  const renderFilterValue = (filter, value) => {
-    const isSelected = isFilterValueSelected(filter.id, value.id);
-    
-    return (
-      <TouchableOpacity
-        key={`filter-value-${value.id}`}
-        style={[styles.filterValueItem, isSelected && styles.selectedFilterValue]}
-        onPress={() => handleFilterSelect(filter.id, value.id)}
-      >
-        <Text style={[styles.filterValueText, isSelected && styles.selectedFilterValueText]}>
-          {value.label}
-        </Text>
-        {isSelected && (
-          <Icon 
-            iconType={'Material Icon'} 
-            name={'check'} 
-            style={styles.checkIcon}
-          />
-        )}
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{collectionTitle}</Text>
@@ -750,13 +773,7 @@ export function ReactComponent({ model }) {
         sortOption={sortOption}
         sortReverse={sortReverse}
         filterData={filterData}
-        activeFilterTab={activeFilterTab}
-        setActiveFilterTab={setActiveFilterTab}
-        renderFilterValue={renderFilterValue}
-        isLoadingFilteredCount={isLoadingFilteredCount}
         selectedFilters={selectedFilters}
-        filteredProductsCount={filteredProductsCount}
-        isMaxFilteredCount={isMaxFilteredCount}
         clearAllFilters={clearAllFilters}
         applyFilters={applyFilters}
       />

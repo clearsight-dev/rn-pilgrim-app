@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { 
   View, 
   Text,
@@ -8,30 +8,193 @@ import {
   FlatList,
   ActivityIndicator
 } from 'react-native';
-import { Icon } from 'apptile-core';
+import { useSelector } from 'react-redux';
+import { datasourceTypeModelSel, Icon } from 'apptile-core';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';
+import RadioButton from '../../../../extractedQueries/RadioButton';
+import Checkbox from '../../../../extractedQueries/Checkbox';
+import { fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
 
-const Footer = React.forwardRef(({ 
+const Footer = React.forwardRef(({
   sortOptions, 
   handleSortOptionSelect, 
   sortOption, 
   sortReverse,
   filterData,
-  activeFilterTab,
-  setActiveFilterTab,
-  renderFilterValue,
-  isLoadingFilteredCount,
   selectedFilters,
-  filteredProductsCount,
-  isMaxFilteredCount,
   clearAllFilters,
   applyFilters
 }, ref) => {
+  const [editableCopyOfSelectedFilters, setEditableCopyOfSelectedFilters] = useState([]);
+  const [activeFilterTab, setActiveFilterTab] = useState(0);
+  const maxFilteredCount = 90;
+  const [filteredProductsCount, setFilteredProductsCount] = useState({
+    state: 'uninitialized', // loading, loaded
+    value: 0
+  });
+  const [isLoadingFilteredCount, setIsLoadingFilteredCount] = useState(false);
+  const [isMaxFilteredCount, setIsMaxFilteredCount] = useState(false);
+  
   const filterBottomSheetRef = useRef(null);
   const sortBottomSheetRef = useRef(null);
+  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+
+  // Function to convert selected filters to Shopify filter format
+  const getShopifyFilters = (filters) => {
+    return filters.map(filter => {
+      // Check if this is a metafield filter (contains 'p.m' in the ID)
+      if (filter.id.includes('p.m')) {
+        // Split the ID by dots
+        const parts = filter.id.split('.');
+        
+        // For metafield filters, the format is typically:
+        // filter.p.m.[namespace].[key].[value-identifier]
+        // We need to extract the namespace and key
+        if (parts.length >= 4) {
+          const namespace = parts[parts.length - 2];
+          const key = parts[parts.length - 1];
+          
+          // For metafield filters, we need to use the label as the value
+          // and create a filter for each selected value
+          return filter.values.map(valueId => {
+            // Find the corresponding filter value object to get the label
+            const filterDataItem = filterData.find(f => f.id === filter.id);
+            const valueObj = filterDataItem?.values?.find(v => v.id === valueId);
+            
+            return {
+              productMetafield: {
+                namespace,
+                key,
+                value: valueObj?.label || valueId
+              }
+            };
+          });
+        }
+      }
+      
+      // Default case: use the standard product filter format
+      return {
+        productFilter: {
+          filterType: filter.id,
+          values: filter.values
+        }
+      };
+    }).flat(); // Flatten the array since metafield filters might return arrays
+  };
+
+  // Function to fetch filtered products count
+  const fetchFilteredCount = async (filters) => {
+    if (!shopifyDSModel || filters.length === 0) {
+      setFilteredProductsCount({
+        state: 'loaded',
+        value: 0
+      });
+      setIsMaxFilteredCount(false);
+      return;
+    }
+    
+    setIsLoadingFilteredCount(true);
+    setFilteredProductsCount({
+      state: 'loading',
+      value: 0
+    });
+    
+    try {
+      const queryRunner = shopifyDSModel.get('queryRunner');
+      const shopifyFilters = getShopifyFilters(filters);
+      
+      const result = await fetchFilteredProductsCount(queryRunner, "hair-care", shopifyFilters);
+      
+      setFilteredProductsCount({
+        state: 'loaded',
+        value: result.count
+      });
+      setIsMaxFilteredCount(result.count >= maxFilteredCount);
+    } catch (error) {
+      console.error('Error fetching filtered products count:', error);
+      setFilteredProductsCount({
+        state: 'error',
+        value: 0
+      });
+    } finally {
+      setIsLoadingFilteredCount(false);
+    }
+  };
+
+  // Function to handle filter selection
+  const handleFilterSelect = (filterId, valueId) => {
+    setEditableCopyOfSelectedFilters(prev => {
+      // Check if this filter is already selected
+      const existingFilterIndex = prev.findIndex(f => f.id === filterId);
+      
+      let newFilters;
+      if (existingFilterIndex >= 0) {
+        // Filter exists, check if value is already selected
+        const existingFilter = prev[existingFilterIndex];
+        const valueIndex = existingFilter.values.indexOf(valueId);
+        
+        if (valueIndex >= 0) {
+          // Value exists, remove it
+          const newValues = [...existingFilter.values];
+          newValues.splice(valueIndex, 1);
+          
+          // If no values left, remove the filter
+          if (newValues.length === 0) {
+            newFilters = [...prev];
+            newFilters.splice(existingFilterIndex, 1);
+          } else {
+            // Update the filter with new values
+            newFilters = [...prev];
+            newFilters[existingFilterIndex] = {
+              ...existingFilter,
+              values: newValues
+            };
+          }
+        } else {
+          // Value doesn't exist, add it
+          newFilters = [...prev];
+          newFilters[existingFilterIndex] = {
+            ...existingFilter,
+            values: [...existingFilter.values, valueId]
+          };
+        }
+      } else {
+        // Filter doesn't exist, add it with the value
+        newFilters = [...prev, { id: filterId, values: [valueId] }];
+      }
+      
+      // Update the filtered count
+      fetchFilteredCount(newFilters);
+      
+      return newFilters;
+    });
+  };
+
+  // Function to check if a filter value is selected
+  const isFilterValueSelected = (filterId, valueId) => {
+    const filter = editableCopyOfSelectedFilters.find(f => f.id === filterId);
+    return filter ? filter.values.includes(valueId) : false;
+  };
 
   // Function to open filter bottom sheet
   const openFilterBottomSheet = () => {
+    // We get a copy of the selectedFilters and edit those 
+    // in the bottomsheet. Once the applyFilter is clicked we close the 
+    // bottomsheet so this copy is unused after that point.
+    setEditableCopyOfSelectedFilters([...selectedFilters]);
+    setActiveFilterTab(0);
+    
+    // Reset the filtered count
+    setFilteredProductsCount({
+      state: 'uninitialized',
+      value: 0
+    });
+    
+    // If there are filters, fetch the count
+    if (selectedFilters.length > 0) {
+      fetchFilteredCount(selectedFilters);
+    }
+    
     if (filterBottomSheetRef.current) {
       filterBottomSheetRef.current.show();
     }
@@ -75,28 +238,61 @@ const Footer = React.forwardRef(({
     );
   };
 
-  // Render sort option item
+  // Render sort option item with RadioButton
   const renderSortOption = (option, index) => {
     const isSelected = sortOption === option.value && sortReverse === option.reverse;
     
     return (
-      <TouchableOpacity
-        key={`sort-option-${index}`}
-        style={[styles.sortOptionItem, isSelected && styles.selectedSortOption]}
-        onPress={() => handleSortOptionSelect(option)}
-      >
-        <Text style={[styles.sortOptionText, isSelected && styles.selectedSortOptionText]}>
-          {option.label}
-        </Text>
-        {isSelected && (
-          <Icon 
-            iconType={'Material Icon'} 
-            name={'check'} 
-            style={styles.checkIcon}
-          />
-        )}
-      </TouchableOpacity>
+      <View key={`sort-option-${index}`} style={styles.sortOptionItem}>
+        <RadioButton
+          label={option.label}
+          initialValue={isSelected}
+          onChange={(prevValue, newValue) => {
+            if (newValue) {
+              handleSortOptionSelect(option);
+            }
+          }}
+          style={styles.sortRadioButton}
+          labelStyle={[styles.sortOptionText, isSelected && styles.selectedSortOptionText]}
+          controlsPosition="right"
+        />
+      </View>
     );
+  };
+
+  // Render filter value item with Checkbox
+  const renderFilterValueWithCheckbox = (filter, value) => {
+    const isSelected = isFilterValueSelected(filter.id, value.id);
+    
+    return (
+      <View key={`filter-value-${value.id}`} style={styles.filterValueItem}>
+        <Checkbox
+          label={value.label}
+          initialValue={isSelected}
+          onChange={(prevValue, newValue) => {
+            handleFilterSelect(filter.id, value.id);
+          }}
+          style={styles.filterCheckbox}
+          labelStyle={[styles.filterValueText, isSelected && styles.selectedFilterValueText]}
+          controlsPosition="right"
+        />
+      </View>
+    );
+  };
+
+  // Function to handle clear all filters
+  const handleClearAllFilters = () => {
+    setEditableCopyOfSelectedFilters([]);
+    setFilteredProductsCount({
+      state: 'loaded',
+      value: 0
+    });
+    setIsMaxFilteredCount(false);
+  };
+
+  // Function to handle apply filters
+  const handleApplyFilters = () => {
+    applyFilters(editableCopyOfSelectedFilters);
   };
 
   return (
@@ -148,7 +344,7 @@ const Footer = React.forwardRef(({
               {filterData.length > 0 && activeFilterTab < filterData.length && (
                 <FlatList
                   data={filterData[activeFilterTab].values}
-                  renderItem={({ item }) => renderFilterValue(filterData[activeFilterTab], item)}
+                  renderItem={({ item }) => renderFilterValueWithCheckbox(filterData[activeFilterTab], item)}
                   keyExtractor={(item) => item.id}
                   showsVerticalScrollIndicator={false}
                 />
@@ -163,10 +359,10 @@ const Footer = React.forwardRef(({
                 <ActivityIndicator size="small" color="#007bff" />
               ) : (
                 <Text style={styles.filterCountText}>
-                  {selectedFilters.length > 0 ? (
+                  {editableCopyOfSelectedFilters.length > 0 && filteredProductsCount.state === 'loaded' ? (
                     isMaxFilteredCount ? 
-                    '90+ Products' : 
-                    `${filteredProductsCount} Products`
+                    `${maxFilteredCount}+ Products` : 
+                    `${filteredProductsCount.value} Products`
                   ) : ''}
                 </Text>
               )}
@@ -175,12 +371,12 @@ const Footer = React.forwardRef(({
             <View style={styles.filterButtonsContainer}>
               <TouchableOpacity 
                 style={styles.clearButton}
-                onPress={clearAllFilters}
-                disabled={selectedFilters.length === 0}
+                onPress={handleClearAllFilters}
+                disabled={editableCopyOfSelectedFilters.length === 0}
               >
                 <Text style={[
                   styles.clearButtonText, 
-                  selectedFilters.length === 0 && styles.disabledButtonText
+                  editableCopyOfSelectedFilters.length === 0 && styles.disabledButtonText
                 ]}>
                   Clear All
                 </Text>
@@ -189,14 +385,14 @@ const Footer = React.forwardRef(({
               <TouchableOpacity 
                 style={[
                   styles.applyButton,
-                  selectedFilters.length === 0 && styles.disabledButton
+                  editableCopyOfSelectedFilters.length === 0 && styles.disabledButton
                 ]}
-                onPress={applyFilters}
-                disabled={selectedFilters.length === 0}
+                onPress={handleApplyFilters}
+                disabled={editableCopyOfSelectedFilters.length === 0}
               >
                 <Text style={[
                   styles.applyButtonText,
-                  selectedFilters.length === 0 && styles.disabledButtonText
+                  editableCopyOfSelectedFilters.length === 0 && styles.disabledButtonText
                 ]}>
                   Apply
                 </Text>
@@ -220,6 +416,12 @@ const Footer = React.forwardRef(({
 });
 
 const styles = StyleSheet.create({
+  sortRadioButton: {
+    width: '100%',
+  },
+  filterCheckbox: {
+    width: '100%',
+  },
   // Bottom buttons styles
   bottomButtonsContainer: {
     position: 'absolute',
