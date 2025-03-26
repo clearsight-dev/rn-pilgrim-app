@@ -1,16 +1,29 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
+import QuickCollections from './QuickCollections';
 
 export function ReactComponent({ model }) {
   // Get collection handle and number of products from model props or use defaults
-  const collectionHandle = model?.get('collectionHandle') || 'bestsellers';
-  const numberOfProducts = model?.get('numberOfProducts') || 5;
+  const numberOfProducts = 5;
+  const quickCollectionsData = model.get('quickCollections') || [];
 
   return (
     <View style={styles.container}>
+      <QuickCollections 
+        title="Shop by Category" 
+        collections={quickCollectionsData}
+      />
       <ChipCollectionCarousel 
-        collectionHandle={collectionHandle}
+        collectionHandle={'bestsellers'}
+        numberOfProducts={numberOfProducts}
+      />
+      <ChipCollectionCarousel 
+        collectionHandle={'makeup'}
+        numberOfProducts={numberOfProducts}
+      />
+      <ChipCollectionCarousel 
+        collectionHandle={'new-launch'}
         numberOfProducts={numberOfProducts}
       />
     </View>
@@ -25,22 +38,31 @@ const styles = StyleSheet.create({
 });
 
 export const WidgetConfig = {
-  collectionHandle: {
-    type: 'string',
-    default: 'bestsellers',
-    label: 'Collection Handle',
-    description: 'Handle of the collection to display products from'
-  },
-  numberOfProducts: {
-    type: 'number',
-    default: 5,
-    label: 'Number of Products',
-    description: 'Number of products to display'
-  }
+  quickCollections: [],
+  numberOfProducts: ''
 };
 
 export const WidgetEditors = {
-  basic: ['collectionHandle', 'numberOfProducts'],
+  basic: [
+    {
+      type: 'customData',
+      name: 'quickCollections',
+      props: {
+        label: 'Quick collections',
+        schema: {
+          type: 'array',
+          items: {
+            type: 'object',
+            fields: {
+              urls: {type: 'image'},
+              title: {type: 'string'},
+              collection: {type: 'collection', dataFormat: 'handle'}
+            }
+          }
+        }
+      }
+    }
+  ],
 };
 
 export const PropertySettings = {};

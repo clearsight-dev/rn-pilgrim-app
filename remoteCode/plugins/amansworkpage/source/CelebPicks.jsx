@@ -48,7 +48,7 @@ const CelebPicks = ({celebs = []}) => {
             <Button 
               title="Go"
               onPress={() => {
-                dispatch(navigateToScreen('NewCollection', {productHandle: "3-redensyl-4-anagain-hair-growth-serum"}))             
+                dispatch(navigateToScreen('NewCollection', {collectionHandle: "hair-care"}))             
               }}
             />
             <Underline style={{height: 12, alignSelf: 'flex-end'}} />

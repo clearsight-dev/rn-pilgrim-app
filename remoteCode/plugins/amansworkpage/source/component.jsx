@@ -4,7 +4,6 @@ import {useSelector} from 'react-redux';
 import {datasourceTypeModelSel} from 'apptile-core';
 import {fetchCollectionData} from '../../../../extractedQueries/homepageQueries';
 import CollectionCarousel from './CollectionCarousel';
-import CollectionsGridSquare from './CollectionsGridSquare';
 import CelebPicks from './CelebPicks';
 import BlogCarousel from './BlogCarousel';
 
@@ -63,58 +62,6 @@ const carouselData = [
           'https://s3-alpha-sig.figma.com/img/5c7a/a266/b15ae60ee5f0977a4b5d54a0f03dc226?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=A4P79zvZY6kgFCjYeBTl6SEp27e3JSnSHJuANCm8Gq1S5gxAcoQC7WIPsof4c6zK7hOkygqp33VM0Et58wyPSSEsJhFJBYB~9s8HmyQpwBgfGK7Kv770oZohCyh1PPm2cCdpxCrRfCfTRAmpWguVCgkr~war8qJf-XJD2UPjIlk4xCrkQR9Lq28nzIzDovXOeZcC8zHirDSxGyPr537l6l041TZSB3iSuDi7lenGgs-5coa7W69gDyeHgarGj~mi2pSGWb2nL96IeZ59gW7Om2vAgo-CH4A1FvlD3MeWbjJPDO74QuHqf-pwT0G5lF71sncDQ2toQxU5n71c~~qPVw__',
       },
     ],
-  },
-];
-
-// Hardcoded data for budget-friendly collections grid
-const budgetFriendlyCollections = [
-  {
-    id: '1',
-    title: 'Under\n₹300',
-    collectionName: 'Skin care',
-    collectionHandle: 'under-300-skin-care',
-    backgroundImage:
-      'https://s3-alpha-sig.figma.com/img/6d2b/013a/3fb5359d2a80c7dea0492a1a9d815422?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=C8dszPd9Ku0tiJkusCy9kGw4CW0GqXvp9ipYhyylhRlfsDXrE8J4Z~~zbHsy6yOMoCJR5AP1E008ICawOrVQ7flId0WyL91ryGh4Bvwct~1cYjbKCHD8NTyIS35d7nsskYfRJbJlN6rH2DTSyzMVJK9r1VJV7WDgGlPx9TG7gyPvfDpwBeu6SxzmUkooXkcVxKzNdS3jkJRJOLpgO5IAmwQPxrKupi-efXvYU8w86OlynYLEc08Y9UB~xPlVYRur6BlrT0FGpi778hVEXcYgBYfqwPqYDflILl7T0FLUlsnm0Rtcfmp2moUK9WOwvAsT4Zuwq4RZPovFVtzLxbb1sg__',
-  },
-  {
-    id: '2',
-    title: 'Under\n₹300',
-    collectionName: 'Skin care',
-    collectionHandle: 'under-300-skin-care',
-    backgroundImage:
-      'https://s3-alpha-sig.figma.com/img/6d2b/013a/3fb5359d2a80c7dea0492a1a9d815422?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=C8dszPd9Ku0tiJkusCy9kGw4CW0GqXvp9ipYhyylhRlfsDXrE8J4Z~~zbHsy6yOMoCJR5AP1E008ICawOrVQ7flId0WyL91ryGh4Bvwct~1cYjbKCHD8NTyIS35d7nsskYfRJbJlN6rH2DTSyzMVJK9r1VJV7WDgGlPx9TG7gyPvfDpwBeu6SxzmUkooXkcVxKzNdS3jkJRJOLpgO5IAmwQPxrKupi-efXvYU8w86OlynYLEc08Y9UB~xPlVYRur6BlrT0FGpi778hVEXcYgBYfqwPqYDflILl7T0FLUlsnm0Rtcfmp2moUK9WOwvAsT4Zuwq4RZPovFVtzLxbb1sg__',
-  },
-  {
-    id: '3',
-    title: 'Under\n₹300',
-    collectionName: 'Skin care',
-    collectionHandle: 'under-300-skin-care',
-    backgroundImage:
-      'https://s3-alpha-sig.figma.com/img/6d2b/013a/3fb5359d2a80c7dea0492a1a9d815422?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=C8dszPd9Ku0tiJkusCy9kGw4CW0GqXvp9ipYhyylhRlfsDXrE8J4Z~~zbHsy6yOMoCJR5AP1E008ICawOrVQ7flId0WyL91ryGh4Bvwct~1cYjbKCHD8NTyIS35d7nsskYfRJbJlN6rH2DTSyzMVJK9r1VJV7WDgGlPx9TG7gyPvfDpwBeu6SxzmUkooXkcVxKzNdS3jkJRJOLpgO5IAmwQPxrKupi-efXvYU8w86OlynYLEc08Y9UB~xPlVYRur6BlrT0FGpi778hVEXcYgBYfqwPqYDflILl7T0FLUlsnm0Rtcfmp2moUK9WOwvAsT4Zuwq4RZPovFVtzLxbb1sg__',
-  },
-  {
-    id: '4',
-    title: 'Under\n₹300',
-    collectionName: 'Skin care',
-    collectionHandle: 'under-300-skin-care',
-    backgroundImage:
-      'https://s3-alpha-sig.figma.com/img/6d2b/013a/3fb5359d2a80c7dea0492a1a9d815422?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=C8dszPd9Ku0tiJkusCy9kGw4CW0GqXvp9ipYhyylhRlfsDXrE8J4Z~~zbHsy6yOMoCJR5AP1E008ICawOrVQ7flId0WyL91ryGh4Bvwct~1cYjbKCHD8NTyIS35d7nsskYfRJbJlN6rH2DTSyzMVJK9r1VJV7WDgGlPx9TG7gyPvfDpwBeu6SxzmUkooXkcVxKzNdS3jkJRJOLpgO5IAmwQPxrKupi-efXvYU8w86OlynYLEc08Y9UB~xPlVYRur6BlrT0FGpi778hVEXcYgBYfqwPqYDflILl7T0FLUlsnm0Rtcfmp2moUK9WOwvAsT4Zuwq4RZPovFVtzLxbb1sg__',
-  },
-  {
-    id: '5',
-    title: 'Under\n₹300',
-    collectionName: 'Skin care',
-    collectionHandle: 'under-300-skin-care',
-    backgroundImage:
-      'https://s3-alpha-sig.figma.com/img/6d2b/013a/3fb5359d2a80c7dea0492a1a9d815422?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=C8dszPd9Ku0tiJkusCy9kGw4CW0GqXvp9ipYhyylhRlfsDXrE8J4Z~~zbHsy6yOMoCJR5AP1E008ICawOrVQ7flId0WyL91ryGh4Bvwct~1cYjbKCHD8NTyIS35d7nsskYfRJbJlN6rH2DTSyzMVJK9r1VJV7WDgGlPx9TG7gyPvfDpwBeu6SxzmUkooXkcVxKzNdS3jkJRJOLpgO5IAmwQPxrKupi-efXvYU8w86OlynYLEc08Y9UB~xPlVYRur6BlrT0FGpi778hVEXcYgBYfqwPqYDflILl7T0FLUlsnm0Rtcfmp2moUK9WOwvAsT4Zuwq4RZPovFVtzLxbb1sg__',
-  },
-  {
-    id: '6',
-    title: 'Under\n₹300',
-    collectionName: 'Skin care',
-    collectionHandle: 'under-300-skin-care',
-    backgroundImage:
-      'https://s3-alpha-sig.figma.com/img/6d2b/013a/3fb5359d2a80c7dea0492a1a9d815422?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=C8dszPd9Ku0tiJkusCy9kGw4CW0GqXvp9ipYhyylhRlfsDXrE8J4Z~~zbHsy6yOMoCJR5AP1E008ICawOrVQ7flId0WyL91ryGh4Bvwct~1cYjbKCHD8NTyIS35d7nsskYfRJbJlN6rH2DTSyzMVJK9r1VJV7WDgGlPx9TG7gyPvfDpwBeu6SxzmUkooXkcVxKzNdS3jkJRJOLpgO5IAmwQPxrKupi-efXvYU8w86OlynYLEc08Y9UB~xPlVYRur6BlrT0FGpi778hVEXcYgBYfqwPqYDflILl7T0FLUlsnm0Rtcfmp2moUK9WOwvAsT4Zuwq4RZPovFVtzLxbb1sg__',
   },
 ];
 
@@ -195,9 +142,6 @@ export function ReactComponent({model}) {
       {carouselData.map(data => (
         <CollectionCarousel carouselData={data} key={data.title} />
       ))}
-
-      {/* Render the CollectionsGridSquare component */}
-      <CollectionsGridSquare collections={budgetFriendlyCollections} />
 
       {/* Render the CelebPicks component */}
       <CelebPicks celebs={celebPicksData} />

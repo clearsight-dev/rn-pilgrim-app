@@ -17,6 +17,7 @@ import Header from './Header';
 import styles from './styles';
 
 export function ReactComponent({ model }) {
+  const collectionHandle = model.get('collectionHandle') || '';
   const footerRef = useRef(null);
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [products, setProducts] = useState([]);
@@ -125,7 +126,7 @@ export function ReactComponent({ model }) {
     
     const queryRunner = shopifyDSModel?.get('queryRunner');
     
-    fetchCollectionData(queryRunner, "hair-care", 12, cursor, sortKey, reverse)
+    fetchCollectionData(queryRunner, collectionHandle, 12, cursor, sortKey, reverse)
       .then(res => {
         // Set collection title
         if (res.data.collection?.title) {
@@ -200,13 +201,13 @@ export function ReactComponent({ model }) {
           setLoading(false);
         }
       });
-  }, [shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
+  }, [collectionHandle, shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
 
   useEffect(() => {
     if (shopifyDSModel) {
       fetchData(null);
     }
-  }, [shopifyDSModel, fetchData]);
+  }, [shopifyDSModel, fetchData, collectionHandle]);
   
   // Log when PDP data is loaded
   useEffect(() => {
@@ -574,7 +575,7 @@ export function ReactComponent({ model }) {
     
     const queryRunner = shopifyDSModel?.get('queryRunner');
     
-    fetchCollectionData(queryRunner, "hair-care", 12, cursor, sortKey, reverse, filters)
+    fetchCollectionData(queryRunner, collectionHandle, 12, cursor, sortKey, reverse, filters)
       .then(res => {
         // Set collection title
         if (res.data.collection?.title) {
@@ -649,7 +650,7 @@ export function ReactComponent({ model }) {
           setLoading(false);
         }
       });
-  }, [shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
+  }, [collectionHandle, shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
   
   // Function to clear all filters
   const handleClearAllFilters = () => {
@@ -835,10 +836,19 @@ export function ReactComponent({ model }) {
 }
 
 export const WidgetConfig = {
+  collectionHandle: ''
 };
 
 export const WidgetEditors = {
-  basic: [],
+  basic: [
+    {
+      type: 'codeInput',
+      name: 'collectionHandle',
+      props: {
+        label: 'Collection Handle'
+      }
+    }
+  ],
 };
 
 export const PropertySettings = {};
