@@ -1,10 +1,11 @@
 import React, {useEffect} from 'react';
 import { View, StyleSheet } from 'react-native';
-import ChipCollectionCarousel from './ChipCollectionCarousel';
-import QuickCollections from './QuickCollections';
-import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import { datasourceTypeModelSel } from 'apptile-core';
 import { useSelector } from 'react-redux';
+import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
+import ChipCollectionCarousel from './ChipCollectionCarousel';
+import QuickCollections from './QuickCollections';
+import ImageCarousel from '../../../../extractedQueries/ImageCarousel';
 
 export function ReactComponent({ model }) {
   // Get collection handle and number of products from model props or use defaults
@@ -52,7 +53,8 @@ const styles = StyleSheet.create({
 
 export const WidgetConfig = {
   quickCollections: [],
-  numberOfProducts: ''
+  numberOfProducts: '',
+  imageCarouselImages: []
 };
 
 export const WidgetEditors = {
@@ -70,6 +72,26 @@ export const WidgetEditors = {
               urls: {type: 'image'},
               title: {type: 'string'},
               collection: {type: 'collection', dataFormat: 'handle'}
+            }
+          }
+        }
+      }
+    },
+    {
+      type: 'customData',
+      name: 'imageCarouselImages',
+      props: {
+        label: 'Image carousel images',
+        schema: {
+          type: 'array',
+          items: {
+            type: 'object',
+            fields: {
+              urls: {type: 'image'},
+              title: {type: 'string'},
+              subtitle: {type: 'string'},
+              collection: {type: 'collection', dataFormat: 'handle'},
+              product: {type: 'product', dataFormat: 'handle'}
             }
           }
         }

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims, Icon } from 'apptile-core';
+import { useRoute } from '@react-navigation/native';
 import RatingPill from '../../../../extractedQueries/RatingPill';
 import { useSelector } from 'react-redux';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
@@ -10,7 +11,9 @@ import VariantCard from './VariantCard';
 import ImageCarousel from './ProductCarousel';
 
 export function ReactComponent({ model }) {
-  const productHandle = model.get('productHandle');
+  const route = useRoute();
+  // const productHandle = model.get('productHandle');
+  const productHandle = route.params.productHandle;
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

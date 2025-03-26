@@ -7,6 +7,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useRoute } from '@react-navigation/native';
 import { datasourceTypeModelSel, Icon } from 'apptile-core';
 import { ProductCountSkeleton,  ProductGridSkeleton } from './Skeletons';
 import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
@@ -17,7 +18,9 @@ import Header from './Header';
 import styles from './styles';
 
 export function ReactComponent({ model }) {
-  const collectionHandle = model.get('collectionHandle') || '';
+  // const collectionHandle = model.get('collectionHandle') || '';
+  const route = useRoute();
+  const collectionHandle = route.params.collectionHandle;
   const footerRef = useRef(null);
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [products, setProducts] = useState([]);
