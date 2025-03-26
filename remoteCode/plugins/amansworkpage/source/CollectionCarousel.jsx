@@ -6,7 +6,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-// import everyDayUnderline from '../../../../assets/every-day-underline.png';
+import Underline from '../../../../extractedQueries/Underline';
 import {useState} from 'react';
 
 const CollectionCarousel = ({carouselData}) => {
@@ -21,14 +21,13 @@ const CollectionCarousel = ({carouselData}) => {
             alignSelf: 'flex-start',
           }}>
           <Text style={[styles.subtitle]}>{carouselData.subtitle}</Text>
-          <Image
-            source={{uri: ""}}
+          <Underline
             style={{
-              width: 65,
+              width: 70,
               height: 10,
               resizeMode: 'stretch',
-              marginTop: -10,
               alignSelf: 'flex-end',
+              transform: [{translateY: -15}],
             }}
           />
         </View>
