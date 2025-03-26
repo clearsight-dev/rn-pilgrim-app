@@ -2,5 +2,10 @@
   <string name="app_name">Pilgrim SDK staging</string>
   <string name="APPTILE_API_ENDPOINT">https://api.apptile.io</string>
   <string name="APPTILE_UPDATE_ENDPOINT">https://appconfigs.apptile.io</string>
-  <string name="APP_ID">2299b5c8-77d8-4500-9723-c0ccfe91694d</string>
+  <string name="APP_ID">c4f28cbc-920a-413c-ab71-edc14cd7e0d5</string>
+  <string name="APPTILE_URL_SCHEME">discoverpilgrim</string>
+  <string name="APPTILE_APP_HOST">discoverpilgrim.com</string>
+  <string name="APPTILE_APP_HOST_2">discoverpilgrimindia.onelink.me</string>
+  <string name="APPTILE_APP_FORK">main</string>
+  <string name="IS_PREVIEW_APP">NO</string>
 </resources>

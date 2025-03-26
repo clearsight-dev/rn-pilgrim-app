@@ -40,6 +40,7 @@ object ApptileApiClient {
         if (serviceInstance == null) {
             synchronized(this) {
                 if (serviceInstance == null) {
+//                    serviceInstance = RetrofitClient.createService(context.getString(R.string.APPTILE_UPDATE_ENDPOINT), ApiService::class.java)
                     serviceInstance = RetrofitClient.createService(context.getString(R.string.APPTILE_API_ENDPOINT), ApiService::class.java)
                 }
             }
