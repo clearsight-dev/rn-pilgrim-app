@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { 
   View, 
   Text,
-  StyleSheet,
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../ext
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import Footer from './Footer';
+import styles from './styles';
 
 export function ReactComponent({ model }) {
   const footerRef = useRef(null);
@@ -30,10 +30,14 @@ export function ReactComponent({ model }) {
   const [loadingPdpData, setLoadingPdpData] = useState(false);
   const [filterData, setFilterData] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
+  const [appliedFilters, setAppliedFilters] = useState([]); // Track applied filters separately
   const [activeFilterTab, setActiveFilterTab] = useState(0);
   const [filteredProductsCount, setFilteredProductsCount] = useState(0);
   const [isLoadingFilteredCount, setIsLoadingFilteredCount] = useState(false);
   const [isMaxFilteredCount, setIsMaxFilteredCount] = useState(false);
+  const [totalProductsCount, setTotalProductsCount] = useState(0);
+  const [isLoadingTotalCount, setIsLoadingTotalCount] = useState(false);
+  const [isMaxTotalCount, setIsMaxTotalCount] = useState(false);
   const flatListRef = useRef(null);
   const currentlyVisibleItems = useRef([]);
   const visibleItemsTimeoutRef = useRef(null);
@@ -107,6 +111,9 @@ export function ReactComponent({ model }) {
     setCurrentCursor(null);
     setPdpData({});
     fetchData(null, false, option.value, option.reverse);
+    
+    // Refresh the total count when sort option changes
+    fetchTotalProductsCount();
   };
 
   const fetchData = useCallback((cursor = null, isLoadingMore = false, sortKey = sortOption, reverse = sortReverse) => {
@@ -305,9 +312,9 @@ export function ReactComponent({ model }) {
   // Handle loading more products when reaching the end of the list
   const handleLoadMore = () => {
     if (hasNextPage && !loadingMore && !loading) {
-      if (selectedFilters.length > 0) {
+      if (appliedFilters.length > 0) {
         // If filters are applied, use fetchDataWithFilters
-        const shopifyFilters = getShopifyFilters();
+        const shopifyFilters = getAppliedShopifyFilters();
         fetchDataWithFilters(currentCursor, true, sortOption, sortReverse, shopifyFilters);
       } else {
         // Otherwise, use the regular fetchData
@@ -433,6 +440,51 @@ export function ReactComponent({ model }) {
     }).flat(); // Flatten the array since metafield filters might return arrays
   }, [selectedFilters, filterData]);
   
+  // Function to convert applied filters to Shopify filter format
+  const getAppliedShopifyFilters = useCallback(() => {
+    return appliedFilters.map(filter => {
+      // Check if this is a metafield filter (contains 'p.m' in the ID)
+      if (filter.id.includes('p.m')) {
+        // Split the ID by dots
+        const parts = filter.id.split('.');
+        
+        // For metafield filters, the format is typically:
+        // filter.p.m.[namespace].[key].[value-identifier]
+        // We need to extract the namespace and key
+        if (parts.length >= 4) {
+          const namespace = parts[parts.length - 2];
+          const key = parts[parts.length - 1];
+          
+          // For metafield filters, we need to use the label as the value
+          // and create a filter for each selected value
+          return filter.values.map(valueId => {
+            // Find the corresponding filter value object to get the label
+            const filterDataItem = filterData.find(f => f.id === filter.id);
+            const valueObj = filterDataItem?.values?.find(v => v.id === valueId);
+            
+            console.log(`Creating metafield filter: namespace=${namespace}, key=${key}, value=${valueObj?.label || valueId}`);
+            
+            return {
+              productMetafield: {
+                namespace,
+                key,
+                value: valueObj?.label || valueId
+              }
+            };
+          });
+        }
+      }
+      
+      // Default case: use the standard product filter format
+      return {
+        productFilter: {
+          filterType: filter.id,
+          values: filter.values
+        }
+      };
+    }).flat(); // Flatten the array since metafield filters might return arrays
+  }, [appliedFilters, filterData]);
+  
   // Function to fetch filtered products count
   const fetchFilteredCount = useCallback(async () => {
     if (!shopifyDSModel || selectedFilters.length === 0) {
@@ -458,10 +510,37 @@ export function ReactComponent({ model }) {
     }
   }, [shopifyDSModel, selectedFilters, getShopifyFilters]);
   
+  // Function to fetch total products count
+  const fetchTotalProductsCount = useCallback(async () => {
+    if (!shopifyDSModel) return;
+    
+    setIsLoadingTotalCount(true);
+    
+    try {
+      const queryRunner = shopifyDSModel.get('queryRunner');
+      // Fetch count with no filters
+      const result = await fetchFilteredProductsCount(queryRunner, "hair-care", []);
+      
+      setTotalProductsCount(result.count);
+      setIsMaxTotalCount(result.isMaxCount);
+    } catch (error) {
+      console.error('Error fetching total products count:', error);
+    } finally {
+      setIsLoadingTotalCount(false);
+    }
+  }, [shopifyDSModel]);
+  
   // Update filtered products count when selected filters change
   useEffect(() => {
     fetchFilteredCount();
   }, [selectedFilters, fetchFilteredCount]);
+  
+  // Fetch total products count when component loads
+  useEffect(() => {
+    if (shopifyDSModel) {
+      fetchTotalProductsCount();
+    }
+  }, [shopifyDSModel, fetchTotalProductsCount]);
   
   // Function to apply filters
   const applyFilters = () => {
@@ -469,6 +548,9 @@ export function ReactComponent({ model }) {
     if (footerRef.current) {
       footerRef.current.hideFilterBottomSheet();
     }
+    
+    // Set applied filters to current selected filters
+    setAppliedFilters([...selectedFilters]);
     
     // Reload products with selected filters
     setProducts([]);
@@ -480,6 +562,11 @@ export function ReactComponent({ model }) {
     
     // Fetch data with filters
     fetchDataWithFilters(null, false, sortOption, sortReverse, shopifyFilters);
+    
+    // If no filters are applied, refresh the total count
+    if (selectedFilters.length === 0) {
+      fetchTotalProductsCount();
+    }
   };
   
   // Function to fetch data with filters
@@ -603,7 +690,25 @@ export function ReactComponent({ model }) {
       <Text style={styles.title}>{collectionTitle}</Text>
       
       <View style={styles.headerContainer}>
-        <Text style={styles.productsCount}>{products.length} Products</Text>
+        {appliedFilters.length > 0 ? (
+          // Show filtered count when filters are applied
+          isLoadingFilteredCount ? (
+            <ActivityIndicator size="small" color="#007bff" />
+          ) : (
+            <Text style={styles.productsCount}>
+              {isMaxFilteredCount ? '90+ Products' : `${filteredProductsCount} Products`}
+            </Text>
+          )
+        ) : (
+          // Show total count when no filters are applied
+          isLoadingTotalCount ? (
+            <ActivityIndicator size="small" color="#007bff" />
+          ) : (
+            <Text style={styles.productsCount}>
+              {isMaxTotalCount ? '90+ Products' : `${totalProductsCount} Products`}
+            </Text>
+          )
+        )}
       </View>
       
       {loading ? (
@@ -658,91 +763,6 @@ export function ReactComponent({ model }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  productsCount: {
-    fontSize: 16,
-    color: '#666',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  loading: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  footerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-  loadingMoreText: {
-    fontSize: 14,
-    marginLeft: 8,
-  },
-  gridContainer: {
-    paddingBottom: 80, // Add padding to account for bottom buttons
-  },
-  row: {
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  productCard: {
-    width: '48%',
-    marginRight: 0,
-    marginBottom: 16,
-  },
-  emptyText: {
-    textAlign: 'center',
-    fontSize: 16,
-    marginTop: 32,
-    color: '#666',
-  },
-  filterValueItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  selectedFilterValue: {
-    backgroundColor: '#f8f8f8',
-  },
-  filterValueText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  selectedFilterValueText: {
-    fontWeight: '600',
-    color: '#000',
-  },
-  checkIcon: {
-    fontSize: 20,
-    color: '#007bff',
-  },
-});
 
 export const WidgetConfig = {
 };
