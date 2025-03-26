@@ -491,10 +491,12 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    position: 'relative', // Add relative positioning to the container
   },
   filterOptions: {
     flexGrow: 1,
     flexDirection: 'row',
+    paddingBottom: 60, // Add padding to account for the fixed action bar height
   },
   filterTabsContainer: {
     width: '40%',
@@ -548,6 +550,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#eee',
+    position: 'absolute', // Position it absolutely
+    bottom: 0, // Stick to the bottom
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff', // Add background color to ensure it's not transparent
   },
   filterCountContainer: {
     height: 60,
