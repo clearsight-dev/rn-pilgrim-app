@@ -1,17 +1,30 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { View, StyleSheet } from 'react-native';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
+import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
+import { datasourceTypeModelSel } from 'apptile-core';
+import { useSelector } from 'react-redux';
 
 export function ReactComponent({ model }) {
   // Get collection handle and number of products from model props or use defaults
   const numberOfProducts = 5;
   const quickCollectionsData = model.get('quickCollections') || [];
+  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+  useEffect(() => {
+    if (quickCollectionsData.length > 0) {
+      setTimeout(() => {
+        const queryRunner = shopifyDSModel?.get('queryRunner');
+        for (let i = 0; i < quickCollectionsData.length; ++i) {
+          fetchCollectionData(queryRunner, quickCollectionsData[i].collection, 12);
+        }
+      }, 2000);
+    }
+  }, [quickCollectionsData])
 
   return (
     <View style={styles.container}>
       <QuickCollections 
-        title="Shop by Category" 
         collections={quickCollectionsData}
       />
       <ChipCollectionCarousel 

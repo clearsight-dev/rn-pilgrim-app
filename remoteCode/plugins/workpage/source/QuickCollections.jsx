@@ -12,7 +12,6 @@ import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 
 const QuickCollections = ({ 
-  title = "Shop by Category",
   collections = []
 }) => {
   const dispatch = useDispatch();

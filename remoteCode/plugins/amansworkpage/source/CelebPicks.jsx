@@ -45,13 +45,7 @@ const CelebPicks = ({celebs = []}) => {
               flexDirection: 'column',
             }}>
             <Text style={styles.subtitle}>Essentials You Can't Miss!</Text>
-            <Button 
-              title="Go"
-              onPress={() => {
-                dispatch(navigateToScreen('NewCollection', {collectionHandle: "hair-care"}))             
-              }}
-            />
-            <Underline style={{height: 12, alignSelf: 'flex-end'}} />
+            <Underline style={{height: 12, width: 90, alignSelf: 'flex-end'}} />
           </View>
         </View>
         <View style={styles.celebsContainer}>
