@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel, Icon } from 'apptile-core';
+import { ProductCountSkeleton,  ProductGridSkeleton } from './Skeletons';
 import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
@@ -759,7 +760,7 @@ export function ReactComponent({ model }) {
         {appliedFilters.length > 0 ? (
           // Show filtered count when filters are applied
           isLoadingFilteredCount ? (
-            <ActivityIndicator size="small" color="#007bff" />
+            <ProductCountSkeleton />
           ) : (
             <Text style={styles.productsCount}>
               {isMaxFilteredCount ? '90+ Products' : `${filteredProductsCount} Products`}
@@ -768,7 +769,7 @@ export function ReactComponent({ model }) {
         ) : (
           // Show total count when no filters are applied
           isLoadingTotalCount ? (
-            <ActivityIndicator size="small" color="#007bff" />
+            <ProductCountSkeleton />
           ) : (
             <Text style={styles.productsCount}>
               {isMaxTotalCount ? '90+ Products' : `${totalProductsCount} Products`}
@@ -788,8 +789,7 @@ export function ReactComponent({ model }) {
       
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007bff" />
-          <Text style={styles.loading}>Loading products...</Text>
+          <ProductGridSkeleton />
         </View>
       ) : (
         <FlatList
