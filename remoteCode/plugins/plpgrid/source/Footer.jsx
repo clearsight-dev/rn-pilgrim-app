@@ -286,6 +286,16 @@ const Footer = React.forwardRef(({
     applyFilters(editableCopyOfSelectedFilters);
   };
 
+  const currentSortLabel = sortOptions.find(it => it.value === sortOption && it.reverse === sortReverse)
+  let numFiltersText = 'No Filter Applied';
+  const flattenedFilters = selectedFilters.flatMap(it => it.values);
+  console.log('filters: ', flattenedFilters);
+  if (flattenedFilters?.length === 1) {
+    numFiltersText = '1 Filter Applied';
+  } else if (flattenedFilters?.length > 1) {
+    numFiltersText = `${flattenedFilters.length} Filters Applied`;
+  }
+
   return (
     <>
       {/* Bottom buttons for sort and filter */}
@@ -299,8 +309,13 @@ const Footer = React.forwardRef(({
             name={'sort'} 
             style={styles.buttonIcon}
           />
-          <Text style={styles.buttonText}>Sort</Text>
+          <View style={{flexDirection: 'column'}}>
+            <Text style={styles.buttonText}>Sort By</Text>
+            {currentSortLabel && <Text style={styles.buttonSubtext}>{currentSortLabel.label}</Text>}
+          </View>
         </TouchableOpacity>
+
+        <View style={styles.bottomButtonsSeparator}></View>
         
         <TouchableOpacity 
           style={styles.bottomButton}
@@ -311,7 +326,10 @@ const Footer = React.forwardRef(({
             name={'filter-outline'} 
             style={styles.buttonIcon}
           />
-          <Text style={styles.buttonText}>Filter</Text>
+          <View style={{flexDirection: 'column'}}>
+            <Text style={styles.buttonText}>Filter</Text>
+            <Text style={styles.buttonSubtext}>{numFiltersText}</Text>
+          </View>
         </TouchableOpacity>
       </View>
       
@@ -408,25 +426,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    paddingVertical: 10,
     paddingHorizontal: 16,
+  },
+  bottomButtonsSeparator: {
+    height: '100%',
+    width: 1,
+    backgroundColor: '#00000010'
   },
   bottomButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 22,
     marginHorizontal: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
   },
   buttonIcon: {
     marginRight: 8,
     fontSize: 20,
+    fontWeight: '300',
     color: '#1A1A1A',
+  },
+  buttonSubtext: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#646464'
   },
   buttonText: {
     fontSize: 16,
