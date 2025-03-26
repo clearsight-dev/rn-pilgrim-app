@@ -497,14 +497,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   filterTabsContainer: {
-    paddingVertical: 12,
+    width: '40%',
     borderBottomWidth: 1,
     backgroundColor: '#F5F5F5',
     borderBottomColor: '#eee',
   },
   filterTab: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 16,
     backgroundColor: '#F5F5F5',
   },
   activeFilterTab: {
@@ -544,14 +544,16 @@ const styles = StyleSheet.create({
   },
   filterActionBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
-    padding: 16,
     borderTopWidth: 1,
     borderTopColor: '#eee',
   },
   filterCountContainer: {
-    flex: 1,
+    height: 60,
+    width: '50%',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   filterCountText: {
     fontSize: 16,
@@ -559,27 +561,21 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   filterButtonsContainer: {
+    backgroundColor: '#FACA0C',
+    height: 60,
+    width: '50%',
     flexDirection: 'row',
   },
-  clearButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginRight: 8,
-  },
-  clearButtonText: {
-    fontSize: 16,
-    color: '#333',
-  },
   applyButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    backgroundColor: '#1A1A1A',
-    borderRadius: 8,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   applyButtonText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#fff',
+    fontWeight: '600',
+    color: '#0a0a0a',
   },
   disabledButton: {
     backgroundColor: '#ccc',

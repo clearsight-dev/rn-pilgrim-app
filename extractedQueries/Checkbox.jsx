@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
   },
   spacer: {
     flex: 1,
+    maxWidth: 10,
   }
 });
 
