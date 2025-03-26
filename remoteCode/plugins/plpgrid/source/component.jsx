@@ -12,6 +12,7 @@ import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../ext
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import Footer from './Footer';
+import Header from './Header';
 import styles from './styles';
 
 export function ReactComponent({ model }) {
@@ -649,8 +650,109 @@ export function ReactComponent({ model }) {
       });
   }, [shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
   
+  // Function to clear all filters
+  const handleClearAllFilters = () => {
+    // Clear all filters
+    setSelectedFilters([]);
+    setAppliedFilters([]);
+    
+    // Reload products with no filters
+    setProducts([]);
+    setCurrentCursor(null);
+    setPdpData({});
+    
+    // Fetch data without filters
+    fetchData(null, false, sortOption, sortReverse);
+    
+    // Refresh the total count
+    fetchTotalProductsCount();
+  };
+  
+  // Function to handle selecting a filter from the header chips
+  const handleFilterSelect = (filterId, valueId) => {
+    // Create a copy of the current applied filters
+    const updatedFilters = [...appliedFilters];
+    
+    // Check if this filter type already exists in the selected filters
+    const existingFilterIndex = updatedFilters.findIndex(f => f.id === filterId);
+    
+    if (existingFilterIndex >= 0) {
+      // Filter exists, check if this value is already selected
+      const existingFilter = updatedFilters[existingFilterIndex];
+      if (!existingFilter.values.includes(valueId)) {
+        // Add this value to the existing filter
+        updatedFilters[existingFilterIndex] = {
+          ...existingFilter,
+          values: [...existingFilter.values, valueId]
+        };
+      }
+    } else {
+      // Filter doesn't exist, add it with the selected value
+      updatedFilters.push({
+        id: filterId,
+        values: [valueId]
+      });
+    }
+    
+    // Apply the updated filters
+    applyFilters(updatedFilters);
+  };
+  
+  // Function to handle removing a filter from the header chips
+  const handleFilterRemove = (filterId, valueId) => {
+    // Create a copy of the current applied filters
+    const updatedFilters = [...appliedFilters];
+    
+    // Find the filter in the array
+    const filterIndex = updatedFilters.findIndex(f => f.id === filterId);
+    
+    if (filterIndex >= 0) {
+      const filter = updatedFilters[filterIndex];
+      
+      // Remove the value from the filter's values array
+      const valueIndex = filter.values.indexOf(valueId);
+      if (valueIndex >= 0) {
+        const newValues = [...filter.values];
+        newValues.splice(valueIndex, 1);
+        
+        // If no values left, remove the filter entirely
+        if (newValues.length === 0) {
+          updatedFilters.splice(filterIndex, 1);
+        } else {
+          // Otherwise update the filter with the new values
+          updatedFilters[filterIndex] = {
+            ...filter,
+            values: newValues
+          };
+        }
+        
+        // Update the selected filters state
+        setSelectedFilters(updatedFilters);
+        
+        // Update the applied filters
+        setAppliedFilters(updatedFilters);
+        
+        // Reload products with updated filters
+        setProducts([]);
+        setCurrentCursor(null);
+        setPdpData({});
+        
+        // Get the Shopify filters format
+        const shopifyFilters = getAppliedShopifyFilters();
+        
+        // Fetch data with updated filters
+        fetchDataWithFilters(null, false, sortOption, sortReverse, shopifyFilters);
+        
+        // If no filters are applied, refresh the total count
+        if (updatedFilters.length === 0) {
+          fetchTotalProductsCount();
+        }
+      }
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>{collectionTitle}</Text>
       
       <View style={styles.headerContainer}>
@@ -674,6 +776,15 @@ export function ReactComponent({ model }) {
           )
         )}
       </View>
+      
+      {/* Filter chips header */}
+      <Header 
+        filterData={filterData}
+        selectedFilters={appliedFilters}
+        onFilterRemove={handleFilterRemove}
+        onFilterSelect={handleFilterSelect}
+        onClearAllFilters={handleClearAllFilters}
+      />
       
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -719,7 +830,7 @@ export function ReactComponent({ model }) {
         totalProductsCount={totalProductsCount}
         isMaxTotalCount={isMaxTotalCount}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
