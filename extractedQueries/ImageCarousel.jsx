@@ -8,7 +8,7 @@ import AutoScrollBubbles from './AutoScrollBubbles';
 import ScrollBubbles from './ScrollBubbles';
 
 // Reusable image carousel component with auto-scrolling and manual interaction
-export default function ImageCarousel({ images, width }) {
+export function Carousel({ width, flatlistData, renderChildren }) {
   const scrollView = useRef();
   const scrollBubblesRef = useRef();
   const currentIndexRef = useRef(0);
@@ -17,14 +17,14 @@ export default function ImageCarousel({ images, width }) {
   
   // Function to handle automatic index changes
   const handleAutoIndexChange = useCallback((index) => {
-    if (scrollView.current && index < images?.length) {
+    if (scrollView.current && index < flatlistData?.length) {
       scrollView.current.scrollToIndex({
         index: index,
         animated: true
       });
       currentIndexRef.current = index;
     }
-  }, [images?.length]);
+  }, [flatlistData?.length]);
   
   // Function to calculate layout for FlatList items
   const getItemLayout = useCallback((data, index) => ({
@@ -49,14 +49,14 @@ export default function ImageCarousel({ images, width }) {
       
       resetInactivityTimer();
     }
-  }, [images?.length, userInteracted]);
+  }, [flatlistData?.length, userInteracted]);
   
   // Function to handle scroll events
   const handleScroll = useCallback((event) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(contentOffsetX / width);
     
-    if (index !== currentIndexRef.current && index >= 0 && index < images.length) {
+    if (index !== currentIndexRef.current && index >= 0 && index < flatlistData.length) {
       currentIndexRef.current = index;
       
       // Update the ScrollBubbles component via imperative handle
@@ -71,7 +71,7 @@ export default function ImageCarousel({ images, width }) {
       
       resetInactivityTimer();
     }
-  }, [width, images?.length, userInteracted]);
+  }, [width, flatlistData?.length, userInteracted]);
   
   // Function to reset the inactivity timer
   const resetInactivityTimer = useCallback(() => {
@@ -95,7 +95,7 @@ export default function ImageCarousel({ images, width }) {
     };
   }, []);
 
-  if (!images || images.length === 0) {
+  if (!flatlistData || flatlistData.length === 0) {
     return null;
   }
 
@@ -107,7 +107,7 @@ export default function ImageCarousel({ images, width }) {
     >
       <FlatList
         ref={scrollView}
-        data={images}
+        data={flatlistData}
         style={{
           width: width,
         }}
@@ -128,18 +128,7 @@ export default function ImageCarousel({ images, width }) {
             }
           });
         }}
-        renderItem={({item}) => {
-          return (
-            <Image 
-              source={{uri: item.url}}
-              resizeMode="contain"
-              style={{
-                width: width,
-                aspectRatio: 1
-              }}
-            />   
-          );
-        }}
+        renderItem={renderChildren}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
@@ -156,18 +145,41 @@ export default function ImageCarousel({ images, width }) {
         {userInteracted ? (
           <ScrollBubbles 
             ref={scrollBubblesRef}
-            numBubbles={images.length} 
+            numBubbles={flatlistData.length} 
             currentIndex={currentIndexRef.current}
             onBubblePress={handleBubblePress}
           />
         ) : (
           <AutoScrollBubbles 
-            numBubbles={images.length} 
+            numBubbles={flatlistData.length} 
             onIndexChange={handleAutoIndexChange}
             startIndex={currentIndexRef.current}
           />
         )}
       </View>
     </View>
+  );
+}
+
+export default function ImageCarousel({ images, width, aspectRatio = 1 }) {
+  return (
+    <Carousel
+      flatlistData={images}
+      renderChildren={({item}) => {
+        return (
+          <Image 
+            source={{uri: item.url}}
+            resizeMode="contain"
+            style={{
+              width: width,
+              aspectRatio,
+              minHeight: 100,
+            }}
+          />   
+        );
+      }}
+      width={width}
+      aspectRatio={aspectRatio}
+    />
   );
 }

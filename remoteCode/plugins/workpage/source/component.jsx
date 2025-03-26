@@ -1,13 +1,14 @@
 import React, {useEffect} from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
-import { useSelector } from 'react-redux';
+import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { datasourceTypeModelSel, navigateToScreen, useApptileWindowDims } from 'apptile-core';
+import { useSelector, useDispatch } from 'react-redux';
 import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
-import ImageCarousel from '../../../../extractedQueries/ImageCarousel';
+import {Carousel} from '../../../../extractedQueries/ImageCarousel';
 
 export function ReactComponent({ model }) {
+  const dispatch = useDispatch();
   // Get collection handle and number of products from model props or use defaults
   const numberOfProducts = 5;
   const {width: screenWidth} = useApptileWindowDims();
@@ -31,10 +32,75 @@ export function ReactComponent({ model }) {
         collections={quickCollectionsData}
       />
       <View style={{position: 'relative'}}>      
-        <ImageCarousel 
-          aspectRatio={1.8}
-          images={imageCarouselImages.map((it, i) => ({id: i, url: it.urls[0]}))}
+        <Carousel 
+          flatlistData={imageCarouselImages.map(
+            (it, i) => ({
+              id: i, 
+              ...it,
+              url: it.urls[0],
+            })
+          )}
           width={screenWidth}
+          renderChildren={({item}) => {
+            return (
+              <View style={{position: 'relative'}}>
+                <Image 
+                  source={{uri: item.url}}
+                  resizeMode="contain"
+                  style={{
+                    width: screenWidth,
+                    aspectRatio: 1.7,
+                    minHeight: 100,
+                  }}
+                />   
+                <View 
+                  style={{
+                    position: 'absolute', 
+                    width: 200,
+                    left: 10
+                  }}
+                >
+                  <Text 
+                    style={{
+                      fontSize: 44, 
+                      fontWeight: '600'
+                    }}
+                  >
+                    {item.title}
+                  </Text>
+                  <Text 
+                    style={{
+                      fontSize: 20, 
+                      fontWeight: '300'
+                    }}
+                  >
+                    {item.subtitle}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (item.collection) {
+                        dispatch(navigateToScreen('NewCollection', {collectionHandle: item.collection}));
+                      } else if (item.product) {
+                        dispatch(navigateToScreen('NewProduct', {productHandle: item.product}));
+                      }
+                    }}
+                    style={{
+                      height: 33,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: '#ffffff88',
+                      marginTop: 20,
+                      paddingHorizontal: 10,
+                      borderRadius: 8,
+                      width: 100,
+                    }}
+                  >
+                    <Text>Shop now -&gt;</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          }}
         />
       </View>
       <ChipCollectionCarousel 
