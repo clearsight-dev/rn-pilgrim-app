@@ -22,8 +22,9 @@ const Footer = React.forwardRef(({
   sortReverse,
   filterData,
   selectedFilters,
-  clearAllFilters,
-  applyFilters
+  applyFilters,
+  totalProductsCount,
+  isMaxTotalCount
 }, ref) => {
   const [editableCopyOfSelectedFilters, setEditableCopyOfSelectedFilters] = useState([]);
   const [activeFilterTab, setActiveFilterTab] = useState(0);
@@ -280,16 +281,6 @@ const Footer = React.forwardRef(({
     );
   };
 
-  // Function to handle clear all filters
-  const handleClearAllFilters = () => {
-    setEditableCopyOfSelectedFilters([]);
-    setFilteredProductsCount({
-      state: 'loaded',
-      value: 0
-    });
-    setIsMaxFilteredCount(false);
-  };
-
   // Function to handle apply filters
   const handleApplyFilters = () => {
     applyFilters(editableCopyOfSelectedFilters);
@@ -363,37 +354,21 @@ const Footer = React.forwardRef(({
                     isMaxFilteredCount ? 
                     `${maxFilteredCount}+ Products` : 
                     `${filteredProductsCount.value} Products`
-                  ) : ''}
+                  ) : (
+                    isMaxTotalCount ? 
+                    `${maxFilteredCount}+ Products` : 
+                    `${totalProductsCount} Products`
+                  )}
                 </Text>
               )}
             </View>
             
             <View style={styles.filterButtonsContainer}>
               <TouchableOpacity 
-                style={styles.clearButton}
-                onPress={handleClearAllFilters}
-                disabled={editableCopyOfSelectedFilters.length === 0}
-              >
-                <Text style={[
-                  styles.clearButtonText, 
-                  editableCopyOfSelectedFilters.length === 0 && styles.disabledButtonText
-                ]}>
-                  Clear All
-                </Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[
-                  styles.applyButton,
-                  editableCopyOfSelectedFilters.length === 0 && styles.disabledButton
-                ]}
+                style={styles.applyButton}
                 onPress={handleApplyFilters}
-                disabled={editableCopyOfSelectedFilters.length === 0}
               >
-                <Text style={[
-                  styles.applyButtonText,
-                  editableCopyOfSelectedFilters.length === 0 && styles.disabledButtonText
-                ]}>
+                <Text style={styles.applyButtonText}>
                   Apply
                 </Text>
               </TouchableOpacity>

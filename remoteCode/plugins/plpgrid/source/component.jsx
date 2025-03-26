@@ -4,8 +4,7 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
-  TouchableOpacity,
-  ScrollView
+  SafeAreaView
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel, Icon } from 'apptile-core';
@@ -342,59 +341,6 @@ export function ReactComponent({ model }) {
     );
   };
 
-  // Function to handle filter selection
-  const handleFilterSelect = useCallback((filterId, valueId) => {
-    console.log("[AGENT]: Filter selected")
-    setSelectedFilters(prev => {
-      // Check if this filter is already selected
-      const existingFilterIndex = prev.findIndex(f => f.id === filterId);
-      
-      if (existingFilterIndex >= 0) {
-        // Filter exists, check if value is already selected
-        const existingFilter = prev[existingFilterIndex];
-        const valueIndex = existingFilter.values.indexOf(valueId);
-        
-        if (valueIndex >= 0) {
-          // Value exists, remove it
-          const newValues = [...existingFilter.values];
-          newValues.splice(valueIndex, 1);
-          
-          // If no values left, remove the filter
-          if (newValues.length === 0) {
-            const newFilters = [...prev];
-            newFilters.splice(existingFilterIndex, 1);
-            return newFilters;
-          } else {
-            // Update the filter with new values
-            const newFilters = [...prev];
-            newFilters[existingFilterIndex] = {
-              ...existingFilter,
-              values: newValues
-            };
-            return newFilters;
-          }
-        } else {
-          // Value doesn't exist, add it
-          const newFilters = [...prev];
-          newFilters[existingFilterIndex] = {
-            ...existingFilter,
-            values: [...existingFilter.values, valueId]
-          };
-          return newFilters;
-        }
-      } else {
-        // Filter doesn't exist, add it with the value
-        return [...prev, { id: filterId, values: [valueId] }];
-      }
-    });
-  }, []);
-  
-  // Function to check if a filter value is selected
-  const isFilterValueSelected = useCallback((filterId, valueId) => {
-    const filter = selectedFilters.find(f => f.id === filterId);
-    return filter ? filter.values.includes(valueId) : false;
-  }, [selectedFilters]);
-  
   // Function to convert selected filters to Shopify filter format
   const getShopifyFilters = useCallback(() => {
     return selectedFilters.map(filter => {
@@ -703,11 +649,6 @@ export function ReactComponent({ model }) {
       });
   }, [shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
   
-  // Function to clear all filters
-  const clearAllFilters = () => {
-    setSelectedFilters([]);
-  };
-  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{collectionTitle}</Text>
@@ -774,8 +715,9 @@ export function ReactComponent({ model }) {
         sortReverse={sortReverse}
         filterData={filterData}
         selectedFilters={selectedFilters}
-        clearAllFilters={clearAllFilters}
         applyFilters={applyFilters}
+        totalProductsCount={totalProductsCount}
+        isMaxTotalCount={isMaxTotalCount}
       />
     </View>
   );
