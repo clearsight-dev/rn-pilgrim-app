@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
-import { View, StyleSheet } from 'react-native';
-import { datasourceTypeModelSel } from 'apptile-core';
+import { View, StyleSheet, Text } from 'react-native';
+import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useSelector } from 'react-redux';
 import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
@@ -10,7 +10,9 @@ import ImageCarousel from '../../../../extractedQueries/ImageCarousel';
 export function ReactComponent({ model }) {
   // Get collection handle and number of products from model props or use defaults
   const numberOfProducts = 5;
+  const {width: screenWidth} = useApptileWindowDims();
   const quickCollectionsData = model.get('quickCollections') || [];
+  const imageCarouselImages = model.get('imageCarouselImages') || [];
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   useEffect(() => {
     if (quickCollectionsData.length > 0) {
@@ -28,6 +30,13 @@ export function ReactComponent({ model }) {
       <QuickCollections 
         collections={quickCollectionsData}
       />
+      <View style={{position: 'relative'}}>      
+        <ImageCarousel 
+          aspectRatio={1.8}
+          images={imageCarouselImages.map((it, i) => ({id: i, url: it.urls[0]}))}
+          width={screenWidth}
+        />
+      </View>
       <ChipCollectionCarousel 
         collectionHandle={'bestsellers'}
         numberOfProducts={numberOfProducts}
