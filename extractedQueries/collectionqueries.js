@@ -1,5 +1,141 @@
 import gql from 'graphql-tag';
 
+// Function to fetch collection data for the carousel component
+export const fetchCollectionCarouselData = async (queryRunner, collectionHandle) => {
+  console.log('[AGENT] running query for collection: ', collectionHandle)
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
+  
+  // Query to fetch collection data with filters
+  const COLLECTION_FILTERS_QUERY = gql`
+    query CollectionFilters($handle: String) {
+      collection(handle: $handle) {
+        id
+        handle
+        title
+        image {
+          url
+        }
+        products(first: 1) {
+          filters {
+            label
+            type
+            values {
+              id
+              label
+            }
+            presentation
+          }
+        }
+      }
+    }
+  `;
+  
+  try {
+    // First, fetch the collection data with filters
+    const collectionData = await queryRunner.runQuery(
+      'query',
+      COLLECTION_FILTERS_QUERY,
+      {
+        handle: collectionHandle
+      },
+      {
+        cachePolicy: 'cache-first'
+      }
+    );
+    
+    // Extract the filters from the response
+    const filters = collectionData.data.collection?.products?.filters || [];
+    
+    // Find the category filter (for tabs)
+    const categoryFilter = filters.find(filter => 
+      filter.label && filter.label.toLowerCase().includes('category') && 
+      !filter.label.toLowerCase().includes('subcategory')
+    );
+    
+    // Find the subcategory filter (for category cards)
+    const subcategoryFilter = filters.find(filter => 
+      filter.label && filter.label.toLowerCase().includes('subcategory')
+    );
+    
+    // If no subcategory filter found, return basic collection data
+    if (!subcategoryFilter) {
+      return {
+        collection: collectionData.data.collection,
+        tabs: categoryFilter ? categoryFilter.values.map(v => v.label) : [],
+        categories: []
+      };
+    }
+    
+    // For each subcategory, fetch the first product's image
+    const subcategoryProducts = await Promise.all(
+      subcategoryFilter.values.map(async (subcategory) => {
+        // Query to fetch the first product in this subcategory
+        const SUBCATEGORY_PRODUCT_QUERY = gql`
+          query SubcategoryProduct($handle: String, $filters: [ProductFilter!]) {
+            collection(handle: $handle) {
+              products(first: 1, filters: $filters) {
+                nodes {
+                  featuredImage {
+                    url
+                  }
+                  title
+                }
+              }
+            }
+          }
+        `;
+        
+        // Create filter for this subcategory
+        const filters = [
+          {
+            productMetafield: {
+              key: "l2_subcategory",
+              namespace: "custom",
+              value: subcategory.label
+            }
+          }
+        ];
+        
+        // Fetch the first product in this subcategory
+        const productData = await queryRunner.runQuery(
+          'query',
+          SUBCATEGORY_PRODUCT_QUERY,
+          {
+            handle: collectionHandle,
+            filters: filters
+          },
+          {
+            cachePolicy: 'cache-first'
+          }
+        );
+        
+        // Get the product image URL
+        const product = productData.data.collection?.products?.nodes?.[0];
+        const imageUrl = product?.featuredImage?.url || '';
+        
+        // Return the subcategory with its image
+        return {
+          id: subcategory.id,
+          title: subcategory.label,
+          image: imageUrl
+        };
+      })
+    );
+    
+    // Return the formatted collection data
+    return {
+      collection: collectionData.data.collection,
+      tabs: categoryFilter ? categoryFilter.values.map(v => v.label) : [],
+      categories: subcategoryProducts
+    };
+  } catch (error) {
+    console.error('Error fetching collection carousel data:', error);
+    throw error;
+  }
+};
+
 // Function to fetch collection data using the GraphQL query with pagination support
 export const fetchCollectionData = async (queryRunner, collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) => {
   if (!queryRunner) {

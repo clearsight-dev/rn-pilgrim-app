@@ -6,6 +6,7 @@ import { fetchCollectionData } from '../../../../extractedQueries/collectionquer
 import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
+import MultiCollectionCarousel from './MultiCollectionCarousel';
 import {Carousel} from '../../../../extractedQueries/ImageCarousel';
 
 export function ReactComponent({ model }) {
@@ -110,6 +111,7 @@ export function ReactComponent({ model }) {
         numberOfProducts={numberOfProducts}
       />
       <CelebPicks celebs={celebPicksData} />
+      <MultiCollectionCarousel />
       <ChipCollectionCarousel 
         collectionHandle={'makeup'}
         numberOfProducts={numberOfProducts}

@@ -1,0 +1,30 @@
+import React from 'react';
+import {View, StyleSheet} from 'react-native';
+import CollectionCarouselComponent from './CollectionCarousel';
+
+/**
+ * MultiCollectionCarousel component that displays multiple collection carousels
+ * for the specified collection handles.
+ */
+export default function MultiCollectionCarousel() {
+  // Collection handles to display
+  const collectionHandles = ['skin-care', 'hair-care', 'makeup'];
+
+  return (
+    <View style={styles.container}>
+      {collectionHandles.map(handle => {
+        return (
+          <CollectionCarouselComponent 
+            key={handle} 
+            collectionHandle={handle} 
+          />
+        );
+      })}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+  },
+});
