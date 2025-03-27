@@ -30,9 +30,9 @@ object Actions {
 
     private suspend fun fetchManifest(appId: String, context: Context) = withContext(Dispatchers.IO) {
         try {
-//            val forkName = context.getString(R.string.APPTILE_APP_FORK)
-//            ApptileApiClient.service.getManifest(appId, forkName, "0.17.0") // hardcoding framework version
-              ApptileApiClient.service.getManifest(appId)
+            val forkName = context.getString(R.string.APPTILE_APP_FORK)
+            ApptileApiClient.service.getManifest(appId, forkName, "0.17.0") // hardcoding framework version
+//              ApptileApiClient.service.getManifest(appId)
         } catch (e: Exception) {
             Log.e(APPTILE_LOG_TAG, "Failed to fetch manifest: ${e.message}", e)
             null
@@ -166,9 +166,9 @@ object Actions {
             val parsedTrackerData: Map<String, Any>? = Gson().fromJson(it, mapType)
 
             val localCommitId = (parsedTrackerData?.get("publishedCommitId") as? Number)?.toLong()
-            val latestCommitId = manifest.forks.getOrNull(0)?.publishedCommitId
+            val latestCommitId = manifest.publishedCommitId
 
-            val bundle = manifest.codeArtefacts.find { it.type == "android-jsbundle" }
+            val bundle = manifest.artefacts.find { it.type == "android-jsbundle" }
             val localBundleId = (parsedTrackerData?.get("androidBundleId") as? Number)?.toLong()
             val latestBundleId = bundle?.id
             val latestBundleUrl = bundle?.cdnlink
