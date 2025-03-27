@@ -21,6 +21,8 @@ export function ReactComponent({ model }) {
   // const collectionHandle = model.get('collectionHandle') || '';
   const route = useRoute();
   const collectionHandle = route.params.collectionHandle;
+  const selectedCategory = route.params.category;
+  const selectedSubcategory = route.params.subcategory;
   const footerRef = useRef(null);
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [products, setProducts] = useState([]);
@@ -53,6 +55,66 @@ export function ReactComponent({ model }) {
     { label: 'Price: High to Low', value: 'PRICE', reverse: true },
     { label: 'What\'s new', value: 'CREATED', reverse: false }
   ];
+
+  // Create initial filters based on selected category and subcategory
+  const createInitialFilters = useCallback(() => {
+    const initialFilters = [];
+    
+    // If we have a selected category, add it as a filter
+    if (selectedCategory) {
+      console.log(`[AGENT] Adding category filter: ${selectedCategory}`);
+      
+      // Find the filter ID for categories
+      const categoryFilterId = filterData.find(f => 
+        f.label?.toLowerCase() === 'category' || 
+        f.label?.toLowerCase() === 'categories'
+      )?.id;
+      
+      if (categoryFilterId) {
+        // Find the value ID for this category
+        const categoryFilter = filterData.find(f => f.id === categoryFilterId);
+        const categoryValueId = categoryFilter?.values?.find(v => 
+          v.label?.toLowerCase() === selectedCategory.toLowerCase()
+        )?.id;
+        
+        if (categoryValueId) {
+          initialFilters.push({
+            id: categoryFilterId,
+            values: [categoryValueId]
+          });
+        }
+      }
+    }
+    
+    // If we have a selected subcategory, add it as a filter
+    if (selectedSubcategory) {
+      console.log(`[AGENT] Adding subcategory filter: ${selectedSubcategory}`);
+      
+      // Find the filter ID for subcategories
+      const subcategoryFilterId = filterData.find(f => 
+        f.label?.toLowerCase() === 'subcategory' || 
+        f.label?.toLowerCase() === 'subcategories' ||
+        f.label?.toLowerCase() === 'type'
+      )?.id;
+      
+      if (subcategoryFilterId) {
+        // Find the value ID for this subcategory
+        const subcategoryFilter = filterData.find(f => f.id === subcategoryFilterId);
+        const subcategoryValueId = subcategoryFilter?.values?.find(v => 
+          v.label?.toLowerCase() === selectedSubcategory.toLowerCase()
+        )?.id;
+        
+        if (subcategoryValueId) {
+          initialFilters.push({
+            id: subcategoryFilterId,
+            values: [subcategoryValueId]
+          });
+        }
+      }
+    }
+    
+    return initialFilters;
+  }, [selectedCategory, selectedSubcategory, filterData]);
 
   // Function to fetch PDP data for a specific product handle
   const fetchProductPdpData = useCallback(async (productHandle) => {
@@ -189,6 +251,18 @@ export function ReactComponent({ model }) {
         // Store filter data if available
         if (res.data.collection?.products?.filters) {
           setFilterData(res.data.collection.products.filters);
+          
+          // If we have selected category or subcategory, apply them as filters
+          if ((selectedCategory || selectedSubcategory) && !isLoadingMore) {
+            // We need to wait for filter data to be set before creating initial filters
+            setTimeout(() => {
+              const initialFilters = createInitialFilters();
+              if (initialFilters.length > 0) {
+                console.log('[AGENT] Applying initial filters:', initialFilters);
+                applyFilters(initialFilters);
+              }
+            }, 500);
+          }
         }
         
         setHasNextPage(res.data.pagination.hasNextPage);
@@ -204,148 +278,7 @@ export function ReactComponent({ model }) {
           setLoading(false);
         }
       });
-  }, [collectionHandle, shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
-
-  useEffect(() => {
-    if (shopifyDSModel) {
-      fetchData(null);
-    }
-  }, [shopifyDSModel, fetchData, collectionHandle]);
-  
-  // Log when PDP data is loaded
-  useEffect(() => {
-    if (Object.keys(pdpData).length > 0) {
-      console.log('PDP data loaded for products:', Object.keys(pdpData));
-    }
-  }, [pdpData]);
-
-  // Function to process visible items and fetch PDP data
-  const processVisibleItems = useCallback(() => {
-    if (!products || products.length === 0 || loadingPdpData) return;
-    
-    // Get the handles of currently visible products
-    const visibleHandles = currentlyVisibleItems.current;
-    
-    if (visibleHandles.length === 0) return;
-    
-    // Get the products that are currently visible
-    const visibleProducts = products.filter(product => 
-      product && product.handle && visibleHandles.includes(product.handle)
-    );
-    
-    if (visibleProducts.length === 0) return;
-    
-    // Filter out products that already have PDP data
-    const productsToFetch = visibleProducts.filter(product => !pdpData[product.handle]);
-    
-    if (productsToFetch.length === 0) return;
-    
-    console.log('Fetching PDP data for visible products:', productsToFetch.map(p => p.handle));
-    setLoadingPdpData(true);
-    
-    // Create an object to store the PDP data
-    const newPdpDataObj = { ...pdpData };
-    
-    // Fetch PDP data for each product
-    Promise.all(
-      productsToFetch.map(async (product) => {
-        try {
-          const data = await fetchProductPdpData(product.handle);
-          if (data) {
-            newPdpDataObj[product.handle] = data;
-          }
-        } catch (error) {
-          console.error(`Error fetching PDP data for ${product.handle}:`, error);
-        }
-      })
-    )
-    .then(() => {
-      // Update the PDP data state
-      setPdpData(newPdpDataObj);
-      console.log('Fetched PDP data for visible products:', productsToFetch.map(p => p.handle));
-    })
-    .catch(error => {
-      console.error('Error fetching PDP data for visible products:', error);
-    })
-    .finally(() => {
-      setLoadingPdpData(false);
-    });
-  }, [products, pdpData, loadingPdpData, fetchProductPdpData]);
-  
-  // Create a stable reference to the viewable items handler
-  const stableViewableItemsHandler = useRef(null);
-  
-  // Initialize the stable handler
-  useEffect(() => {
-    stableViewableItemsHandler.current = ({ viewableItems }) => {
-      if (viewableItems.length === 0) return;
-      
-      // Update the list of currently visible items
-      currentlyVisibleItems.current = viewableItems
-        .map(viewableItem => viewableItem.item?.handle)
-        .filter(Boolean);
-      
-      // Clear any existing timeout
-      if (visibleItemsTimeoutRef.current) {
-        clearTimeout(visibleItemsTimeoutRef.current);
-      }
-      
-      // Schedule a new timeout to process visible items
-      visibleItemsTimeoutRef.current = setTimeout(() => {
-        processVisibleItems();
-      }, 2000); // 2 seconds debounce
-    };
-  }, [processVisibleItems]);
-  
-  // Stable wrapper function that doesn't change on re-renders
-  const handleViewableItemsChanged = useCallback(info => {
-    if (stableViewableItemsHandler.current) {
-      stableViewableItemsHandler.current(info);
-    }
-  }, []);
-  
-  // Clean up timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (visibleItemsTimeoutRef.current) {
-        clearTimeout(visibleItemsTimeoutRef.current);
-      }
-    };
-  }, []);
-  
-  // Handle loading more products when reaching the end of the list
-  const handleLoadMore = () => {
-    if (hasNextPage && !loadingMore && !loading) {
-      if (appliedFilters.length > 0) {
-        // If filters are applied, use fetchDataWithFilters
-        const shopifyFilters = getAppliedShopifyFilters();
-        fetchDataWithFilters(currentCursor, true, sortOption, sortReverse, shopifyFilters);
-      } else {
-        // Otherwise, use the regular fetchData
-        fetchData(currentCursor, true);
-      }
-    }
-  };
-
-  // Render a product item in the grid
-  const renderProductItem = ({ item, index }) => (
-    <RelatedProductCard 
-      product={item}
-      style={styles.productCard}
-    />
-  );
-
-  // Render footer with loading indicator when loading more products
-  const renderFooter = () => {
-    if (!loadingMore) return null;
-    
-    return (
-      <View style={styles.footerContainer}>
-        <ActivityIndicator size="small" color="#007bff" />
-        <Text style={styles.loadingMoreText}>Loading more products...</Text>
-      </View>
-    );
-  };
+  }, [collectionHandle, shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData, selectedCategory, selectedSubcategory, createInitialFilters]);
 
   // Function to convert selected filters to Shopify filter format
   const getShopifyFilters = useCallback(() => {
@@ -455,7 +388,7 @@ export function ReactComponent({ model }) {
       const filters = getShopifyFilters();
       console.log("[AGENT] Fetching filtered count with filters:", filters);
       
-      const result = await fetchFilteredProductsCount(queryRunner, "hair-care", filters);
+      const result = await fetchFilteredProductsCount(queryRunner, collectionHandle, filters);
       console.log("[AGENT] Filtered count result:", result);
       
       setFilteredProductsCount(result.count);
@@ -465,7 +398,7 @@ export function ReactComponent({ model }) {
     } finally {
       setIsLoadingFilteredCount(false);
     }
-  }, [shopifyDSModel, selectedFilters, getShopifyFilters]);
+  }, [shopifyDSModel, selectedFilters, getShopifyFilters, collectionHandle]);
   
   // Function to fetch total products count
   const fetchTotalProductsCount = useCallback(async () => {
@@ -476,7 +409,7 @@ export function ReactComponent({ model }) {
     try {
       const queryRunner = shopifyDSModel.get('queryRunner');
       // Fetch count with no filters
-      const result = await fetchFilteredProductsCount(queryRunner, "hair-care", []);
+      const result = await fetchFilteredProductsCount(queryRunner, collectionHandle, []);
       
       setTotalProductsCount(result.count);
       setIsMaxTotalCount(result.isMaxCount);
@@ -485,20 +418,7 @@ export function ReactComponent({ model }) {
     } finally {
       setIsLoadingTotalCount(false);
     }
-  }, [shopifyDSModel]);
-  
-  // Update filtered products count when selected filters change
-  useEffect(() => {
-    console.log("[AGENT] selectedFilters changed, calling fetchFilteredCount");
-    fetchFilteredCount();
-  }, [selectedFilters, fetchFilteredCount]);
-  
-  // Fetch total products count when component loads
-  useEffect(() => {
-    if (shopifyDSModel) {
-      fetchTotalProductsCount();
-    }
-  }, [shopifyDSModel, fetchTotalProductsCount]);
+  }, [shopifyDSModel, collectionHandle]);
   
   // Function to apply filters
   const applyFilters = (newSelectedFilters) => {
@@ -654,6 +574,160 @@ export function ReactComponent({ model }) {
         }
       });
   }, [collectionHandle, shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
+
+  // Update filtered products count when selected filters change
+  useEffect(() => {
+    console.log("[AGENT] selectedFilters changed, calling fetchFilteredCount");
+    fetchFilteredCount();
+  }, [selectedFilters, fetchFilteredCount]);
+  
+  // Fetch total products count when component loads
+  useEffect(() => {
+    if (shopifyDSModel) {
+      fetchTotalProductsCount();
+    }
+  }, [shopifyDSModel, fetchTotalProductsCount]);
+
+  useEffect(() => {
+    if (shopifyDSModel) {
+      fetchData(null);
+    }
+  }, [shopifyDSModel, fetchData, collectionHandle]);
+  
+  // Log when PDP data is loaded
+  useEffect(() => {
+    if (Object.keys(pdpData).length > 0) {
+      console.log('PDP data loaded for products:', Object.keys(pdpData));
+    }
+  }, [pdpData]);
+
+  // Function to process visible items and fetch PDP data
+  const processVisibleItems = useCallback(() => {
+    if (!products || products.length === 0 || loadingPdpData) return;
+    
+    // Get the handles of currently visible products
+    const visibleHandles = currentlyVisibleItems.current;
+    
+    if (visibleHandles.length === 0) return;
+    
+    // Get the products that are currently visible
+    const visibleProducts = products.filter(product => 
+      product && product.handle && visibleHandles.includes(product.handle)
+    );
+    
+    if (visibleProducts.length === 0) return;
+    
+    // Filter out products that already have PDP data
+    const productsToFetch = visibleProducts.filter(product => !pdpData[product.handle]);
+    
+    if (productsToFetch.length === 0) return;
+    
+    console.log('Fetching PDP data for visible products:', productsToFetch.map(p => p.handle));
+    setLoadingPdpData(true);
+    
+    // Create an object to store the PDP data
+    const newPdpDataObj = { ...pdpData };
+    
+    // Fetch PDP data for each product
+    Promise.all(
+      productsToFetch.map(async (product) => {
+        try {
+          const data = await fetchProductPdpData(product.handle);
+          if (data) {
+            newPdpDataObj[product.handle] = data;
+          }
+        } catch (error) {
+          console.error(`Error fetching PDP data for ${product.handle}:`, error);
+        }
+      })
+    )
+    .then(() => {
+      // Update the PDP data state
+      setPdpData(newPdpDataObj);
+      console.log('Fetched PDP data for visible products:', productsToFetch.map(p => p.handle));
+    })
+    .catch(error => {
+      console.error('Error fetching PDP data for visible products:', error);
+    })
+    .finally(() => {
+      setLoadingPdpData(false);
+    });
+  }, [products, pdpData, loadingPdpData, fetchProductPdpData]);
+  
+  // Create a stable reference to the viewable items handler
+  const stableViewableItemsHandler = useRef(null);
+  
+  // Initialize the stable handler
+  useEffect(() => {
+    stableViewableItemsHandler.current = ({ viewableItems }) => {
+      if (viewableItems.length === 0) return;
+      
+      // Update the list of currently visible items
+      currentlyVisibleItems.current = viewableItems
+        .map(viewableItem => viewableItem.item?.handle)
+        .filter(Boolean);
+      
+      // Clear any existing timeout
+      if (visibleItemsTimeoutRef.current) {
+        clearTimeout(visibleItemsTimeoutRef.current);
+      }
+      
+      // Schedule a new timeout to process visible items
+      visibleItemsTimeoutRef.current = setTimeout(() => {
+        processVisibleItems();
+      }, 2000); // 2 seconds debounce
+    };
+  }, [processVisibleItems]);
+  
+  // Stable wrapper function that doesn't change on re-renders
+  const handleViewableItemsChanged = useCallback(info => {
+    if (stableViewableItemsHandler.current) {
+      stableViewableItemsHandler.current(info);
+    }
+  }, []);
+  
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (visibleItemsTimeoutRef.current) {
+        clearTimeout(visibleItemsTimeoutRef.current);
+      }
+    };
+  }, []);
+  
+  // Handle loading more products when reaching the end of the list
+  const handleLoadMore = () => {
+    if (hasNextPage && !loadingMore && !loading) {
+      if (appliedFilters.length > 0) {
+        // If filters are applied, use fetchDataWithFilters
+        const shopifyFilters = getAppliedShopifyFilters();
+        fetchDataWithFilters(currentCursor, true, sortOption, sortReverse, shopifyFilters);
+      } else {
+        // Otherwise, use the regular fetchData
+        fetchData(currentCursor, true);
+      }
+    }
+  };
+
+  // Render a product item in the grid
+  const renderProductItem = ({ item, index }) => (
+    <RelatedProductCard 
+      product={item}
+      style={styles.productCard}
+    />
+  );
+
+  // Render footer with loading indicator when loading more products
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    
+    return (
+      <View style={styles.footerContainer}>
+        <ActivityIndicator size="small" color="#007bff" />
+        <Text style={styles.loadingMoreText}>Loading more products...</Text>
+      </View>
+    );
+  };
   
   // Function to clear all filters
   const handleClearAllFilters = () => {

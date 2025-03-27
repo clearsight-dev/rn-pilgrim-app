@@ -12,6 +12,7 @@ import {useState, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {datasourceTypeModelSel} from 'apptile-core';
 import {fetchCollectionCarouselData} from '../../../../extractedQueries/collectionqueries';
+import {useNavigation} from '@react-navigation/native';
 
 // Subtitles for each collection
 const COLLECTION_SUBTITLES = {
@@ -34,6 +35,7 @@ export default function CollectionCarousel({collectionHandle}) {
   const [carouselData, setCarouselData] = useState(null);
   const [error, setError] = useState(null);
   
+  const navigation = useNavigation();
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   
   useEffect(() => {
@@ -71,6 +73,23 @@ export default function CollectionCarousel({collectionHandle}) {
     
     fetchData();
   }, [collectionHandle, shopifyDSModel]);
+  
+  // Function to navigate to the NewCollection page with parameters
+  const navigateToCollection = (category) => {
+    // Get the subcategory from the active tab if available
+    const subcategory = carouselData.tabs[activeTab] !== 'All Products' 
+      ? carouselData.tabs[activeTab] 
+      : null;
+    
+    console.log(`[AGENT] Navigating to NewCollection with handle: ${collectionHandle}, category: ${category.title}, subcategory: ${subcategory}`);
+    
+    // Navigate to the NewCollection page with parameters
+    navigation.navigate('NewCollection', {
+      collectionHandle: collectionHandle,
+      category: category.title,
+      subcategory: subcategory
+    });
+  };
   
   if (loading) {
     return (
@@ -155,7 +174,10 @@ export default function CollectionCarousel({collectionHandle}) {
           showsHorizontalScrollIndicator={false}
           style={styles.cardsContainer}>
           {carouselData.categories.map(category => (
-            <TouchableOpacity key={category.id} style={styles.card}>
+            <TouchableOpacity 
+              key={category.id} 
+              style={styles.card}
+              onPress={() => navigateToCollection(category)}>
               <View style={[styles.cardImageContainer, {position: 'relative'}]}>
                 <Image
                   source={{uri: category.image}}

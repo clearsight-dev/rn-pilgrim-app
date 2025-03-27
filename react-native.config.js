@@ -17,6 +17,12 @@ module.exports = {
         "android": null,
         "ios": null
       }
+    },
+    "clevertap-react-native": {
+      "platforms": {
+        "android": null,
+        "ios": null
+      }
     }
   }
 }
