@@ -14,6 +14,8 @@
     <string>apptile.io</string>
     <key>APP_ID</key>
     <string>2299b5c8-77d8-4500-9723-c0ccfe91694d</string>
+    <key>IS_PREVIEW_APP</key>
+    <string>NO</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
