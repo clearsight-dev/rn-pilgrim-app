@@ -8,7 +8,7 @@ import CollectionCarouselComponent from './CollectionCarousel';
  */
 export default function MultiCollectionCarousel() {
   // Collection handles to display
-  const collectionHandles = ['skin-care', 'hair-care', 'makeup'];
+  const collectionHandles = ['pore-care', 'hair-care', 'makeup'];
 
   return (
     <View style={styles.container}>

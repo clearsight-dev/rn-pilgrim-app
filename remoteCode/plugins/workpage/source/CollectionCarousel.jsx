@@ -15,14 +15,14 @@ import {fetchCollectionCarouselData} from '../../../../extractedQueries/collecti
 
 // Subtitles for each collection
 const COLLECTION_SUBTITLES = {
-  'skin-care': 'Glow Every Day!',
+  'pore-care': 'Glow Every Day!',
   'hair-care': 'Shine Every Day!',
   'makeup': 'Look Your Best!',
 };
 
 // Cover images for each collection
 const COLLECTION_COVER_IMAGES = {
-  'skin-care': 'https://s3-alpha-sig.figma.com/img/9bfb/5a5a/0e5496159d8f7ee3eed1dfaee6578a4f?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=HhcipHKNL63XQwL7JeUKjU6Cv3lZaAvwEo0H2yVuxTwr8jk-~wCdv2rZ6CB42o6lNg0RUivmkbK9jo90CMq048KJQ2EzVMwKI~f2~4vCcfqwmPEU8b58PlC2xbvKd-ncTUSOcDIuqpqSRzeh~Bs9cfFOE57Yh0vN3qzzb3BLxurr3V9oqJSQmpyp3TSAY4Stjzq-qLmJaCLEY~s8Q75Ekzg7QJuQ22Xmao9qhVP-r-ePbeXtRSiBHpikbCAkmhBhdzM4y00O27jXfFnQEntCLWQ37bBVGp6~ZmY35RPpvPrIa5wXseKhqQEKbdSU4F7IMazfefG84-j5l1nxdqS29w__',
+  'pore-care': 'https://s3-alpha-sig.figma.com/img/9bfb/5a5a/0e5496159d8f7ee3eed1dfaee6578a4f?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=HhcipHKNL63XQwL7JeUKjU6Cv3lZaAvwEo0H2yVuxTwr8jk-~wCdv2rZ6CB42o6lNg0RUivmkbK9jo90CMq048KJQ2EzVMwKI~f2~4vCcfqwmPEU8b58PlC2xbvKd-ncTUSOcDIuqpqSRzeh~Bs9cfFOE57Yh0vN3qzzb3BLxurr3V9oqJSQmpyp3TSAY4Stjzq-qLmJaCLEY~s8Q75Ekzg7QJuQ22Xmao9qhVP-r-ePbeXtRSiBHpikbCAkmhBhdzM4y00O27jXfFnQEntCLWQ37bBVGp6~ZmY35RPpvPrIa5wXseKhqQEKbdSU4F7IMazfefG84-j5l1nxdqS29w__',
   'hair-care': 'https://s3-alpha-sig.figma.com/img/2f05/72c9/70a04491bffa2a2bde621f85b4c2a29f?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=QM28qb8wuaXmvPl0-xfG58mGqNrlHHiZoddsTUZiFSvFBzGVSLg4zFD6LfFQXKibGYN2Bp~YgTaVb-WiGCEDlsd4K7GFhOgqx9S9yw8c~AF9JiC1e1Au7~6eKZHFJswZGFjjtMkb0XCmV0APKRdu-S2ciOD4YkiV8U0e0NjLqiZWu62VsZ50O1ZPZpbtsz0xJAPky9w5dn48UI~uu-U-lzZZjzp21Kyy43norFPKd9rZsV-0AVTYq6N1NVEUkoyn6gvtoHms3x6ABJWrwrbQThD4pdeZizF2~9mA9kDVR8cT~2ANUaKFMuL0Q~K50ClmxCZovXW2NmOj89zprgH-nA__',
   'makeup': 'https://s3-alpha-sig.figma.com/img/9bfb/5a5a/0e5496159d8f7ee3eed1dfaee6578a4f?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=HhcipHKNL63XQwL7JeUKjU6Cv3lZaAvwEo0H2yVuxTwr8jk-~wCdv2rZ6CB42o6lNg0RUivmkbK9jo90CMq048KJQ2EzVMwKI~f2~4vCcfqwmPEU8b58PlC2xbvKd-ncTUSOcDIuqpqSRzeh~Bs9cfFOE57Yh0vN3qzzb3BLxurr3V9oqJSQmpyp3TSAY4Stjzq-qLmJaCLEY~s8Q75Ekzg7QJuQ22Xmao9qhVP-r-ePbeXtRSiBHpikbCAkmhBhdzM4y00O27jXfFnQEntCLWQ37bBVGp6~ZmY35RPpvPrIa5wXseKhqQEKbdSU4F7IMazfefG84-j5l1nxdqS29w__',
 };
