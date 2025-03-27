@@ -2,7 +2,6 @@ package com.apptileseed
 
 import android.app.Application
 import android.util.Log
-import com.apptileseed.src.actions.Actions
 import com.apptileseed.src.apis.ApptileApiClient
 import com.apptileseed.src.utils.APPTILE_LOG_TAG
 import com.apptileseed.src.utils.BundleTrackerPrefs
@@ -20,16 +19,10 @@ import com.facebook.react.modules.i18nmanager.I18nUtil
 import com.facebook.react.modules.systeminfo.AndroidInfoHelpers
 import com.facebook.soloader.SoLoader
 import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import java.io.File
 
 
 class MainApplication : Application(), ReactApplication {
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val systemDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
 
 
@@ -99,27 +92,6 @@ class MainApplication : Application(), ReactApplication {
             systemDefaultExceptionHandler?.uncaughtException(thread, throwable)
         }
 
-
-        appScope.launch {
-            try {
-                Log.d(APPTILE_LOG_TAG, "Running in: ${Thread.currentThread().name}")
-                Log.i(APPTILE_LOG_TAG, "Starting Startup Process")
-                val appId = getString(R.string.APP_ID)
-
-                if (BundleTrackerPrefs.isBrokenBundle()) {
-                    Log.d(
-                        APPTILE_LOG_TAG, "Previous bundle status: failed, starting rollback"
-                    )
-                    Actions.rollBackUpdates(this@MainApplication)
-                }
-
-                Actions.startApptileAppProcess(appId, this@MainApplication)
-                Log.i(APPTILE_LOG_TAG, "Startup Process completed")
-            } catch (e: Exception) {
-                Log.e(APPTILE_LOG_TAG, "Startup Process failed", e)
-            }
-        }
-
 //        createCleverTapIntegration(this).initialize(intent);
         SoLoader.init(this, false)
         // disable RTL
@@ -136,11 +108,15 @@ class MainApplication : Application(), ReactApplication {
         ReactNativeFlipper.initializeFlipper(this, reactNativeHost.reactInstanceManager)
     }
 
-    override fun onTerminate() {
-        super.onTerminate()
-        appScope.cancel() // Cancel coroutines when the app is shutting down
-    }
+    fun resetReactNativeHost() {
+        reactNativeHost.clear()
+        Log.i(APPTILE_LOG_TAG, "Cleared ReactNativeHost")
 
+        // Force reinitialization by accessing the instance again
+        val newInstanceManager = reactNativeHost.reactInstanceManager
+        Log.i(APPTILE_LOG_TAG, "Recreated ReactInstanceManager: $newInstanceManager")
+
+    }
 //    fun onNewIntent(intent: Intent) {
 //        super.onNewIntent(intent)
 //

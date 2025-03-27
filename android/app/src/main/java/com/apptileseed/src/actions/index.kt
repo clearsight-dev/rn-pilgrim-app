@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.apptileseed.MainActivity
+import com.apptileseed.MainApplication
 import com.apptileseed.R
 import com.apptileseed.src.apis.ApptileApiClient
 import com.apptileseed.src.utils.APPTILE_LOG_TAG
@@ -27,9 +28,11 @@ object Actions {
     const val APP_CONFIG_FILE_NAME = "appConfig.json"
     const val BUNDLE_TRACKER_FILE_NAME = "localBundleTracker.json"
 
-    private suspend fun fetchManifest(appId: String) = withContext(Dispatchers.IO) {
+    private suspend fun fetchManifest(appId: String, context: Context) = withContext(Dispatchers.IO) {
         try {
-            ApptileApiClient.service.getManifest(appId)
+            val forkName = context.getString(R.string.APPTILE_APP_FORK)
+            ApptileApiClient.service.getManifest(appId, forkName, "0.17.0") // hardcoding framework version
+//              ApptileApiClient.service.getManifest(appId)
         } catch (e: Exception) {
             Log.e(APPTILE_LOG_TAG, "Failed to fetch manifest: ${e.message}", e)
             null
@@ -154,7 +157,7 @@ object Actions {
 
 
     private suspend fun checkForOTA(appId: String, context: Context) = withContext(Dispatchers.IO) {
-        val manifest = fetchManifest(appId) ?: return@withContext
+        val manifest = fetchManifest(appId, context) ?: return@withContext
         val trackerData =
             readFileContent(File(context.filesDir, BUNDLE_TRACKER_FILE_NAME).absolutePath)
 
@@ -163,9 +166,9 @@ object Actions {
             val parsedTrackerData: Map<String, Any>? = Gson().fromJson(it, mapType)
 
             val localCommitId = (parsedTrackerData?.get("publishedCommitId") as? Number)?.toLong()
-            val latestCommitId = manifest.forks.getOrNull(0)?.publishedCommitId
+            val latestCommitId = manifest.publishedCommitId
 
-            val bundle = manifest.codeArtefacts.find { it.type == "android-jsbundle" }
+            val bundle = manifest.artefacts.find { it.type == "android-jsbundle" }
             val localBundleId = (parsedTrackerData?.get("androidBundleId") as? Number)?.toLong()
             val latestBundleId = bundle?.id
             val latestBundleUrl = bundle?.cdnlink
@@ -218,7 +221,8 @@ object Actions {
 
     private suspend fun applyUpdates(context: Context) {
         withContext(Dispatchers.Main) {
-            restartReactNativeApp(context)
+            Log.i(APPTILE_LOG_TAG, "Reinitialize React Native instance manager from apply updates")
+            (context.applicationContext as? MainApplication)?.resetReactNativeHost()
         }
     }
 
@@ -256,6 +260,13 @@ object Actions {
     suspend fun startApptileAppProcess(appId: String, context: Context) =
         withContext(Dispatchers.IO) {
             try {
+                if (BundleTrackerPrefs.isBrokenBundle()) {
+                    Log.d(
+                        APPTILE_LOG_TAG, "Previous bundle status: failed, starting rollback"
+                    )
+                    rollBackUpdates(context)
+                }
+
                 val trackerFile = File(context.filesDir, BUNDLE_TRACKER_FILE_NAME)
                 if (!trackerFile.exists()) {
                     if (!listOf(

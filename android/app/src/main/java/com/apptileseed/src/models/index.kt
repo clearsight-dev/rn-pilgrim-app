@@ -4,7 +4,7 @@ data class CodeArtefact(
     val id: Long, val type: String, val cdnlink: String, val tag: String
 )
 
-data class Fork(
+data class ManifestResponse(
     val id: Int,
     val appId: Int,
     val frameworkVersion: String,
@@ -13,16 +13,7 @@ data class Fork(
     val publishedCommitId: Long,
     val createdAt: String,
     val updatedAt: String,
-    val deletedAt: String?
-)
-
-data class ManifestResponse(
-    val id: Int,
-    val name: String,
-    val uuid: String,
-    val organizationId: String,
-    val published: Boolean,
-    val platformType: String,
-    val codeArtefacts: List<CodeArtefact>,
-    val forks: List<Fork>
+    val deletedAt: String?,
+    val url: String,
+    val artefacts: List<CodeArtefact>
 )
