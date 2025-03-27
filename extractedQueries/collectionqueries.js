@@ -10,6 +10,7 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
   const COLLECTION_PRODUCTS_QUERY = gql`
     query CollectionProducts($handle: String, $identifiers: [HasMetafieldsIdentifier!]!, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
       collection(handle: $handle) {
+        id
         handle
         title
         products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {

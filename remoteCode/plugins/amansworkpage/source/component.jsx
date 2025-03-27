@@ -97,28 +97,6 @@ const blogCarouselData = {
   ],
 };
 
-// Hardcoded data for celebrity picks
-const celebPicksData = [
-  {
-    id: '1',
-    title: "Rashmika's\nFavourite",
-    image:
-      'https://s3-alpha-sig.figma.com/img/14c1/e295/edbe9cbedc9d57c0f33d4be8a9606bfa?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ivXzPgZ8zVvv1A8aU28pvlFtFhjMHMgPXiFlApN-oim2WqV51DfCVo5HUIyMJJl7mg6-HufohSmTOi~HKuje2Q6UOgl3M5BG7kfW-xzVZF11JqPe~YE5WoHIgEPa4PgKJtSR-pQejSsO7l49JUdZjr4SJrmQOvIT3ZdMZ2HyfRij-PAVMBFX48Do~l8K-zuHFOLd0uUsx30fY6rqPxTy3X4Q-YEL2etgsPazUcdjH8xa2VXpfSUsq8YZlQ9qwchhdH5nGtrYygaHXUcPVzrRaVxSZf5ZU~WKNxdc-mdUAT0Rqg2OdVw~LoFAjgbbx-koiIla4vtBZMYSHnUrfZFb3A__',
-  },
-  {
-    id: '2',
-    title: "Manisha's\nPicks",
-    image:
-      'https://s3-alpha-sig.figma.com/img/87d3/26db/aba7c8a147f54fc3105568dd03d76b7a?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=tQMtK8V-FjJY6z9nZ8t9M1wTVMD8KsqaWc2SF9MY6540nkQT6GhN3jFR-O4-7w7GBo5oPXs~bbJHjV0a0xX502SKUnwaXca8UOj7bjW1nmxJoT3ueGWSrqnjA4KbBKKbuQ9P2fm~KUymmbJo592j--m-tmik30iAPwsewFM4hD1k9wGGiU1TN7FyVwRRGbcFMgAq3s~hC9OCySy5ki5No6a-K3BL0yM3NvaweGzE~VefPuuxr~qecY81-We1Az94WxYyTt9U0qvI1Jw3yRLC3Ybwkf8IJoSFRZiZg7hAMKqHKA-5Yx8j2TmekuCzSsklgdMQtAuDsL4ygTVMi0dZnQ__',
-  },
-  {
-    id: '3',
-    title: "Jennifer's\nFavourite",
-    image:
-      'https://s3-alpha-sig.figma.com/img/9ba4/ec05/08ba3ea1dba659d28c3e8b6d12ce21dd?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=Tsgvp~X53cMKAD1ATXiDsbrAEsIqSL~3l6CkAL6NuG6hI9kj7sH0SkCg7uJxFes8lU4bP2yyOXgF1JE22WyDy3dHAv1Ke0zVAx6MnEEeXoG0G~48HXm5Ff-sf5bxI5hsgFUQ588GRlPDF3ViL2ESfjF15siwxxCVN7Bz772slqKo39~KGmEUNHCg5LY5ZWyzWSiPiNF2HmM5v0UVKXE-wP6dBLneDdwdrpcEwon9CugSpDNmD-Axe-venWzSdorDxIxnaJscOC5LuvoDs-aqwTorwi8UwD~JHWi8daux7ydwUn6fwejJ5kU6f0s2hjS3pdEIh5z8ZmRJ36WjIfaUDw__',
-  },
-];
-
 export function ReactComponent({model}) {
   // const shopifyDSModel = useSelector(state =>
   //   datasourceTypeModelSel(state, 'shopifyV_22_10'),
@@ -142,9 +120,6 @@ export function ReactComponent({model}) {
       {carouselData.map(data => (
         <CollectionCarousel carouselData={data} key={data.title} />
       ))}
-
-      {/* Render the CelebPicks component */}
-      <CelebPicks celebs={celebPicksData} />
 
       {/* Render the BlogCarousel component */}
       <BlogCarousel carouselData={blogCarouselData} />

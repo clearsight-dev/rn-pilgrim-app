@@ -11,9 +11,10 @@ import VariantCard from './VariantCard';
 import ImageCarousel from './ProductCarousel';
 
 export function ReactComponent({ model }) {
-  const route = useRoute();
-  // const productHandle = model.get('productHandle');
-  const productHandle = route.params.productHandle;
+  // const route = useRoute();
+  // const productHandle = route.params.productHandle;
+  const productHandle = model.get('productHandle');
+  
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

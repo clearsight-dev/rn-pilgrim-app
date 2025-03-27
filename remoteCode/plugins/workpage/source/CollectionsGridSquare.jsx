@@ -1,6 +1,7 @@
 import React from 'react';
 import {useApptileWindowDims} from 'apptile-core';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 
 const CollectionsGridSquare = ({collections = []}) => {
   const {width} = useApptileWindowDims();

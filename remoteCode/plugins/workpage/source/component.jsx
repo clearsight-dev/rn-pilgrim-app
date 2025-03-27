@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
+import CelebPicks from './CelebPicks';
 import {Carousel} from '../../../../extractedQueries/ImageCarousel';
 
 export function ReactComponent({ model }) {
@@ -14,6 +15,7 @@ export function ReactComponent({ model }) {
   const {width: screenWidth} = useApptileWindowDims();
   const quickCollectionsData = model.get('quickCollections') || [];
   const imageCarouselImages = model.get('imageCarouselImages') || [];
+  const celebPicksData = model.get('celebPicksData') || [];
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   useEffect(() => {
     if (quickCollectionsData.length > 0) {
@@ -107,6 +109,7 @@ export function ReactComponent({ model }) {
         collectionHandle={'bestsellers'}
         numberOfProducts={numberOfProducts}
       />
+      <CelebPicks celebs={celebPicksData} />
       <ChipCollectionCarousel 
         collectionHandle={'makeup'}
         numberOfProducts={numberOfProducts}
@@ -129,7 +132,8 @@ const styles = StyleSheet.create({
 export const WidgetConfig = {
   quickCollections: [],
   numberOfProducts: '',
-  imageCarouselImages: []
+  imageCarouselImages: [],
+  celebPicksData: []
 };
 
 export const WidgetEditors = {
@@ -167,6 +171,23 @@ export const WidgetEditors = {
               subtitle: {type: 'string'},
               collection: {type: 'collection', dataFormat: 'handle'},
               product: {type: 'product', dataFormat: 'handle'}
+            }
+          }
+        }
+      }
+    },
+    {
+      type: 'customData',
+      name: 'celebPicksData',
+      props: {
+        label: 'Celeb picks',
+        schema: {
+          type: 'array',
+          items: {
+            type: 'object',
+            fields: {
+              title: {type: 'string'},
+              urls: {type: 'image'},
             }
           }
         }

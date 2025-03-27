@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, StyleSheet, Text as RNText, Image } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Text as RNText } from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useSelector } from 'react-redux';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';

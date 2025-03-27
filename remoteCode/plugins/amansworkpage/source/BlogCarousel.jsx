@@ -4,9 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   ScrollView,
 } from 'react-native';
+import Image from 'react-native-fast-image';
 import {useApptileWindowDims} from 'apptile-core';
 
 const BlogCarousel = ({carouselData}) => {

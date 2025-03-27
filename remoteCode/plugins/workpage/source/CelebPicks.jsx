@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import Image from 'react-native-fast-image'
+import {Image} from '../../../../extractedQueries/ImageComponent';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import GradientText from '../../../../extractedQueries/GradientText';
 import Underline from '../../../../extractedQueries/Underline';
@@ -65,7 +65,7 @@ const CelebPicks = ({celebs = []}) => {
                   },
                 ]}>
                 <Image
-                  source={{uri: celeb.image}}
+                  source={{uri: celeb.urls[0]}}
                   style={styles.celebImage}
                   resizeMode="cover"
                 />

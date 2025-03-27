@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { navigateToScreen } from 'apptile-core';
 import { useDispatch } from 'react-redux';
 import Star from '../../../../extractedQueries/Star';
 import ProductFlag from '../../../../extractedQueries/ProductFlag';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 
 const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
   // Extract product details - use fullData if available (from lazy loading)

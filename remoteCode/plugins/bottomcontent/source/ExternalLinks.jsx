@@ -4,8 +4,8 @@ import {
   Text, 
   TouchableOpacity, 
   StyleSheet,
-  Image
 } from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import RadialGradientBackground from '../../../../extractedQueries/RadialGradientBackground';
 

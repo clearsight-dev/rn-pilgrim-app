@@ -2,9 +2,9 @@ import React from 'react';
 import { 
   View, 
   Text,
-  Image,
   StyleSheet
 } from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 import Accordion from './Accordion';
 
 export function PilgrimCode({ content = [] }) {
@@ -14,7 +14,7 @@ export function PilgrimCode({ content = [] }) {
     const item = content[i];
     return (
       <View 
-        key={item.url}
+        key={i + ':' + item.url}
         style={{
           width: 90,
           paddingVertical: 30,

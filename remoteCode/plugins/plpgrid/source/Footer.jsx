@@ -289,7 +289,6 @@ const Footer = React.forwardRef(({
   const currentSortLabel = sortOptions.find(it => it.value === sortOption && it.reverse === sortReverse)
   let numFiltersText = 'No Filter Applied';
   const flattenedFilters = selectedFilters.flatMap(it => it.values);
-  console.log('filters: ', flattenedFilters);
   if (flattenedFilters?.length === 1) {
     numFiltersText = '1 Filter Applied';
   } else if (flattenedFilters?.length > 1) {

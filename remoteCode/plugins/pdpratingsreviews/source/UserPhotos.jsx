@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 import { ImageSkeleton } from './SkeletonLoaders';
 
 const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {

@@ -4,9 +4,8 @@ import {
   Text, 
   StyleSheet, 
   TouchableOpacity, 
-  Image, 
-  Dimensions 
 } from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 import { useDispatch } from 'react-redux';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
