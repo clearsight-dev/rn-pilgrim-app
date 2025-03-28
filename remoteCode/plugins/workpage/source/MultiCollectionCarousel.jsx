@@ -10,13 +10,15 @@ export default function MultiCollectionCarousel() {
   // Collection handles to display
   const collectionHandles = ['pore-care', 'hair-care', 'makeup'];
 
+  console.log("[AGENT] rendering multicollection carousel")
   return (
     <View style={styles.container}>
-      {collectionHandles.map(handle => {
+      {collectionHandles.map((handle, i) => {
         return (
           <CollectionCarouselComponent 
             key={handle} 
             collectionHandle={handle} 
+            delay={(i + 1) * 1000}
           />
         );
       })}

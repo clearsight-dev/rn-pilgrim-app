@@ -21,6 +21,8 @@ export function ReactComponent({ model }) {
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   useEffect(() => {
     RNApptile.notifyJSReady();
+  }, [])
+  useEffect(() => {
     if (quickCollectionsData.length > 0) {
       setTimeout(() => {
         const queryRunner = shopifyDSModel?.get('queryRunner');
@@ -31,6 +33,7 @@ export function ReactComponent({ model }) {
     }
   }, [quickCollectionsData])
 
+  console.log("Rendering workpage")
   return (
     <View style={styles.container}>
       <QuickCollections
@@ -113,7 +116,7 @@ export function ReactComponent({ model }) {
         numberOfProducts={numberOfProducts}
       />
       <CelebPicks celebs={celebPicksData} />
-      {/* <MultiCollectionCarousel /> */}
+      <MultiCollectionCarousel />
       <ChipCollectionCarousel
         collectionHandle={'makeup'}
         numberOfProducts={numberOfProducts}

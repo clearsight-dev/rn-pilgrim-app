@@ -3,16 +3,15 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  FlatList,
   Image,
   ActivityIndicator,
 } from 'react-native';
 import Underline from '../../../../extractedQueries/Underline';
 import {useState, useEffect} from 'react';
-import {useSelector} from 'react-redux';
-import {datasourceTypeModelSel} from 'apptile-core';
+import {useSelector, useDispatch} from 'react-redux';
+import {datasourceTypeModelSel, navigateToScreen} from 'apptile-core';
 import {fetchCollectionCarouselData} from '../../../../extractedQueries/collectionqueries';
-import {useNavigation} from '@react-navigation/native';
 
 // Subtitles for each collection
 const COLLECTION_SUBTITLES = {
@@ -28,17 +27,18 @@ const COLLECTION_COVER_IMAGES = {
   'makeup': 'https://s3-alpha-sig.figma.com/img/9bfb/5a5a/0e5496159d8f7ee3eed1dfaee6578a4f?Expires=1743984000&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=HhcipHKNL63XQwL7JeUKjU6Cv3lZaAvwEo0H2yVuxTwr8jk-~wCdv2rZ6CB42o6lNg0RUivmkbK9jo90CMq048KJQ2EzVMwKI~f2~4vCcfqwmPEU8b58PlC2xbvKd-ncTUSOcDIuqpqSRzeh~Bs9cfFOE57Yh0vN3qzzb3BLxurr3V9oqJSQmpyp3TSAY4Stjzq-qLmJaCLEY~s8Q75Ekzg7QJuQ22Xmao9qhVP-r-ePbeXtRSiBHpikbCAkmhBhdzM4y00O27jXfFnQEntCLWQ37bBVGp6~ZmY35RPpvPrIa5wXseKhqQEKbdSU4F7IMazfefG84-j5l1nxdqS29w__',
 };
 
-export default function CollectionCarousel({collectionHandle}) {
-  console.log("[AGENT] rendering for collection: ", collectionHandle)
+export default function CollectionCarousel({collectionHandle, delay}) {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [carouselData, setCarouselData] = useState(null);
   const [error, setError] = useState(null);
   
-  const navigation = useNavigation();
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   
+  console.log("[AGENT] rendering collection carousel");
   useEffect(() => {
+    console.log("[AGENT] Running effect for delayed: ", delay)
     const fetchData = async () => {
       if (!shopifyDSModel || !collectionHandle) {
         setLoading(false);
@@ -72,7 +72,7 @@ export default function CollectionCarousel({collectionHandle}) {
     };
     
     fetchData();
-  }, [collectionHandle, shopifyDSModel]);
+  }, [collectionHandle, shopifyDSModel, delay]);
   
   // Function to navigate to the NewCollection page with parameters
   const navigateToCollection = (category) => {
@@ -84,11 +84,11 @@ export default function CollectionCarousel({collectionHandle}) {
     console.log(`[AGENT] Navigating to NewCollection with handle: ${collectionHandle}, category: ${category.title}, subcategory: ${subcategory}`);
     
     // Navigate to the NewCollection page with parameters
-    navigation.navigate('NewCollection', {
+    dispatch(navigateToScreen('NewCollection', {
       collectionHandle: collectionHandle,
       category: category.title,
       subcategory: subcategory
-    });
+    }))
   };
   
   if (loading) {
@@ -169,13 +169,16 @@ export default function CollectionCarousel({collectionHandle}) {
 
       {/* Category Cards */}
       {carouselData.categories.length > 0 ? (
-        <ScrollView
+        <FlatList
+          data={carouselData.categories}
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.cardsContainer}>
-          {carouselData.categories.map(category => (
+          style={styles.cardsContainer}
+          initialNumToRender={3}
+          maxToRenderPerBatch={4}
+          keyExtractor={(item) => item.id}
+          renderItem={({item: category}) => (
             <TouchableOpacity 
-              key={category.id} 
               style={styles.card}
               onPress={() => navigateToCollection(category)}>
               <View style={[styles.cardImageContainer, {position: 'relative'}]}>
@@ -192,8 +195,8 @@ export default function CollectionCarousel({collectionHandle}) {
                 <Text style={styles.cardTitle}>{category.title}</Text>
               </View>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+          )}
+        />
       ) : (
         <Text style={styles.noDataText}>No categories available</Text>
       )}
