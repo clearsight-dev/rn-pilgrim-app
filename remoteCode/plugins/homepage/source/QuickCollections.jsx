@@ -4,6 +4,7 @@ import {
   Text, 
   StyleSheet, 
   TouchableOpacity, 
+  NativeModules
 } from 'react-native';
 import {Image} from '../../../../extractedQueries/ImageComponent';
 import { useDispatch } from 'react-redux';
@@ -31,7 +32,7 @@ const QuickCollections = ({
       <View style={styles.gridContainer}>
         {collections.map((item, index) => (
           <TouchableOpacity
-            key={item.collection || index}
+            key={item.collection + index}
             style={[
               styles.gridItem,
               { width: itemWidth, height: itemHeight }

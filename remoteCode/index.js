@@ -5,6 +5,7 @@ import pligrimtextwidget from "./plugins/pligrimtextwidget/source/widget";
 import pilgrimotplogin from "./plugins/pilgrimotplogin/source/widget";
 import pdpratingsreviews from "./plugins/pdpratingsreviews/source/widget";
 import keybenefits from "./plugins/keybenefits/source/widget";
+import homepage from "./plugins/homepage/source/widget";
 import faqs from "./plugins/faqs/source/widget";
 import descriptioncard from "./plugins/descriptioncard/source/widget";
 import complementaryrecos from "./plugins/complementaryrecos/source/widget";
@@ -27,6 +28,7 @@ return [
     complementaryrecos,
     descriptioncard,
     faqs,
+    homepage,
     keybenefits,
     pdpratingsreviews,
     pilgrimotplogin,

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import Image from 'react-native-fast-image';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 import {useApptileWindowDims} from 'apptile-core';
 
 const BlogCarousel = ({carouselData}) => {

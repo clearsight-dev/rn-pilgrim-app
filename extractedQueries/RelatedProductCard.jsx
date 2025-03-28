@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import Image from 'react-native-fast-image';
+import {Image} from './ImageComponent';
 import { navigateToScreen } from 'apptile-core';
 import { useDispatch } from 'react-redux';
 import Star from './Star';
