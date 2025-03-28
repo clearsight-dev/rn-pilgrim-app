@@ -877,18 +877,18 @@ export function ReactComponent({ model }) {
           keyExtractor={(item, index) => item.handle || `product-${index}`}
           numColumns={2}
           initialNumToRender={4}
-          maxToRenderPerBatch={8}
+          maxToRenderPerBatch={6}
           windowSize={5}
           contentContainerStyle={styles.gridContainer}
           columnWrapperStyle={styles.row}
           showsVerticalScrollIndicator={false}
           onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3} // Trigger when 30% from the end
-          onViewableItemsChanged={handleViewableItemsChanged}
-          viewabilityConfig={{
-            itemVisiblePercentThreshold: 50, // Item is considered visible when 50% of it is visible
-            minimumViewTime: 300 // Item must be visible for at least 300ms
-          }}
+          onEndReachedThreshold={0.5} // Trigger when 30% from the end
+          // onViewableItemsChanged={handleViewableItemsChanged}
+          // viewabilityConfig={{
+          //   itemVisiblePercentThreshold: 50, // Item is considered visible when 50% of it is visible
+          //   minimumViewTime: 300 // Item must be visible for at least 300ms
+          // }}
           ListFooterComponent={renderFooter}
           ListEmptyComponent={
             <Text style={styles.emptyText}>No products found</Text>

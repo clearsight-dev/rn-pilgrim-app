@@ -1,11 +1,10 @@
 import React from 'react';
-import {NativeModules} from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { 
-  apptileNavigationRef, 
-  ApptileWrapper, 
-  ApptileAppRoot, 
+import {
+  apptileNavigationRef,
+  ApptileWrapper,
+  ApptileAppRoot,
   useStartApptile
 } from 'apptile-core';
 
@@ -16,22 +15,21 @@ import FloatingUpdateModal from './components/FloatingUpdateModal';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
-  NativeUtils: {appId: string};
-  AdminPage: {appId: string};
+  NativeUtils: { appId: string };
+  AdminPage: { appId: string };
 };
 
 // Import the generated code. The folder analytics is generated when you run the app.
-import {init as initAnalytics} from './analytics';
+import { init as initAnalytics } from './analytics';
 
 const Stack = createNativeStackNavigator<ScreenParams>();
-const {RNApptile} = NativeModules;
 
 function App(): React.JSX.Element {
   const status = useStartApptile(initAnalytics);
 
   let body = null;
   if (status.isDownloading) {
-    body = <JSSplash/>;
+    body = <JSSplash />;
   } else {
     body = (
       <NavigationContainer
@@ -42,22 +40,23 @@ function App(): React.JSX.Element {
         }}
         linking={status.linking}
         onReady={() => {
-          RNApptile.notifyJSReady();
+          console.log("Navigators are ready")
+          // RNApptile.notifyJSReady();
         }}
       >
         <Stack.Navigator>
-          <Stack.Screen name="NocodeRoot" component={ApptileAppRoot} options={{headerShown: false}} /> 
-          <Stack.Screen 
-            name="NativeUtils" 
-            component={UpdateModal} 
-            options={{headerShown: true}} 
-            initialParams={{appId: status.appId}} 
+          <Stack.Screen name="NocodeRoot" component={ApptileAppRoot} options={{ headerShown: false }} />
+          <Stack.Screen
+            name="NativeUtils"
+            component={UpdateModal}
+            options={{ headerShown: true }}
+            initialParams={{ appId: status.appId }}
           />
-          <Stack.Screen 
-            name="AdminPage" 
-            component={AdminPage} 
-            options={{headerShown: true}}
-            initialParams={{appId: status.appId}}
+          <Stack.Screen
+            name="AdminPage"
+            component={AdminPage}
+            options={{ headerShown: true }}
+            initialParams={{ appId: status.appId }}
           />
         </Stack.Navigator>
       </NavigationContainer>
@@ -72,7 +71,7 @@ function App(): React.JSX.Element {
     // If you want to show the update modal as soon as you have determined that there
     // is an update and want the download to happen while the modal is being 
     // displayed then use the status.hasUpdate
-    updateModal = (<FloatingUpdateModal 
+    updateModal = (<FloatingUpdateModal
       navigationRef={apptileNavigationRef}
       appId={status.appId}
       updateDownloaded={status.updateDownloaded}
@@ -82,10 +81,10 @@ function App(): React.JSX.Element {
   // The nocode layer will not do navigation to these screens so you can handle those navigations in the onNavigationEvent
   return (
     <ApptileWrapper
-      noNavigatePaths={["NativeUtils", "AdminPage"]} 
+      noNavigatePaths={["NativeUtils", "AdminPage"]}
       onNavigationEvent={(ev) => {
         console.log("handle navigation event", ev)
-        apptileNavigationRef.current.navigate(ev.screenName, {appId: status.appId});
+        apptileNavigationRef.current.navigate(ev.screenName, { appId: status.appId });
       }}
     >
       {body}

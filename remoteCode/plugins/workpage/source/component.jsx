@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, Text, Image, TouchableOpacity, NativeModules } from 'react-native';
 import { datasourceTypeModelSel, navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
@@ -7,18 +7,20 @@ import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
-import {Carousel} from '../../../../extractedQueries/ImageCarousel';
+import { Carousel } from '../../../../extractedQueries/ImageCarousel';
 
 export function ReactComponent({ model }) {
   const dispatch = useDispatch();
+  const { RNApptile } = NativeModules;
   // Get collection handle and number of products from model props or use defaults
   const numberOfProducts = 5;
-  const {width: screenWidth} = useApptileWindowDims();
+  const { width: screenWidth } = useApptileWindowDims();
   const quickCollectionsData = model.get('quickCollections') || [];
   const imageCarouselImages = model.get('imageCarouselImages') || [];
   const celebPicksData = model.get('celebPicksData') || [];
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   useEffect(() => {
+    RNApptile.notifyJSReady();
     if (quickCollectionsData.length > 0) {
       setTimeout(() => {
         const queryRunner = shopifyDSModel?.get('queryRunner');
@@ -31,49 +33,49 @@ export function ReactComponent({ model }) {
 
   return (
     <View style={styles.container}>
-      <QuickCollections 
+      <QuickCollections
         collections={quickCollectionsData}
       />
-      <View style={{position: 'relative'}}>      
-        <Carousel 
+      <View style={{ position: 'relative' }}>
+        <Carousel
           flatlistData={imageCarouselImages.map(
             (it, i) => ({
-              id: i, 
+              id: i,
               ...it,
               url: it.urls[0],
             })
           )}
           width={screenWidth}
-          renderChildren={({item}) => {
+          renderChildren={({ item }) => {
             return (
-              <View style={{position: 'relative'}}>
-                <Image 
-                  source={{uri: item.url}}
+              <View style={{ position: 'relative' }}>
+                <Image
+                  source={{ uri: item.url }}
                   resizeMode="contain"
                   style={{
                     width: screenWidth,
                     aspectRatio: 1.7,
                     minHeight: 100,
                   }}
-                />   
-                <View 
+                />
+                <View
                   style={{
-                    position: 'absolute', 
+                    position: 'absolute',
                     width: 200,
                     left: 10
                   }}
                 >
-                  <Text 
+                  <Text
                     style={{
-                      fontSize: 44, 
+                      fontSize: 44,
                       fontWeight: '600'
                     }}
                   >
                     {item.title}
                   </Text>
-                  <Text 
+                  <Text
                     style={{
-                      fontSize: 20, 
+                      fontSize: 20,
                       fontWeight: '300'
                     }}
                   >
@@ -82,9 +84,9 @@ export function ReactComponent({ model }) {
                   <TouchableOpacity
                     onPress={() => {
                       if (item.collection) {
-                        dispatch(navigateToScreen('NewCollection', {collectionHandle: item.collection}));
+                        dispatch(navigateToScreen('NewCollection', { collectionHandle: item.collection }));
                       } else if (item.product) {
-                        dispatch(navigateToScreen('NewProduct', {productHandle: item.product}));
+                        dispatch(navigateToScreen('NewProduct', { productHandle: item.product }));
                       }
                     }}
                     style={{
@@ -106,17 +108,17 @@ export function ReactComponent({ model }) {
           }}
         />
       </View>
-      <ChipCollectionCarousel 
+      <ChipCollectionCarousel
         collectionHandle={'bestsellers'}
         numberOfProducts={numberOfProducts}
       />
       <CelebPicks celebs={celebPicksData} />
-      <MultiCollectionCarousel />
-      <ChipCollectionCarousel 
+      {/* <MultiCollectionCarousel /> */}
+      <ChipCollectionCarousel
         collectionHandle={'makeup'}
         numberOfProducts={numberOfProducts}
       />
-      <ChipCollectionCarousel 
+      <ChipCollectionCarousel
         collectionHandle={'new-launch'}
         numberOfProducts={numberOfProducts}
       />
@@ -150,9 +152,9 @@ export const WidgetEditors = {
           items: {
             type: 'object',
             fields: {
-              urls: {type: 'image'},
-              title: {type: 'string'},
-              collection: {type: 'collection', dataFormat: 'handle'}
+              urls: { type: 'image' },
+              title: { type: 'string' },
+              collection: { type: 'collection', dataFormat: 'handle' }
             }
           }
         }
@@ -168,11 +170,11 @@ export const WidgetEditors = {
           items: {
             type: 'object',
             fields: {
-              urls: {type: 'image'},
-              title: {type: 'string'},
-              subtitle: {type: 'string'},
-              collection: {type: 'collection', dataFormat: 'handle'},
-              product: {type: 'product', dataFormat: 'handle'}
+              urls: { type: 'image' },
+              title: { type: 'string' },
+              subtitle: { type: 'string' },
+              collection: { type: 'collection', dataFormat: 'handle' },
+              product: { type: 'product', dataFormat: 'handle' }
             }
           }
         }
@@ -188,8 +190,8 @@ export const WidgetEditors = {
           items: {
             type: 'object',
             fields: {
-              title: {type: 'string'},
-              urls: {type: 'image'},
+              title: { type: 'string' },
+              urls: { type: 'image' },
             }
           }
         }
