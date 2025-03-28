@@ -21,10 +21,13 @@ export function ReactComponent({ model }) {
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   useEffect(() => {
     if (Platform.OS !== 'web') {
-      const { RNApptile } = NativeModules;
-      RNApptile.notifyJSReady();
+      setTimeout(() => {
+        const { RNApptile } = NativeModules;
+        RNApptile.notifyJSReady();
+      }, 300);
     }
-  }, [])
+  }, []);
+
   useEffect(() => {
     if (quickCollectionsData.length > 0) {
       setTimeout(() => {
