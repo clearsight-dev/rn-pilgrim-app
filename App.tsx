@@ -44,7 +44,11 @@ function App(): React.JSX.Element {
           // RNApptile.notifyJSReady();
         }}
       >
-        <Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{
+            animation: 'none'
+          }}
+        >
           <Stack.Screen name="NocodeRoot" component={ApptileAppRoot} options={{ headerShown: false }} />
           <Stack.Screen
             name="NativeUtils"

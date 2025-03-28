@@ -18,7 +18,6 @@ export default function MultiCollectionCarousel() {
           <CollectionCarouselComponent 
             key={handle} 
             collectionHandle={handle} 
-            delay={(i + 1) * 1000}
           />
         );
       })}
