@@ -8,16 +8,31 @@ import {fetchProductData} from '../../../../extractedQueries/pdpquery';
 import AboveThefoldContent from './AboveThefoldContent';
 import DescriptionCard from './DescriptionCard';
 import RecommendationsRoot from './recommendations/RecommendationsRoot';
+import BenefitsRoot from './keybenefits/BenefitsRoot';
 
 export function ReactComponent({ model }) {
   const route = useRoute();
   const productHandle = route.params.productHandle;
   // const productHandle = model.get('productHandle');
+  const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
+  const aspectRatio = model.get('aspectRatio') || '1/1.5';
+  const cardWidthPercentage = parseFloat(model.get('cardWidthPercentage') || '70');
+  const imageBand = model.get('imageBand') || [];
+  const cardSpacing = parseInt(model.get('cardSpacing') || '10', 10);
   
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(0);
+  const [benefits, setBenefits] = useState({
+    carouselItems: [],
+    title: "",
+    benefitsList: [],
+    ingredients: {
+      title: "",
+      images: []
+    }
+  });
   const { width: screenWidth } = useApptileWindowDims();
   
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
@@ -147,12 +162,79 @@ export function ReactComponent({ model }) {
     return data.data.productByHandle;
   };
   
+  // Process benefits data from metafields
+  const processBenefitsData = (metafields) => {
+    if (!metafields || !Array.isArray(metafields)) {
+      return null;
+    }
+    
+    // Extract carousel benefit data from metafields
+    const carouselData = metafields
+      .filter(mf => mf && (
+        mf.key === 'test_benefit_url' ||
+        mf.key === 'after_atc_benefit2_url' ||
+        mf.key === 'after_atc_benefit3_url'
+      ))
+      .map((mf) => {
+        return {
+          imageUrl: mf.value
+        };
+      });
+    
+    // Extract key benefits title and list for BenefitsCard
+    const keyBenefitsTitle = metafields.find(field => 
+      field?.key?.includes('key_benefits_heading') 
+    );
+    
+    const keyBenefitsList = metafields
+      .filter(field => field?.key?.includes('key_benefits') && field?.type === 'multi_line_text_field')
+      .flatMap(item => item.value.split('•'))
+      .filter(line => line.trim() !== ''); // Filter out empty lines
+
+    const ingredients = metafields.filter(field => {
+      return field?.key?.startsWith('ingredients') && 
+        field?.key?.endsWith('_url')
+    })
+    .map(it => {
+      return {
+        imageUrl: it.value
+      };
+    });
+
+    const ingredientsHeading = metafields
+      .find(it => it?.key === "ingredients_heading")?.value ?? "";
+    
+    if (carouselData.length > 0) {
+      return {
+        carouselItems: carouselData,
+        title: keyBenefitsTitle?.value,
+        benefitsList: keyBenefitsList,
+        ingredients: {
+          title: ingredientsHeading,
+          images: ingredients
+        }
+      };
+    }
+    
+    return null;
+  };
+  
   // Main render
   const product = getProductDetails(productData);
   const productImages = product ? getProductImages(product) : [];
   const productLabel = product ? formatProductLabel(product.metafields) : null;
   const rating = product ? parseRating(product.metafields) : "4.8";
   const offers = product ? extractOffers(product.metafields) : [];
+  
+  // Process benefits data when product data changes
+  useEffect(() => {
+    if (product && product.metafields) {
+      const benefitsData = processBenefitsData(product.metafields);
+      if (benefitsData) {
+        setBenefits(benefitsData);
+      }
+    }
+  }, [product]);
   
   return (
     <View style={styles.container}>
@@ -174,6 +256,17 @@ export function ReactComponent({ model }) {
         productData={productData.data.productByHandle} 
         loading={loading} 
       />)}
+
+      <BenefitsRoot
+        loading={loading}
+        error={error}
+        benefits={benefits}
+        backgroundColor={backgroundColor}
+        aspectRatio={aspectRatio}
+        cardWidthPercentage={cardWidthPercentage}
+        cardSpacing={cardSpacing}
+        imageBand={imageBand}
+      />
 
       <RecommendationsRoot 
         loading={loading}
@@ -212,5 +305,26 @@ export const PropertySettings = {};
 
 export const WrapperTileConfig = {
   name: 'Product Detail Page',
-  defaultProps: {},
+  defaultProps: {
+    backgroundColor: {
+      label: "Background Color",
+      defaultValue: "#C5FAFF4D"
+    },
+    aspectRatio: {
+      label: "Card Aspect Ratio",
+      defaultValue: "1/1.5"
+    },
+    cardWidthPercentage: {
+      label: "Card Width (% of screen)",
+      defaultValue: "70"
+    },
+    cardSpacing: {
+      label: "Spacing Between Cards",
+      defaultValue: "20"
+    },
+    imageBand: {
+      label: "Image Band",
+      defaultValue: []
+    }
+  },
 };
