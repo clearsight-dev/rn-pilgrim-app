@@ -1,0 +1,422 @@
+I am working in a low code platform for apptile.io. In this platform we have a react-native project and inside that there is folder named remoteCode. Each subfolder in remoteCode/plugins is a plugin that wraps a reactcomponent so that it can be drag & dropped into the app using the low code editor. I have several plugins at this point, but Im facing a perf issue on low end android devices in one screen that is using multiple plugins. I want to try and merge all these plugins into a single one so that I can validate that multiple plugins is the issue. Another benefit is that once evertying is in a single plugin I can also try putting all the components in a sectionlist that might make it faster. I dunno yet. Anyway, I want you to merge multiple plugins into one. 
+
+About how plugins are structured:
+```
+<section id="basics-of-apptile">
+      <h1>Writing a hello world component</h1>
+      <p>
+        The simplest component that you can write is to show a hello world in the 
+        apptile platform looks like this
+        <code class="language-jsx" id="hello-world-code-snippet">
+          <pre>
+import React from 'react';
+import { View, Text } from 'react-native';
+
+export function ReactComponent({ model }) {
+  return (
+    &lt;View
+      style={{
+        height: 600,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    &gt;
+      &lt;Text
+        style={{
+          fontSize: 20
+        }}
+      &gt;
+       hello world
+      &lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+export const WidgetConfig = {};
+
+export const WidgetEditors = {
+  basic: [],
+};
+
+export const PropertySettings = {};
+
+export const WrapperTileConfig = {
+  name: 'Rating Summary Card',
+  defaultProps: {
+  },
+};
+          </pre>
+        </code>
+      </p>
+      <h2 id="hello-world-explanation">Explanation of <a href="#hello-world-code-snippet">hello world example</a> </h2>
+      <p>
+        As shown in the <a href="#hello-world-code-snippet">hello world example</a> you 
+        need to export 5 things for the platform to use a <i class="inline-code">
+        react-native</i> component. These are:
+        <ol>
+          <li id="react-component">
+            <i class="inline-code">ReactComponent</i>: The react-native component which <em>MUST</em> be named 
+            <i class="inline-code">ReactComponent</i>
+          </li>
+          <li id="widget-config">
+            <p>
+              <i class="inline-code">WidgetConfig</i>: An object that is used by 
+              the nocode platform to connect props to the component. If the 
+              <i class="inline-code">react-native</i> component takes a prop named 
+              <i class="inline-code">imageUrl</i> then the WigetConfig should define 
+              it as follows 
+              <code class="language-javascript">
+<pre>
+export const WidgetConfig = {
+  imageUrl: ''
+}
+</pre>
+              </code>
+            </p>
+            <p>
+              Similarly if the react-native component has multiple props defined 
+              by the type:
+              <code class="language-typescript">
+<pre>
+type ComponentProps = {
+  prop1: string;
+  prop2: number;
+  prop3: boolean;
+  prop4: any;
+};
+</pre>
+              </code>
+              then the <i class="inline-code">WidgetConfig</i> should be:
+              <code class="language-javascript">
+<pre>
+export const WidgetConfig = {
+  prop1: '',
+  prop2: '',
+  prop3: '',
+  prop4: '',
+};
+</pre>
+              </code>
+              i.e. all props regardless of their type should be initialized to 
+              empty strings in the <i class="inline-code">WidgetConfig</i>.
+            </p>
+          </li>
+          <li id="widget-editors">
+            <p>
+              <i class="inline-code">WidgetEditors</i>: This is used by the 
+              nocode platform to render controls that allow the user to configure 
+              the props for the <i class="inline-code">ReactComponent</i>. The 
+              <i class="inline-code">WidgetConfig</i> object can be thought of
+              as defining the initial zero-value for the props and <i class="inline-code">
+              WidgetEditors</i> tell the platform what kind of input widgets it 
+              must provide to allow the users to set the values of those props.
+
+              Here is an example of <i class="inline-code"> WidgetEditors</i> with 
+              the different possible editors supported by the platform. 
+              <code class="language-javascript" id="widget-editors-example">
+<pre>
+export const WidgetEditors = {
+  basic: [ 
+    {
+      type: 'codeInput',
+      name: 'prop1', 
+      props: {
+        label: 'prop1 for the react component'
+      }
+    },
+    {
+      type: 'codeInput',
+      name: 'prop2', 
+      props: {
+        label: 'second property for the react component'
+      }
+    },
+    {
+      type: 'colorInput',
+      name: 'prop3', 
+      props: {
+        label: 'this is the third prop for the component'
+      }
+    },
+    {
+      type: 'radioGroup',
+      name: 'prop4', 
+      props: {
+        label: 'this is the fourth prop for the component',
+        options: ['option1', 'option2']
+      }
+    },
+    {
+      type: 'customData',
+      name: 'prop5',
+      props: {
+        label: 'this is the fifth prop for the component',
+        schema: {
+          type: 'object',
+          fields: {
+            attr1: {
+              type: 'string'
+            },
+            imageUrls: {
+              type: 'image'
+            }
+          }
+        }
+      }
+    }
+  ]
+};
+</pre>
+              </code>
+            </p>
+            <p>
+              The <i class="inline-code">type</i> of the editor for a given prop 
+              should be one of <i class="inline-code">codeInput</i>, <i class="inline-code">
+              colorInput</i>,  <i class="inline-code">radioGroup</i> or 
+              <i class="inline-code">customData</i>. These control what kind of 
+              property editor component will be rendered in the platform in order 
+              for the user to set a value for the associated prop: 
+              <ul>
+                <li> 
+                  <i class="inline-code">colorInput</i>: Renders a html color 
+                    picker. So if the prop expects a color value set type to 
+                    colorInput.
+                </li>
+                <li> 
+                  <i class="inline-code">radioGroup</i>: Renders a buttonGroup 
+                  which can select one of a given list of options. So if the 
+                  prop is like an enum use the <i class="inline-code">radioGroup
+                  </i> type and put the options of the enum into the options array.
+                </li>
+                <li>
+                  <i class="inline-code">codeInput</i>: Renders a text input in 
+                  which the user can either type a string or a javascript 
+                  expression that is evaluated in an appropriate context and the 
+                  result of the expression is passed as the prop value. This can 
+                  therefore be used for props that require all types not covered 
+                  by the other two editors.
+                </li>
+                <li> 
+                  <i class="inline-code">customData</i>: Renders a excel-sheet-esque 
+                  editor in a popup. This is useful when you want to get a 
+                  complex json object with arbitrary nesting as the input. This 
+                  control also provides cell-editors for users so that they can 
+                  edit the object required for the prop in a user-friendly way.
+                </li>
+              </ul>
+            </p>
+            <p>
+              To clarify further the type of <i class="inline-code">WidgetEditors</i> 
+              for the simpler variants like <i class="inline-code">codeInput</i>, 
+              <i class="inline-code">colorInput</i> and <i class="inline-code">
+              radioGroup</i> is as follows:
+                <code class="language-typescript">
+<pre>
+type WidgetEditorsType = {
+  basic: Array<{
+
+    /* this should be set to 'colorInput' if the prop its editing accepts a color value, 
+        otherwise it should be set to 'codeInput' */
+    type: 'codeInput'|'colorInput'|'radioGroup';
+
+    /* this is the name of the prop that this editor instance will configure */
+    name: string; 
+
+    props: {
+      /* this is the label that will be displayed for the editor in the nocode platform */
+      label: string;
+      /* if the type is `radioGroup` then this controls what options are shown in the picker */
+      options?: string[];
+    };
+  }|CustomDataEditor>;
+}
+</pre>
+                </code>
+
+            </p>
+            <p>
+              A widgetEditor with type customData will conform to the following 
+              interface:
+              <code class="language-typescript">
+<pre>
+interface CustomDataEditor {
+  type: 'customData',
+  name: string;
+  props: {
+    schema: CustomDataEditorSchema;
+  };
+};
+</pre>
+              </code>
+              The props.schema determines how the excel sheet is rendered (i.e. 
+              with how many rows, columns, which cells use which pickers for 
+              editing etc)
+              <section>
+                <h4>Explanation of CustomDataEditorSchema</h4>
+                <p>
+                  Use this when you want to accept any kind of nested object or 
+                  array as the value of a prop.
+                  <code class="language-typescript">
+<pre>
+type CustomDataEditorSchema = {
+  type: 'object';
+  fields: {
+    [key extends string]: CustomDdataEditorSchema;
+  }
+}|
+{
+  type: 'array';
+  items: {
+    type: CustomDataEditorSchema;
+  };
+}|
+{
+  type: 'string'|'number'|'boolean'|'image'|'collection'|'product';
+  nullable?: boolean; 
+  defaultValue?: boolean
+};
+</pre>
+                  </code>
+                  <ul>
+                    <li>
+                      The types <i class="inline-code">string</i>, <i class="inline-code">
+                      number</i> and <i class="inline-code">boolean</i> will 
+                      make the cells in the sheet editor have simple textboxes 
+                      or switches that allows users to edit these values.
+                    </li>
+                    <li>
+                      The type <i class="inline-code">image</i> will render an 
+                      imagePicker and provides an array of image urls as the value.
+                    </li>
+                    <li>
+                      The type <i class="inline-code">collection</i> will render 
+                      a collection picker and the result would be a shopify 
+                      collection object. The <i class="inline-code">collection</i> 
+                      picker should only be used inside an <i class="inline-code">object</i> 
+                      picker or an <i class="inline-code">array</i> picker.
+                    </li>
+                    <li>
+                      The type <i class="inline-code">product</i> will make render 
+                      a product picker and provides a shopify product. The 
+                      <i class="inline-code">product</i> picker should only be 
+                      used inside an an <i class="inline-code">object</i> 
+                      picker or an <i class="inline-code">array</i> picker.
+                    </li>
+                  </ul>
+                </p> 
+                <p>
+                  More examples on how to use the <i class="inline-code">customData</i>
+                  picker are given in the cookbook in <a href="#cookbook-5">example 1</a>,
+                  <a href="#cookbook-6">example 2</a>,<a href="#cookbook-7">example 3</a>,
+                  <a href="#cookbook-8">example 4</a>,<a href="#cookbook-9">example 5</a>,
+                  <a href="#cookbook-10">example 6</a>.
+                </p>
+              </section>
+            </p>
+          </li>
+          <li id="wrapper-tile-config">
+            <i class="inline-code">WrapperTileConfig</i>: The nocode platform 
+            will show a list of available components for the user to choose from. 
+            For this it requires an object <i class="inline-code">WrapperTileConfig</i> 
+            of the following structure.
+            <code class="language-javascript">
+<pre>
+export const WrapperTileConfig = {
+  name: "Descriptive name of this component for display in component library",
+  defaultProps: {
+    prop1: {
+      label: "Descriptive name for prop1",
+      defaultValue: "some title",
+    },
+    prop2: {
+      label: "Descriptive name for prop2",
+      defaultValue: "#ff00a1"
+    },
+    prop3: {
+      label: "Descriptive name for prop3",
+      defaultValue: "some other value"
+    }
+  },
+};
+</pre>
+            </code>
+            This object should contain the name of the component that will appear 
+            in the library of components, as well as default values for each of 
+            the props that the component takes. If a prop doesn't have a default 
+            value use an empty string as the value. For each prop generate a 
+            short descriptive label that summarizes what the prop controls. For 
+            example if the prop is used to show the title of a card, you could 
+            generate the label as "Card title", if it controls the fill color of 
+            some visual element in the component you could generate the label as 
+            "Color of _name_of_visual_element_" and so on.
+          </li>
+          <li id="plugin-property-settings">
+            <i class="inline-code">PluginPropertySettings</i>:
+            This can be an empty object for components that do not generate any 
+            events. For components that do generate events, you can tell the 
+            nocode layer to show the ui that allows performing different actions 
+            when the event happens. For example if you are asked to write a 
+            button that should create an `onCustomEvent` event.
+
+            There are 5 things you need to do in order to trigger a custom event 
+            that the nocode layer will be able to configure. These are shown as 
+            5 steps in the comments in the following snippt.
+            <code class="language-javascript" id="event-trigger-example">
+<pre>
+import {Button} from 'react-native';
+
+// 1. Import the special constant EventTriggerIdentifier from apptile-core
+import {EventTriggerIdentifier} from 'apptile-core';
+
+// 2. Get the `triggerEvent` callback from the props
+export function ReactComponent({model, triggerEvent}) {
+  const label = model.get('label') || 'tap here';
+  return (
+    &lt;Button 
+      label={label} 
+      onPress={() => {
+          // 3. When you want to trigger the `onCustomEvent` event call the `triggerEvent` function obtained from the props
+          triggerEvent('onCustomEvent');
+        }
+      }
+    >&lt;/Button>);
+}
+
+export const WidgetConfig = {
+  label: '',
+  // 4. Specify the event name you want to expose in the WidgetConfig
+  onCustomEvent: ''
+};
+
+export const WidgetEditors = {
+  basic: [
+    type: 'codeInput',
+    name: 'label',
+    props: {
+      label: 'Button title'
+    }
+  ]
+};
+
+// 5. Add the event you want to expose in the PropertySettings object
+export const PropertySettings = {
+  onCustomEvent: {
+    type: EventTriggerIdentifier
+  }
+};
+
+export const WrapperTileConfig = {
+  name: 'Button widget',
+  defaultProps: {}
+};
+
+</pre>
+            </code>
+          </li>
+        </ol>
+      </p>
+    </section>
+```
+
+Each plugin subfolder has a `component.jsx` file where the code that is mounted by the lowcode editor resides. 

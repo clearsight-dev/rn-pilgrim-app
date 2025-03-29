@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, SectionList, Text } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
@@ -34,7 +34,7 @@ export function ReactComponent({ model }) {
       images: []
     }
   });
-  const { width: screenWidth } = useApptileWindowDims();
+  const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
   
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
 
@@ -237,56 +237,168 @@ export function ReactComponent({ model }) {
     }
   }, [product]);
   
+  // Prepare sections for SectionList
+  const sections = [
+    // Actual content sections
+    {
+      title: "Product Information",
+      type: 'above-the-fold',
+      key: 'above-the-fold',
+      data: [{}]
+    },
+    {
+      title: "Product Description",
+      type: 'description',
+      key: 'description',
+      data: productData?.data?.productByHandle ? [{}] : []
+    },
+    {
+      title: "Key Benefits",
+      type: 'benefits',
+      key: 'benefits',
+      data: [{}]
+    },
+    {
+      title: "Ratings & Reviews",
+      type: 'ratings',
+      key: 'ratings',
+      data: [{}]
+    },
+    {
+      title: "Recommended Products",
+      type: 'recommendations',
+      key: 'recommendations',
+      data: [{}]
+    }
+  ];
+
+  // Render section headers
+  const renderSectionHeader = ({ section }) => (
+    null
+    // <View style={styles.sectionHeader}>
+    //   <Text style={styles.sectionHeaderText}>{section.title}</Text>
+    // </View>
+  );
+
+  // Render each section based on its type
+  const renderItem = ({ item, section }) => {
+    switch (section.type) {
+      case 'dummy1':
+        return (
+          <View style={styles.dummySection}>
+            <Text style={styles.dummyText}>This is a dummy section to improve performance</Text>
+          </View>
+        );
+      case 'dummy2':
+        return (
+          <View style={styles.dummySection}>
+            <Text style={styles.dummyText}>Another dummy section to improve performance</Text>
+          </View>
+        );
+      case 'above-the-fold':
+        return (
+          <AboveThefoldContent
+            loading={loading}
+            error={error}
+            product={product}
+            productImages={productImages}
+            productLabel={productLabel}
+            rating={rating}
+            offers={offers}
+            variantOptions={variantOptions}
+            selectedVariant={selectedVariant}
+            setSelectedVariant={setSelectedVariant}
+            screenWidth={screenWidth}
+          />
+        );
+      case 'description':
+        return (
+          <DescriptionCard 
+            productData={productData.data.productByHandle} 
+            loading={loading} 
+          />
+        );
+      case 'benefits':
+        return (
+          <BenefitsRoot
+            loading={loading}
+            error={error}
+            benefits={benefits}
+            backgroundColor={backgroundColor}
+            aspectRatio={aspectRatio}
+            cardWidthPercentage={cardWidthPercentage}
+            cardSpacing={cardSpacing}
+            imageBand={imageBand}
+          />
+        );
+      case 'ratings':
+        return (
+          <RatingsReviewsRoot 
+            productHandle={productHandle}
+          />
+        );
+      case 'recommendations':
+        return (
+          <RecommendationsRoot 
+            loading={loading}
+            error={error}
+            data={productData}
+            handleAddToCart={() => console.log("adding to cart")}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <AboveThefoldContent
-        loading={loading}
-        error={error}
-        product={product}
-        productImages={productImages}
-        productLabel={productLabel}
-        rating={rating}
-        offers={offers}
-        variantOptions={variantOptions}
-        selectedVariant={selectedVariant}
-        setSelectedVariant={setSelectedVariant}
-        screenWidth={screenWidth}
-      />
-
-      {productData?.data?.productByHandle && (<DescriptionCard 
-        productData={productData.data.productByHandle} 
-        loading={loading} 
-      />)}
-
-      <BenefitsRoot
-        loading={loading}
-        error={error}
-        benefits={benefits}
-        backgroundColor={backgroundColor}
-        aspectRatio={aspectRatio}
-        cardWidthPercentage={cardWidthPercentage}
-        cardSpacing={cardSpacing}
-        imageBand={imageBand}
-      />
-
-      <RatingsReviewsRoot 
-        productHandle={productHandle}
-      />
-
-      <RecommendationsRoot 
-        loading={loading}
-        error={error}
-        data={productData}
-        handleAddToCart={() => console.log("adding to cart")}
-      />
-    </View>
+    <SectionList
+      style={[styles.container, { height: screenHeight }]}
+      contentContainerStyle={styles.contentContainer}
+      sections={sections}
+      renderItem={renderItem}
+      renderSectionHeader={renderSectionHeader}
+      keyExtractor={(item, index) => index.toString()}
+      stickySectionHeadersEnabled={false}
+      showsVerticalScrollIndicator={true}
+      initialNumToRender={3} // Start with fewer sections for faster initial render
+      maxToRenderPerBatch={2} // Render fewer items per batch
+      windowSize={5} // Reduce window size for better performance
+      removeClippedSubviews={true} // Important for performance
+    />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexShrink: 1,
+    flex: 1,
     backgroundColor: '#ffffff'
+  },
+  contentContainer: {
+    flexGrow: 1,
+    backgroundColor: '#ffffff'
+  },
+  sectionHeader: {
+    backgroundColor: '#f8f8f8',
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  sectionHeaderText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  dummySection: {
+    padding: 20,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 10,
+    borderRadius: 8,
+  },
+  dummyText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
   }
 });
 
