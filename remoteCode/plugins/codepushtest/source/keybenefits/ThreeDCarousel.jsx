@@ -1,6 +1,9 @@
 import React, { useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import GradientText from '../../../../../extractedQueries/GradientText';
+import {Image} from '../../../../../extractedQueries/ImageComponent';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 const ThreeDCarousel = ({ 
   carouselItems, 
@@ -30,6 +33,7 @@ const ThreeDCarousel = ({
     <Animated.FlatList
       data={carouselItems}
       horizontal
+      initialNumToRender={2}
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{
         paddingHorizontal: (width - itemWidth) / 2,
@@ -84,7 +88,7 @@ const ThreeDCarousel = ({
             ]}
           >
             <View style={[styles.benefitCard, { aspectRatio: cardAspectRatio }]}>
-              <Animated.Image 
+              <AnimatedImage 
                 source={{ uri: item.imageUrl }} 
                 style={styles.benefitImage} 
                 resizeMode="contain" 

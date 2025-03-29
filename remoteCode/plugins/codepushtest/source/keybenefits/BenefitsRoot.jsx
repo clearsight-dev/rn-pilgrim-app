@@ -95,7 +95,7 @@ const BenefitsRoot = ({
         title="Key Benefits"
       />
 
-      <ThreeDCarousel
+      {/* <ThreeDCarousel
         carouselItems={benefits.ingredients.images}
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}
@@ -103,7 +103,7 @@ const BenefitsRoot = ({
         width={width}
         backgroundColor={backgroundColor}
         title={benefits.ingredients.title}
-      />
+      /> */}
       {imageBand.length > 0 && (
         <View 
           style={{

@@ -210,25 +210,25 @@ const RatingsReviewsRoot = ({ productHandle }) => {
           
           // Find rating metafield
           const ratingMetafield = metafields.find(
-            metafield => metafield.key === 'rating' && metafield.namespace === 'reviews'
+            metafield => metafield?.key === 'rating' && metafield?.namespace === 'reviews'
           );
           
           // Find rating_count metafield
           const ratingCountMetafield = metafields.find(
-            metafield => metafield.key === 'rating_count' && metafield.namespace === 'reviews'
+            metafield => metafield?.key === 'rating_count' && metafield?.namespace === 'reviews'
           );
           
           // Find consumer study results metafields
           const consumerStudyResults1 = metafields.find(
-            metafield => metafield.key === 'consumer_study_results_1' && metafield.namespace === 'custom'
+            metafield => metafield?.key === 'consumer_study_results_1' && metafield?.namespace === 'custom'
           );
           
           const consumerStudyResults2 = metafields.find(
-            metafield => metafield.key === 'consumer_study_results_2' && metafield.namespace === 'custom'
+            metafield => metafield?.key === 'consumer_study_results_2' && metafield?.namespace === 'custom'
           );
           
           const consumerStudyResults3 = metafields.find(
-            metafield => metafield.key === 'consumer_study_results_3' && metafield.namespace === 'custom'
+            metafield => metafield?.key === 'consumer_study_results_3' && metafield?.namespace === 'custom'
           );
           
           // Update state with metafield values if they exist

@@ -349,8 +349,8 @@ export function ReactComponent({ model }) {
       keyExtractor={(item, index) => index.toString()}
       stickySectionHeadersEnabled={false}
       showsVerticalScrollIndicator={true}
-      initialNumToRender={3} // Start with fewer sections for faster initial render
-      maxToRenderPerBatch={2} // Render fewer items per batch
+      initialNumToRender={2} // Start with fewer sections for faster initial render
+      maxToRenderPerBatch={4} // Render fewer items per batch
       windowSize={5} // Reduce window size for better performance
       removeClippedSubviews={true} // Important for performance
     />
