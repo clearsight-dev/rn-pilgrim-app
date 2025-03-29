@@ -13,7 +13,7 @@ import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
 
 export function ReactComponent({ model }) {
   const route = useRoute();
-  const productHandle = route.params.productHandle;
+  const productHandle = route.params?.productHandle ?? '3-redensyl-4-anagain-hair-growth-serum';
   // const productHandle = model.get('productHandle');
   const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
   const aspectRatio = model.get('aspectRatio') || '1/1.5';
@@ -283,18 +283,6 @@ export function ReactComponent({ model }) {
   // Render each section based on its type
   const renderItem = ({ item, section }) => {
     switch (section.type) {
-      case 'dummy1':
-        return (
-          <View style={styles.dummySection}>
-            <Text style={styles.dummyText}>This is a dummy section to improve performance</Text>
-          </View>
-        );
-      case 'dummy2':
-        return (
-          <View style={styles.dummySection}>
-            <Text style={styles.dummyText}>Another dummy section to improve performance</Text>
-          </View>
-        );
       case 'above-the-fold':
         return (
           <AboveThefoldContent

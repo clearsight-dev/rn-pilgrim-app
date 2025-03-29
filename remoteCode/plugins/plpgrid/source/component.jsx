@@ -20,9 +20,9 @@ import styles from './styles';
 export function ReactComponent({ model }) {
   // const collectionHandle = model.get('collectionHandle') || '';
   const route = useRoute();
-  const collectionHandle = route.params.collectionHandle;
-  const selectedCategory = route.params.category;
-  const selectedSubcategory = route.params.subcategory;
+  const collectionHandle = route.params?.collectionHandle ?? '3-redensyl-4-anagain-hair-growth-serum';
+  const selectedCategory = route.params?.category;
+  const selectedSubcategory = route.params?.subcategory;
   const footerRef = useRef(null);
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [products, setProducts] = useState([]);
