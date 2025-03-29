@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SectionList, Text } from 'react-native';
+import { View, StyleSheet, SectionList, Text, InteractionManager, Platform } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useRoute } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useSelector, shallowEqual } from 'react-redux';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
 import AboveThefoldContent from './AboveThefoldContent';
 import DescriptionCard from './DescriptionCard';
@@ -35,32 +35,65 @@ export function ReactComponent({ model }) {
     }
   });
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
-  
-  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
 
+  const queryRunner = useSelector(state => {
+    const shopifyDSModel = datasourceTypeModelSel(state, 'shopifyV_22_10')
+    const queryRunner = shopifyDSModel.get('queryRunner');
+    return queryRunner;
+  }, shallowEqual);
+
+  console.log("Rendering pdp");
   useEffect(() => {
     const loadProductData = async () => {
       setLoading(true);
       try {
-        const queryRunner = shopifyDSModel?.get('queryRunner');
         if (!queryRunner || !productHandle) {
+          // TODO(gaurav): actually retry
           console.error("[APPTILE_AGENT] No query runner or product handle. Will retry in 100ms");
           return;
         }
+
         const result = await fetchProductData(queryRunner, productHandle);
-        setProductData(result);
-        setLoading(false);
+
+        // Beware adventurer, wild things follow
+
+        // On low end androids the render cycle is long enough to give a significant
+        // pause before navigation if the render starts too early. So we delay here
+        // to allow the navigation to finish and let the skeleton show for a bit,
+        // before staring the render
+        if (Platform.OS === "android") {
+          setTimeout(() => {
+          // We don't use InteractionManager because that will stop the render from
+          // starting while the transition is happening. This introduces a tradeoff
+          // between the page transition animation finishing completely but smoothly
+          // and the skeleton showing till the render is finished, or there being a 
+          // bit of a jank in the page transition animation but the page contents 
+          // loading by the time the animation finishes. When loading from apollo cache
+          // it looks better IMO when the page loads as the animation finishes, 
+          // even if there is a bit of a jank
+          // The delay is 50 because its seems to be the optimal choice on xiaomi
+          // and pixel 6 to have the jank occur at the last possible moment of the 
+          // animation
+          // InteractionManager.runAfterInteractions(() => {
+            setProductData(result);
+            setLoading(false);
+          }, 50);
+        } else {
+          setProductData(result);
+          setLoading(false);
+        }
+
       } catch (err) {
         console.error("[APPTILE_AGENT] Error fetching product data:", err);
         setError(err.message || "Failed to fetch product data");
         setLoading(false);
       }
     };
-
-    if (shopifyDSModel && productHandle) {
+  
+    if (queryRunner && productHandle) {
       loadProductData();
     }
-  }, [shopifyDSModel, productHandle]);
+  }, [queryRunner, productHandle]);
 
   // Extract and format product label
   const formatProductLabel = (metafields) => {
