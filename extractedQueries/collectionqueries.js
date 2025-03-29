@@ -75,6 +75,7 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
         const SUBCATEGORY_PRODUCT_QUERY = gql`
           query SubcategoryProduct($handle: String, $filters: [ProductFilter!]) {
             collection(handle: $handle) {
+              id
               products(first: 1, filters: $filters) {
                 nodes {
                   featuredImage {

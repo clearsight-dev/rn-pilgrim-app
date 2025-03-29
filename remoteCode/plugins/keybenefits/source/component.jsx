@@ -3,13 +3,16 @@ import { View, ActivityIndicator, StyleSheet, Text as RNText } from 'react-nativ
 import {Image} from '../../../../extractedQueries/ImageComponent';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useSelector } from 'react-redux';
+import { useRoute } from '@react-navigation/native';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import BenefitsCard from './BenefitsCard';
 import ThreeDCarousel from './threeDCarousel';
 import GradientText from '../../../../extractedQueries/GradientText';
 
 export function ReactComponent({ model }) {
-  const productHandle = model.get('productHandle');
+  // const productHandle = model.get('productHandle');
+  const route = useRoute();
+  const productHandle = route.params.productHandle;
   const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
   const aspectRatio = model.get('aspectRatio') || '1/1.5'; // Get aspect ratio from props
   const cardWidthPercentage = parseFloat(model.get('cardWidthPercentage') || '70'); // Get card width as percentage of screen

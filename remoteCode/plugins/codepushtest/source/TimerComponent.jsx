@@ -27,31 +27,31 @@ const TimerComponent = ({
   const [seconds, setSeconds] = useState(initialSeconds);
   const [isActive, setIsActive] = useState(true);
 
-  useEffect(() => {
-    let interval = null;
+  // useEffect(() => {
+  //   let interval = null;
     
-    if (isActive) {
-      interval = setInterval(() => {
-        if (seconds > 0) {
-          setSeconds(seconds - 1);
-        } else if (minutes > 0) {
-          setMinutes(minutes - 1);
-          setSeconds(59);
-        } else if (hours > 0) {
-          setHours(hours - 1);
-          setMinutes(59);
-          setSeconds(59);
-        } else {
-          setIsActive(false);
-          onTimerEnd();
-        }
-      }, 1000);
-    } else if (!isActive && (seconds !== 0 || minutes !== 0 || hours !== 0)) {
-      clearInterval(interval);
-    }
+  //   if (isActive) {
+  //     interval = setInterval(() => {
+  //       if (seconds > 0) {
+  //         setSeconds(seconds - 1);
+  //       } else if (minutes > 0) {
+  //         setMinutes(minutes - 1);
+  //         setSeconds(59);
+  //       } else if (hours > 0) {
+  //         setHours(hours - 1);
+  //         setMinutes(59);
+  //         setSeconds(59);
+  //       } else {
+  //         setIsActive(false);
+  //         onTimerEnd();
+  //       }
+  //     }, 1000);
+  //   } else if (!isActive && (seconds !== 0 || minutes !== 0 || hours !== 0)) {
+  //     clearInterval(interval);
+  //   }
     
-    return () => clearInterval(interval);
-  }, [isActive, seconds, minutes, hours, onTimerEnd]);
+  //   return () => clearInterval(interval);
+  // }, [isActive, seconds, minutes, hours, onTimerEnd]);
 
   // Format numbers to always have two digits
   const formatNumber = (num) => {
