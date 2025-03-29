@@ -55,8 +55,7 @@ export function ReactComponent({ model }) {
 
         const result = await fetchProductData(queryRunner, productHandle);
 
-        // Beware adventurer, wild things follow
-
+        // Beware adventurer! android ahead
         // On low end androids the render cycle is long enough to give a significant
         // pause before navigation if the render starts too early. So we delay here
         // to allow the navigation to finish and let the skeleton show for a bit,
