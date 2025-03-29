@@ -9,6 +9,7 @@ import AboveThefoldContent from './AboveThefoldContent';
 import DescriptionCard from './DescriptionCard';
 import RecommendationsRoot from './recommendations/RecommendationsRoot';
 import BenefitsRoot from './keybenefits/BenefitsRoot';
+import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
 
 export function ReactComponent({ model }) {
   const route = useRoute();
@@ -266,6 +267,10 @@ export function ReactComponent({ model }) {
         cardWidthPercentage={cardWidthPercentage}
         cardSpacing={cardSpacing}
         imageBand={imageBand}
+      />
+
+      <RatingsReviewsRoot 
+        productHandle={productHandle}
       />
 
       <RecommendationsRoot 
