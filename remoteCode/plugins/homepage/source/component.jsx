@@ -1,6 +1,18 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, NativeModules } from 'react-native';
-import { datasourceTypeModelSel, navigateToScreen, useApptileWindowDims } from 'apptile-core';
+import React, { useEffect, useContext, useCallback, useRef } from 'react';
+import { 
+  View, 
+  StyleSheet, 
+  Text, 
+  Image, 
+  TouchableOpacity, 
+  NativeModules, 
+  ScrollView 
+} from 'react-native';
+import { 
+  datasourceTypeModelSel, 
+  navigateToScreen, 
+  useApptileWindowDims 
+} from 'apptile-core';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
@@ -9,8 +21,11 @@ import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
 import { Carousel } from '../../../../extractedQueries/ImageCarousel';
 import { Platform } from 'react-native';
+import {PilgrimContext} from '../../../../PilgrimContext';
 
 export function ReactComponent({ model }) {
+  const {pilgrimGlobals, setPilgrimGlobals} = useContext(PilgrimContext);
+  const prevScrollY = useRef(0);
   const dispatch = useDispatch();
   // Get collection handle and number of products from model props or use defaults
   const numberOfProducts = 5;
@@ -40,8 +55,39 @@ export function ReactComponent({ model }) {
   }, [quickCollectionsData])
 
   console.log("Rendering workpage")
+
+  const handleScroll = useCallback(
+    (ev) => {
+      const currentY = ev.nativeEvent.contentOffset.y;
+
+      // Determine scroll direction
+      const isScrollingDown = currentY > prevScrollY.current;
+      const isScrollingUp = currentY < prevScrollY.current;
+
+      if (currentY < 80 && pilgrimGlobals.homePageScrolledDown) {
+        setPilgrimGlobals((prev) => ({...prev, homePageScrolledDown: false}));
+      } else {
+        // Update state only if needed
+        if (currentY >= 80 && isScrollingDown && !pilgrimGlobals.homePageScrolledDown) {
+          console.log("Setting scrolldown")
+          setPilgrimGlobals((prev) => ({ ...prev, homePageScrolledDown: true }));
+        } else if (isScrollingUp && pilgrimGlobals.homePageScrolledDown) {
+          console.log("Setting scrollup")
+          setPilgrimGlobals((prev) => ({ ...prev, homePageScrolledDown: false }));
+        }
+      }
+
+      prevScrollY.current = currentY; 
+    },
+    [pilgrimGlobals, setPilgrimGlobals]
+  );
+
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      onScroll={handleScroll}
+      scrollEventThrottle={50}
+    >
       <QuickCollections
         collections={quickCollectionsData}
       />
@@ -131,7 +177,7 @@ export function ReactComponent({ model }) {
         collectionHandle={'new-launch'}
         numberOfProducts={numberOfProducts}
       />
-    </View>
+    </ScrollView>
   );
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import {
@@ -12,6 +12,7 @@ import JSSplash from './components/JSSplash';
 import UpdateModal from './components/UpdateModal';
 import AdminPage from './components/AdminPage';
 import FloatingUpdateModal from './components/FloatingUpdateModal';
+import {PilgrimContext} from './PilgrimContext';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
@@ -25,6 +26,7 @@ import { init as initAnalytics } from './analytics';
 const Stack = createNativeStackNavigator<ScreenParams>();
 
 function App(): React.JSX.Element {
+  const [pilgrimGlobals, setPilgrimGlobals] = useState({homePageScrolledDown: false});
   const status = useStartApptile(initAnalytics);
 
   let body = null;
@@ -84,16 +86,18 @@ function App(): React.JSX.Element {
 
   // The nocode layer will not do navigation to these screens so you can handle those navigations in the onNavigationEvent
   return (
-    <ApptileWrapper
-      noNavigatePaths={["NativeUtils", "AdminPage"]}
-      onNavigationEvent={(ev) => {
-        console.log("handle navigation event", ev)
-        apptileNavigationRef.current.navigate(ev.screenName, { appId: status.appId });
-      }}
-    >
-      {body}
-      {updateModal}
-    </ApptileWrapper>
+    <PilgrimContext.Provider value={{pilgrimGlobals, setPilgrimGlobals}}>
+      <ApptileWrapper
+        noNavigatePaths={["NativeUtils", "AdminPage"]}
+        onNavigationEvent={(ev) => {
+          console.log("handle navigation event", ev)
+          apptileNavigationRef.current.navigate(ev.screenName, { appId: status.appId });
+        }}
+      >
+        {body}
+        {updateModal}
+      </ApptileWrapper>
+    </PilgrimContext.Provider>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useContext } from 'react';
 import {
   Platform, 
   View, 
@@ -21,6 +21,7 @@ import {
 import {useSelector, shallowEqual} from 'react-redux';
 import {Image} from '../../../../extractedQueries/ImageComponent';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {PilgrimContext} from '../../../../PilgrimContext';
 
 const BottomTabNavigator = createBottomTabNavigator();
 
@@ -34,7 +35,8 @@ function CustomTabHeader({navigation, route, options}) {
   const insets = useSafeAreaInsets();
   const currentCartLineItemsLength = useSelector(numCartLineItems, shallowEqual);
   const searchBarTranslation = useRef(new Animated.Value(0));
-  const textInputRef = useRef(null);
+  const textInputRef = useRef(null); 
+  const {pilgrimGlobals} = useContext(PilgrimContext);
 
   const FIRST_ROW_HEIGHT = 40;
   let SECOND_ROW_HEIGHT = 40;
@@ -47,49 +49,85 @@ function CustomTabHeader({navigation, route, options}) {
 
   useEffect(() => {
     let animation = null;
-    const toggleVisibility = ({target, data}) => {
-      console.log("Target: ", target, route.name)
-      const isHomeRoute = route.name === "Home";
-      if (!isHomeRoute) {
-        console.log("Hide animation")
-        searchBarTranslation.current.setValue(0);
-        animation = Animated.timing(searchBarTranslation.current, {
-          toValue: -50,
-          duration: 300,
-          useNativeDriver: true
-        }).start((finished) => {
-          if (finished) {
-            console.log("Animation 1 finished");
-            animation = null;
-          }
-        });
-      } else {
-        console.log("show animation")
-        searchBarTranslation.current.setValue(-50);
-        animation = Animated.timing(searchBarTranslation.current, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true
-        }).start((finished) => {
-          if (finished) {
-            console.log("Animation 2 finished")
-            animation = null;
-          }
-        });
-      }
+    if (pilgrimGlobals.homePageScrolledDown === true) {
+      console.log("Hide animation")
+      searchBarTranslation.current.setValue(0);
+      animation = Animated.timing(searchBarTranslation.current, {
+        toValue: -50,
+        duration: 300,
+        useNativeDriver: true
+      }).start((finished) => {
+        if (finished) {
+          console.log("Animation 1 finished");
+          animation = null;
+        }
+      });
+    } else if (pilgrimGlobals.homePageScrolledDown === false) {
+      console.log("show animation")
+      searchBarTranslation.current.setValue(-50);
+      animation = Animated.timing(searchBarTranslation.current, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true
+      }).start((finished) => {
+        if (finished) {
+          console.log("Animation 2 finished")
+          animation = null;
+        }
+      });
     }
 
-    const removeListener = navigation.addListener('focus', toggleVisibility);
     return () => {
-      removeListener();
       if (animation) {
         console.log("Cancelling animation")
         animation.stop();
       }
     }
-  }, [searchBarTranslation]);
+  }, [pilgrimGlobals]);
 
-  
+  // useEffect(() => {
+  //   let animation = null;
+  //   const toggleVisibility = ({target, data}) => {
+  //     console.log("Target: ", target, route.name)
+  //     const isHomeRoute = route.name === "Home";
+  //     if (!isHomeRoute) {
+  //       console.log("Hide animation")
+  //       searchBarTranslation.current.setValue(0);
+  //       animation = Animated.timing(searchBarTranslation.current, {
+  //         toValue: -50,
+  //         duration: 300,
+  //         useNativeDriver: true
+  //       }).start((finished) => {
+  //         if (finished) {
+  //           console.log("Animation 1 finished");
+  //           animation = null;
+  //         }
+  //       });
+  //     } else {
+  //       console.log("show animation")
+  //       searchBarTranslation.current.setValue(-50);
+  //       animation = Animated.timing(searchBarTranslation.current, {
+  //         toValue: 0,
+  //         duration: 300,
+  //         useNativeDriver: true
+  //       }).start((finished) => {
+  //         if (finished) {
+  //           console.log("Animation 2 finished")
+  //           animation = null;
+  //         }
+  //       });
+  //     }
+  //   }
+
+  //   const removeListener = navigation.addListener('focus', toggleVisibility);
+  //   return () => {
+  //     removeListener();
+  //     if (animation) {
+  //       console.log("Cancelling animation")
+  //       animation.stop();
+  //     }
+  //   }
+  // }, [searchBarTranslation]);
 
   return (
     <View
