@@ -70,7 +70,7 @@ const QuickCollections = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 16,
+    marginBottom: 16,
     paddingHorizontal: 16,
     backgroundColor: '#fff',
   },
