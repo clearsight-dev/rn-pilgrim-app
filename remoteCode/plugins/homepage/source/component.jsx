@@ -54,30 +54,33 @@ export function ReactComponent({ model }) {
     }
   }, [quickCollectionsData])
 
-  console.log("Rendering workpage")
-
   const handleScroll = useCallback(
     (ev) => {
       const currentY = ev.nativeEvent.contentOffset.y;
 
+      const delY = currentY - prevScrollY.current;
+
       // Determine scroll direction
-      const isScrollingDown = currentY > prevScrollY.current;
-      const isScrollingUp = currentY < prevScrollY.current;
+      const isScrollingDown = delY > 100;
+      const isScrollingUp = delY < -100;
 
       if (currentY < 80 && pilgrimGlobals.homePageScrolledDown) {
+        console.log("Showing searchbar because scroll location is near the top");
         setPilgrimGlobals((prev) => ({...prev, homePageScrolledDown: false}));
-      } else {
+      } else if (currentY >= 80) {
         // Update state only if needed
-        if (currentY >= 80 && isScrollingDown && !pilgrimGlobals.homePageScrolledDown) {
-          console.log("Setting scrolldown")
+        if (isScrollingDown && !pilgrimGlobals.homePageScrolledDown) {
+          console.log("Setting scrolldown to hide the searchbar");
           setPilgrimGlobals((prev) => ({ ...prev, homePageScrolledDown: true }));
         } else if (isScrollingUp && pilgrimGlobals.homePageScrolledDown) {
-          console.log("Setting scrollup")
+          console.log("Setting scrollup to show the scrollbar");
           setPilgrimGlobals((prev) => ({ ...prev, homePageScrolledDown: false }));
         }
       }
 
-      prevScrollY.current = currentY; 
+      if (Math.abs(delY) > 100) {
+        prevScrollY.current = currentY; 
+      }
     },
     [pilgrimGlobals, setPilgrimGlobals]
   );

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useContext } from 'react';
+import React, {useEffect, useRef, useContext, useState } from 'react';
 import {
   Platform, 
   View, 
@@ -32,6 +32,7 @@ const numCartLineItems = (state) => {
 }
 
 function CustomTabHeader({navigation, route, options}) {
+  const [searchbarIsMounted, setSearchbarIdMounted] = useState(true);
   const insets = useSafeAreaInsets();
   const currentCartLineItemsLength = useSelector(numCartLineItems, shallowEqual);
   const searchBarTranslation = useRef(new Animated.Value(0));
@@ -49,7 +50,7 @@ function CustomTabHeader({navigation, route, options}) {
 
   useEffect(() => {
     let animation = null;
-    if (pilgrimGlobals.homePageScrolledDown === true) {
+    if (pilgrimGlobals.homePageScrolledDown === true && route.name === "Home") {
       console.log("Hide animation")
       searchBarTranslation.current.setValue(0);
       animation = Animated.timing(searchBarTranslation.current, {
@@ -58,23 +59,27 @@ function CustomTabHeader({navigation, route, options}) {
         useNativeDriver: true
       }).start((finished) => {
         if (finished) {
-          console.log("Animation 1 finished");
+          setSearchbarIdMounted(false);
+          console.log("hide animation finished for searchbar");
           animation = null;
         }
       });
-    } else if (pilgrimGlobals.homePageScrolledDown === false) {
+    } else if (pilgrimGlobals.homePageScrolledDown === false && route.name === "Home") {
       console.log("show animation")
+      setSearchbarIdMounted(true);
       searchBarTranslation.current.setValue(-50);
-      animation = Animated.timing(searchBarTranslation.current, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true
-      }).start((finished) => {
-        if (finished) {
-          console.log("Animation 2 finished")
-          animation = null;
-        }
-      });
+      setTimeout(() => {
+        animation = Animated.timing(searchBarTranslation.current, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true
+        }).start((finished) => {
+          if (finished) {
+            console.log("show animation finished for searchbar")
+            animation = null;
+          }
+        });
+      }, 100);
     }
 
     return () => {
@@ -85,49 +90,21 @@ function CustomTabHeader({navigation, route, options}) {
     }
   }, [pilgrimGlobals]);
 
-  // useEffect(() => {
-  //   let animation = null;
-  //   const toggleVisibility = ({target, data}) => {
-  //     console.log("Target: ", target, route.name)
-  //     const isHomeRoute = route.name === "Home";
-  //     if (!isHomeRoute) {
-  //       console.log("Hide animation")
-  //       searchBarTranslation.current.setValue(0);
-  //       animation = Animated.timing(searchBarTranslation.current, {
-  //         toValue: -50,
-  //         duration: 300,
-  //         useNativeDriver: true
-  //       }).start((finished) => {
-  //         if (finished) {
-  //           console.log("Animation 1 finished");
-  //           animation = null;
-  //         }
-  //       });
-  //     } else {
-  //       console.log("show animation")
-  //       searchBarTranslation.current.setValue(-50);
-  //       animation = Animated.timing(searchBarTranslation.current, {
-  //         toValue: 0,
-  //         duration: 300,
-  //         useNativeDriver: true
-  //       }).start((finished) => {
-  //         if (finished) {
-  //           console.log("Animation 2 finished")
-  //           animation = null;
-  //         }
-  //       });
-  //     }
-  //   }
+  useEffect(() => {
+    const toggleVisibility = ({target, data}) => {
+      console.log("Target: ", target, route.name)
+      const isHomeRoute = route.name === "Home";
+      if (!isHomeRoute) {
+        searchBarTranslation.current.setValue(-50);
+        setSearchbarIdMounted(false);
+      } 
+    }
 
-  //   const removeListener = navigation.addListener('focus', toggleVisibility);
-  //   return () => {
-  //     removeListener();
-  //     if (animation) {
-  //       console.log("Cancelling animation")
-  //       animation.stop();
-  //     }
-  //   }
-  // }, [searchBarTranslation]);
+    const removeListener = navigation.addListener('focus', toggleVisibility);
+    return () => {
+      removeListener();
+    }
+  }, [route.name]);
 
   return (
     <View
@@ -136,7 +113,7 @@ function CustomTabHeader({navigation, route, options}) {
           position: "relative",
           left: 0,
           top: insets.top,
-          height: FIRST_ROW_HEIGHT + SECOND_ROW_HEIGHT + 10,
+          height: (FIRST_ROW_HEIGHT + 10),
           flexDirection: "column",
           backgroundColor: "white",
           // borderWidth: 1, 
@@ -191,8 +168,13 @@ function CustomTabHeader({navigation, route, options}) {
       <Animated.View 
         style={{
           paddingHorizontal: 16,
+          backgroundColor: "#fff",
           paddingBottom: 10,
           zIndex: 1,
+          opacity: searchBarTranslation.current.interpolate({
+            inputRange: [-50, -40, 0],
+            outputRange: [0, 0.8, 1]
+          }),
           transform: [
             {
               translateY: searchBarTranslation.current
