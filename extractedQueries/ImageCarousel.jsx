@@ -142,7 +142,13 @@ export function Carousel({ width, flatlistData, renderChildren }) {
           left: 0.25 * width,
         }}
       >
-        {userInteracted ? (
+        <ScrollBubbles 
+          ref={scrollBubblesRef}
+          numBubbles={flatlistData.length} 
+          currentIndex={currentIndexRef.current}
+          onBubblePress={handleBubblePress}
+        />
+        {/* {userInteracted ? (
           <ScrollBubbles 
             ref={scrollBubblesRef}
             numBubbles={flatlistData.length} 
@@ -155,7 +161,7 @@ export function Carousel({ width, flatlistData, renderChildren }) {
             onIndexChange={handleAutoIndexChange}
             startIndex={currentIndexRef.current}
           />
-        )}
+        )} */}
       </View>
     </View>
   );

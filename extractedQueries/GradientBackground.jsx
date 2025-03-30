@@ -38,7 +38,7 @@ const GradientBackground = ({
       style={[{ position: 'relative'}, style]}
       onLayout={ev => {
         const { width, height } = ev.nativeEvent.layout;
-        if (Math.abs(width - dimensions.width) > 1 || Math.abs(height - dimensions.height) > 1) {
+        if (Math.abs(width - dimensions.width) > 20 || Math.abs(height - dimensions.height) > 20) {
           setDimensions({ width, height });
         }
       }}
