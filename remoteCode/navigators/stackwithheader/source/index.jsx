@@ -20,6 +20,7 @@ import {
   Icon, 
   datasourceTypeModelSel,
 } from 'apptile-core';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const StackNavigator = createStackNavigator();
 
@@ -54,7 +55,7 @@ function isOnHome(state) {
   return false;
 };
 
-const CustomHeader = forwardRef((props, ref) => {
+const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbutton}, ref) => {
   console.log("[AGENT] rendering dumb header");
   const locals = useRef({
     isSearchbarVisible: true,
@@ -135,13 +136,21 @@ const CustomHeader = forwardRef((props, ref) => {
 
   const FIRST_ROW_HEIGHT = 40;
 
+  const handleHeaderLeft = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      console.warn("Triggered back navigation on a screen that cannot go back");
+    }
+  }
+
   return (
     <View
       style={[
         {
           position: "relative",
           left: 0,
-          top: props.topInset,
+          top: topInset,
           height: (FIRST_ROW_HEIGHT + 10),
           flexDirection: "column",
           backgroundColor: "white",
@@ -165,9 +174,12 @@ const CustomHeader = forwardRef((props, ref) => {
         zIndex: 2,
         backgroundColor: "white"
       }}>
-        <Pressable style={styles.iconContainer}>
-          <Icon iconType="MaterialIcons" name="menu" size={24} color="#333" />
-        </Pressable>
+        <TouchableOpacity 
+          style={styles.iconContainer}
+          onPress={handleHeaderLeft}
+        >
+          <Icon iconType="MaterialIcons" name={showBackbutton ? "keyboard-backspace" : "menu"} size={24} color="#333" />
+        </TouchableOpacity>
         <View style={styles.logoContainer}>
           <Image 
             source={{
@@ -184,10 +196,10 @@ const CustomHeader = forwardRef((props, ref) => {
           
           <Pressable style={styles.iconContainer}>
             <Icon iconType="MaterialIcons" name="shopping-cart" size={24} color="#333" />
-            {props.numCartItems ? (
+            {numCartItems ? (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>
-                  {props.numCartItems}
+                  {numCartItems}
                 </Text>
               </View>
             ) : null}
@@ -231,7 +243,7 @@ const CustomHeader = forwardRef((props, ref) => {
   );
 })
 
-function CustomHeaderSmart({navigation}) {
+function CustomHeaderSmart({route, navigation}) {
   console.log('[AGENT] rendering smart custom header')
   const insets = useSafeAreaInsets();
   const currentCartLineItemsLength = useSelector(numCartLineItems, shallowEqual);
@@ -260,8 +272,10 @@ function CustomHeaderSmart({navigation}) {
 
   return (
     <CustomHeader
+      navigation={navigation}
       topInset={insets?.top ?? 0}
       numCartItems={currentCartLineItemsLength}
+      showBackbutton={route.name !== "Nav1"}
       ref={headerComponent}
     />
   );
@@ -285,7 +299,7 @@ export default function createCustomStackNavWithHeader(
     headerShown: true,
     header: ({route, navigation, navConfig}) => (
       <CustomHeaderSmart 
-        // route={route}
+        route={route}
         navigation={navigation}
       />
     ),
