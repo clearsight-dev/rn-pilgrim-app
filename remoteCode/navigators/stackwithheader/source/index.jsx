@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useContext, useState } from 'react';
+import React, {useRef, useContext, useEffect} from 'react';
 import {
   Platform, 
   View, 
@@ -8,27 +8,54 @@ import {
   TextInput, 
   Animated, 
 } from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { useNavigationState } from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {useSelector, shallowEqual} from 'react-redux';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Image} from '../../../../extractedQueries/ImageComponent';
+import {PilgrimContext} from '../../../../PilgrimContext';
 import {
   createScreenFromConfig, 
   createNavigatorsFromConfig, 
   Icon, 
   datasourceTypeModelSel,
 } from 'apptile-core';
-import {useSelector, shallowEqual} from 'react-redux';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Image} from '../../../../extractedQueries/ImageComponent';
-import {PilgrimContext} from '../../../../PilgrimContext';
 
-const BottomTabNavigator = createBottomTabNavigator();
+const StackNavigator = createStackNavigator();
 
-const numCartLineItems = (state) => {
+function numCartLineItems(state) {
   const shopifyDS = datasourceTypeModelSel(state, "shopifyV_22_10");
   const currentCart = shopifyDS?.get('currentCart');
   return currentCart?.lines?.length ?? 0;
 }
 
+function isOnHome(state) {
+  try {
+    const currentRoute = state.routes?.[state?.index ?? 0] ?? null;
+    if (currentRoute?.name === "Nav1") {
+      const nav1State = currentRoute.state;
+
+      if (nav1State && nav1State.index) {
+        const activeRoute = nav1State.routes[nav1State.index];
+        return activeRoute.name === "Home";
+      } else if (!currentRoute.index) {
+        console.log('[AGENT] returning onHomeRoute because it looks like tab navigator state is not initialized');
+        return true;
+      } else {
+        console.error("I have no idea what is going on now");
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } catch(err) {
+    console.error("error: ", err)
+  }
+  return false;
+};
+
 function CustomTabHeader({navigation, route, options}) {
+  const isHomeRoute = isOnHome(navigation);
   const insets = useSafeAreaInsets();
   const currentCartLineItemsLength = useSelector(numCartLineItems, shallowEqual);
   const searchBarTranslation = useRef(new Animated.Value(0));
@@ -37,8 +64,6 @@ function CustomTabHeader({navigation, route, options}) {
 
   const FIRST_ROW_HEIGHT = 40;
   let SECOND_ROW_HEIGHT = 40;
-
-  const isHomeRoute = route.name === "Home";
 
   if (!isHomeRoute) {
     SECOND_ROW_HEIGHT = 0
@@ -84,20 +109,16 @@ function CustomTabHeader({navigation, route, options}) {
     }
   }, [pilgrimGlobals]);
 
-  useEffect(() => {
-    const toggleVisibility = ({target, data}) => {
-      console.log("Target: ", target, route.name)
-      const isHomeRoute = route.name === "Home";
-      if (!isHomeRoute) {
-        searchBarTranslation.current.setValue(-50);
-      } 
+  useNavigationState((state) => {
+    debugger
+    console.log("Updated navigation state: ", state);
+    const isHomeRoute = isOnHome(state);
+    if (isHomeRoute) {
+      searchBarTranslation.current.setValue(0);
+    } else if (!isHomeRoute) {
+      searchBarTranslation.current.setValue(-50);
     }
-
-    const removeListener = navigation.addListener('focus', toggleVisibility);
-    return () => {
-      removeListener();
-    }
-  }, [route.name]);
+  })
 
   return (
     <View
@@ -195,51 +216,64 @@ function CustomTabHeader({navigation, route, options}) {
   );
 }
 
-export default function createBottomTabNavigatorFromConfig(
+export default function createCustomStackNavWithHeader(
   navigatorConfig,
   navigatorModel,
   props = {},
   pages,
-){
+) {
   let navigatorOptions = {
     screenOptions: {
-      tabBarLabelPosition: 'below-icon',
-      // header: ({route, navigation, navConfig}) => (
-      //   <CustomTabHeader 
-      //     route={route}
-      //     navigation={navigation}
-      //     navConfig={navConfig}
-      //   />
-      // ),
-    },
+      detachPreviousScreen: false,
+    }, 
   };
-
   if (Platform.OS !== 'web') navigatorOptions = {...navigatorOptions, detachInactiveScreens: false};
 
+  let NavScreenOptions = {
+    detachPreviousScreen: false,
+    headerShown: true,
+    header: ({route, navigation, navConfig}) => (
+      <CustomTabHeader 
+        route={route}
+        navigation={navigation}
+        navConfig={navConfig}
+      />
+    ),
+  };
+
   return (
-    <BottomTabNavigator.Navigator 
+    <StackNavigator.Navigator 
       id={navigatorConfig.name} 
       {...navigatorOptions} 
       {...props}
     >
-      {navigatorConfig.screens
-        .map(config => {
-          const screenModel = navigatorModel?.screens[config.name];
-          return config.type === 'navigator' ? (
-            <BottomTabNavigator.Screen
-              name={config.name}
-              key={config.name}
-              navigationKey={config.name}
-              options={{headerShown: false}}>
-              {screenProps => createNavigatorsFromConfig(config, screenModel, screenProps, pages)}
-            </BottomTabNavigator.Screen>
-          ) : (
-            createScreenFromConfig(BottomTabNavigator, config, screenModel, pages)
-          );
-        })
-        .toList()
-        .toJS()}
-    </BottomTabNavigator.Navigator>
+      {navigatorConfig.screens.size === 0 ? (
+        <StackNavigator.Screen
+          name="EmptyScreen"
+          options={{headerShown: false}}
+          component={() => <Text>Add One or More Screens!</Text>}
+        />
+      ) : (
+        navigatorConfig.screens
+          .map(config => {
+            const screenModal = navigatorModel?.screens[config.name];
+            return config.type === 'navigator' ? (
+              <StackNavigator.Screen
+                name={config.name}
+                key={config.name}
+                navigationKey={config.name}
+                options={NavScreenOptions}
+              >
+                {screenProps => createNavigatorsFromConfig(config, screenModal, screenProps, pages)}
+              </StackNavigator.Screen>
+            ) : (
+              createScreenFromConfig(StackNavigator, config, screenModal, pages, NavScreenOptions)
+            );
+          })
+          .toList()
+          .toJS()
+      )}
+    </StackNavigator.Navigator>
   );
 };
 

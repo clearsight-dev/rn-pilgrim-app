@@ -6,7 +6,8 @@ import {
   Image, 
   TouchableOpacity, 
   NativeModules, 
-  ScrollView 
+  ScrollView,
+  Platform 
 } from 'react-native';
 import { 
   datasourceTypeModelSel, 
@@ -20,7 +21,6 @@ import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
 import { Carousel } from '../../../../extractedQueries/ImageCarousel';
-import { Platform } from 'react-native';
 import {PilgrimContext} from '../../../../PilgrimContext';
 
 export function ReactComponent({ model }) {
