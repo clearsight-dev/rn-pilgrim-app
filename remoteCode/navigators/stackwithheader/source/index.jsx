@@ -1,4 +1,4 @@
-import React, {useRef, useContext, useEffect} from 'react';
+import React, {useRef, useContext, useEffect, forwardRef, useImperativeHandle} from 'react';
 import {
   Platform, 
   View, 
@@ -54,71 +54,86 @@ function isOnHome(state) {
   return false;
 };
 
-function CustomTabHeader({navigation, route, options}) {
-  const isHomeRoute = isOnHome(navigation);
-  const insets = useSafeAreaInsets();
-  const currentCartLineItemsLength = useSelector(numCartLineItems, shallowEqual);
+const CustomHeader = forwardRef((props, ref) => {
+  console.log("[AGENT] rendering dumb header");
+  const locals = useRef({
+    isSearchbarVisible: true,
+    searchbarAnimation: null
+  });
   const searchBarTranslation = useRef(new Animated.Value(0));
   const textInputRef = useRef(null); 
-  const {pilgrimGlobals} = useContext(PilgrimContext);
 
-  const FIRST_ROW_HEIGHT = 40;
-  let SECOND_ROW_HEIGHT = 40;
-
-  if (!isHomeRoute) {
-    SECOND_ROW_HEIGHT = 0
-  }
-
-  useEffect(() => {
-    let animation = null;
-    if (pilgrimGlobals.homePageScrolledDown === true && route.name === "Home") {
-      console.log("Hide animation")
-      searchBarTranslation.current.setValue(0);
-      animation = Animated.timing(searchBarTranslation.current, {
-        toValue: -50,
-        duration: 300,
-        useNativeDriver: true
-      }).start((finished) => {
-        if (finished) {
-          console.log("hide animation finished for searchbar");
-          animation = null;
-        }
-      });
-    } else if (pilgrimGlobals.homePageScrolledDown === false && route.name === "Home") {
-      console.log("show animation")
-      searchBarTranslation.current.setValue(-50);
-      setTimeout(() => {
-        animation = Animated.timing(searchBarTranslation.current, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true
-        }).start((finished) => {
-          if (finished) {
-            console.log("show animation finished for searchbar")
-            animation = null;
+  useImperativeHandle(ref, () => {
+    return {
+      showSearchbarAnimated: () => {
+        if (!locals.current.isSearchbarVisible) {
+          locals.current.isSearchbarVisible = true;
+          console.log("Show animation");
+          if (locals.current.searchbarAnimation) {
+            locals.current.searchbarAnimation.stop();
           }
-        });
-      }, 100);
-    }
 
-    return () => {
-      if (animation) {
-        console.log("Cancelling animation")
-        animation.stop();
+          searchBarTranslation.current.setValue(-50);
+          locals.current.isSearchbarVisible = Animated.timing(searchBarTranslation.current, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true
+          }).start((finished) => {
+            if (finished) {
+              console.log("show animation finished for searchbar");
+              locals.current.searchbarAnimation = null;
+            }
+          });
+        } else {
+          console.log("searchbar is alredy visible");
+        }
+      },
+      hideSearchbarAnimated: () => {
+        if (locals.current.isSearchbarVisible) {
+          locals.current.isSearchbarVisible = false;
+          console.log("Hide animation");
+          if (locals.current.searchbarAnimation) {
+            locals.current.searchbarAnimation.stop();
+          }
+
+          searchBarTranslation.current.setValue(0);
+          locals.current.isSearchbarVisible = Animated.timing(searchBarTranslation.current, {
+            toValue: -50,
+            duration: 300,
+            useNativeDriver: true
+          }).start((finished) => {
+            if (finished) {
+              console.log("hide animation finished for searchbar");
+              locals.current.searchbarAnimation = null;
+            }
+          });
+        } else {
+          console.log("searchbar is already hidden");
+        }
+      },
+      showSearchbar: () => {
+        if (!locals.current.isSearchbarVisible) {
+          locals.current.isSearchbarVisible = true;
+          searchBarTranslation.current.setValue(0);
+        } else {
+          console.warn("Searchbar is already visible!");
+        }
+      },
+      hideSearchbar: () => {
+        if (locals.current.isSearchbarVisible) {
+          locals.current.isSearchbarVisible = false;
+          searchBarTranslation.current.setValue(-50);
+        } else {
+          console.warn("Searchbar is already hidden!");
+        }
+      },
+      isSearchbarVisible: () => {
+        return locals.current.isSearchbarVisible;
       }
     }
-  }, [pilgrimGlobals]);
+  }, [searchBarTranslation, locals.current]);
 
-  useNavigationState((state) => {
-    debugger
-    console.log("Updated navigation state: ", state);
-    const isHomeRoute = isOnHome(state);
-    if (isHomeRoute) {
-      searchBarTranslation.current.setValue(0);
-    } else if (!isHomeRoute) {
-      searchBarTranslation.current.setValue(-50);
-    }
-  })
+  const FIRST_ROW_HEIGHT = 40;
 
   return (
     <View
@@ -126,7 +141,7 @@ function CustomTabHeader({navigation, route, options}) {
         {
           position: "relative",
           left: 0,
-          top: insets.top,
+          top: props.topInset,
           height: (FIRST_ROW_HEIGHT + 10),
           flexDirection: "column",
           backgroundColor: "white",
@@ -169,10 +184,10 @@ function CustomTabHeader({navigation, route, options}) {
           
           <Pressable style={styles.iconContainer}>
             <Icon iconType="MaterialIcons" name="shopping-cart" size={24} color="#333" />
-            {currentCartLineItemsLength ? (
+            {props.numCartItems ? (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>
-                  {currentCartLineItemsLength}
+                  {props.numCartItems}
                 </Text>
               </View>
             ) : null}
@@ -214,6 +229,42 @@ function CustomTabHeader({navigation, route, options}) {
       </Animated.View>
     </View>
   );
+})
+
+function CustomHeaderSmart({navigation}) {
+  console.log('[AGENT] rendering smart custom header')
+  const insets = useSafeAreaInsets();
+  const currentCartLineItemsLength = useSelector(numCartLineItems, shallowEqual);
+  const {pilgrimGlobals} = useContext(PilgrimContext);
+  const headerComponent = useRef(null);
+
+  useEffect(() => {
+    const onHome = isOnHome(navigation.getState());
+    const isSearchbarVisible = headerComponent?.current?.isSearchbarVisible();
+    if (isSearchbarVisible && pilgrimGlobals.homePageScrolledDown === true && onHome) {
+      headerComponent?.current?.hideSearchbarAnimated();
+    } else if (!isSearchbarVisible && pilgrimGlobals.homePageScrolledDown === false && onHome) {
+      headerComponent?.current?.showSearchbarAnimated();
+    }
+  }, [pilgrimGlobals, headerComponent, navigation]);
+
+  useNavigationState((state) => {
+    const isHomeRoute = isOnHome(state);
+    const isSearchbarVisible = headerComponent?.current?.isSearchbarVisible();
+    if (!isSearchbarVisible && isHomeRoute) {
+      headerComponent?.current?.showSearchbar();
+    } else if (isSearchbarVisible && !isHomeRoute) {
+      headerComponent?.current?.hideSearchbar();
+    }
+  })
+
+  return (
+    <CustomHeader
+      topInset={insets?.top ?? 0}
+      numCartItems={currentCartLineItemsLength}
+      ref={headerComponent}
+    />
+  );
 }
 
 export default function createCustomStackNavWithHeader(
@@ -233,10 +284,9 @@ export default function createCustomStackNavWithHeader(
     detachPreviousScreen: false,
     headerShown: true,
     header: ({route, navigation, navConfig}) => (
-      <CustomTabHeader 
-        route={route}
+      <CustomHeaderSmart 
+        // route={route}
         navigation={navigation}
-        navConfig={navConfig}
       />
     ),
   };
