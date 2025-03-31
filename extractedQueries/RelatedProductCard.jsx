@@ -6,9 +6,7 @@ import { useDispatch } from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 
-const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
-  // Extract product details - use fullData if available (from lazy loading)
-  const fullData = product.fullData || {};
+const RelatedProductCard = ({ product, style, onAddToCart }) => {
   const { 
     title, 
     featuredImage, 
@@ -17,11 +15,7 @@ const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
     metafield, 
     handle, 
     rating 
-  } = {
-    ...product,
-    // Override with fullData if available
-    ...fullData
-  };
+  } = product;
   
   // Get price information
   const price = priceRange?.minVariantPrice?.amount || '0';
@@ -60,7 +54,7 @@ const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
         />
         {/* Rating */}
         <View style={styles.ratingContainer}>
-          <Text style={styles.ratingText}>{rating || fullData?.rating || '4.8'}</Text>
+          <Text style={styles.ratingText}>{rating}</Text>
           <Star color={'#00909E'} size={12} fillPercentage={1} />
         </View>
         
@@ -91,7 +85,10 @@ const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
         }}
       >
         <TouchableOpacity
-          onPress={e => e.stopPropagation()}
+          onPress={e => {
+            e.stopPropagation();
+            onAddToCart(product);
+          }}
           style={{
             height: 33, 
             backgroundColor: '#FACA0C',

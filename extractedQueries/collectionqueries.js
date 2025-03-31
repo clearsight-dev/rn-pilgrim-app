@@ -172,6 +172,7 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
           }
           edges {
             node {
+              id
               handle
               featuredImage {
                 url
@@ -271,6 +272,7 @@ export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, 
         products(filters: $filters, first: $first) {
           edges {
             node {
+              id
               handle
             }
           }

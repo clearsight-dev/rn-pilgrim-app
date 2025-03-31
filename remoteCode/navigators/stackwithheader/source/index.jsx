@@ -14,6 +14,7 @@ import {useSelector, shallowEqual} from 'react-redux';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Image} from '../../../../extractedQueries/ImageComponent';
 import {PilgrimContext} from '../../../../PilgrimContext';
+import {useCartIconData} from '../../../../extractedQueries/selectors';
 import {
   createScreenFromConfig, 
   createNavigatorsFromConfig, 
@@ -23,12 +24,6 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const StackNavigator = createStackNavigator();
-
-function numCartLineItems(state) {
-  const shopifyDS = datasourceTypeModelSel(state, "shopifyV_22_10");
-  const currentCart = shopifyDS?.get('currentCart');
-  return currentCart?.lines?.length ?? 0;
-}
 
 function isOnHome(state) {
   try {
@@ -246,7 +241,7 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
 function CustomHeaderSmart({route, navigation}) {
   console.log('[AGENT] rendering smart custom header')
   const insets = useSafeAreaInsets();
-  const currentCartLineItemsLength = useSelector(numCartLineItems, shallowEqual);
+  const {numCurrentCartItems} = useCartIconData();
   const {pilgrimGlobals} = useContext(PilgrimContext);
   const headerComponent = useRef(null);
 
@@ -274,7 +269,7 @@ function CustomHeaderSmart({route, navigation}) {
     <CustomHeader
       navigation={navigation}
       topInset={insets?.top ?? 0}
-      numCartItems={currentCartLineItemsLength}
+      numCartItems={numCurrentCartItems}
       showBackbutton={route.name !== "Nav1"}
       ref={headerComponent}
     />

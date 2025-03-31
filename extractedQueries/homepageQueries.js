@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 const COLLECTION_QUERY = gql`
   query NewQuery($handle: String) {
     collection(handle: $handle) {
+      id
       image {
         url
       }
@@ -10,6 +11,7 @@ const COLLECTION_QUERY = gql`
       products(first: 3) {
         edges {
           node {
+            id
             images(first: 3) {
               nodes {
                 url

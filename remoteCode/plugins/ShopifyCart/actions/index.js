@@ -633,17 +633,17 @@ class CartActions {
         return;
       }
 
-      if (isCacheEnabled) {
-        cartLineCache = await this.cacheCartLineItem(
-          dispatch,
-          config,
-          model,
-          selector,
-          merchandiseId,
-          appConfig,
-          appModel,
-        );
-      }
+      // if (isCacheEnabled) {
+      //   cartLineCache = await this.cacheCartLineItem(
+      //     dispatch,
+      //     config,
+      //     model,
+      //     selector,
+      //     merchandiseId,
+      //     appConfig,
+      //     appModel,
+      //   );
+      // }
 
       const lineItemToAdd = {
         merchandiseId,

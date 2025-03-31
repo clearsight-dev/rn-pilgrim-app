@@ -9,6 +9,7 @@ const PRODUCT_QUERY = gql`
     $languageCode: LanguageCode
   ) @inContext(country: $countryCode, language: $languageCode) {
     relatedRecommendations: productRecommendations(productHandle: $productHandle, intent: RELATED) {
+      id
       featuredImage {
         url
         height
@@ -36,9 +37,10 @@ const PRODUCT_QUERY = gql`
         key
         namespace
         value
-      }
+      } 
     }
     complementaryRecommendations: productRecommendations(productHandle: $productHandle, intent: COMPLEMENTARY) {
+      id
       featuredImage {
         url
         height
