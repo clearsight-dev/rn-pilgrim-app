@@ -105,10 +105,18 @@ const BottomSheet = forwardRef(function ({
             borderTopRightRadius: 16,
             transform: [
               {
-                translateY: sheetVisibility.interpolate({
-                  inputRange: [0, 1], 
-                  outputRange: [sheetHeight * screenHeight, 0]
-                })
+                translateY: Animated.add(
+                  sheetVisibility.interpolate({
+                    inputRange: [0, 1], 
+                    outputRange: [sheetHeight * screenHeight, 0]
+                  }),
+                  // Only allow positive translation (downward)
+                  translateY.interpolate({
+                    inputRange: [-100, 0, 100, 200],
+                    outputRange: [0, 0, 100, 200],
+                    extrapolate: 'clamp'
+                  })
+                )
               }
             ]
           }}
