@@ -4,7 +4,7 @@ import {
   Text, 
   StyleSheet, 
   TouchableOpacity, 
-  ScrollView,
+  FlatList,
   Image,
   ActivityIndicator
 } from 'react-native';
@@ -176,16 +176,48 @@ const ShadeSelector = ({
     }
   };
 
-  // Create chunks of 4 items for the grid layout
-  const createShadeRows = (items) => {
-    const rows = [];
-    for (let i = 0; i < items.length; i += 4) {
-      rows.push(items.slice(i, i + 4));
-    }
-    return rows;
-  };
-
-  const shadeRows = createShadeRows(shades);
+  // Render a shade item
+  const renderShadeItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.shadeItem}
+      onPress={() => setSelectedShade(item)}
+    >
+      <View style={styles.shadeContainer}>
+        {item.colorHex ? (
+          <View style={[
+            styles.shadeTablet, 
+            { backgroundColor: item.colorHex }
+          ]} />
+        ) : item.imageUrl ? (
+          <Image 
+            source={{ uri: item.imageUrl }} 
+            style={styles.shadeImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={[
+            styles.shadeTablet, 
+            { backgroundColor: '#CCCCCC' }
+          ]} />
+        )}
+        
+        {/* Checkmark overlay for selected shade */}
+        {selectedShade?.id === item.id && (
+          <View style={styles.checkmarkContainer}>
+            <Icon 
+              name="check" 
+              size={24} 
+              color="#FFFFFF" 
+            />
+          </View>
+        )}
+      </View>
+      <Text style={[
+        styles.shadeName,
+        (selectedShade?.id === item.id) ? styles.selectedShadeName : {}
+      ]}>{item.name}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <BottomSheet 
@@ -240,58 +272,15 @@ const ShadeSelector = ({
           <View style={styles.divider} />
           
           {/* Shade Selection */}
-          <ScrollView 
-            style={styles.scrollContainer}
+          <FlatList
+            data={shades}
+            renderItem={renderShadeItem}
+            keyExtractor={item => item.id}
+            numColumns={4}
             contentContainerStyle={styles.shadeGrid}
             showsVerticalScrollIndicator={true}
-          >
-            {shadeRows.map((row, rowIndex) => (
-              <View key={`row-${rowIndex}`} style={styles.shadeRow}>
-                {row.map(item => (
-                  <TouchableOpacity 
-                    key={item.id}
-                    style={styles.shadeItem}
-                    onPress={() => setSelectedShade(item)}
-                  >
-                    <View style={styles.shadeContainer}>
-                      {item.colorHex ? (
-                        <View style={[
-                          styles.shadeTablet, 
-                          { backgroundColor: item.colorHex }
-                        ]} />
-                      ) : item.imageUrl ? (
-                        <Image 
-                          source={{ uri: item.imageUrl }} 
-                          style={styles.shadeImage}
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        <View style={[
-                          styles.shadeTablet, 
-                          { backgroundColor: '#CCCCCC' }
-                        ]} />
-                      )}
-                      
-                      {/* Checkmark overlay for selected shade */}
-                      {selectedShade?.id === item.id && (
-                        <View style={styles.checkmarkContainer}>
-                          <Icon 
-                            name="check" 
-                            size={24} 
-                            color="#FFFFFF" 
-                          />
-                        </View>
-                      )}
-                    </View>
-                    <Text style={[
-                      styles.shadeName,
-                      (selectedShade?.id === item.id) ? styles.selectedShadeName : {}
-                    ]}>{item.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            ))}
-          </ScrollView>
+            style={styles.flatListContainer}
+          />
           
           {/* Add to Cart Button */}
           <TouchableOpacity 
@@ -361,15 +350,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEEEEE',
     marginVertical: 16,
   },
-  scrollContainer: {
+  flatListContainer: {
     flex: 1,
   },
   shadeGrid: {
     paddingBottom: 16,
-  },
-  shadeRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
   },
   shadeItem: {
     width: '25%',
