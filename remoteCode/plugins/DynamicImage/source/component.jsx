@@ -247,6 +247,17 @@ export const widgetEditors = {
   animations: defaultEditors.animations,
 };
 
+export const ImageWidgetConfig = {
+  value: '',
+  resizeMode: 'contain',
+  sourceType: 'url',
+  assetId: '',
+  dynamicWidth: false,
+  width: '',
+  allowPreview: false,
+  isLoading: false,
+};
+
 export const imageWidgetStyleEditorsConfig = [
   {
     type: 'colorInput',

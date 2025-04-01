@@ -15,6 +15,7 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
         handle
         title
         image {
+          id
           url
         }
         products(first: 1) {
@@ -79,6 +80,7 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
               products(first: 1, filters: $filters) {
                 nodes {
                   featuredImage {
+                    id
                     url
                   }
                   title
@@ -164,7 +166,9 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
               id
               label
               image {
+                id
                 image {
+                  id
                   url
                 }
               }
@@ -175,6 +179,7 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
               id
               handle
               featuredImage {
+                id
                 url
               }
               description
@@ -213,6 +218,7 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
                   id
                   title
                   image {
+                    id
                     url
                   }
                   price {
@@ -301,6 +307,7 @@ export const fetchVariantBySelectedOptions = async (queryRunner, productHandle, 
             amount
           }
           image {
+            id
             url
             height
             width
@@ -344,6 +351,7 @@ export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, 
   const FILTERED_PRODUCTS_COUNT_QUERY = gql`
     query FilteredProductsCount($handle: String, $filters: [ProductFilter!], $first: Int!) {
       collection(handle: $handle) {
+        id
         products(filters: $filters, first: $first) {
           edges {
             node {

@@ -5,6 +5,7 @@ const COLLECTION_QUERY = gql`
     collection(handle: $handle) {
       id
       image {
+        id
         url
       }
       handle
@@ -14,6 +15,7 @@ const COLLECTION_QUERY = gql`
             id
             images(first: 3) {
               nodes {
+                id
                 url
               }
             }

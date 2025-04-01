@@ -43,16 +43,16 @@ export function ReactComponent({ model }) {
     }
   }, []);
 
-  useEffect(() => {
-    if (quickCollectionsData.length > 0) {
-      setTimeout(() => {
-        const queryRunner = shopifyDSModel?.get('queryRunner');
-        for (let i = 0; i < quickCollectionsData.length; ++i) {
-          fetchCollectionData(queryRunner, quickCollectionsData[i].collection, 12);
-        }
-      }, 2000);
-    }
-  }, [quickCollectionsData])
+  // useEffect(() => {
+  //   if (quickCollectionsData.length > 0) {
+  //     setTimeout(() => {
+  //       const queryRunner = shopifyDSModel?.get('queryRunner');
+  //       for (let i = 0; i < quickCollectionsData.length; ++i) {
+  //         fetchCollectionData(queryRunner, quickCollectionsData[i].collection, 12);
+  //       }
+  //     }, 2000);
+  //   }
+  // }, [quickCollectionsData])
 
   const handleScroll = useCallback(
     (ev) => {

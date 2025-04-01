@@ -4,13 +4,12 @@ const PRODUCT_QUERY = gql`
   query GetProduct(
     $productHandle: String!, 
     $productMetafields: [HasMetafieldsIdentifier!]!, 
-    $variantMetafields: [HasMetafieldsIdentifier!]!, 
-    $countryCode: CountryCode, 
-    $languageCode: LanguageCode
-  ) @inContext(country: $countryCode, language: $languageCode) {
+    $variantMetafields: [HasMetafieldsIdentifier!]!
+  ) {
     relatedRecommendations: productRecommendations(productHandle: $productHandle, intent: RELATED) {
       id
       featuredImage {
+        id
         url
         height
         width
@@ -42,6 +41,7 @@ const PRODUCT_QUERY = gql`
     complementaryRecommendations: productRecommendations(productHandle: $productHandle, intent: COMPLEMENTARY) {
       id
       featuredImage {
+        id
         url
         height
         width
@@ -127,8 +127,8 @@ const PRODUCT_QUERY = gql`
               namespace
             }
             image {
-              url
               id
+              url
               height
               width
             }
@@ -225,7 +225,6 @@ export const fetchProductData = async (queryRunner, productHandle) => {
         { key: "variant_subtitle", namespace: "custom" },
         { key: "light_skin_tone_image_url", namespace: "custom" }
       ],
-      countryCode: "US"
     },
     {
       cachePolicy: 'cache-first'
