@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 
-const RelatedProductCard = ({ product, style, onAddToCart }) => {
+const RelatedProductCard = ({ product, style, onAddToCart, onSelectShade }) => {
   const { 
     title, 
     featuredImage, 
@@ -30,6 +30,11 @@ const RelatedProductCard = ({ product, style, onAddToCart }) => {
   
   const dispatch = useDispatch();
 
+  // Determine the CTA button text and action
+  const isSelectShade = variantsCount > 1 && productType.startsWith("Makeup");
+  const isChooseVariant = variantsCount > 1 && !productType.startsWith("Makeup");
+  const buttonText = isSelectShade ? "Select Shade" : (isChooseVariant ? "Choose Variant" : "Add to Cart");
+  
   const cardCTA = (
     <View
       style={{
@@ -39,7 +44,11 @@ const RelatedProductCard = ({ product, style, onAddToCart }) => {
       <Pressable
         onPress={e => {
           e.stopPropagation();
-          onAddToCart(product);
+          if (isSelectShade && onSelectShade) {
+            onSelectShade(product);
+          } else {
+            onAddToCart(product);
+          }
         }}
         style={{
           height: 33, 
@@ -55,7 +64,7 @@ const RelatedProductCard = ({ product, style, onAddToCart }) => {
             fontWeight: '500'
           }}
         >
-          {variantsCount > 1 ? (productType.startsWith("Makeup") ? "Select Shade" : "Choose Variant") : "Add to Cart"}
+          {buttonText}
         </Text>
       </Pressable>
     </View>

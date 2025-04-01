@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { 
   View, 
   Text,
@@ -8,9 +8,11 @@ import {
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { datasourceTypeModelSel, navigateToScreen } from 'apptile-core';
-import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
-import RelatedProductsCarousel from '../../../../extractedQueries/RelatedProductsCarousel';
-import Header from './Header';
+import { fetchCollectionData } from '../../../../../extractedQueries/collectionqueries';
+import RelatedProductsCarousel from '../../../../../extractedQueries/RelatedProductsCarousel';
+import { useShopifyQueryAndAddtoCart } from '../../../../../extractedQueries/selectors';
+import Header from '../Header';
+import ShadeSelector from './ShadeSelector';
 
 const ChipCollectionCarousel = ({ 
   collectionHandle = 'bestsellers',
@@ -18,8 +20,11 @@ const ChipCollectionCarousel = ({
   title,
   style
 }) => {
+  const bottomSheetRef = useRef(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+  const { addLineItemToCart } = useShopifyQueryAndAddtoCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterLoading, setFilterLoading] = useState(false);
@@ -239,6 +244,8 @@ const ChipCollectionCarousel = ({
       compareAtPriceRange: product.compareAtPriceRange,
       variantsCount: product.variantsCount?.count ?? 1,
       productType: product.productType,
+      options: product.options || [],
+      variants: product.variants?.nodes || [],
       metafield: product.metafields?.find(m => 
         (m?.key === 'product_label_1' || m?.key === 'product_label_2') && 
         m?.namespace === 'custom'
@@ -250,6 +257,12 @@ const ChipCollectionCarousel = ({
   const handleSeeAllClick = () => {
     dispatch(navigateToScreen('NewCollection', { collectionHandle }));
   };
+  
+  // Handle Select Shade button click
+  const handleSelectShade = useCallback((product) => {
+    setSelectedProduct(product);
+    bottomSheetRef.current?.show();
+  }, []);
 
   // Format products for the carousel
   const formattedProducts = formatProductsForCarousel(products);
@@ -304,8 +317,16 @@ const ChipCollectionCarousel = ({
           products={formattedProducts}
           initialProductsToLoad={2}
           style={styles.carousel}
+          onSelectShade={handleSelectShade}
         />
       )}
+      
+      {/* Shade Selector Modal */}
+      <ShadeSelector 
+        bottomSheetRef={bottomSheetRef}
+        product={selectedProduct}
+        onAddToCart={addLineItemToCart}
+      />
     </View>
   );
 };

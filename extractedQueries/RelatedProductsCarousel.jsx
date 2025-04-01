@@ -1,15 +1,19 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { fetchProductData } from './pdpquery';
 import RelatedProductCard from './RelatedProductCard';
 import { useShopifyQueryAndAddtoCart } from './selectors';
+import BottomSheet from './BottomSheet';
 
 const RelatedProductsCarousel = ({
   title = "Customers also liked",
   products = [],
   style,
-  initialProductsToLoad = 2 // Default to loading 5 products initially
+  initialProductsToLoad = 2, // Default to loading 2 products initially
+  onSelectShade
 }) => {
+  const bottomSheetRef = useRef(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const {queryRunner, addLineItemToCart} = useShopifyQueryAndAddtoCart();
 
   // Function to fetch product data
@@ -43,6 +47,16 @@ const RelatedProductsCarousel = ({
       console.error("no function found for adding to cart!");
     }
   }, [addLineItemToCart]);
+  
+  const handleSelectShade = useCallback((product) => {
+    setSelectedProduct(product);
+    if (onSelectShade) {
+      onSelectShade(product, bottomSheetRef);
+    } else {
+      // Default behavior if no custom handler is provided
+      bottomSheetRef.current?.show();
+    }
+  }, [onSelectShade]);
 
   // Initialize with the specified number of products
   useEffect(() => {
@@ -74,6 +88,7 @@ const RelatedProductsCarousel = ({
             key={product.handle || index}
             product={product}
             onAddToCart={handleAddToCart}
+            onSelectShade={handleSelectShade}
           />
         )}
         keyExtractor={(product, index) => product.handle || index.toString()}

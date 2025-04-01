@@ -204,9 +204,24 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
               variantsCount {
                 count
               }
-              variants(first: 1) {
+              options {
+                name
+                values
+              }
+              variants(first: 10) {
                 nodes {
                   id
+                  title
+                  image {
+                    url
+                  }
+                  price {
+                    amount
+                  }
+                  selectedOptions {
+                    name
+                    value
+                  }
                 }
               }
             }
@@ -267,6 +282,57 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
     }
   };
 }
+
+// Function to fetch product variant by selected options
+export const fetchVariantBySelectedOptions = async (queryRunner, productHandle, selectedOptions) => {
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
+  
+  const VARIANT_BY_SELECTED_OPTIONS_QUERY = gql`
+    query VariantBySelectedOptions($handle: String, $selectedOptions: [SelectedOptionInput!]!) {
+      product(handle: $handle) {
+        variantBySelectedOptions(selectedOptions: $selectedOptions) {
+          id
+          title
+          weight
+          weightUnit
+          price {
+            amount
+          }
+          image {
+            url
+            height
+            width
+          }
+        }
+      }
+    }
+  `;
+  
+  try {
+    const data = await queryRunner.runQuery(
+      'query',
+      VARIANT_BY_SELECTED_OPTIONS_QUERY,
+      {
+        handle: productHandle,
+        selectedOptions: selectedOptions
+      },
+      {
+        cachePolicy: 'cache-first'
+      }
+    );
+    
+    return {
+      data: {
+        variant: data.data.product?.variantBySelectedOptions
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching variant by selected options:', error);
+    throw error;
+  }
+};
 
 // Function to fetch only the count of products matching specific filters
 export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, filters = []) => {

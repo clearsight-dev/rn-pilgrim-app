@@ -16,7 +16,7 @@ import {
 } from 'apptile-core';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
-import ChipCollectionCarousel from './ChipCollectionCarousel';
+import ChipCollectionCarousel from './ChipCollectionCarousel/index';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
@@ -267,4 +267,3 @@ export const WrapperTileConfig = {
     numberOfProducts: 5
   },
 };
-
