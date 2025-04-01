@@ -4,12 +4,12 @@ import {
   Text, 
   StyleSheet, 
   TouchableOpacity, 
-  FlatList,
+  ScrollView,
   Image,
   ActivityIndicator
 } from 'react-native';
 import { useSelector } from 'react-redux';
-import { datasourceTypeModelSel } from 'apptile-core';
+import { datasourceTypeModelSel, useApptileWindowDims, Icon } from 'apptile-core';
 import BottomSheet from '../../../../../extractedQueries/BottomSheet';
 import { colorSwatches, imageSwatches } from '../../../../../extractedQueries/colorswatchinfo';
 import { fetchVariantBySelectedOptions } from '../../../../../extractedQueries/collectionqueries';
@@ -27,6 +27,7 @@ const ShadeSelector = ({
   const [loadingVariant, setLoadingVariant] = useState(false);
   const [colorOption, setColorOption] = useState(null);
   const originalBottomSheetRef = useRef(bottomSheetRef);
+  const {width: screenWidth} = useApptileWindowDims();
 
   // Reset state when modal is closed
   useEffect(() => {
@@ -175,10 +176,21 @@ const ShadeSelector = ({
     }
   };
 
+  // Create chunks of 4 items for the grid layout
+  const createShadeRows = (items) => {
+    const rows = [];
+    for (let i = 0; i < items.length; i += 4) {
+      rows.push(items.slice(i, i + 4));
+    }
+    return rows;
+  };
+
+  const shadeRows = createShadeRows(shades);
+
   return (
     <BottomSheet 
       ref={bottomSheetRef}
-      title={product?.title || "Select Shade"}
+      title={"Select Shade"}
       sheetHeight={0.8} // 80% of screen height
     >
       {product && (
@@ -186,19 +198,27 @@ const ShadeSelector = ({
           {/* Product Header */}
           <View style={styles.productHeader}>
             {loadingVariant ? (
-              <View style={styles.loadingContainer}>
+              <View style={[
+                styles.loadingContainer,
+                {minHeight: screenWidth / 2.1}
+              ]}>
                 <ActivityIndicator size="small" color="#00909E" />
               </View>
             ) : (
               <>
                 <Image 
                   source={{ uri: selectedVariant?.image?.url || product.featuredImage?.url }} 
-                  style={styles.productImage}
+                  style={[
+                    styles.productImage,
+                    {
+                      height: screenWidth / 2.1
+                    }
+                  ]}
                   resizeMode="contain"
                 />
                 <View style={styles.productInfo}>
                   <Text style={styles.productTitle} numberOfLines={2}>
-                    {selectedVariant?.title || product.title}
+                    {product.title}
                   </Text>
                   <Text style={styles.productPrice}>
                     ₹{parseInt(selectedVariant?.price?.amount || product.priceRange?.minVariantPrice?.amount || 0).toLocaleString()}
@@ -208,6 +228,9 @@ const ShadeSelector = ({
                       {selectedVariant.weight} {selectedVariant.weightUnit.toLowerCase()}
                     </Text>
                   )}
+                  <Text style={styles.productWeight}>
+                    Shade: {selectedVariant?.title}
+                  </Text>
                 </View>
               </>
             )}
@@ -217,46 +240,58 @@ const ShadeSelector = ({
           <View style={styles.divider} />
           
           {/* Shade Selection */}
-          <Text style={styles.sectionTitle}>Select Shade</Text>
-          <FlatList
-            data={shades}
-            numColumns={4}
-            keyExtractor={item => item.id}
+          <ScrollView 
+            style={styles.scrollContainer}
             contentContainerStyle={styles.shadeGrid}
-            renderItem={({ item }) => (
-              <TouchableOpacity 
-                style={styles.shadeItem}
-                onPress={() => setSelectedShade(item)}
-              >
-              {item.colorHex ? (
-                <View style={[
-                  styles.shadeCircle, 
-                  { backgroundColor: item.colorHex },
-                  selectedShade?.id === item.id && styles.selectedShadeCircle
-                ]} />
-              ) : item.imageUrl ? (
-                <Image 
-                  source={{ uri: item.imageUrl }} 
-                  style={[
-                    styles.shadeImage,
-                    selectedShade?.id === item.id && styles.selectedShadeCircle
-                  ]}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View style={[
-                  styles.shadeCircle, 
-                  { backgroundColor: '#CCCCCC' },
-                  selectedShade?.id === item.id && styles.selectedShadeCircle
-                ]} />
-              )}
-                <Text style={[
-                  styles.shadeName,
-                  selectedShade?.id === item.id && styles.selectedShadeName
-                ]}>{item.name}</Text>
-              </TouchableOpacity>
-            )}
-          />
+            showsVerticalScrollIndicator={true}
+          >
+            {shadeRows.map((row, rowIndex) => (
+              <View key={`row-${rowIndex}`} style={styles.shadeRow}>
+                {row.map(item => (
+                  <TouchableOpacity 
+                    key={item.id}
+                    style={styles.shadeItem}
+                    onPress={() => setSelectedShade(item)}
+                  >
+                    <View style={styles.shadeContainer}>
+                      {item.colorHex ? (
+                        <View style={[
+                          styles.shadeTablet, 
+                          { backgroundColor: item.colorHex }
+                        ]} />
+                      ) : item.imageUrl ? (
+                        <Image 
+                          source={{ uri: item.imageUrl }} 
+                          style={styles.shadeImage}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={[
+                          styles.shadeTablet, 
+                          { backgroundColor: '#CCCCCC' }
+                        ]} />
+                      )}
+                      
+                      {/* Checkmark overlay for selected shade */}
+                      {selectedShade?.id === item.id && (
+                        <View style={styles.checkmarkContainer}>
+                          <Icon 
+                            name="check" 
+                            size={24} 
+                            color="#FFFFFF" 
+                          />
+                        </View>
+                      )}
+                    </View>
+                    <Text style={[
+                      styles.shadeName,
+                      (selectedShade?.id === item.id) ? styles.selectedShadeName : {}
+                    ]}>{item.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ))}
+          </ScrollView>
           
           {/* Add to Cart Button */}
           <TouchableOpacity 
@@ -286,7 +321,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   productImage: {
-    height: 180,
     aspectRatio: 1,
     borderRadius: 8,
     marginRight: 16,
@@ -327,35 +361,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEEEEE',
     marginVertical: 16,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333333',
-    marginBottom: 16,
+  scrollContainer: {
+    flex: 1,
   },
   shadeGrid: {
     paddingBottom: 16,
+  },
+  shadeRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
   },
   shadeItem: {
     width: '25%',
     alignItems: 'center',
     marginBottom: 16,
+    padding: 8
   },
-  shadeCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  shadeContainer: {
+    position: 'relative',
+    width: '100%',
+    height: 56,
     marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
+  },
+  shadeTablet: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 4,
   },
   shadeImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#EEEEEE',
+    width: '100%',
+    height: '100%',
+    borderRadius: 4,
+  },
+  checkmarkContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 4,
   },
   shadeName: {
     fontSize: 12,
@@ -379,13 +426,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333333',
   },
-  selectedShadeCircle: {
-    borderWidth: 2,
-    borderColor: '#00909E',
-    transform: [{ scale: 1.1 }]
-  },
   selectedShadeName: {
-    color: '#00909E',
+    color: '#00AEBD',
     fontWeight: '600'
   }
 });
