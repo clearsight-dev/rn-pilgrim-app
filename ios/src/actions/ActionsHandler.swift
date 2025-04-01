@@ -19,7 +19,21 @@ class Actions: NSObject {
         _ completion: @escaping @convention(block) (Bool) -> Void
     ) {
         Task(priority: .background) {
-            APIClient.shared.initialize(baseURL: "https://api.apptile.io")
+            
+            if BundleTrackerPrefs.isBrokenBundle() {
+              Logger.warn("Previous bundle status: failed, starting rollback")
+              rollBackUpdates()
+            }
+            
+          
+            guard let apptileUpdateEndpoint = Bundle.main.object(forInfoDictionaryKey: "APPTILE_UPDATE_ENDPOINT") as? String
+                    else {
+              Logger.error("APPTILE_UPDATE_ENDPOINT is missing or empty in Info.plist")
+              completion(false)
+              return
+            }
+                  
+            APIClient.shared.initialize(baseURL: apptileUpdateEndpoint)
 
             guard let appId = getAppId(),
                   !appId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -83,7 +97,11 @@ class Actions: NSObject {
 
     static func fetchManifest(appId: String) async -> ManifestResponse? {
         do {
-            return try await ApptileApiClient.shared.getManifest(appId: appId)
+          guard let appForkName = Bundle.main.object(forInfoDictionaryKey: "APPTILE_APP_FORK") as? String else {
+            Logger.error("APPTILE_APP_FORK is missing or empty in Info.plist")
+            return nil
+          }
+          return try await ApptileApiClient.shared.getManifest(appId: appId, forkName: appForkName)
         } catch {
             Logger.error("Failed to fetch manifest: \(error.localizedDescription)")
             return nil
@@ -108,8 +126,8 @@ class Actions: NSObject {
         let localCommitId = (trackerData["publishedCommitId"] as? NSNumber)?.int64Value
         let localBundleId = (trackerData["iosBundleId"] as? NSNumber)?.int64Value
 
-        let latestCommitId = manifest.forks.first?.publishedCommitId
-        let latestBundle = manifest.codeArtefacts.first { $0.type == "ios-jsbundle" }
+        let latestCommitId = manifest.publishedCommitId
+        let latestBundle = manifest.artefacts.first { $0.type == "ios-jsbundle" }
 
         let latestBundleId = latestBundle?.id
         let latestBundleUrl = latestBundle?.cdnlink
@@ -122,19 +140,20 @@ class Actions: NSObject {
 
         if shouldUpdateCommit {
             Logger.info("Starting App Config update...")
-            updateResults.append(await Actions.updateAppConfig(appId: appId, latestCommitId: latestCommitId!))
+            updateResults.append(await Actions.updateAppConfig(appId: appId, latestCommitId: latestCommitId))
         }
 
         if shouldUpdateBundle {
             Logger.info("Starting Bundle update...")
             updateResults.append(await Actions.updateBundle(bundleId: latestBundleId!, bundleUrl: latestBundleUrl))
         }
-
-        if updateResults.contains(true) {
-            DispatchQueue.main.async {
-                applyUpdates()
-            }
-        }
+      
+// Disabling temp: Restarting app incase of update found
+//        if updateResults.contains(true) {
+//            DispatchQueue.main.async {
+//                applyUpdates()
+//            }
+//        }
 
         return updateResults.allSatisfy { $0 }
     }

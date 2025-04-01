@@ -38,9 +38,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  // Codepush & OTA Handling
+   // Setting up CrashHandlers
    [CrashHandler setupSignalHandlers];
-   [StartupHandler handleStartupProcess];
     
 #if ENABLE_CLEVERTAP
   [CleverTap autoIntegrate];
@@ -83,13 +82,37 @@
   sdkConfig.consoleLogConfig = [[MoEngageConsoleLogConfig alloc] initWithIsLoggingEnabled:false loglevel:MoEngageLoggerTypeVerbose];
   [[MoEngageInitializer sharedInstance] initializeDefaultSDKConfig:sdkConfig andLaunchOptions:launchOptions];
 #endif
+  
+  // storing launch option for later use while opening react native from startup handler
+  self.storedLaunchOptions = launchOptions;
 
-  BOOL result = [super application:application didFinishLaunchingWithOptions:launchOptions];
-  
+  // starting app launch process don't alter the order
   [self showNativeSplash];
+  [StartupHandler handleStartupProcess];
   
-  return result;
+  return YES;
 }
+
+
+// Function to start React Native manually after startup operations
+- (void)startReactNativeApp:(UIApplication *)application withOptions:(NSDictionary *)launchOptions
+{
+    NSLog(@"[ApptileStartupProcess] Starting React Native...");
+  
+    // Use stored launchOptions if not provided
+    if (!launchOptions) {
+        launchOptions = self.storedLaunchOptions;
+    }
+  
+    BOOL result = [super application:application didFinishLaunchingWithOptions:launchOptions];
+
+    if (result) {
+        NSLog(@"[ApptileStartupProcess] React Native started successfully.");
+    } else {
+        NSLog(@"[ApptileStartupProcess] Failed to start React Native.");
+    }
+}
+
 
 #define ENABLE_NATIVE_SPLASH 1
 #define MIN_SPLASH_DURATION 1

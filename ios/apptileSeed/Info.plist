@@ -4,6 +4,8 @@
   <dict>
     <key>APPTILE_API_ENDPOINT</key>
     <string>https://api.apptile.io</string>
+    <key>APPTILE_APP_FORK</key>
+    <string>main</string>
     <key>APPTILE_UPDATE_ENDPOINT</key>
     <string>https://appconfigs.apptile.io</string>
     <key>APPTILE_URL_SCHEME</key>

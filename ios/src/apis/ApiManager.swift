@@ -87,7 +87,7 @@ class APIClient {
 // MARK: - ApiService Protocol
 
 protocol ApiService {
-    func getManifest(appId: String) async throws -> ManifestResponse
+  func getManifest(appId: String, forkName: String) async throws -> ManifestResponse
     func downloadFile(from url: String) async throws -> URL
 }
 
@@ -101,9 +101,9 @@ class ApptileApiClient: ApiService {
         self.apiClient = apiClient
     }
 
-    func getManifest(appId: String) async throws -> ManifestResponse {
+  func getManifest(appId: String, forkName: String) async throws -> ManifestResponse {
         return try await apiClient.request(
-            endpoint: "/api/v2/app/\(appId)/manifest",
+            endpoint: "/app/\(appId)/\(forkName)/manifest?frameworkVersion=0.17.0",
             responseType: ManifestResponse.self
         )
     }
@@ -137,7 +137,7 @@ struct CodeArtefact: Codable {
     let tag: String
 }
 
-struct Fork: Codable {
+struct ManifestResponse: Codable {
     let id: Int
     let appId: Int
     let frameworkVersion: String
@@ -147,15 +147,6 @@ struct Fork: Codable {
     let createdAt: String
     let updatedAt: String
     let deletedAt: String?
-}
-
-struct ManifestResponse: Codable {
-    let id: Int
-    let name: String
-    let uuid: String
-    let organizationId: String
-    let published: Bool
-    let platformType: String
-    let codeArtefacts: [CodeArtefact]
-    let forks: [Fork]
+    let url: String
+    let artefacts: [CodeArtefact]
 }
