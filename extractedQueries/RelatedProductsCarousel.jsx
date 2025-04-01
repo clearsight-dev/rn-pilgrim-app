@@ -38,7 +38,7 @@ const RelatedProductsCarousel = ({
   const handleAddToCart = useCallback((product) => {
     console.log("Adding product: ", product)
     if (addLineItemToCart) {
-      addLineItemToCart(product.id);
+      addLineItemToCart(product.firstVariantId);
     } else {
       console.error("no function found for adding to cart!");
     }

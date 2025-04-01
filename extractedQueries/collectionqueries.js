@@ -200,6 +200,15 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
                 }
               }
               availableForSale
+              productType
+              variantsCount {
+                count
+              }
+              variants(first: 1) {
+                nodes {
+                  id
+                }
+              }
             }
             cursor
           }

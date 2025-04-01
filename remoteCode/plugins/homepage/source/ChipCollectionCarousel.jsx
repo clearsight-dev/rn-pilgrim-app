@@ -27,49 +27,6 @@ const ChipCollectionCarousel = ({
   const [filterData, setFilterData] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
 
-  // Function to convert selected filters to Shopify filter format
-  const getShopifyFilters = useCallback(() => {
-    return selectedFilters.map(filter => {
-      // Check if this is a metafield filter (contains 'p.m' in the ID)
-      if (filter.id.includes('p.m')) {
-        // Split the ID by dots
-        const parts = filter.id.split('.');
-        
-        // For metafield filters, the format is typically:
-        // filter.p.m.[namespace].[key].[value-identifier]
-        // We need to extract the namespace and key
-        if (parts.length >= 4) {
-          const namespace = parts[parts.length - 2];
-          const key = parts[parts.length - 1];
-          
-          // For metafield filters, we need to use the label as the value
-          // and create a filter for each selected value
-          return filter.values.map(valueId => {
-            // Find the corresponding filter value object to get the label
-            const filterDataItem = filterData.find(f => f.id === filter.id);
-            const valueObj = filterDataItem?.values?.find(v => v.id === valueId);
-            
-            return {
-              productMetafield: {
-                namespace,
-                key,
-                value: valueObj?.label || valueId
-              }
-            };
-          });
-        }
-      }
-      
-      // Default case: use the standard product filter format
-      return {
-        productFilter: {
-          filterType: filter.id,
-          values: filter.values
-        }
-      };
-    }).flat(); // Flatten the array since metafield filters might return arrays
-  }, [selectedFilters, filterData]);
-
   // Function to fetch products with filters
   const fetchProducts = useCallback(async (filters = [], isFilterChange = false) => {
     try {
@@ -272,13 +229,16 @@ const ChipCollectionCarousel = ({
   // Format products for the carousel
   const formatProductsForCarousel = (products) => {
     if (!products || !Array.isArray(products)) return [];
-    
     return products.map(product => ({
+      id: product.id,
+      firstVariantId: product.variants?.nodes?.[0]?.id ?? null,
       title: product.title,
       handle: product.handle,
       featuredImage: product.featuredImage,
       priceRange: product.priceRange,
       compareAtPriceRange: product.compareAtPriceRange,
+      variantsCount: product.variantsCount?.count ?? 1,
+      productType: product.productType,
       metafield: product.metafields?.find(m => 
         (m?.key === 'product_label_1' || m?.key === 'product_label_2') && 
         m?.namespace === 'custom'
@@ -342,7 +302,7 @@ const ChipCollectionCarousel = ({
         <RelatedProductsCarousel 
           title="" // We're already showing the title above
           products={formattedProducts}
-          initialProductsToLoad={5}
+          initialProductsToLoad={2}
           style={styles.carousel}
         />
       )}

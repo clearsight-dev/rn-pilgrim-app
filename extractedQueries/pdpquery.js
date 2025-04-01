@@ -105,6 +105,10 @@ const PRODUCT_QUERY = gql`
           }
         }
       }
+      productType
+      variantsCount {
+        count
+      }
       variants(first: 10) {
         edges {
           node {

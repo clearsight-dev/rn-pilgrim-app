@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native';
 import {Image} from './ImageComponent';
 import { navigateToScreen } from 'apptile-core';
 import { useDispatch } from 'react-redux';
@@ -14,7 +14,9 @@ const RelatedProductCard = ({ product, style, onAddToCart }) => {
     compareAtPriceRange, 
     metafield, 
     handle, 
-    rating 
+    rating,
+    productType,
+    variantsCount
   } = product;
   
   // Get price information
@@ -27,6 +29,37 @@ const RelatedProductCard = ({ product, style, onAddToCart }) => {
     : 0;
   
   const dispatch = useDispatch();
+
+  const cardCTA = (
+    <View
+      style={{
+        paddingHorizontal: 8
+      }}
+    >
+      <Pressable
+        onPress={e => {
+          e.stopPropagation();
+          onAddToCart(product);
+        }}
+        style={{
+          height: 33, 
+          backgroundColor: '#FACA0C',
+          borderRadius: 8,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: '500'
+          }}
+        >
+          {variantsCount > 1 ? (productType.startsWith("Makeup") ? "Select Shade" : "Choose Variant") : "Add to Cart"}
+        </Text>
+      </Pressable>
+    </View>
+  );
 
   return (
     <TouchableOpacity 
@@ -79,34 +112,7 @@ const RelatedProductCard = ({ product, style, onAddToCart }) => {
           )}
         </View>
       </View>
-      <View
-        style={{
-          paddingHorizontal: 8
-        }}
-      >
-        <TouchableOpacity
-          onPress={e => {
-            e.stopPropagation();
-            onAddToCart(product);
-          }}
-          style={{
-            height: 33, 
-            backgroundColor: '#FACA0C',
-            borderRadius: 8,
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: '500'
-            }}
-          >
-            Add to Cart
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {cardCTA}
     </TouchableOpacity>
   );
 };

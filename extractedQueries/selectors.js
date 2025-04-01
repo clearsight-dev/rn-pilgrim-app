@@ -64,7 +64,6 @@ export function useCartIconData() {
     let numCurrentCartItems = 0;
     let clearCart = async () => console.log("Cannot clear the cart yet!");
 
-    debugger
     const shopifyDS = datasourceTypeModelSel(state, "shopifyCart");
     const cartLineCache = shopifyDS?.get('cartLineCache');;
 
@@ -73,7 +72,6 @@ export function useCartIconData() {
     //   const clearCartAction = shopifyDS?.get('clearCart')
     //   if (clearCartAction) {
     //     clearCart = async () => {
-    //       debugger
     //       return clearCartAction(
     //         dispatch, 
     //         globalPluginsConfigs.get('shopifyCart'),
