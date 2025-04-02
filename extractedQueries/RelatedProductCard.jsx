@@ -1,46 +1,58 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Pressable,
+} from 'react-native';
 import {Image} from './ImageComponent';
-import { navigateToScreen } from 'apptile-core';
-import { useDispatch } from 'react-redux';
+import {navigateToScreen} from 'apptile-core';
+import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 
-const RelatedProductCard = ({ product, style, onAddToCart, onSelectShade }) => {
-  const { 
-    title, 
-    featuredImage, 
-    priceRange, 
-    compareAtPriceRange, 
-    metafield, 
-    handle, 
+const RelatedProductCard = ({product, style, onAddToCart, onSelectShade}) => {
+  console.log('Rendering relatedproductcard');
+  const {
+    title,
+    featuredImage,
+    priceRange,
+    compareAtPriceRange,
+    metafield,
+    handle,
     rating,
     productType,
-    variantsCount
+    variantsCount,
   } = product;
-  
+
   // Get price information
   const price = priceRange?.minVariantPrice?.amount || '0';
   const compareAtPrice = compareAtPriceRange?.minVariantPrice?.amount || null;
-  
+
   // Calculate discount percentage if compareAtPrice exists
-  const discountPercentage = compareAtPrice 
-    ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) 
+  const discountPercentage = compareAtPrice
+    ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
     : 0;
-  
+
   const dispatch = useDispatch();
 
   // Determine the CTA button text and action
-  const isSelectShade = variantsCount > 1 && productType.startsWith("Makeup");
-  const isChooseVariant = variantsCount > 1 && !productType.startsWith("Makeup");
-  const buttonText = isSelectShade ? "Select Shade" : (isChooseVariant ? "Choose Variant" : "Add to Cart");
-  
+  const isSelectShade = variantsCount > 1 && productType.startsWith('Makeup');
+  const isChooseVariant =
+    variantsCount > 1 && !productType.startsWith('Makeup');
+  const buttonText = isSelectShade
+    ? 'Select Shade'
+    : isChooseVariant
+    ? 'Choose Variant'
+    : 'Add to Cart';
+
   const cardCTA = (
     <View
       style={{
-        paddingHorizontal: 8
-      }}
-    >
+        paddingHorizontal: 8,
+      }}>
       <Pressable
         onPress={e => {
           e.stopPropagation();
@@ -51,19 +63,17 @@ const RelatedProductCard = ({ product, style, onAddToCart, onSelectShade }) => {
           }
         }}
         style={{
-          height: 33, 
+          height: 33,
           backgroundColor: '#FACA0C',
           borderRadius: 8,
           alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
+          justifyContent: 'center',
+        }}>
         <Text
           style={{
             fontSize: 14,
-            fontWeight: '500'
-          }}
-        >
+            fontWeight: '500',
+          }}>
           {buttonText}
         </Text>
       </Pressable>
@@ -71,16 +81,15 @@ const RelatedProductCard = ({ product, style, onAddToCart, onSelectShade }) => {
   );
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.container, style]}
       onPress={() => {
-        dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
-      }}
-    >
+        dispatch(navigateToScreen('NewPDP', {productHandle: handle}));
+      }}>
       {/* Promo Tag */}
-      <ProductFlag 
-        label={metafield?.value || "Buy 3@999"} 
-        color="#00726C" 
+      <ProductFlag
+        label={metafield?.value || 'Buy 3@999'}
+        color="#00726C"
         style={styles.promoTagContainer}
         textStyle={styles.promoTagText}
         height={18}
@@ -89,8 +98,8 @@ const RelatedProductCard = ({ product, style, onAddToCart, onSelectShade }) => {
 
       {/* Product Image */}
       <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: featuredImage?.url }} 
+        <Image
+          source={{uri: featuredImage?.url}}
           style={styles.image}
           resizeMode="contain"
         />
@@ -99,23 +108,29 @@ const RelatedProductCard = ({ product, style, onAddToCart, onSelectShade }) => {
           <Text style={styles.ratingText}>{rating}</Text>
           <Star color={'#00909E'} size={12} fillPercentage={1} />
         </View>
-        
+
         {/* No loading indicator - optimistic loading */}
       </View>
 
       {/* Product Details */}
       <View style={styles.detailsContainer}>
-        <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>BESTSELLER</Text>
-        <Text style={styles.title} numberOfLines={2}>{title}</Text>
+        <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>
+          BESTSELLER
+        </Text>
+        <Text style={styles.title} numberOfLines={2}>
+          {title}
+        </Text>
         <Text style={styles.subtitle}>2 Sizes</Text>
-        
+
         {/* Price Section */}
         <View style={styles.priceContainer}>
           <Text style={styles.price}>₹{parseInt(price).toLocaleString()}</Text>
-          
+
           {compareAtPrice && (
             <>
-              <Text style={styles.compareAtPrice}>₹{parseInt(compareAtPrice).toLocaleString()}</Text>
+              <Text style={styles.compareAtPrice}>
+                ₹{parseInt(compareAtPrice).toLocaleString()}
+              </Text>
               <Text style={styles.discount}>{discountPercentage}% Off</Text>
             </>
           )}
@@ -137,12 +152,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     left: 0,
-    zIndex: 1
+    zIndex: 1,
   },
   promoTagText: {
     color: '#FFFFFF',
     fontSize: 10,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   imageContainer: {
     width: '100%',
@@ -155,7 +170,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: 8
+    borderRadius: 8,
   },
   ratingContainer: {
     position: 'absolute',
@@ -169,20 +184,20 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 24,
     borderColor: '#F3F3F3',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   ratingText: {
     fontSize: 12,
     color: '#1A1A1A',
     fontWeight: '600',
-    marginRight: 4
+    marginRight: 4,
   },
   detailsContainer: {
     fontSize: 12,
     color: '#767676',
     fontWeight: '400',
     padding: 12,
-    paddingTop: 4
+    paddingTop: 4,
   },
   title: {
     fontSize: 14,
@@ -190,7 +205,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: '#333333',
     marginBottom: 4,
-    lineHeight: 18
+    lineHeight: 18,
   },
   subtitle: {
     fontSize: 12,
@@ -201,7 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     flexWrap: 'wrap',
-    marginTop: 4
+    marginTop: 4,
   },
   price: {
     fontSize: 18,
@@ -229,7 +244,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8
+    borderRadius: 8,
   },
 });
 
