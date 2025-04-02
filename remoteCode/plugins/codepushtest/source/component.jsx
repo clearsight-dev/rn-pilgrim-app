@@ -170,13 +170,21 @@ export function ReactComponent({ model }) {
 
   // Extract product images
   const getProductImages = (product) => {
-    if (!product || !product.images || !product.images.edges || !Array.isArray(product.images.edges)) {
-      return [];
-    }
+    const images = [];
     
-    return product.images.edges
-      .filter(edge => edge && edge.node && edge.node.url)
-      .map(edge => edge.node.url);
+    
+    if (Array.isArray(product.variants?.edges)) {
+      for (let i = 0; i < product.variants.edges.length; ++i) {
+        const imageNode = product.variants.edges[i].node.image;
+        images.push(imageNode.url);
+      }
+    }
+
+    if (images.length == 0 && product.featuredImage?.url) {
+      images.unshift(product.featuredImage.url);
+    }
+
+    return images;
   };
 
   // Mock variants data - in a real app, you would extract this from the product data

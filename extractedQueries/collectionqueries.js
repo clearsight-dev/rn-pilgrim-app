@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-
+import {PRODUCT_CARD_INFO} from './pdpquery';
 // Function to fetch collection data for the carousel component
 export const fetchCollectionCarouselData = async (queryRunner, collectionHandle) => {
   console.log('[AGENT] running query for collection: ', collectionHandle)
@@ -147,7 +147,7 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
   
   // Modify the query to include pagination parameters, sorting and filters
   const COLLECTION_PRODUCTS_QUERY = gql`
-    query CollectionProducts($handle: String, $identifiers: [HasMetafieldsIdentifier!]!, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
+    query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
       collection(handle: $handle) {
         id
         handle
@@ -175,62 +175,7 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
             }
           }
           edges {
-            node {
-              id
-              handle
-              featuredImage {
-                id
-                url
-              }
-              description
-              title
-              priceRange {
-                maxVariantPrice {
-                  amount
-                }
-                minVariantPrice {
-                  amount
-                }
-              }
-              metafields(identifiers: $identifiers) {
-                key
-                value
-              }
-              compareAtPriceRange {
-                maxVariantPrice {
-                  amount
-                }
-                minVariantPrice {
-                  amount
-                }
-              }
-              availableForSale
-              productType
-              variantsCount {
-                count
-              }
-              options {
-                name
-                values
-              }
-              variants(first: 10) {
-                nodes {
-                  id
-                  title
-                  image {
-                    id
-                    url
-                  }
-                  price {
-                    amount
-                  }
-                  selectedOptions {
-                    name
-                    value
-                  }
-                }
-              }
-            }
+            node ${PRODUCT_CARD_INFO}
             cursor
           }
         }
@@ -243,20 +188,6 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
     COLLECTION_PRODUCTS_QUERY,
     {
       handle: collectionHandle,
-      identifiers: [
-        {
-          key: "rating",
-          namespace: "reviews"
-        },
-        {
-          key: "product_label_1",
-          namespace: "custom"
-        },
-        {
-          key: "product_label_2",
-          namespace: "custom"
-        }
-      ],
       first: first,
       after: afterCursor,
       sortKey: sortKey,
@@ -298,21 +229,7 @@ export const fetchVariantBySelectedOptions = async (queryRunner, productHandle, 
   const VARIANT_BY_SELECTED_OPTIONS_QUERY = gql`
     query VariantBySelectedOptions($handle: String, $selectedOptions: [SelectedOptionInput!]!) {
       product(handle: $handle) {
-        variantBySelectedOptions(selectedOptions: $selectedOptions) {
-          id
-          title
-          weight
-          weightUnit
-          price {
-            amount
-          }
-          image {
-            id
-            url
-            height
-            width
-          }
-        }
+        variantBySelectedOptions(selectedOptions: $selectedOptions) ${PRODUCT_CARD_INFO}
       }
     }
   `;
@@ -352,14 +269,7 @@ export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, 
     query FilteredProductsCount($handle: String, $filters: [ProductFilter!], $first: Int!) {
       collection(handle: $handle) {
         id
-        products(filters: $filters, first: $first) {
-          edges {
-            node {
-              id
-              handle
-            }
-          }
-        }
+        products(filters: $filters, first: $first) ${PRODUCT_CARD_INFO}
       }
     }
   `;

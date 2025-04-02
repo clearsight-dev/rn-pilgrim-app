@@ -77,11 +77,11 @@ const RecommendationsRoot = ({
       />
       
       {/* Related Products Carousel */}
-      {relatedProducts && relatedProducts.length > 0 && (
+      {/* {relatedProducts && relatedProducts.length > 0 && (
         <RelatedProductsCarousel 
           products={relatedProducts}
         />
-      )}
+      )} */}
     </View>
   );
 };
