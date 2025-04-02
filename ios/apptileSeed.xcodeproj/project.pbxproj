@@ -44,6 +44,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		35CF899B7D8A84863D4B6D8E /* Pods_ImageNotification.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE92CACC6511CEE87BF3F90 /* Pods_ImageNotification.framework */; };
 		6132EF182BDFF13200BBE14D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6132EF172BDFF13200BBE14D /* PrivacyInfo.xcprivacy */; };
+		74D0DE982D9D45A50096D47B /* SplashScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 74D0DE972D9D45A50096D47B /* SplashScreenViewController.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		CA8D86B3F5856CA3ED6F6C3E /* Pods_apptileSeed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13073C5F6CDFAD3176D33ED3 /* Pods_apptileSeed.framework */; };
 		D589E150BAA1D6CBE8607F00 /* Pods_NotificationContentExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF697EA46399938C821ECE02 /* Pods_NotificationContentExtension.framework */; };
@@ -127,6 +128,8 @@
 		5699E0854AAE7DA7423445FC /* Pods-apptileSeed.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-apptileSeed.release.xcconfig"; path = "Target Support Files/Pods-apptileSeed/Pods-apptileSeed.release.xcconfig"; sourceTree = "<group>"; };
 		5F09DB5A152E8D6B71332DB9 /* Pods-ImageNotification.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageNotification.debug.xcconfig"; path = "Target Support Files/Pods-ImageNotification/Pods-ImageNotification.debug.xcconfig"; sourceTree = "<group>"; };
 		6132EF172BDFF13200BBE14D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = apptileSeed/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		74D0DE952D9D457B0096D47B /* SplashScreenViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SplashScreenViewController.h; sourceTree = "<group>"; };
+		74D0DE972D9D45A50096D47B /* SplashScreenViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SplashScreenViewController.m; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = apptileSeed/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8ED2602A8E3B9F7822713340 /* Pods-apptileSeed.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-apptileSeed.debug.xcconfig"; path = "Target Support Files/Pods-apptileSeed/Pods-apptileSeed.debug.xcconfig"; sourceTree = "<group>"; };
 		C0DCB3D1B66E6AA488E96CFD /* Pods-NotificationContentExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationContentExtension.debug.xcconfig"; path = "Target Support Files/Pods-NotificationContentExtension/Pods-NotificationContentExtension.debug.xcconfig"; sourceTree = "<group>"; };
@@ -251,6 +254,8 @@
 				05A846D82CF09CD600784D02 /* RNGetValues.h */,
 				057DB67B2D60965900CD76F4 /* RNApptile.m */,
 				057DB67D2D60968E00CD76F4 /* RNApptile.h */,
+				74D0DE952D9D457B0096D47B /* SplashScreenViewController.h */,
+				74D0DE972D9D45A50096D47B /* SplashScreenViewController.m */,
 			);
 			name = apptileSeed;
 			sourceTree = "<group>";
@@ -638,6 +643,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				057DB67C2D60965900CD76F4 /* RNApptile.m in Sources */,
+				74D0DE982D9D45A50096D47B /* SplashScreenViewController.m in Sources */,
 				05A846D52CF09C9400784D02 /* RNGetValues.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				055C1EC32CB7C9C600EE8821 /* ShakeEventModule.m in Sources */,

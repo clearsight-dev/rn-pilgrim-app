@@ -3,6 +3,7 @@
 #import "CrashHandler.h"
 #import "StartupHandler.h"
 #import "apptileSeed-Swift.h"
+#import "SplashScreenViewController.h"
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
@@ -83,12 +84,14 @@
   [[MoEngageInitializer sharedInstance] initializeDefaultSDKConfig:sdkConfig andLaunchOptions:launchOptions];
 #endif
   
-  // storing launch option for later use while opening react native from startup handler
-  self.storedLaunchOptions = launchOptions;
-
-  // starting app launch process don't alter the order
-  [self showNativeSplash];
-  [StartupHandler handleStartupProcess];
+   // storing launch option for later use while opening react native from startup handler
+   self.storedLaunchOptions = launchOptions;
+  
+   // Set SplashScreenViewController as the initial screen
+   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+   SplashScreenViewController *splashScreenVC = [[SplashScreenViewController alloc] init];
+   self.window.rootViewController = splashScreenVC;
+   [self.window makeKeyAndVisible];
   
   return YES;
 }
@@ -105,6 +108,7 @@
     }
   
     BOOL result = [super application:application didFinishLaunchingWithOptions:launchOptions];
+    [self showNativeSplash];
 
     if (result) {
         NSLog(@"[ApptileStartupProcess] React Native started successfully.");
@@ -155,27 +159,6 @@
   });
 #endif 
 #ifdef ENABLE_NATIVE_SPLASH
-  // Attempt to remove splash after minimum play duration
-  NSTimeInterval minSplashDuration = MIN_SPLASH_DURATION + 0.5;
-  dispatch_time_t minSplashTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(minSplashDuration * NSEC_PER_SEC));
-  dispatch_after(minSplashTime, dispatch_get_main_queue(), ^(void){
-    self.minDurationPassed = YES;
-    if (self.splash != NULL && self.jsLoaded == YES) {
-      [self.splash removeFromSuperview];
-      self.splash = NULL;
-    }
-  });
-  
-  // Remove the splash after max duration if its not removed yet
-  NSTimeInterval maxSplashDuration = MAX_SPLASH_DURATION + 0.5;
-  dispatch_time_t maxSplashTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(maxSplashDuration * NSEC_PER_SEC));
-  dispatch_after(maxSplashTime, dispatch_get_main_queue(), ^(void){
-    if (self.splash != NULL) {
-      [self.splash removeFromSuperview];
-      self.splash = NULL;
-    }
-  });
-  
   // append the splash image or gif to the window
   rctImageView.frame = self.window.frame;
   rctImageView.resizeMode = RCTResizeModeCover;
@@ -189,7 +172,7 @@
 {
 #ifdef ENABLE_NATIVE_SPLASH
   self.jsLoaded = YES;
-  if (self.splash != NULL && self.minDurationPassed == YES) {
+  if (self.splash != NULL) {
     [self.splash removeFromSuperview];
     self.splash = NULL;
   }
