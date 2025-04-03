@@ -3,7 +3,7 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  TouchableOpacity, 
+  Pressable, 
   FlatList,
   Image,
   ActivityIndicator
@@ -12,20 +12,18 @@ import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel, useApptileWindowDims, Icon } from 'apptile-core';
 import BottomSheet from '../../../../../extractedQueries/BottomSheet';
 import { colorSwatches, imageSwatches } from '../../../../../extractedQueries/colorswatchinfo';
-import { fetchVariantBySelectedOptions } from '../../../../../extractedQueries/collectionqueries';
+import { fetchProductOptions, fetchVariantBySelectedOptions } from '../../../../../extractedQueries/collectionqueries';
 
 const ShadeSelector = ({ 
   bottomSheetRef, 
   product, 
   onAddToCart 
 }) => {
-  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [selectedShade, setSelectedShade] = useState(null);
   const [shades, setShades] = useState([]);
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loadingVariant, setLoadingVariant] = useState(false);
-  const [colorOption, setColorOption] = useState(null);
   const originalBottomSheetRef = useRef(bottomSheetRef);
   const {width: screenWidth} = useApptileWindowDims();
 
@@ -58,92 +56,93 @@ const ShadeSelector = ({
   // Process product options to get shade data
   useEffect(() => {
     if (!product) return;
-    
-    // Find the color option
-    const option = product.options?.find(option => 
-      option.name.toLowerCase() === 'color' || 
-      option.name.toLowerCase() === 'shade' || 
-      option.name.toLowerCase() === 'colour'
-    );
-    
-    if (!option) return;
-    
-    setColorOption(option);
-    
-    // Process each color value
-    const processedShades = option.values.map((value, index) => {
-      // Normalize the color name (remove non-alphanumeric chars, replace with spaces, condense spaces)
-      const normalizedName = value.toLowerCase()
-        .replace(/[^a-z0-9\s]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      
-      // Find matching variant
-      const variant = product.variants?.find(v => 
-        v.selectedOptions?.some(opt => 
-          opt.name.toLowerCase() === option.name.toLowerCase() && 
-          opt.value === value
-        )
+
+    async function getShades() {
+      const res = await fetchProductOptions(product.handle);
+      const options = res?.data?.options ?? [];
+
+      // Find the color option
+      const option = options?.find(option => 
+        option.name.toLowerCase() === 'color' 
       );
       
-      // Try to find color in colorSwatches
-      let colorHex = null;
-      if (colorSwatches[normalizedName]) {
-        colorHex = colorSwatches[normalizedName].colorHex;
+      if (!option) return;
+
+      const normalizeOption = (value) => {
+        return value?.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
       }
       
-      // If no color found, try to find image in imageSwatches
-      let imageUrl = null;
-      if (!colorHex && imageSwatches[normalizedName]) {
-        imageUrl = imageSwatches[normalizedName];
-      }
+      // Process each color value
+      const processedShades = option.optionValues.map((value, index) => {
+        // Normalize the color name (remove non-alphanumeric chars, replace with spaces, condense spaces)
+        const normalizedName = normalizeOption(value.name);
+        
+        // Find matching variant
+        const variant = product.variants[0];
+        
+        // Try to find color in colorSwatches
+        let colorHex = null;
+        if (colorSwatches[normalizedName]) {
+          colorHex = colorSwatches[normalizedName].colorHex;
+        }
+        
+        // If no color found, try to find image in imageSwatches
+        let imageUrl = null;
+        if (!colorHex && imageSwatches[normalizedName]) {
+          imageUrl = imageSwatches[normalizedName];
+        }
+        
+        // If still no image, use variant image
+        if (!imageUrl && variant?.image?.url) {
+          imageUrl = variant.image.url;
+        }
+        
+        return {
+          id: index.toString(),
+          name: value.name,
+          normalizedName,
+          colorHex,
+          imageUrl,
+          variantId: variant?.id
+        };
+      });
       
-      // If still no image, use variant image
-      if (!imageUrl && variant?.image?.url) {
-        imageUrl = variant.image.url;
-      }
+      setShades(processedShades);
       
-      return {
-        id: index.toString(),
-        name: value,
-        normalizedName,
-        colorHex,
-        imageUrl,
-        variantId: variant?.id
-      };
-    });
-    
-    setShades(processedShades);
-    
-    // Select the first shade by default when product changes
-    if (processedShades.length > 0) {
-      setSelectedShade(processedShades[0]);
+      // Select the first shade by default when product changes
+      if (Array.isArray(product.variants[0]?.selectedOptions)) {
+        const selectedOption = product.variants[0].selectedOptions[0];
+        const selectedShadeIndex = processedShades.find(it => it.name === selectedOption.value)
+        if (selectedShadeIndex >= 0) {
+          setSelectedShade(selectedShadeIndex);
+        }
+      }
     }
+
+    getShades();
   }, [product]);
 
   // Fetch variant details when a shade is selected
   useEffect(() => {
-    if (!selectedShade || !product || !colorOption) return;
+    if (!selectedShade || !product) return;
     
     const fetchVariantDetails = async () => {
+      debugger
       // Only show loading after 200ms to avoid flicker for cached data
       const loadingTimer = setTimeout(() => {
         setLoadingVariant(true);
       }, 200);
       
       try {
-        const queryRunner = shopifyDSModel?.get('queryRunner');
-        if (!queryRunner) {
-          throw new Error('Query runner not available');
-        }
-        
         const selectedOptions = [{
-          name: colorOption.name,
+          name: 'Color',
           value: selectedShade.name
         }];
         
         const result = await fetchVariantBySelectedOptions(
-          queryRunner,
           product.handle,
           selectedOptions
         );
@@ -167,7 +166,7 @@ const ShadeSelector = ({
     };
     
     fetchVariantDetails();
-  }, [selectedShade, product, colorOption, shopifyDSModel]);
+  }, [selectedShade, product]);
 
   const handleAddToCart = () => {
     if (selectedVariantId && onAddToCart) {
@@ -178,7 +177,7 @@ const ShadeSelector = ({
 
   // Render a shade item
   const renderShadeItem = ({ item }) => (
-    <TouchableOpacity 
+    <Pressable 
       style={styles.shadeItem}
       onPress={() => setSelectedShade(item)}
     >
@@ -216,7 +215,7 @@ const ShadeSelector = ({
         styles.shadeName,
         (selectedShade?.id === item.id) ? styles.selectedShadeName : {}
       ]}>{item.name}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
@@ -283,7 +282,7 @@ const ShadeSelector = ({
           />
           
           {/* Add to Cart Button */}
-          <TouchableOpacity 
+          <Pressable 
             style={[
               styles.addToCartButton,
               !selectedShade && styles.addToCartButtonDisabled
@@ -293,7 +292,7 @@ const ShadeSelector = ({
             <Text style={styles.addToCartText}>
               {selectedShade ? "Add to Cart" : "Select a Shade"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </BottomSheet>

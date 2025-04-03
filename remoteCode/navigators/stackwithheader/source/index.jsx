@@ -35,7 +35,7 @@ function isOnHome(state) {
         const activeRoute = nav1State.routes[nav1State.index];
         return activeRoute.name === "Home";
       } else if (!currentRoute.index) {
-        console.log('[AGENT] returning onHomeRoute because it looks like tab navigator state is not initialized');
+        // console.log('[AGENT] returning onHomeRoute because it looks like tab navigator state is not initialized');
         return true;
       } else {
         console.error("I have no idea what is going on now");
@@ -51,7 +51,6 @@ function isOnHome(state) {
 };
 
 const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbutton}, ref) => {
-  console.log("[AGENT] rendering dumb header");
   const locals = useRef({
     isSearchbarVisible: true,
     searchbarAnimation: null
@@ -239,9 +238,8 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
 })
 
 function CustomHeaderSmart({route, navigation}) {
-  console.log('[AGENT] rendering smart custom header')
   const insets = useSafeAreaInsets();
-  const {numCurrentCartItems} = useCartIconData();
+  // const {numCurrentCartItems} = useCartIconData();
   const {pilgrimGlobals} = useContext(PilgrimContext);
   const headerComponent = useRef(null);
 
@@ -269,7 +267,7 @@ function CustomHeaderSmart({route, navigation}) {
     <CustomHeader
       navigation={navigation}
       topInset={insets?.top ?? 0}
-      numCartItems={numCurrentCartItems}
+      numCartItems={0}
       showBackbutton={route.name !== "Nav1"}
       ref={headerComponent}
     />

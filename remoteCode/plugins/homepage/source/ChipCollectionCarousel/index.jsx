@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { 
   View, 
   Text,
@@ -10,58 +10,66 @@ import { useSelector, useDispatch } from 'react-redux';
 import { datasourceTypeModelSel, navigateToScreen } from 'apptile-core';
 import { fetchCollectionData } from '../../../../../extractedQueries/collectionqueries';
 import RelatedProductsCarousel from '../../../../../extractedQueries/RelatedProductsCarousel';
-import { useShopifyQueryAndAddtoCart } from '../../../../../extractedQueries/selectors';
+import { cheaplyGetShopifyQueryRunner, useShopifyQueryAndAddtoCart, useShopifyQueryRunner } from '../../../../../extractedQueries/selectors';
 import Header from '../Header';
 import ShadeSelector from './ShadeSelector';
 
-const ChipCollectionCarousel = ({ 
+function ChipCollectionCarousel({ 
+  data,
   collectionHandle = 'bestsellers',
   numberOfProducts = 5,
   title,
   style
-}) => {
+}) {
+  console.log("Rendering chip collection carousel: ", collectionHandle);
   const bottomSheetRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
-  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
-  const { addLineItemToCart } = useShopifyQueryAndAddtoCart();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filterLoading, setFilterLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [filterData, setFilterData] = useState([]);
-  const [selectedFilters, setSelectedFilters] = useState([]);
+  // const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
+  // const { queryRunner, addLineItemToCart } = useShopifyQueryAndAddtoCart();
+  const addLineItemToCart = () => {};
+  // const queryRunner = useShopifyQueryRunner();
+  // const [products, setProducts] = useState([]);
+  const products = data.products;
+  // const [loading, setLoading] = useState(false);
+  let loading = false; 
+  if (data.status === "loading") {
+    loading = true;
+  }
+  // const [filterLoading, setFilterLoading] = useState(false);
+  // const [error, setError] = useState(null);
+  const error = data.error;
+  // const [filterData, setFilterData] = useState([]);
+  const filterData = data.filters;
+  // const [selectedFilters, setSelectedFilters] = useState([]);
 
   // Function to fetch products with filters
-  const fetchProducts = useCallback(async (filters = [], isFilterChange = false) => {
+  async function fetchProducts (collectionHandle, numberOfProducts, filters = [], isFilterChange = false) {
     try {
       // Set the appropriate loading state
       if (isFilterChange) {
-        setFilterLoading(true);
+        // setFilterLoading(true);
       } else {
-        setLoading(true);
+        // setLoading(true);
       }
       
-      const queryRunner = shopifyDSModel?.get('queryRunner');
-      
-      if (!queryRunner) {
-        throw new Error('Query runner not available');
-      }
+      // const queryRunner = shopifyDSModel?.get('queryRunner');
       
       // Fetch products from collection
       const result = await fetchCollectionData(
-        queryRunner, 
         collectionHandle,
         numberOfProducts,
-        null, 
+        null, // after cursor
         'BEST_SELLING', // Sort by best selling
         false, // reverse
         filters // Apply filters if any
       );
       
       if (result?.data?.collection?.products?.edges) {
+        console.log("Setting products")
         setProducts(result.data.collection.products.edges.map(edge => edge.node));
       } else {
+        console.log("Clearing products")
         setProducts([]);
       }
       
@@ -73,18 +81,11 @@ const ChipCollectionCarousel = ({
       console.error('Error fetching products:', err);
       setError(err.toString());
     } finally {
-      setLoading(false);
-      setFilterLoading(false);
+      // setLoading(false);
+      // setFilterLoading(false);
     }
-  }, [shopifyDSModel, collectionHandle, numberOfProducts]);
+  };
 
-  // Initial data fetch
-  useEffect(() => {
-    if (shopifyDSModel) {
-      fetchProducts();
-    }
-  }, [shopifyDSModel, fetchProducts]);
-  
   // Function to handle filter selection
   const handleFilterSelect = (filterId, valueId) => {
     setSelectedFilters(prev => {
@@ -146,7 +147,7 @@ const ChipCollectionCarousel = ({
       }).flat();
       
       // Fetch products with the new filters, indicating this is a filter change
-      fetchProducts(shopifyFilters, true);
+      fetchProducts(collectionHandle, numberOfProducts, shopifyFilters, true);
       
       return newFilters;
     });
@@ -214,7 +215,7 @@ const ChipCollectionCarousel = ({
           }).flat();
           
           // Fetch products with the new filters, indicating this is a filter change
-          fetchProducts(shopifyFilters, true);
+          fetchProducts(collectionHandle, numberOfProducts, shopifyFilters, true);
           
           return newFilters;
         }
@@ -228,29 +229,40 @@ const ChipCollectionCarousel = ({
   // Function to clear all filters
   const handleClearAllFilters = () => {
     setSelectedFilters([]);
-    fetchProducts([], true); // Fetch products with no filters, indicating this is a filter change
+    fetchProducts(collectionHandle, numberOfProducts, [], true); // Fetch products with no filters, indicating this is a filter change
   };
 
   // Format products for the carousel
   const formatProductsForCarousel = (products) => {
     if (!products || !Array.isArray(products)) return [];
-    return products.map(product => ({
-      id: product.id,
-      firstVariantId: product.variants?.nodes?.[0]?.id ?? null,
-      title: product.title,
-      handle: product.handle,
-      featuredImage: product.featuredImage,
-      priceRange: product.priceRange,
-      compareAtPriceRange: product.compareAtPriceRange,
-      variantsCount: product.variantsCount?.count ?? 1,
-      productType: product.productType,
-      options: product.options || [],
-      variants: product.variants?.nodes || [],
-      metafield: product.metafields?.find(m => 
-        (m?.key === 'product_label_1' || m?.key === 'product_label_2') && 
-        m?.namespace === 'custom'
-      )
-    }));
+    return products.map(product => {
+      const firstVariant = product.variants?.edges?.[0]?.node;
+      let parsedRating = 0;
+      try {
+        parsedRating = parseFloat(JSON.parse(product.rating)?.value);
+      } catch (err) {
+        parsedRating = 0;
+      }
+
+      return {
+        id: product.id,
+        firstVariantId: firstVariant?.id ?? null,
+        title: product.title,
+        handle: product.handle,
+        featuredImage: product.featuredImage,
+        price: firstVariant?.price ?? {amount: 0},
+        compareAtPrice: firstVariant?.compareAtPrice ?? {amount: 0},
+        variantsCount: product.variantsCount?.count ?? 0,
+        productType: product.productType,
+        options: product.options || [],
+        variants: [product.variants?.edges?.[0]?.node],
+        rating: parsedRating,
+        productLabel1: product.productLabel1,
+        productLabel2: product.productLabel2,
+        weight: firstVariant?.weight,
+        weightUnit: firstVariant?.weightUnit
+      }
+    });
   };
 
   // Handle "See All" button click
@@ -260,6 +272,7 @@ const ChipCollectionCarousel = ({
   
   // Handle Select Shade button click
   const handleSelectShade = useCallback((product) => {
+    console.log("Selecting shade")
     setSelectedProduct(product);
     bottomSheetRef.current?.show();
   }, []);
@@ -284,18 +297,11 @@ const ChipCollectionCarousel = ({
       {/* Filter chips header */}
       <Header 
         filterData={filterData}
-        selectedFilters={selectedFilters}
+        selectedFilters={[]}
         onFilterRemove={handleFilterRemove}
         onFilterSelect={handleFilterSelect}
         onClearAllFilters={handleClearAllFilters}
       />
-      
-      {/* Linear loader for filter changes */}
-      {filterLoading && (
-        <View style={styles.linearLoader}>
-          <ActivityIndicator size="small" color="#00909E" />
-        </View>
-      )}
       
       {/* Loading state */}
       {loading ? (
@@ -315,7 +321,7 @@ const ChipCollectionCarousel = ({
         <RelatedProductsCarousel 
           title="" // We're already showing the title above
           products={formattedProducts}
-          initialProductsToLoad={2}
+          initialProductsToLoad={5}
           style={styles.carousel}
           onSelectShade={handleSelectShade}
         />
@@ -392,4 +398,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default ChipCollectionCarousel;
+export default memo(ChipCollectionCarousel);

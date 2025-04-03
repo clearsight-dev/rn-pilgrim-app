@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
 import {PRODUCT_CARD_INFO} from './pdpquery';
+import { cheaplyGetShopifyQueryRunner } from './selectors';
 // Function to fetch collection data for the carousel component
 export const fetchCollectionCarouselData = async (queryRunner, collectionHandle) => {
   console.log('[AGENT] running query for collection: ', collectionHandle)
@@ -140,7 +141,8 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
 };
 
 // Function to fetch collection data using the GraphQL query with pagination support
-export const fetchCollectionData = async (queryRunner, collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) => {
+export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
@@ -220,8 +222,51 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
   };
 }
 
+export async function fetchProductOptions(handle) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
+
+  const OPTIONS_QUERY = gql`
+    query GetOptionsForProduct($handle: String) {
+      product(handle: $handle) {
+        id
+        handle
+        options {
+          name
+          optionValues {
+            name
+            swatch {
+              color
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const res = await queryRunner.runQuery(
+    'query',
+    OPTIONS_QUERY,
+    {
+      handle,
+    },
+    {
+      cachePolicy: 'cache-first'
+    }
+  );
+  
+  return {
+    data: {
+      options: res.data.product?.options
+    }
+  };
+}
+
 // Function to fetch product variant by selected options
-export const fetchVariantBySelectedOptions = async (queryRunner, productHandle, selectedOptions) => {
+export const fetchVariantBySelectedOptions = async (productHandle, selectedOptions) => {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
@@ -229,13 +274,26 @@ export const fetchVariantBySelectedOptions = async (queryRunner, productHandle, 
   const VARIANT_BY_SELECTED_OPTIONS_QUERY = gql`
     query VariantBySelectedOptions($handle: String, $selectedOptions: [SelectedOptionInput!]!) {
       product(handle: $handle) {
-        variantBySelectedOptions(selectedOptions: $selectedOptions) ${PRODUCT_CARD_INFO}
+        id
+        variantBySelectedOptions(selectedOptions: $selectedOptions) {
+          id
+          title
+          image {
+            url
+            id
+          }
+          price {
+            amount
+          }
+          weight
+          weightUnit
+        }
       }
     }
   `;
   
   try {
-    const data = await queryRunner.runQuery(
+    const res = await queryRunner.runQuery(
       'query',
       VARIANT_BY_SELECTED_OPTIONS_QUERY,
       {
@@ -249,7 +307,7 @@ export const fetchVariantBySelectedOptions = async (queryRunner, productHandle, 
     
     return {
       data: {
-        variant: data.data.product?.variantBySelectedOptions
+        variant: res.data.product?.variantBySelectedOptions
       }
     };
   } catch (error) {

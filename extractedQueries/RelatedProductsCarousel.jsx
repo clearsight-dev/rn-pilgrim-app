@@ -15,41 +15,42 @@ const RelatedProductsCarousel = ({
   console.log('Rendering RelatedProductsCarousel');
   const bottomSheetRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const {queryRunner, addLineItemToCart} = useShopifyQueryAndAddtoCart();
+  // const {queryRunner, addLineItemToCart} = useShopifyQueryAndAddtoCart();
 
   // Function to fetch product data
-  async function cacheProductDetails(productHandle) {
-    if (!queryRunner) return;
+  // async function cacheProductDetails(productHandle) {
+  //   if (!queryRunner) return;
 
-    try {
-      await fetchProductData(queryRunner, productHandle);
-    } catch (error) {
-      console.error(`Error fetching product ${productHandle}:`, error);
-    }
-  }
+  //   try {
+  //     await fetchProductData(queryRunner, productHandle);
+  //   } catch (error) {
+  //     console.error(`Error fetching product ${productHandle}:`, error);
+  //   }
+  // }
 
-  async function cacheMultipleProducts(products) {
-    if (!products || products.length === 0) return;
-    for (let i = 0; i < products.length; ++i) {
-      await cacheProductDetails(products[i].handle);
-      await new Promise(resolve => {
-        setTimeout(() => {
-          resolve();
-        }, 500);
-      });
-    }
-  }
+  // async function cacheMultipleProducts(products) {
+  //   if (!products || products.length === 0) return;
+  //   for (let i = 0; i < products.length; ++i) {
+  //     await cacheProductDetails(products[i].handle);
+  //     await new Promise(resolve => {
+  //       setTimeout(() => {
+  //         resolve();
+  //       }, 500);
+  //     });
+  //   }
+  // }
 
   const handleAddToCart = useCallback(
     product => {
       console.log('Adding product: ', product);
-      if (addLineItemToCart) {
-        addLineItemToCart(product.firstVariantId);
-      } else {
-        console.error('no function found for adding to cart!');
-      }
+      // if (addLineItemToCart) {
+      //   addLineItemToCart(product.firstVariantId);
+      // } else {
+      //   console.error('no function found for adding to cart!');
+      // }
     },
-    [addLineItemToCart],
+    // [addLineItemToCart],
+    []
   );
 
   const handleSelectShade = useCallback(
@@ -66,13 +67,13 @@ const RelatedProductsCarousel = ({
   );
 
   // Initialize with the specified number of products
-  useEffect(() => {
-    const initialProducts = products.slice(
-      0,
-      Math.min(initialProductsToLoad, products.length),
-    );
-    cacheMultipleProducts(initialProducts);
-  }, [products]);
+  // useEffect(() => {
+  //   const initialProducts = products.slice(
+  //     0,
+  //     Math.min(initialProductsToLoad, products.length),
+  //   );
+  //   // cacheMultipleProducts(initialProducts);
+  // }, [products]);
 
   if (!products || products.length === 0) {
     return null;
@@ -92,13 +93,13 @@ const RelatedProductsCarousel = ({
         // onScroll={handleScroll}
         // onEndDrag={() => cacheMultipleProducts(products)}
         // onMomentumScrollEnd={() => cacheMultipleProducts(products)}
-        scrollEventThrottle={16}
+        // scrollEventThrottle={60}
         initialNumToRender={2}
-        windowSize={1}
-        maxToRenderPerBatch={3}
+        windowSize={3}
+        maxToRenderPerBatch={5}
         renderItem={({item: product, index}) => (
           <RelatedProductCard
-            key={product.handle || index}
+            key={product.handle + index}
             product={product}
             onAddToCart={handleAddToCart}
             onSelectShade={handleSelectShade}

@@ -21,7 +21,9 @@ export const PRODUCT_CARD_INFO =
         title
         price {
           amount
-          currencyCode
+        }
+        compareAtPrice {
+          amount
         }
         image {
           id
@@ -29,6 +31,10 @@ export const PRODUCT_CARD_INFO =
         }
         weight
         weightUnit
+        selectedOptions {
+          name
+          value
+        }
         variantSubtitle: metafield(key: "variant_subtitle", namespace: "custom") {
           id
           key

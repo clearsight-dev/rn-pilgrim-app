@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {
   View,
   Text,
@@ -13,28 +13,40 @@ import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 
-const RelatedProductCard = ({product, style, onAddToCart, onSelectShade}) => {
+function RelatedProductCard({product, style, onAddToCart, onSelectShade}) {
   console.log('Rendering relatedproductcard');
   const {
+    handle,
     title,
     featuredImage,
-    priceRange,
-    compareAtPriceRange,
-    metafield,
-    handle,
+    price,
+    compareAtPrice,
     rating,
     productType,
     variantsCount,
+    productLabel1,
+    productLabel2,
+    weight,
+    weightUnit
   } = product;
 
-  // Get price information
-  const price = priceRange?.minVariantPrice?.amount || '0';
-  const compareAtPrice = compareAtPriceRange?.minVariantPrice?.amount || null;
-
   // Calculate discount percentage if compareAtPrice exists
-  const discountPercentage = compareAtPrice
-    ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
+  let discountPercentage = compareAtPrice?.amount
+    ? Math.round(((compareAtPrice.amount - price.amount) / compareAtPrice.amount) * 100)
     : 0;
+  if (isNaN(discountPercentage)) {
+    discountPercentage = 0;
+  }
+
+  let weightString = "";
+  if (weight && weightUnit && weightUnit.toString) {
+    weightString = `${weight}${weightUnit.toString().toLowerCase()}`;
+  }
+
+  let isBestSeller = false;
+  if (productLabel1?.value?.toString().toLowerCase().includes("bestseller")) {
+    isBestSeller = true;
+  }
 
   const dispatch = useDispatch();
 
@@ -81,20 +93,21 @@ const RelatedProductCard = ({product, style, onAddToCart, onSelectShade}) => {
   );
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[styles.container, style]}
       onPress={() => {
         dispatch(navigateToScreen('NewPDP', {productHandle: handle}));
       }}>
       {/* Promo Tag */}
-      <ProductFlag
-        label={metafield?.value || 'Buy 3@999'}
+      {productLabel2?.value && <ProductFlag
+        label={productLabel2?.value}
         color="#00726C"
         style={styles.promoTagContainer}
         textStyle={styles.promoTagText}
         height={18}
         width={95}
-      />
+      />}
+      {/* <Text>{JSON.stringify(price)}{JSON.stringify(compareAtPrice}</Text> */}
 
       {/* Product Image */}
       <View style={styles.imageContainer}>
@@ -103,41 +116,44 @@ const RelatedProductCard = ({product, style, onAddToCart, onSelectShade}) => {
           style={styles.image}
           resizeMode="contain"
         />
-        {/* Rating */}
-        <View style={styles.ratingContainer}>
+        {(rating > 0) && (<View style={styles.ratingContainer}>
           <Text style={styles.ratingText}>{rating}</Text>
           <Star color={'#00909E'} size={12} fillPercentage={1} />
-        </View>
-
-        {/* No loading indicator - optimistic loading */}
-      </View>
+        </View>)}
+      </View> 
 
       {/* Product Details */}
       <View style={styles.detailsContainer}>
-        <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>
-          BESTSELLER
-        </Text>
+        {
+          isBestSeller && (
+            <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>
+              BESTSELLER
+            </Text>
+          )
+      }
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
-        <Text style={styles.subtitle}>2 Sizes</Text>
+        <Text style={styles.subtitle}>{weightString}</Text>
 
         {/* Price Section */}
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>₹{parseInt(price).toLocaleString()}</Text>
+        <View style={{flexGrow: 1, flexDirection: 'column', justifyContent: 'flex-end'}}>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>₹{parseInt(price.amount).toLocaleString()}</Text>
 
-          {compareAtPrice && (
-            <>
-              <Text style={styles.compareAtPrice}>
-                ₹{parseInt(compareAtPrice).toLocaleString()}
-              </Text>
-              <Text style={styles.discount}>{discountPercentage}% Off</Text>
-            </>
-          )}
+            {(compareAtPrice && discountPercentage > 0) && (
+              <>
+                <Text style={styles.compareAtPrice}>
+                  ₹{parseInt(compareAtPrice).toLocaleString()}
+                </Text>
+                <Text style={styles.discount}>{discountPercentage}% Off</Text>
+              </>
+            )}
+          </View>
         </View>
       </View>
       {cardCTA}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -193,6 +209,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   detailsContainer: {
+    flexGrow: 1,
     fontSize: 12,
     color: '#767676',
     fontWeight: '400',
@@ -248,4 +265,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RelatedProductCard;
+export default memo(RelatedProductCard);
