@@ -238,11 +238,10 @@ function ChipCollectionCarousel({
   };
   
   // Handle Select Shade button click
-  const handleSelectShade = useCallback((product) => {
-    console.log("Selecting shade")
+  const handleSelectShade = (product) => {
     setSelectedProduct(product);
     bottomSheetRef.current?.show();
-  }, []);
+  };
 
   // Format products for the carousel
   const formattedProducts = formatProductsForCarousel(products);
