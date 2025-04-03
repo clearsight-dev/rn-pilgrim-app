@@ -3,18 +3,48 @@ import {View, Text, StyleSheet, FlatList} from 'react-native';
 import {fetchProductData} from './pdpquery';
 import RelatedProductCard from './RelatedProductCard';
 import {useShopifyQueryAndAddtoCart} from './selectors';
-import BottomSheet from './BottomSheet';
+
+export function formatProductsForCarousel(products) {
+  if (!products || !Array.isArray(products)) return [];
+  return products.map(product => {
+    const firstVariant = product.variants?.edges?.[0]?.node;
+    let parsedRating = 0;
+    try {
+      parsedRating = parseFloat(JSON.parse(product.rating)?.value);
+    } catch (err) {
+      parsedRating = 0;
+    }
+
+    return {
+      id: product.id,
+      firstVariantId: firstVariant?.id ?? null,
+      title: product.title,
+      handle: product.handle,
+      featuredImage: product.featuredImage,
+      price: firstVariant?.price ?? {amount: 0},
+      compareAtPrice: firstVariant?.compareAtPrice ?? {amount: 0},
+      variantsCount: product.variantsCount?.count ?? 0,
+      productType: product.productType,
+      options: product.options || [],
+      variants: [product.variants?.edges?.[0]?.node],
+      rating: parsedRating,
+      productLabel1: product.productLabel1,
+      productLabel2: product.productLabel2,
+      weight: firstVariant?.weight,
+      weightUnit: firstVariant?.weightUnit
+    }
+  });
+};
 
 const RelatedProductsCarousel = ({
   title = 'Customers also liked',
   products = [],
   style,
-  initialProductsToLoad = 2, // Default to loading 2 products initially
+  // initialProductsToLoad = 2, // Default to loading 2 products initially
   onSelectShade,
 }) => {
   console.log('Rendering RelatedProductsCarousel');
   const bottomSheetRef = useRef(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   // const {queryRunner, addLineItemToCart} = useShopifyQueryAndAddtoCart();
 
   // Function to fetch product data
@@ -55,7 +85,6 @@ const RelatedProductsCarousel = ({
 
   const handleSelectShade = useCallback(
     product => {
-      setSelectedProduct(product);
       if (onSelectShade) {
         onSelectShade(product, bottomSheetRef);
       } else {

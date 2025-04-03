@@ -9,10 +9,10 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { datasourceTypeModelSel, navigateToScreen } from 'apptile-core';
 import { fetchCollectionData } from '../../../../../extractedQueries/collectionqueries';
-import RelatedProductsCarousel from '../../../../../extractedQueries/RelatedProductsCarousel';
+import RelatedProductsCarousel, {formatProductsForCarousel} from '../../../../../extractedQueries/RelatedProductsCarousel';
 import { cheaplyGetShopifyQueryRunner, useShopifyQueryAndAddtoCart, useShopifyQueryRunner } from '../../../../../extractedQueries/selectors';
 import Header from '../Header';
-import ShadeSelector from './ShadeSelector';
+import ShadeSelector from '../../../../../extractedQueries/ShadeSelector';
 
 function ChipCollectionCarousel({ 
   data,
@@ -232,39 +232,6 @@ function ChipCollectionCarousel({
     fetchProducts(collectionHandle, numberOfProducts, [], true); // Fetch products with no filters, indicating this is a filter change
   };
 
-  // Format products for the carousel
-  const formatProductsForCarousel = (products) => {
-    if (!products || !Array.isArray(products)) return [];
-    return products.map(product => {
-      const firstVariant = product.variants?.edges?.[0]?.node;
-      let parsedRating = 0;
-      try {
-        parsedRating = parseFloat(JSON.parse(product.rating)?.value);
-      } catch (err) {
-        parsedRating = 0;
-      }
-
-      return {
-        id: product.id,
-        firstVariantId: firstVariant?.id ?? null,
-        title: product.title,
-        handle: product.handle,
-        featuredImage: product.featuredImage,
-        price: firstVariant?.price ?? {amount: 0},
-        compareAtPrice: firstVariant?.compareAtPrice ?? {amount: 0},
-        variantsCount: product.variantsCount?.count ?? 0,
-        productType: product.productType,
-        options: product.options || [],
-        variants: [product.variants?.edges?.[0]?.node],
-        rating: parsedRating,
-        productLabel1: product.productLabel1,
-        productLabel2: product.productLabel2,
-        weight: firstVariant?.weight,
-        weightUnit: firstVariant?.weightUnit
-      }
-    });
-  };
-
   // Handle "See All" button click
   const handleSeeAllClick = () => {
     dispatch(navigateToScreen('NewCollection', { collectionHandle }));
@@ -321,7 +288,7 @@ function ChipCollectionCarousel({
         <RelatedProductsCarousel 
           title="" // We're already showing the title above
           products={formattedProducts}
-          initialProductsToLoad={5}
+          // initialProductsToLoad={5}
           style={styles.carousel}
           onSelectShade={handleSelectShade}
         />

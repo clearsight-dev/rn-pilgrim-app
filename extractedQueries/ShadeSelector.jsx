@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel, useApptileWindowDims, Icon } from 'apptile-core';
-import BottomSheet from '../../../../../extractedQueries/BottomSheet';
-import { colorSwatches, imageSwatches } from '../../../../../extractedQueries/colorswatchinfo';
-import { fetchProductOptions, fetchVariantBySelectedOptions } from '../../../../../extractedQueries/collectionqueries';
+import BottomSheet from './BottomSheet';
+import { colorSwatches, imageSwatches } from './colorswatchinfo';
+import { fetchProductOptions, fetchVariantBySelectedOptions } from './collectionqueries';
 
 const ShadeSelector = ({ 
   bottomSheetRef, 
@@ -252,7 +252,7 @@ const ShadeSelector = ({
                     {product.title}
                   </Text>
                   <Text style={styles.productPrice}>
-                    ₹{parseInt(selectedVariant?.price?.amount || product.priceRange?.minVariantPrice?.amount || 0).toLocaleString()}
+                    ₹{parseInt(selectedVariant?.price?.amount).toLocaleString()}
                   </Text>
                   {selectedVariant?.weight > 0 && (
                     <Text style={styles.productWeight}>
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderRadius: 4,
   },
   shadeName: {
