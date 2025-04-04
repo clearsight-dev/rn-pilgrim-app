@@ -189,9 +189,9 @@ export function ReactComponent({ model }) {
 
   // Mock variants data - in a real app, you would extract this from the product data
   const variantOptions = [
-    { size: "50ml", price: "855", popular: true },
-    { size: "30ml", price: "545", popular: false },
-    { size: "15ml", price: "159", discount: "4%", originalPrice: "895", popular: false }
+    { name: "50ml", price: 855, compareAtPrice: 342, popular: true },
+    { name: "30ml", price: 545, compareAtPrice: 342, popular: false },
+    { name: "15ml", price: 159, compareAtPrice: 342, discount: "4%", originalPrice: "895", popular: false }
   ];
   
   // Extract product details

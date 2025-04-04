@@ -35,13 +35,12 @@ const ProductInfo = ({
               activeOpacity={0.7}
             >
               <VariantCard
-                size={variant.size}
-                price={variant.price}
-                originalPrice={variant.originalPrice}
-                discount={variant.discount}
-                isPopular={variant.popular}
+                variant={variant}
+                optionName={"Size"}
                 isSelected={selectedIndex === index}
+                isPopular={variant.popular}
                 showTimer={shouldShowTimer(index)}
+                onSelect={() => {}}
               />
             </TouchableOpacity>
           ))}
