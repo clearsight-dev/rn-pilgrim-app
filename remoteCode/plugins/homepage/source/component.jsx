@@ -6,7 +6,7 @@ import {
   Image, 
   TouchableOpacity, 
   NativeModules, 
-  ScrollView,
+  SectionList,
   Platform 
 } from 'react-native';
 import { 
@@ -242,43 +242,140 @@ export function ReactComponent({ model }) {
     [pilgrimGlobals, setPilgrimGlobals]
   );
 
+  // Define sections for SectionList
+  const sections = [
+    {
+      title: "Quick Collections",
+      type: 'quick-collections',
+      key: 'quick-collections',
+      data: [{}]
+    },
+    {
+      title: "Banner Carousel",
+      type: 'banner-carousel',
+      key: 'banner-carousel',
+      data: [{}]
+    },
+    {
+      title: "Weekly Picks",
+      type: 'weekly-picks',
+      key: 'weekly-picks',
+      data: [{}]
+    },
+    {
+      title: "Bestsellers",
+      type: 'bestsellers',
+      key: 'bestsellers',
+      data: [{}]
+    },
+    {
+      title: "Celeb Picks",
+      type: 'celeb-picks',
+      key: 'celeb-picks',
+      data: [{}]
+    },
+    {
+      title: "Multi Collection",
+      type: 'multi-collection',
+      key: 'multi-collection',
+      data: [{}]
+    },
+    {
+      title: "Makeup",
+      type: 'makeup',
+      key: 'makeup',
+      data: [{}]
+    },
+    {
+      title: "New Launch",
+      type: 'new-launch',
+      key: 'new-launch',
+      data: [{}]
+    }
+  ];
+
+  // Render section headers (currently not displaying any headers)
+  const renderSectionHeader = ({ section }) => null;
+
+  // Render each section based on its type
+  const renderItem = ({ item, section }) => {
+    switch (section.type) {
+      case 'quick-collections':
+        return (
+          <QuickCollections
+            collections={quickCollectionsData}
+          />
+        );
+      case 'banner-carousel':
+        return (
+          <BannerCarousel 
+            items={imageCarouselImages}
+            screenWidth={screenWidth}
+            onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
+          />
+        );
+      case 'weekly-picks':
+        return (
+          <WeeklyPicksSection
+            products={childrenData.newLaunch.products}
+            loading={childrenData.newLaunch.status !== "loaded"}
+            error={childrenData.newLaunch.error}
+          />
+        );
+      case 'bestsellers':
+        return (
+          <ChipCollectionCarousel
+            collectionHandle={'bestsellers'}
+            numberOfProducts={numberOfProducts}
+            data={childrenData.bestsellers}
+          />
+        );
+      case 'celeb-picks':
+        return (
+          <CelebPicks celebs={celebPicksData} />
+        );
+      case 'multi-collection':
+        return (
+          <MultiCollectionCarousel />
+        );
+      case 'makeup':
+        return (
+          <ChipCollectionCarousel
+            collectionHandle={'makeup'}
+            numberOfProducts={numberOfProducts}
+            data={childrenData.makeup}
+          />
+        );
+      case 'new-launch':
+        return (
+          <ChipCollectionCarousel
+            collectionHandle={'new-launch'}
+            numberOfProducts={numberOfProducts}
+            data={childrenData.newLaunch}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <ScrollView 
+    <SectionList
       style={styles.container}
-      onScroll={handleScroll}
+      contentContainerStyle={styles.contentContainer}
+      sections={sections}
+      renderItem={renderItem}
+      renderSectionHeader={renderSectionHeader}
+      keyExtractor={(item, index) => index.toString()}
+      stickySectionHeadersEnabled={false}
+      showsVerticalScrollIndicator={true}
+      // onScroll={handleScroll}
       scrollEventThrottle={50}
-    >
-      <QuickCollections
-        collections={quickCollectionsData}
-      />
-      <BannerCarousel 
-        items={imageCarouselImages}
-        screenWidth={screenWidth}
-        onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
-      />
-      <WeeklyPicksSection
-        products={childrenData.newLaunch.products}
-        loading={childrenData.newLaunch.status !== "loaded"}
-        error={childrenData.newLaunch.error}
-      />
-      <ChipCollectionCarousel
-        collectionHandle={'bestsellers'}
-        numberOfProducts={numberOfProducts}
-        data={childrenData.bestsellers}
-      />
-      <CelebPicks celebs={celebPicksData} />
-      <MultiCollectionCarousel />
-      <ChipCollectionCarousel
-        collectionHandle={'makeup'}
-        numberOfProducts={numberOfProducts}
-        data={childrenData.makeup}
-      />
-      <ChipCollectionCarousel
-        collectionHandle={'new-launch'}
-        numberOfProducts={numberOfProducts}
-        data={childrenData.newLaunch}
-      />
-    </ScrollView>
+      initialNumToRender={3}
+      maxToRenderPerBatch={3}
+      windowSize={3}
+      removeClippedSubviews={Platform.OS !== 'web'}
+    />
   );
 }
 
@@ -286,6 +383,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  contentContainer: {
+    flexGrow: 1,
+    backgroundColor: '#fff'
   }
 });
 
