@@ -17,23 +17,11 @@ export default function MultiCollectionCarousel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get queryRunner from Redux store
-  const queryRunner = useSelector(state => {
-    const shopifyDSModel = datasourceTypeModelSel(state, 'shopifyV_22_10')
-    const queryRunner = shopifyDSModel.get('queryRunner');
-    return queryRunner;
-  }, shallowEqual);
-
   // Fetch data for all collections
   useEffect(() => {
     console.log("[AGENT] Fetching data for all collections in MultiCollectionCarousel");
     
     const fetchAllCollectionsData = async () => {
-      if (!queryRunner) {
-        setLoading(false);
-        return;
-      }
-      
       try {
         setLoading(true);
         
@@ -41,7 +29,7 @@ export default function MultiCollectionCarousel() {
         const results = await Promise.all(
           collectionHandles.map(async (handle) => {
             try {
-              const result = await fetchCollectionCarouselData(queryRunner, handle);
+              const result = await fetchCollectionCarouselData(handle);
               return { handle, data: result, error: null };
             } catch (err) {
               console.error(`Error fetching data for collection ${handle}:`, err);
@@ -67,7 +55,7 @@ export default function MultiCollectionCarousel() {
     };
     
     fetchAllCollectionsData();
-  }, [queryRunner]);
+  }, []);
 
   console.log("[AGENT] rendering multicollection carousel")
   

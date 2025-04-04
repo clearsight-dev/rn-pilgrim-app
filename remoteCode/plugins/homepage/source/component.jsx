@@ -267,7 +267,7 @@ export function ReactComponent({ model }) {
         data={childrenData.bestsellers}
       />
       <CelebPicks celebs={celebPicksData} />
-      {/* <MultiCollectionCarousel /> */}
+      <MultiCollectionCarousel />
       <ChipCollectionCarousel
         collectionHandle={'makeup'}
         numberOfProducts={numberOfProducts}

@@ -2,8 +2,8 @@ import gql from 'graphql-tag';
 import {PRODUCT_CARD_INFO} from './pdpquery';
 import { cheaplyGetShopifyQueryRunner } from './selectors';
 // Function to fetch collection data for the carousel component
-export const fetchCollectionCarouselData = async (queryRunner, collectionHandle) => {
-  console.log('[AGENT] running query for collection: ', collectionHandle)
+export async function fetchCollectionCarouselData(collectionHandle) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
@@ -21,6 +21,7 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
         }
         products(first: 1) {
           filters {
+            id
             label
             type
             values {
@@ -80,6 +81,8 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
               id
               products(first: 1, filters: $filters) {
                 nodes {
+                  id
+                  handle
                   featuredImage {
                     id
                     url

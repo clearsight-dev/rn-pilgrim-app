@@ -14,12 +14,12 @@ import BottomSheet from './BottomSheet';
 import { fetchProductOptions, fetchVariantBySelectedOptions } from './collectionqueries';
 import VariantCard from './VariantCard';
 
-const VariantSelector = ({ 
+function VariantSelector({ 
   bottomSheetRef, 
   product, 
   onAddToCart,
   optionName
-}) => {
+}) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [variants, setVariants] = useState([]);
   const [selectedVariantId, setSelectedVariantId] = useState(null);
