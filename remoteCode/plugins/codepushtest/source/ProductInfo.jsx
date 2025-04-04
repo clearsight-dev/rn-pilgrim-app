@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { Icon } from 'apptile-core';
 import RatingPill from '../../../../extractedQueries/RatingPill';
 import OfferCard from './OfferCard';
-import VariantCard from './VariantCard';
+import VariantCard from '../../../../extractedQueries/VariantCard';
 
 const ProductInfo = ({ 
   product, 

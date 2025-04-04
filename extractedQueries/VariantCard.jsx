@@ -1,15 +1,55 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Stop, Rect, Path } from 'react-native-svg';
 import GradientText from './GradientText';
 
-const DiscountBadge = ({ discount }) => (
-  <View style={styles.discountBadgeContainer}>
-    <View style={styles.discountBadge}>
-      <Text style={styles.discountText}>{discount}Off</Text>
+const DiscountBadge = ({ discount }) => {
+  // Badge dimensions
+  const width = 40;
+  const height = 40;
+  const peakHeight = 4; // Height of the peaks as requested
+  const numPeaks = 3;
+  const halfPeakWidth = width / (2 * numPeaks);
+  
+  // Create a path with three peaks (inverted mountains) at the bottom
+  const createJaggedPath = () => {
+    // Calculate positions for three peaks
+    
+    let path = `M0 ${height}`; // Start at bottom left with first peak
+    path += ` L${halfPeakWidth} ${height - peakHeight}`; // Down to valley after first peak
+    path += ` L${2 * halfPeakWidth} ${height}`; // Second peak
+    path += ` L${3 * halfPeakWidth} ${height - peakHeight}`;
+    path += ` L${4 * halfPeakWidth} ${height}`;
+    path += ` L${5 * halfPeakWidth} ${height - peakHeight}`;
+    path += ` L${6 * halfPeakWidth} ${height}`;
+    path += ` L${width} 0`; // To top right
+    path += ` L0 0`; // To top left
+    path += ` Z`; // Close the path
+    
+    return path;
+  };
+
+  return (
+    <View style={[styles.discountBadgeContainer, {height}]}>
+      <Svg style={{position: 'absolute'}} width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+        <Path
+          d={createJaggedPath()}
+          fill="#D64545"
+        />
+      </Svg>
+      <Text
+        style={styles.discountBadgeText}
+      >
+        {discount}
+      </Text>
+      <Text
+        style={styles.discountBadgeText}
+      >
+        Off
+      </Text>
     </View>
-  </View>
-);
+  );
+};
 
 const PopularChoiceFooter = () => (
   <View style={styles.popularChoiceFooter}>
@@ -52,6 +92,10 @@ const VariantCard = ({
   isPopular = false,
   onSelect,
 }) => {
+  let truncatedVariantName = variant.name;
+  if (variant.name.indexOf("(") >= 0) {
+    truncatedVariantName = variant.name.slice(0, variant.name.indexOf("("));
+  }
   return (
     <View style={styles.variantCardContainer}>   
       {/* Main Card Content */}
@@ -66,12 +110,12 @@ const VariantCard = ({
         <View style={styles.variantInfoContainer}>
           <View style={styles.sizeContainer}>
             <Text style={styles.sizeLabel}>{optionName}:</Text>
-            <Text style={styles.sizeValue}>{variant.name}</Text>
+            <Text style={styles.sizeValue}>{truncatedVariantName}</Text>
           </View>
           
           <View style={styles.priceContainer}>
             <Text style={styles.currentPrice}>₹{variant.price}</Text>
-            {variant.originalPrice && (
+            {(variant.originalPrice !== variant.price) && (
               <Text style={styles.originalPrice}>₹{variant.originalPrice}</Text>
             )}
           </View>
@@ -149,19 +193,20 @@ const styles = StyleSheet.create({
   },
   discountBadgeContainer: {
     position: 'absolute',
-    top: 2,
-    right: 2,
-  },
-  discountBadge: {
-    backgroundColor: '#D64545',
-    borderRadius: 4,
+    alignItems: 'center',
+    top: 0,
+    right: 0,
+    width: 40,
+    paddingTop: 2,
     paddingHorizontal: 4,
-    paddingVertical: 2,
+    zIndex: 3,
+    borderTopRightRadius: 8, 
+    overflow: 'hidden',
   },
-  discountText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: '600',
+  discountBadgeText: {
+    fontWeight: "bold",
+    fontSize: 12,
+    color: 'white'
   },
   variantInfoContainer: {
     gap: 4,

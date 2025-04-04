@@ -90,7 +90,7 @@ const VariantSelector = ({
           normalizedName,
           price: variant?.price?.amount || "",
           originalPrice: variant?.compareAtPrice?.amount || "",
-          discount: variant?.compareAtPrice?.amount ? 
+          discount: (variant?.compareAtPrice?.amount !== variant.price.amount) ? 
             Math.round((1 - (variant.price.amount / variant.compareAtPrice.amount)) * 100) + "% " : null,
           variantId: variant?.id,
           image: variant?.image?.url || product.featuredImage?.url
