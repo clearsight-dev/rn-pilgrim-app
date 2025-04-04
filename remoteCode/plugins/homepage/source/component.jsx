@@ -23,6 +23,7 @@ import MultiCollectionCarousel from './MultiCollectionCarousel';
 import BannerCarousel from './BannerCarousel';
 import {PilgrimContext} from '../../../../PilgrimContext';
 import { cheaplyGetShopifyQueryRunner } from '../../../../extractedQueries/selectors';
+import WeeklyPicksSection from './weeklypicks/WeeklyPicksSection';
 
 async function decayingWait(checkFn) {
   // By the end this will wait upto ~7 seconds
@@ -254,6 +255,11 @@ export function ReactComponent({ model }) {
         items={imageCarouselImages}
         screenWidth={screenWidth}
         onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
+      />
+      <WeeklyPicksSection
+        products={childrenData.newLaunch.products}
+        loading={childrenData.newLaunch.status !== "loaded"}
+        error={childrenData.newLaunch.error}
       />
       <ChipCollectionCarousel
         collectionHandle={'bestsellers'}
