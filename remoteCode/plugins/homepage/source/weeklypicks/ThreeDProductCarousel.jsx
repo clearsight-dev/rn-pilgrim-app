@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Animated, StyleSheet, View, Text } from 'react-native';
+import { Animated, StyleSheet, View, Text, Platform } from 'react-native';
 import {Svg, Path} from "react-native-svg";
 import GradientText from '../../../../../extractedQueries/GradientText';
 import GradientBackground from '../../../../../extractedQueries/GradientBackground';
@@ -83,7 +83,7 @@ function ThreeDProductCarousel({
           showsHorizontalScrollIndicator={false}
           initialScrollIndex={products.length > 0 ? 1 : 0}
           getItemLayout={(data, index) => {
-            return {length: itemWidth, offset: index * itemWidth, index: 0};
+            return {length: itemWidth, offset: index * itemWidth, index};
           }}
           contentContainerStyle={{
             paddingHorizontal: (width - itemWidth) / 2,
