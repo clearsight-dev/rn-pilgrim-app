@@ -11,6 +11,7 @@ import Underline from '../../../../extractedQueries/Underline';
 import {useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {navigateToScreen} from 'apptile-core';
+import GradientBackground from '../../../../extractedQueries/GradientBackground';
 
 // Subtitles for each collection
 const COLLECTION_SUBTITLES = {
@@ -82,7 +83,17 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
   return (
     <View style={styles.container}>
       {/* Collection Header */}
-      <View style={styles.headerContainer}>
+      <GradientBackground 
+        gradientColors={[
+          { offset: "0%", color: "#FFFFFF", opacity: 0.5 },
+          { offset: "10%", color: "#E6F8FC", opacity: 1 },
+          { offset: "50%", color: "#E6F8FC", opacity: 1 },
+          { offset: "90%", color: "#E6F8FC", opacity: 0.5 },
+          { offset: "100%", color: "#FFFFFF", opacity: 0.5 }
+        ]}
+        childrenContainerStyle={{paddingHorizontal: 16, }}
+        style={styles.headerContainer}
+      >
         <Text style={styles.title}>{carouselData.title}</Text>
         <View
           style={{
@@ -106,10 +117,10 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
             height: 160,
             position: 'absolute',
             right: -30,
-            bottom: -60,
+            bottom: -50,
           }}
         />
-      </View>
+      </GradientBackground>
 
       {/* Tab Navigation */}
       {carouselData.tabs.length > 0 && (
@@ -173,13 +184,13 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     borderRadius: 8,
     marginVertical: 15,
   },
   headerContainer: {
     marginBottom: 16,
     position: 'relative',
+    top: 22,
   },
   title: {
     fontSize: 20,
@@ -193,6 +204,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   tabContainer: {
+    paddingHorizontal: 16,
     flexDirection: 'row',
     marginBottom: 20,
   },
@@ -219,6 +231,7 @@ const styles = StyleSheet.create({
   },
   cardsContainer: {
     flexDirection: 'row',
+    paddingHorizontal: 16
   },
   card: {
     width: 150,

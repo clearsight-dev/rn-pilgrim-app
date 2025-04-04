@@ -17,7 +17,8 @@ const GradientBackground = ({
   gradientColors = [], 
   gradientDirection = 'vertical',
   borderRadius = 0,
-  children 
+  children,
+  childrenContainerStyle = {}
 }) => {
   // State to track the dimensions of the container
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -82,7 +83,7 @@ const GradientBackground = ({
       )}
       
       {/* Child components */}
-      <View style={{ zIndex: 1 }}>
+      <View style={[childrenContainerStyle, { zIndex: 1 }]}>
         {children}
       </View>
     </View>
