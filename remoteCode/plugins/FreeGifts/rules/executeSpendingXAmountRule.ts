@@ -1,10 +1,11 @@
+import {Rule} from '../actions/types';
 import _ from 'lodash';
 
 export const executeSpendingXAmountRule = (
-  ruleConfig,
-  lineItems = [],
-  _cartLineCache = {},
-  giftsToAdd,
+  ruleConfig: Rule,
+  lineItems: any[] = [],
+  _cartLineCache: any = {},
+  giftsToAdd: any[],
 ) => {
   const totalPrice = lineItems.reduce((total, entry) => {
     if (

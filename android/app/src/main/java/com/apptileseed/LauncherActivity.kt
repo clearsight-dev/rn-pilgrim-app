@@ -36,12 +36,17 @@ class LauncherActivity : AppCompatActivity() {
     private fun startMainActivity() {
         Log.d(APPTILE_LOG_TAG, "starting main activity")
 
-        val intent = Intent(this, MainActivity::class.java)
-        val options = ActivityOptions.makeCustomAnimation(
-            this, 0, 0
-        ).toBundle()
+        val mainIntent = Intent(this, MainActivity::class.java).apply {
+            // forwarding everything received in current activity to main activity
+            putExtras(intent.extras ?: Bundle())
+            data = intent.data
+            action = intent.action
+            categories?.forEach { addCategory(it) }
+        }
 
-        startActivity(intent, options)
+        val options = ActivityOptions.makeCustomAnimation(this, 0, 0).toBundle()
+
+        startActivity(mainIntent, options)
         SplashOverlayManager.removeOverlay(this)
         finish()
     }

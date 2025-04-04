@@ -1,11 +1,12 @@
+import {Rule} from '../actions/types';
 import _ from 'lodash';
 import freeGiftsActions from '../actions/freeGiftsActions';
 
 export const executeBuyXProductFromCollectionYRule = (
-  ruleConfig,
-  lineItems = [],
-  cartLineCache = {},
-  giftsToAdd,
+  ruleConfig: Rule,
+  lineItems: any[] = [],
+  cartLineCache: any = {},
+  giftsToAdd: any[],
 ) => {
   const minItemsCountAcrossCollections = ruleConfig?.minProductsCount || 0;
   const collectionsToCheck = new Set(
@@ -23,7 +24,7 @@ export const executeBuyXProductFromCollectionYRule = (
     const pickCollectionFromMetaInfo =
       cartLineCache[entry?.variant?.id]?.product?.collections || [];
     const variantCollections = new Set(
-      pickCollectionFromMetaInfo.map(collection => collection?.id),
+      pickCollectionFromMetaInfo.map((collection: {id: any}) => collection?.id),
     );
     const hasMatchingCollection = [...collectionsToCheck].some(id =>
       variantCollections.has(id),

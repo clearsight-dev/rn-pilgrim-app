@@ -470,7 +470,7 @@ function removeCleverTap(androidManifest, stringsObj, extraModules, parsedReactN
 
 function addFacebook(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig) {
   const facebookIntegration = apptileConfig.integrations.metaAds;
-  upsertInStringsXML(stringsObj, 'facebook_app_id', facebookIntegration.FacebookAppID);
+  upsertInStringsXML(stringsObj, 'facebook_app_id', facebookIntegration.FacebookAppId);
   addMetadata(androidManifest, 'com.facebook.sdk.ApplicationId', '@string/facebook_app_id');
 
   upsertInStringsXML(stringsObj, 'facebook_client_token', facebookIntegration.FacebookClientToken);

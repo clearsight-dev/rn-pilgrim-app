@@ -1,14 +1,15 @@
+import {Rule} from '../actions/types';
 import _ from 'lodash';
 import freeGiftsActions from '../actions/freeGiftsActions';
 
 export const executeSpendingXAmountInCollectionYRule = (
-  ruleConfig,
-  lineItems = [],
-  cartLineCache = {},
-  giftsToAdd,
+  ruleConfig: Rule,
+  lineItems: any[] = [],
+  cartLineCache: any = {},
+  giftsToAdd: any[],
 ) => {
   const minAmount = ruleConfig?.minAmount || 0;
-  const purchaseAmountByCollection = {};
+  const purchaseAmountByCollection: {[key: string]: number} = {};
 
   _.get(ruleConfig, 'collections', []).forEach(entry => {
     const collectionId = entry?.collectionId;

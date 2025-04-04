@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 // ![Note] this logic is specific to pilgrim [Need to remove in future]
-const getCollectionListData = field => {
+const getCollectionListData = (field: any) => {
   const references = field?.references?.nodes ?? [];
   return references.map(ref => ({
     collectionId: ref.id,
@@ -10,7 +10,7 @@ const getCollectionListData = field => {
   }));
 };
 
-const getGiftItemData = field => {
+const getGiftItemData = (field: any) => {
   const product = field?.reference?.product;
   return {
     productId: product?.id,
@@ -27,21 +27,21 @@ const getGiftItemData = field => {
 
 const transformRule = nodes => {
   return nodes.map(node => {
-    const rule = {};
+    const rule: Record<string, any> = {};
     const giftingType = node.fields.find(e => e.key === 'type').value;
 
     node.fields.forEach(field => {
       switch (field.key) {
         case 'collections':
           if (giftingType !== 'SPENDING_X_AMOUNT') {
-            rule['collections'] = getCollectionListData(field);
+            rule.collections = getCollectionListData(field);
           }
           break;
         case 'giftItems':
-          rule['giftItems'] = getGiftItemData(field);
+          rule.giftItems = getGiftItemData(field);
           break;
         case 'type':
-          rule['type'] = field.value;
+          rule.type = field.value;
           break;
         case 'minAmount':
           if (
@@ -49,12 +49,12 @@ const transformRule = nodes => {
               giftingType,
             )
           ) {
-            rule['minAmount'] = Number(field.value);
+            rule.minAmount = Number(field.value);
           }
           break;
         case 'minProductsCount':
           if (giftingType === 'BUY_X_PRODUCT_FROM_COLLECTION_Y') {
-            rule['minProductsCount'] = Number(field.value);
+            rule.minProductsCount = Number(field.value);
           }
           break;
         default:
@@ -62,26 +62,26 @@ const transformRule = nodes => {
       }
     });
 
-    rule['discountOfferedOnFreeGift'] = {type: 'percentage', value: 100};
+    rule.discountOfferedOnFreeGift = {type: 'percentage', value: 100};
     return rule;
   });
 };
 
 export const transformMetaObjectToFreeGiftConfig = metaobject => {
-  const config = {};
+  const config: Record<string, any> = {};
   metaobject.fields.forEach(field => {
     switch (field.key) {
       case 'isEnabled':
-        config['isEnabled'] = field.value === 'true';
+        config.isEnabled = field.value === 'true';
         break;
       case 'isMultipleFreeGiftAllowed':
-        config['giftingConfig'] = {
+        config.giftingConfig = {
           isAutomatic: true,
           isMultipleFreeGiftAllowed: field.value === 'true',
         };
         break;
       case 'rules':
-        config['rules'] = transformRule(field.references.nodes);
+        config.rules = transformRule(field.references.nodes);
         break;
       default:
         config[field.key] = field.value;
@@ -89,7 +89,7 @@ export const transformMetaObjectToFreeGiftConfig = metaobject => {
     }
   });
 
-  config['discountConfig'] = {
+  config.discountConfig = {
     combinesWith: {
       orderDiscounts: true,
       productDiscounts: true,

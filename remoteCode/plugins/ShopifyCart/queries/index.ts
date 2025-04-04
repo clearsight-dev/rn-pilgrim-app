@@ -176,7 +176,7 @@ fragment CartSchema on Cart {
         totalTaxAmountEstimated
     }
 }
-`;
+` as const;
 
 export const GET_CART = gql`
   query GetShoppingCartDetails($cartId: ID!) {
@@ -198,6 +198,11 @@ export const CREATE_CART = gql`
         field
         message
       }
+      warnings {
+        code
+        message
+        target
+      }
     }
   }
   ${CART_FRAGMENT}
@@ -212,6 +217,11 @@ export const CART_LINES_ADD = gql`
       userErrors {
         field
         message
+      }
+      warnings {
+        code
+        message
+        target
       }
     }
   }
@@ -228,6 +238,11 @@ export const CART_LINES_UPDATE = gql`
         field
         message
       }
+      warnings {
+        code
+        message
+        target
+      }
     }
   }
   ${CART_FRAGMENT}
@@ -242,6 +257,11 @@ export const CART_LINES_REMOVE = gql`
       userErrors {
         field
         message
+      }
+      warnings {
+        code
+        message
+        target
       }
     }
   }
@@ -259,6 +279,32 @@ export const CART_DISCOUNT_CODE_UPDATE = gql`
         field
         message
       }
+      warnings {
+        code
+        message
+        target
+      }
+    }
+  }
+
+  ${CART_FRAGMENT}
+`;
+
+export const CART_GIFT_CARD_CODES_UPDATE = gql`
+  mutation cartGiftCardCodesUpdate($cartId: ID!, $giftCardCodes: [String!]!) {
+    cartGiftCardCodesUpdate(cartId: $cartId, giftCardCodes: $giftCardCodes) {
+      cart {
+        ...CartSchema
+      }
+      userErrors {
+        field
+        message
+      }
+      warnings {
+        code
+        message
+        target
+      }
     }
   }
 
@@ -275,6 +321,11 @@ export const CART_NOTE_UPDATE = gql`
         field
         message
       }
+      warnings {
+        code
+        message
+        target
+      }
     }
   }
   ${CART_FRAGMENT}
@@ -289,6 +340,11 @@ export const CART_BUYER_IDENTITY_UPDATE = gql`
       userErrors {
         field
         message
+      }
+      warnings {
+        code
+        message
+        target
       }
     }
   }
@@ -305,7 +361,13 @@ export const CART_ATTRIBUTES_UPDATE = gql`
         field
         message
       }
+      warnings {
+        code
+        message
+        target
+      }
     }
   }
   ${CART_FRAGMENT}
 `;
+

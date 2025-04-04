@@ -9,3 +9,4 @@ export const CART_PREPARE_KEY = 'preparingCart';
 export const SYNCING_LINE_ITEM_KEY = 'syncingLineItems';
 export const CART_LINE_ITEMS_MAP_KEY = 'cartLineItemsMap';
 export const ENABLE_PRE_CHECKOUT_VALIDATION = 'enablePreCheckoutValidation';
+export const ENABLE_POST_CART_VALIDATION = 'enablePostCartValidation';

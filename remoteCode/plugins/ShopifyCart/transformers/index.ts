@@ -1,17 +1,33 @@
+import {Maybe} from 'graphql/jsutils/Maybe';
 import _ from 'lodash';
+import {
+  ICart,
+  ICartBuyerIdentity,
+  ICartDiscountCode,
+  ICartLineItem,
+  ICartProductVariant,
+  ISubscriptionCartLineItem,
+} from 'apptile-shopify';
 import {
   convertStringToNumber,
   flattenConnection,
   formatDisplayPrice,
   formatQueryReturn,
+  JSONMapperSchema,
   jsonObjectMapper,
 } from 'apptile-core';
-import {TransformProductVariant, TransformMetafields} from 'apptile-shopify';
+import {
+  TransformProductVariant,
+  TransformMetafields,
+  ShopifyGraphqlSchema as ShopifyGenerated,
+} from 'apptile-shopify';
 
 //! [This transformer is copied from old shopify transformer have to refactored]
 // ======================== Helper transformers ==============================//
 // Cart //
-export const TransformCartBuyerIdentity = (data) => {
+export const TransformCartBuyerIdentity = (
+  data: ShopifyGenerated.CartBuyerIdentity,
+): ICartBuyerIdentity | undefined => {
   const buyerSchema = [
     'countryCode',
     {
@@ -22,18 +38,25 @@ export const TransformCartBuyerIdentity = (data) => {
     'phone',
   ];
 
-  return jsonObjectMapper(buyerSchema, data);
+  return jsonObjectMapper(buyerSchema, data) as ICartBuyerIdentity;
 };
 
-export const TransformCartDiscountCode = (data) => {
+export const TransformCartDiscountCode = (
+  data: ShopifyGenerated.CartDiscountCode,
+): ICartDiscountCode | undefined => {
   const discountSchema = ['applicable', 'code'];
 
-  return jsonObjectMapper(discountSchema, data);
+  return jsonObjectMapper(discountSchema, data) as ICartDiscountCode;
 };
 
 // TODO: isSubscriptionProduct should be boolean
-export const TransformSubscriptionCartLineItem = (data, context) => {
-  if (!data) return;
+export const TransformSubscriptionCartLineItem = (
+  data: Maybe<ShopifyGenerated.SellingPlanAllocation>,
+  context: any,
+): ISubscriptionCartLineItem | undefined => {
+  if (!data) {
+    return;
+  }
 
   const {priceAdjustments} = data;
 
@@ -61,18 +84,34 @@ export const TransformSubscriptionCartLineItem = (data, context) => {
   };
 };
 
-export const TransformProductAndCollectionWithMetafields = (data, _context) => {
-  if (!data) return;
+export const TransformProductAndCollectionWithMetafields = (
+  data: Maybe<ShopifyGenerated.ProductVariant['product']> | undefined,
+  _context?: any,
+): ICartProductVariant['product'] | undefined => {
+  if (!data) {
+    return;
+  }
 
-  const {title, handle, totalInventory, id, productType, collections, metafields} = data;
+  const {
+    title,
+    handle,
+    totalInventory,
+    id,
+    productType,
+    collections,
+    metafields,
+  } = data;
 
   const flattenedCollection = flattenConnection(collections);
-  const transformedCollections = _.map(Array.isArray(flattenedCollection) ? flattenedCollection : [], entry => {
-    return {
-      id: entry.id,
-      metafields: TransformMetafields(entry.metafields),
-    };
-  });
+  const transformedCollections = _.map(
+    Array.isArray(flattenedCollection) ? flattenedCollection : [],
+    entry => {
+      return {
+        id: entry.id,
+        metafields: TransformMetafields(entry.metafields),
+      };
+    },
+  );
 
   return {
     title,
@@ -85,19 +124,28 @@ export const TransformProductAndCollectionWithMetafields = (data, _context) => {
   };
 };
 
-export const TransformCartProductVariant = (data, context) => {
-  if (!data) return;
+export const TransformCartProductVariant = (
+  data: Maybe<ShopifyGenerated.ProductVariant> | undefined,
+  context: any,
+): ICartProductVariant | undefined => {
+  if (!data) {
+    return;
+  }
 
   const {product} = data;
-  const {title, handle, totalInventory, id, productType, collections, vendor} = product;
+  const {title, handle, totalInventory, id, productType, collections, vendor} =
+    product;
   const transformedProductVariant = TransformProductVariant(data, context);
 
   const flattenedCollection = flattenConnection(collections);
-  const transformedCollections = _.map(Array.isArray(flattenedCollection) ? flattenedCollection : [], entry => {
-    return {
-      id: entry.id,
-    };
-  });
+  const transformedCollections = _.map(
+    Array.isArray(flattenedCollection) ? flattenedCollection : [],
+    entry => {
+      return {
+        id: entry.id,
+      };
+    },
+  );
 
   return {
     product: {
@@ -113,8 +161,13 @@ export const TransformCartProductVariant = (data, context) => {
   };
 };
 
-export const TransformCartLineItem = (data, context) => {
-  if (!data) return;
+export const TransformCartLineItem = (
+  data: Partial<ShopifyGenerated.CartLine>,
+  context: any,
+): ICartLineItem | undefined => {
+  if (!data) {
+    return;
+  }
 
   const {merchandise, sellingPlanAllocation} = data;
 
@@ -128,18 +181,22 @@ export const TransformCartLineItem = (data, context) => {
     {
       field: 'lineItemDiscount',
       path: 'discountAllocations',
-      transform: (currentValue) => {
+      transform: (currentValue: [{discountedAmount: {amount: number}}]) => {
         return _.sumBy(currentValue, function (discountItem) {
-          return parseFloat(_.get(discountItem, 'discountedAmount.amount', '0'));
+          return parseFloat(
+            _.get(discountItem, 'discountedAmount.amount', '0'),
+          );
         });
       },
     },
     {
       field: 'displayLineItemDiscount',
       path: 'discountAllocations',
-      transform: (currentValue) => {
+      transform: (currentValue: [{discountedAmount: {amount: number}}]) => {
         return _.sumBy(currentValue, function (discountItem) {
-          return parseFloat(_.get(discountItem, 'discountedAmount.amount', '0'));
+          return parseFloat(
+            _.get(discountItem, 'discountedAmount.amount', '0'),
+          );
         });
       },
       formatterFunction: formatDisplayPrice(context),
@@ -147,7 +204,7 @@ export const TransformCartLineItem = (data, context) => {
     {
       field: 'attributes',
       path: 'attributes',
-      transform: (currentValue) => {
+      transform: (currentValue: [{key: string; value: string}]) => {
         return _.map(currentValue, function (attribute) {
           return {
             key: _.get(attribute, 'key'),
@@ -161,14 +218,22 @@ export const TransformCartLineItem = (data, context) => {
   const cartLineData = {
     ...jsonObjectMapper(cartLineSchema, data),
     variant: TransformCartProductVariant(merchandise, context),
-    subscriptionProduct: TransformSubscriptionCartLineItem(sellingPlanAllocation, context),
+    subscriptionProduct: TransformSubscriptionCartLineItem(
+      sellingPlanAllocation,
+      context,
+    ),
   };
 
   return cartLineData;
 };
 
-export const TransformCheckoutLineItem = (data, context) => {
-  if (!data) return;
+export const TransformCheckoutLineItem = (
+  data: Partial<ShopifyGenerated.CartLine>,
+  context: any,
+): ICartLineItem | undefined => {
+  if (!data) {
+    return;
+  }
 
   const checkoutLineSchema = [
     'id',
@@ -184,12 +249,17 @@ export const TransformCheckoutLineItem = (data, context) => {
 
 // =========================== Master Transformers ==================================//
 // Cart //
-export const TransformCart = (data, context) => {
-  if (!data) return;
+export const TransformCart = (
+  data: ShopifyGenerated.Cart | undefined,
+  context: any,
+): ICart | undefined => {
+  if (!data) {
+    return;
+  }
   const {discountCodes, lines} = data;
 
   //TODO:CurrencyCode, channelId
-  const cartSchema = [
+  const cartSchema: JSONMapperSchema = [
     'id',
     'checkoutUrl',
     'note',
@@ -258,25 +328,35 @@ export const TransformCart = (data, context) => {
     },
   ];
 
-  const cartData = {
+  const cartData: ICart = {
     ...jsonObjectMapper(cartSchema, data),
     buyerIdentity: TransformCartBuyerIdentity(data.buyerIdentity),
     discountCodes: discountCodes.map(code => TransformCartDiscountCode(code)),
-    lines: flattenConnection(lines)?.map(line => TransformCartLineItem(line, context)),
-    checkoutLineItemData: flattenConnection(lines)?.map(line => TransformCheckoutLineItem(line, context)),
+    lines: flattenConnection(lines)?.map(line =>
+      TransformCartLineItem(line, context),
+    ),
+    checkoutLineItemData: flattenConnection(lines)?.map(line =>
+      TransformCheckoutLineItem(line, context),
+    ),
   };
 
   return cartData;
 };
 
-export const TransformCartPayload = (cartPayload, context) => {
+export const TransformCartPayload = (
+  cartPayload: ShopifyGenerated.CartCreatePayload,
+  context: any,
+) => {
   const cartData = cartPayload?.cart ?? undefined;
   const result = TransformCart(cartData, context);
   const errors = cartPayload.userErrors ?? [];
   return formatQueryReturn(result, cartData, {}, false, errors);
 };
 
-export const TransformCartMutations = (data, context) => {
+export const TransformCartMutations = (
+  data: Pick<ShopifyGenerated.Mutation, 'cartCreate' | 'cartLinesAdd'>,
+  context: any,
+) => {
   const cartPayload = _.get(Object.entries(data), '0.1', {});
   return TransformCartPayload(cartPayload, context);
 };

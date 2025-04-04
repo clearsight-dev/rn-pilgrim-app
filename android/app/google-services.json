@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "1097578695917",
-    "project_id": "novhara-8032",
-    "storage_bucket": "novhara-8032.appspot.com"
+    "project_number": "508312227012",
+    "project_id": "pilgrim-website---ga-4-propert",
+    "storage_bucket": "pilgrim-website---ga-4-propert.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1097578695917:android:f06e7f9e17ec75b04690e4",
+        "mobilesdk_app_id": "1:508312227012:android:de83a2abcec9cdb7af8d91",
         "android_client_info": {
-          "package_name": "com.novhara.app"
+          "package_name": "com.discoverpilgrim"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "508312227012-j6ntfjs3f09lqd2cll68p91i6uvrak1m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyDEilIEE_soACcCnlSj9Q7JZqplkpQfoys"
+          "current_key": "AIzaSyDo6Z_I6Hhu6mv9gcuHuuqIwcF-1vGSsB0"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "508312227012-j6ntfjs3f09lqd2cll68p91i6uvrak1m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

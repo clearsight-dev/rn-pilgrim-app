@@ -1,23 +1,66 @@
-import {registerDatasource} from 'apptile-core';
-import {AjaxQueryRunner} from 'apptile-core';
-import {jsonToQueryString} from 'apptile-core';
-import {wrapDatasourceModel} from 'apptile-core';
+import {
+  PluginEditorsConfig,
+  PluginConfigType,
+  AppPageTriggerOptions,
+  PluginListingSettings,
+  PluginModelType,
+  PluginPropertySettings,
+  DatasourceQueryDetail,
+  DatasourceQueryReturnValue,
+  DatasourcePluginConfig,
+  IntegrationPlatformType,
+  registerDatasource,
+  wrapDatasourceModel,
+  AjaxQueryRunner,
+  jsonToQueryString,
+} from 'apptile-core';
 
-const pluginListing = {
-  labelPrefix: 'Clickpost',
-  type: 'datasource',
-  name: 'Clickpost datasource',
-  description: 'Clickpost datasource',
-  section: 'SDK',
-  icon: 'datasource',
-  manifest: {
-    directoryName: 'clickpost',
-  },
+interface IClickpostCredentials {
+  apiBaseUrl: string;
+  storeApiAuthenticationKey: string;
+  serverApiAuthenticationKey: string;
+}
+
+export interface ClickpostPluginConfigType extends DatasourcePluginConfig {
+  apiBaseUrl: string;
+  serverApiBaseUrl: string;
+  appId: string;
+  // customerAccessToken: string;
+  queryRunner: any;
+  headers: Record<string, any>;
+}
+
+type IEditableParams = Record<string, any>;
+
+type ClickpostQueryDetails = DatasourceQueryDetail & {
+  queryType: 'get' | 'post' | 'put' | 'patch' | 'delete';
+  endpoint: string;
+  transformer?: TransformerFunction;
+  contextInputParams?: {[key: string]: any};
+  queryHeadersResolver?: (
+    inputVariables: any,
+    contextInputVariables: any,
+  ) => any;
+  inputResolver?: (inputVariables: any) => any;
+  paginationResolver?: (
+    inputVariables: Record<string, any>,
+    paginationMeta: any,
+  ) => Record<string, any>;
+  endpointResolver: (
+    endpoint: string,
+    inputVariables: any,
+    contextInputVariables: any,
+  ) => string;
+  apiBaseUrlResolver: (dsModel: any) => string;
+  editableInputParams: IEditableParams;
+};
+export type TransformerFunction = (data: any) => {
+  data: any;
+  hasNextPage?: boolean;
+  paginationMeta?: any;
 };
 
-// ------------------------------------------------
-
-const baseClickpostQuerySpec = {
+const baseClickpostQuerySpec: Partial<ClickpostQueryDetails> = {
   isPaginated: false,
   contextInputParams: {
     apiBaseUrl: '',
@@ -25,30 +68,36 @@ const baseClickpostQuerySpec = {
   endpointResolver: (endpoint, inputParams, getNextPage) => {
     return endpoint;
   },
-  apiBaseUrlResolver: dsModel => {
+  apiBaseUrlResolver: (dsModel: any) => {
     return dsModel.get('apiBaseUrl');
   },
   transformer: data => {
     return {data, hasNextPage: false, paginationMeta: {}};
   },
-  paginationResolver: (inputVariables, paginationMeta) => {
+  paginationResolver: (
+    inputVariables: Record<string, any>,
+    paginationMeta: any,
+  ): Record<string, any> => {
     const {after} = paginationMeta ?? {};
     return after ? {...inputVariables, after} : inputVariables;
   },
-  inputResolver: inputVariables => {
+  inputResolver: (inputVariables: any) => {
     return inputVariables;
   },
-  queryHeadersResolver: (inputVariables, contextInputVariables) => {
+  queryHeadersResolver: (inputVariables: any, contextInputVariables: any) => {
     return {};
   },
 };
 
-export const ClickpostApiRecords = {
+export const ClickpostApiRecords: Record<
+  string,
+  Partial<ClickpostQueryDetails>
+> = {
   TrackOrder: {
     ...baseClickpostQuerySpec,
     queryType: 'get',
     endpoint: '/api/v2/track-order/',
-    apiBaseUrlResolver: dsModel => {
+    apiBaseUrlResolver: (dsModel: any) => {
       return dsModel.get('serverApiBaseUrl');
     },
     editableInputParams: {
@@ -70,9 +119,22 @@ export const ClickpostApiRecords = {
   },
 };
 
-const propertySettings = {};
+const propertySettings: PluginPropertySettings = {};
+const pluginListing: Partial<PluginListingSettings> = {
+  labelPrefix: 'Clickpost',
+  type: 'datasource',
+  name: 'Clickpost Integration',
+  description: 'Clickpost Integration.',
+  defaultHeight: 0,
+  defaultWidth: 0,
+  icon: 'datasource',
+  section: 'SDK',
+  manifest: {
+    directoryName: 'clickpost',
+  },
+};
 
-export const ClickpostEditors = {
+export const ClickpostEditors: PluginEditorsConfig<any> = {
   basic: [
     {
       type: 'codeInput',
@@ -109,10 +171,20 @@ export const ClickpostEditors = {
   ],
 };
 
-const makeInputParamsResolver = contextInputParams => {
-  return (dsConfig, dsModelValues) => {
-    const dsPluginConfig = dsConfig.get('config');
-    if (!dsPluginConfig) return;
+const makeInputParamsResolver = (
+  contextInputParams: {[key: string]: string} | undefined,
+) => {
+  return (
+    dsConfig: PluginConfigType<ClickpostPluginConfigType>,
+    dsModelValues: PluginModelType,
+  ) => {
+    const dsPluginConfig = dsConfig.get('config') as any as Immutable.Map<
+      string,
+      ClickpostPluginConfigType
+    >;
+    if (!dsPluginConfig) {
+      return;
+    }
 
     return Object.entries(contextInputParams).reduce((acc, [key, value]) => {
       if (dsPluginConfig && dsPluginConfig.get(key)) {
@@ -127,8 +199,8 @@ const makeInputParamsResolver = contextInputParams => {
 };
 
 const makeInputVariablesTypeCompatible = (
-  inputVariables,
-  editableInputParams,
+  inputVariables: {[key: string]: any},
+  editableInputParams: {[key: string]: any},
 ) => {
   return Object.entries(inputVariables).reduce((acc, [key, value]) => {
     if (editableInputParams && editableInputParams[key] !== undefined) {
@@ -154,12 +226,12 @@ const makeInputVariablesTypeCompatible = (
 };
 
 export const executeQuery = async (
-  dsModel,
-  dsConfig,
-  dsModelValues,
-  queryDetails,
-  inputVariables,
-  options,
+  dsModel: any,
+  dsConfig: any,
+  dsModelValues: any,
+  queryDetails: ClickpostQueryDetails,
+  inputVariables: any,
+  options?: AppPageTriggerOptions,
 ) => {
   try {
     let {endpointResolver, contextInputParams, editableInputParams, endpoint} =
@@ -190,11 +262,12 @@ export const executeQuery = async (
     const apiBaseUrl = queryDetails.apiBaseUrlResolver(dsModelValues);
 
     let headers = {};
-    if (queryDetails.queryHeadersResolver)
+    if (queryDetails.queryHeadersResolver) {
       headers = queryDetails.queryHeadersResolver(
         inputVariables,
         contextInputVariables,
       );
+    }
 
     let queryRunner = AjaxQueryRunner();
 
@@ -244,7 +317,7 @@ export const executeQuery = async (
       errors: [],
       hasError: false,
     };
-  } catch (ex) {
+  } catch (ex: any) {
     const errors = ex?.response?.data?.errors || [ex?.message];
     return {
       rawData: {},
@@ -263,7 +336,7 @@ const clickpostDatasourceModel = wrapDatasourceModel({
     apiBaseUrl: 'https://app.clickpost.com/api-front-v1',
     serverApiBaseUrl: 'https://dev-api.apptile.io/clickpost-proxy',
     queryRunner: 'queryrunner',
-  },
+  } as ClickpostPluginConfigType,
 
   // initDatasource: function* (dsModel: any, dsConfig: PluginConfigType<ClickpostPluginConfigType>, dsModelValues: any) {
   //   const queryRunner = AjaxQueryRunner();
@@ -281,11 +354,11 @@ const clickpostDatasourceModel = wrapDatasourceModel({
   //     ],
   //   };
   // },
-  getQueries: function () {
+  getQueries: function (): Record<string, DatasourceQueryDetail> {
     return ClickpostApiRecords;
   },
 
-  getQueryInputParams: function (queryName) {
+  getQueryInputParams: function (queryName: string) {
     const queryDetails =
       ClickpostApiRecords && ClickpostApiRecords[queryName]
         ? ClickpostApiRecords[queryName]
@@ -295,27 +368,31 @@ const clickpostDatasourceModel = wrapDatasourceModel({
       : {};
   },
 
-  resolveCredentialConfigs: function (credentials) {
+  resolveCredentialConfigs: function (
+    credentials: IClickpostCredentials,
+  ): Partial<ClickpostPluginConfigType> | boolean {
     const {apiBaseUrl} = credentials;
-    if (!apiBaseUrl) return false;
+    if (!apiBaseUrl) {
+      return false;
+    }
     return {
       apiBaseUrl: apiBaseUrl,
     };
   },
   onPluginUpdate: function* (
-    state,
-    pluginId,
-    pageKey,
-    instance,
-    userTriggered,
-    pageLoad,
-    options,
+    state: RootState,
+    pluginId: string,
+    pageKey: string,
+    instance: number | null,
+    userTriggered: boolean,
+    pageLoad: boolean,
+    options: AppPageTriggerOptions,
   ) {},
 
-  resolveClearCredentialConfigs: function () {
+  resolveClearCredentialConfigs: function (): string[] {
     return ['apiBaseUrl'];
   },
-  getPlatformIdentifier: function () {
+  getPlatformIdentifier: function (): IntegrationPlatformType {
     return 'clickpost';
   },
 
@@ -323,12 +400,14 @@ const clickpostDatasourceModel = wrapDatasourceModel({
     dsModel,
     dsConfig,
     dsModelValues,
-    queryName,
-    inputVariables,
-    options,
-  ) {
+    queryName: string,
+    inputVariables: any,
+    options?: AppPageTriggerOptions,
+  ): DatasourceQueryReturnValue {
     const queryDetails = ClickpostApiRecords[queryName];
-    if (!queryDetails) return;
+    if (!queryDetails) {
+      return;
+    }
     return yield executeQuery(
       dsModel,
       dsConfig,

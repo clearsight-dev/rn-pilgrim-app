@@ -1,10 +1,12 @@
 import _ from 'lodash';
+import {queryDetails} from '../source/widget';
 import * as CartGqls from '../queries';
 import * as CartTransformer from '../transformers';
 import {getAppConstants} from 'apptile-core';
 
-const apptileCheckoutAttribute = getAppConstants().APPTILE_CHECKOUT_CUSTOM_ATTRIBUTE;
-export const CartQueryRecords = {
+const apptileCheckoutAttribute = getAppConstants()
+  .APPTILE_CHECKOUT_CUSTOM_ATTRIBUTE as string;
+export const CartQueryRecords: Record<string, queryDetails> = {
   GetCart: {
     queryType: 'query',
     gqlTag: CartGqls.GET_CART,
@@ -12,7 +14,7 @@ export const CartQueryRecords = {
     editableInputParams: {
       cartId: '',
     },
-    checkInputVariabes: (inputVariables) => {
+    checkInputVariabes: (inputVariables: Record<string, any>) => {
       const {cartId} = inputVariables;
       return !!cartId;
     },
@@ -31,7 +33,8 @@ export const CartQueryRecords = {
     },
     transformer: CartTransformer.TransformCartMutations, //! Need to refactor this
     inputResolver: inputVariables => {
-      const {attributes, buyerIdentity, customerAccessToken, ...restOfInput} = inputVariables;
+      const {attributes, buyerIdentity, customerAccessToken, ...restOfInput} =
+        inputVariables;
 
       return {
         input: {
@@ -119,7 +122,7 @@ export const CartQueryRecords = {
     gqlTag: CartGqls.CART_DISCOUNT_CODE_UPDATE,
     editableInputParams: {
       cartId: '',
-      discountCodes: '',
+      discountCodes: '{{[]}}',
     },
     transformer: CartTransformer.TransformCartMutations,
     inputResolver: inputVariables => {
@@ -127,6 +130,22 @@ export const CartQueryRecords = {
       return {
         cartId,
         discountCodes,
+      };
+    },
+  },
+  CartGiftCartUpdate: {
+    queryType: 'mutation',
+    gqlTag: CartGqls.CART_GIFT_CARD_CODES_UPDATE,
+    editableInputParams: {
+      cartId: '',
+      giftCardCodes: '{{[]}}',
+    },
+    transformer: CartTransformer.TransformCartMutations,
+    inputResolver: inputVariables => {
+      const {cartId, giftCardCodes} = inputVariables;
+      return {
+        cartId,
+        giftCardCodes,
       };
     },
   },
@@ -147,9 +166,11 @@ export const CartQueryRecords = {
       customerAccessToken: '',
       buyerIdentity: '{{{}}}',
     },
-    inputResolver: (inputVariables) => {
-      const {cartId, customerAccessToken, buyerIdentity} = inputVariables;
-      return {cartId, buyerIdentity: {...(buyerIdentity ?? {}), customerAccessToken}};
+    inputResolver: ({cartId, customerAccessToken, buyerIdentity = {}}: any) => {
+      if (customerAccessToken) {
+        buyerIdentity.customerAccessToken = customerAccessToken;
+      }
+      return {cartId, buyerIdentity: buyerIdentity};
     },
     transformer: CartTransformer.TransformCartMutations,
   },
@@ -160,11 +181,13 @@ export const CartQueryRecords = {
       cartId: '',
       attributes: '',
     },
-    inputResolver: (inputVariables) => {
+    inputResolver: (inputVariables: any) => {
       const {cartId, attributes} = inputVariables;
       return {
         cartId,
-        attributes: _.isPlainObject(attributes) ? Object.entries(attributes).map(([key, value]) => ({key, value})) : [],
+        attributes: _.isPlainObject(attributes)
+          ? Object.entries(attributes).map(([key, value]) => ({key, value}))
+          : [],
       };
     },
     transformer: CartTransformer.TransformCartMutations,

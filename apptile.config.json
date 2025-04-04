@@ -3,7 +3,7 @@
   "apptile_api_endpoint": "https://api.apptile.io",
   "analytics_api_endpoint": "https://analytics.apptile.io",
   "apptile_update_endpoint": "https://appconfigs.apptile.io",
-  "app_id": "2299b5c8-77d8-4500-9723-c0ccfe91694d",
+  "app_id": "6a1f4f33-744a-418c-947e-30247efdbe91",
   "app_name": "Pilgrim SDK staging",
   "url_scheme": "discoverpilgrim",
   "app_host": "pilgrim.com",
@@ -11,15 +11,15 @@
   "build_ios": true,
   "build_android": true,
   "ios": {
-    "icon_path": "2299b5c8-77d8-4500-9723-c0ccfe91694d/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
-    "splash_path": "2299b5c8-77d8-4500-9723-c0ccfe91694d/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
-    "bundle_id": "com.discoverpilgrimindia",
+    "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
+    "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
+    "bundle_id": "com.discoverpilgrim",
     "team_id": "8SQ493N52G"
   },
   "android": {
-    "icon_path": "2299b5c8-77d8-4500-9723-c0ccfe91694d/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
-    "splash_path": "2299b5c8-77d8-4500-9723-c0ccfe91694d/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
-    "bundle_id": "com.discoverpilgrimindia",
+    "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
+    "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
+    "bundle_id": "com.discoverpilgrim",
     "expected_output": "apk&aab"
   },
   "both": {
@@ -35,15 +35,15 @@
   },
   "integrations": {
     "metaAds": {
-	"FacebookAppId": "275209841592926",
-	"FacebookClientToken": "c652a661acf3d9fc9c503d386c00a27b",
-	"FacebookDisplayName": "Pilgrim Staging",
-	"FacebookAutoLogAppEventsEnabled": "YES",
-	"FacebookAdvertiserIDCollectionEnabled": "NO"
+      "FacebookAppId": "275209841592926",
+      "FacebookClientToken": "c652a661acf3d9fc9c503d386c00a27b",
+      "FacebookDisplayName": "Pilgrim Staging",
+      "FacebookAutoLogAppEventsEnabled": "YES",
+      "FacebookAdvertiserIDCollectionEnabled": "NO"
     },
     "moengage": {
-       "appId": "WF38NKW2X6FKWGZRC749OAF5",
-       "datacenter": "data_center_3"
+      "appId": "WF38NKW2X6FKWGZRC749OAF5",
+      "datacenter": "data_center_3"
     },
     "shopify": {}
   },
@@ -51,12 +51,12 @@
     {
       "fileName": "icon.png",
       "assetClass": "icon",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/2299b5c8-77d8-4500-9723-c0ccfe91694d/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250214T112350Z&X-Amz-Expires=3600&X-Amz-Signature=79334fd73c7126c988d0d5fe88bcd813c77ede34db6cf3745719b1e24fdb5843&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250214T112350Z&X-Amz-Expires=3600&X-Amz-Signature=79334fd73c7126c988d0d5fe88bcd813c77ede34db6cf3745719b1e24fdb5843&X-Amz-SignedHeaders=host&x-id=GetObject"
     },
     {
       "fileName": "splash.png",
       "assetClass": "splash",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/2299b5c8-77d8-4500-9723-c0ccfe91694d/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250214T112350Z&X-Amz-Expires=3600&X-Amz-Signature=a29168501c76b649a4df9d63a428feeea59540240e1b50f58c5bee1784acf5ad&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250214T112350Z&X-Amz-Expires=3600&X-Amz-Signature=a29168501c76b649a4df9d63a428feeea59540240e1b50f58c5bee1784acf5ad&X-Amz-SignedHeaders=host&x-id=GetObject"
     }
   ],
   "secrets": [],
@@ -71,7 +71,7 @@
     "ENABLE_FIREBASE_ANALYTICS": true
   },
   "SDK_PATH": "/Users/vadivazhagan/apptile-cli-home/ReactNativeTSProjeect",
-  "APP_ID": "2299b5c8-77d8-4500-9723-c0ccfe91694d",
+  "APP_ID": "6a1f4f33-744a-418c-947e-30247efdbe91",
   "APPTILE_BACKEND_URL": "https://api.apptile.io",
   "APPCONFIG_SERVER_URL": "https://appconfigs.apptile.io"
 }

@@ -3,6 +3,6 @@ export const shopifyCheckout = {
   preload: () => {},
 };
 
-export const transformPurchaseEvent = (_event) => {
+export const transformPurchaseEvent = (_event: any) => {
   return {};
 };

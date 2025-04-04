@@ -9,13 +9,21 @@ import {GET_METAOBJECT} from '../metaobjects';
 import {ConfigSchema} from '../../FreeGifts/validators';
 import {transformMetaObjectToFreeGiftConfig} from '../../FreeGifts/transformers';
 
-export function* initCartGenerator(pluginDsConfig, _cartPlatformDsConfig, queryRunner) {
+export function* initCartGenerator(
+  pluginDsConfig,
+  _cartPlatformDsConfig,
+  queryRunner,
+) {
   // Initialize cart from local storage
   const cartLSKey = pluginDsConfig.config.get(CART_KEY_FOR_LOCAL_STORAGE_KEY);
   let currentCart = yield call(LocalStorage.getValue, cartLSKey);
 
   // Initialize free gift configuration
-  const freeGiftConfig = yield call(initializeFreeGiftConfig, pluginDsConfig, queryRunner);
+  const freeGiftConfig = yield call(
+    initializeFreeGiftConfig,
+    pluginDsConfig,
+    queryRunner,
+  );
 
   // Refreshing cartLine Cache
   yield spawn(function* () {
@@ -44,7 +52,10 @@ export function* initCartGenerator(pluginDsConfig, _cartPlatformDsConfig, queryR
         newValue: currentCart,
       },
       {
-        selector: [pluginDsConfig.getIn(['config', 'freeGiftDatasourceId']), 'config'],
+        selector: [
+          pluginDsConfig.getIn(['config', 'freeGiftDatasourceId']),
+          'config',
+        ],
         newValue: freeGiftConfig,
       },
     ]),
@@ -52,25 +63,39 @@ export function* initCartGenerator(pluginDsConfig, _cartPlatformDsConfig, queryR
 }
 
 function* initializeFreeGiftConfig(pluginDsConfig, queryRunner) {
-  const freeGiftDataSourceId = pluginDsConfig.getIn(['config', 'freeGiftDatasourceId']);
-  const freeGiftMetaObjectId = pluginDsConfig.getIn(['config', 'freeGiftMetaobjectId']);
+  const freeGiftDataSourceId = pluginDsConfig.getIn([
+    'config',
+    'freeGiftDatasourceId',
+  ]);
+  const freeGiftMetaObjectId = pluginDsConfig.getIn([
+    'config',
+    'freeGiftMetaobjectId',
+  ]);
 
   if (_.isEmpty(freeGiftDataSourceId) || _.isEmpty(freeGiftMetaObjectId)) {
     return {isEnabled: false};
   }
 
   try {
-    const queryResponse = yield call(queryRunner.runQuery, 'query', GET_METAOBJECT, {id: freeGiftMetaObjectId}, {});
+    const queryResponse = yield call(
+      queryRunner.runQuery,
+      'query',
+      GET_METAOBJECT,
+      {id: freeGiftMetaObjectId},
+      {},
+    );
     const freeGiftMetaObject = queryResponse?.data?.metaobject;
 
     if (_.isEmpty(freeGiftMetaObject)) {
       return {isEnabled: false};
     }
 
-    const transformedFreeGiftConfig = transformMetaObjectToFreeGiftConfig(freeGiftMetaObject);
+    const transformedFreeGiftConfig =
+      transformMetaObjectToFreeGiftConfig(freeGiftMetaObject);
     const schemaValidation = ConfigSchema.validate(transformedFreeGiftConfig);
 
-    return transformedFreeGiftConfig.isEnabled && _.isEmpty(schemaValidation.error)
+    return transformedFreeGiftConfig.isEnabled &&
+      _.isEmpty(schemaValidation.error)
       ? transformedFreeGiftConfig
       : {isEnabled: false};
   } catch (err) {

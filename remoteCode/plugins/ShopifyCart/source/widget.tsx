@@ -1,6 +1,13 @@
+import {DocumentNode} from 'graphql';
 import _ from 'lodash';
 
 import {
+  RootState,
+  ImmutableMapType,
+  PluginConfigType,
+  AppPageTriggerOptions,
+  PluginListingSettings,
+  PluginPropertySettings,
   TriggerActionIdentifier,
   selectPluginConfig,
   GetRegisteredConfig,
@@ -9,59 +16,109 @@ import {
   sendAnalyticsEvent,
   store,
   registerDatasource,
+  wrapDatasourceModel,
+  baseDatasourceConfig,
+  DatasourceQueryDetail,
+  ApolloQueryRunner as apolloQueryRunner,
 } from 'apptile-core';
-import {baseDatasourceConfig} from 'apptile-core';
-import {wrapDatasourceModel} from 'apptile-core';
 
 import cartActions from '../actions';
 import {
-  CART_KEY_FOR_LOCAL_STORAGE_KEY, 
-  ENABLE_CHECKOUT_SHEET_KEY, 
-  ENABLE_CHECKOUT_PRELOAD_KEY
+  CART_KEY_FOR_LOCAL_STORAGE_KEY,
+  ENABLE_CHECKOUT_SHEET_KEY,
+  ENABLE_CHECKOUT_PRELOAD_KEY,
+  ENABLE_POST_CART_VALIDATION,
 } from '../constants';
 import {CartQueryRecords} from '../queryRecords';
 import {call, select, spawn} from 'redux-saga/effects';
-import {ApolloQueryRunner as apolloQueryRunner} from 'apptile-core';
 
 import {initCartGenerator} from '../generators';
 import {shopifyCheckout, transformPurchaseEvent} from '../checkout';
 
 import {Platform} from 'react-native';
 
-const pluginListing = {
-  labelPrefix: 'shopifyCart',
-  type: 'datasource',
-  name: 'Shopify cart datasource',
-  description: 'apptile shopifycart',
-  section: 'SDK',
-  icon: 'datasource',
-  manifest: {
-    directoryName: 'ShopifyCart',
-  }
+export interface pluginConfigType {
+  cartPlatform: string;
+  syncingCartStatus: boolean;
+  cartLineCache: any;
+  preparingCart: boolean;
+  enabledCartLineCache: boolean;
+  freeGiftDatasourceId: string;
+  freeGiftMetaobjectId: string;
+  orderLimiterDatasourceId: string;
+  syncingLineItems: any;
+  currentCart: string;
+  addCartLineItem: string;
+  removeCartLineItem: string;
+  refreshCart: string;
+  updateCartDiscounts: string;
+  updateGiftCards: string;
+  updateCartAttributes: string;
+  updateCartNote: string;
+  updateCartBuyerIdentity: string;
+  cartLineItemsMap: string;
+  refreshCartLineCache: string;
+  enableCheckoutSheet: boolean;
+  enableCheckoutPreload: boolean;
+  enablePreCheckoutValidation: boolean;
+  enablePostCartValidation: boolean;
+  showShopifyCartErrorMessage: boolean;
+}
+
+export type TransformerFunction = (
+  data: any,
+  context: any,
+  model?: ImmutableMapType<any>,
+) => {data: any; hasNextPage?: boolean; paginationMeta?: any};
+
+export type queryDetails = DatasourceQueryDetail & {
+  queryType: 'query' | 'mutation';
+  gqlTag: DocumentNode;
+  transformer?: TransformerFunction;
+  contextInputParams?: {[key: string]: any};
+  checkInputVariabes?: (inputVariables: Record<string, any>) => Boolean;
+  inputResolver?: (inputVariables: any) => any;
+  paginationResolver?: (
+    inputVariables: Record<string, any>,
+    paginationMeta: any,
+  ) => Record<string, any>;
 };
 
-export const makeInputParamsResolver = (contextInputParams) => {
-  return (modelValues) => {
+export const makeInputParamsResolver = (contextInputParams: {
+  [key: string]: string;
+}) => {
+  return (modelValues: ImmutableMapType) => {
     const dsPluginConfig = modelValues;
-    if (!dsPluginConfig) return;
+    if (!dsPluginConfig) {
+      return;
+    }
 
-    let contextParams = Object.entries(contextInputParams).reduce((acc, [key, value]) => {
-      if (dsPluginConfig && dsPluginConfig.get(value)) {
-        return {...acc, [key]: dsPluginConfig.get(value)};
-      }
-      return acc;
-    }, {});
+    let contextParams = Object.entries(contextInputParams).reduce(
+      (acc, [key, value]) => {
+        if (dsPluginConfig && dsPluginConfig.get(value)) {
+          return {...acc, [key]: dsPluginConfig.get(value)};
+        }
+        return acc;
+      },
+      {},
+    );
     return contextParams;
   };
 };
 
-export const makeInputVariablesTypeCompatible = (inputVariables, editableInputParams) => {
+export const makeInputVariablesTypeCompatible = (
+  inputVariables: {[key: string]: any},
+  editableInputParams: {[key: string]: any},
+) => {
   return Object.entries(inputVariables).reduce((acc, [key, value]) => {
     if (editableInputParams && editableInputParams[key] !== undefined) {
       if (typeof editableInputParams[key] === 'number') {
         return {
           ...acc,
-          [key]: isNaN(value) && typeof value === typeof editableInputParams[key] ? value : parseInt(value),
+          [key]:
+            isNaN(value) && typeof value === typeof editableInputParams[key]
+              ? value
+              : parseInt(value),
         };
       } else {
         return value
@@ -76,8 +133,8 @@ export const makeInputVariablesTypeCompatible = (inputVariables, editableInputPa
   }, {});
 };
 
-const apiRecords = {...CartQueryRecords};
-const propertySettings = {
+const apiRecords: Record<string, queryDetails> = {...CartQueryRecords};
+const propertySettings: PluginPropertySettings = {
   addCartLineItem: {
     type: TriggerActionIdentifier,
     getValue(_model, _renderedValue, _selector) {
@@ -160,6 +217,17 @@ const propertySettings = {
       },
     },
   },
+  updateGiftCards: {
+    type: TriggerActionIdentifier,
+    getValue(_model, _renderedValue, _selector) {
+      return cartActions.updateGiftCards;
+    },
+    actionMetadata: {
+      editableInputParams: {
+        giftCardCodes: '{{[]}}',
+      },
+    },
+  },
   updateCartAttributes: {
     type: TriggerActionIdentifier,
     getValue(_model, _renderedValue, _selector) {
@@ -204,10 +272,29 @@ const propertySettings = {
     getValue(_model, _renderedValue, _selector) {
       return cartActions.initiateCheckout;
     },
+    actionMetadata: {
+      editableInputParams: {
+        doBuyerIdentityUpdate: '{{{}}}',
+      },
+    },
   },
 };
 
-export const editors = {
+const pluginListing: Partial<PluginListingSettings> = {
+  labelPrefix: 'shopifyCart',
+  type: 'datasource',
+  name: 'shopifyCart',
+  description: 'Apptile Shopify Cart',
+  defaultHeight: 0,
+  defaultWidth: 0,
+  section: 'SDK',
+  manifest: {
+    directoryName: 'ShopifyCart',
+  },
+  icon: 'datasource',
+};
+
+export const editors: any = {
   basic: [
     {
       type: 'codeInput',
@@ -237,6 +324,13 @@ export const editors = {
       name: ENABLE_CHECKOUT_PRELOAD_KEY,
       props: {
         label: 'Enable Checkout Preload',
+      },
+    },
+    {
+      type: 'checkbox',
+      name: ENABLE_POST_CART_VALIDATION,
+      props: {
+        label: 'Enable Post Cart Validation',
       },
     },
   ],
@@ -309,6 +403,7 @@ const shopifyCartDS = wrapDatasourceModel({
     clearCart: 'action',
     refreshCart: 'action',
     updateCartDiscounts: 'action',
+    updateGiftCards: 'action',
     updateCartAttributes: 'action',
     updateCartNote: 'action',
     updateCartBuyerIdentity: 'action',
@@ -320,17 +415,22 @@ const shopifyCartDS = wrapDatasourceModel({
     enableCheckoutPreload: false,
     enablePreCheckoutValidation: false,
     showShopifyCartErrorMessage: false,
-  },
+    enablePostCartValidation: false,
+  } as pluginConfigType,
 
-  initDatasource: async (_dsModel, _dsConfig, _dsModelValues) => {},
+  initDatasource: async (
+    _dsModel: any,
+    _dsConfig: PluginConfigType<pluginConfigType>,
+    _dsModelValues: any,
+  ) => {},
   onPluginUpdate: function* (
-    state,
-    pluginId,
-    pageKey,
-    _instance,
-    _userTriggered,
-    pageLoad,
-    _options,
+    state: RootState,
+    pluginId: string,
+    pageKey: string,
+    _instance: number | null,
+    _userTriggered: boolean,
+    pageLoad: boolean,
+    _options: AppPageTriggerOptions,
   ) {
     const pluginConfig = yield select(selectPluginConfig, pageKey, pluginId);
     const configGen = GetRegisteredConfig(pluginConfig.get('subtype'));
@@ -339,18 +439,35 @@ const shopifyCartDS = wrapDatasourceModel({
     const cartPlatformId = dsConfig?.getIn(['config', 'cartPlatform']);
 
     if (pageLoad && !_.isEmpty(cartPlatformId)) {
-      const cartPlatformConfig = yield select(selectPluginConfig, pageKey, cartPlatformId);
-      const cartPlatformConfigGen = GetRegisteredConfig(cartPlatformConfig.get('subtype'));
-      const cartPlatformMergedConfig = cartPlatformConfigGen(cartPlatformConfig.config);
-      const cartPlatformDsConfig = cartPlatformConfig.set('config', cartPlatformMergedConfig);
+      const cartPlatformConfig = yield select(
+        selectPluginConfig,
+        pageKey,
+        cartPlatformId,
+      );
+      const cartPlatformConfigGen = GetRegisteredConfig(
+        cartPlatformConfig.get('subtype'),
+      );
+      const cartPlatformMergedConfig = cartPlatformConfigGen(
+        cartPlatformConfig.config,
+      );
+      const cartPlatformDsConfig = cartPlatformConfig.set(
+        'config',
+        cartPlatformMergedConfig,
+      );
       const dsModel = state.stageModel.getPluginModel(pageKey, pluginId);
 
       if (Platform.OS !== 'web') {
         const dispatch = getAppDispatch();
         shopifyCheckout.addEventListener('completed', event => {
           const currentState = store.getState();
-          const isCustomerHasOrders = currentState.stageModel.getModelValue([cartPlatformId, 'isCustomerHasOrders']);
-          const cartPlatformDsModel = currentState.stageModel.getPluginModel(pageKey, cartPlatformId);
+          const isCustomerHasOrders = currentState.stageModel.getModelValue([
+            cartPlatformId,
+            'isCustomerHasOrders',
+          ]);
+          const cartPlatformDsModel = currentState.stageModel.getPluginModel(
+            pageKey,
+            cartPlatformId,
+          );
           // Clearing cart on purchase complete
           dispatch(
             triggerAction({
@@ -364,13 +481,17 @@ const shopifyCartDS = wrapDatasourceModel({
           );
 
           // Purchase analytics
-          const transformedPurchaseEvent = transformPurchaseEvent(event);
+          const transformedPurchaseEvent = transformPurchaseEvent(event) as any;
           const orderId = _.get(transformedPurchaseEvent, 'orderId');
           dispatch(
             sendAnalyticsEvent(
               'track',
               'purchase',
-              _.set(transformedPurchaseEvent, 'apptileEventId', `${orderId}:purchase`),
+              _.set(
+                transformedPurchaseEvent,
+                'apptileEventId',
+                `${orderId}:purchase`,
+              ),
             ),
           );
           if (!isCustomerHasOrders) {
@@ -378,7 +499,11 @@ const shopifyCartDS = wrapDatasourceModel({
               sendAnalyticsEvent(
                 'track',
                 'first_purchase',
-                _.set(transformedPurchaseEvent, 'apptileEventId', `${orderId}:${_.kebabCase('first_purchase')}`),
+                _.set(
+                  transformedPurchaseEvent,
+                  'apptileEventId',
+                  `${orderId}:${_.kebabCase('first_purchase')}`,
+                ),
               ),
             );
             dispatch(
@@ -401,31 +526,47 @@ const shopifyCartDS = wrapDatasourceModel({
 
       const queryRunner = apolloQueryRunner();
       yield spawn(function* () {
-        yield call(queryRunner.initClient, cartPlatformDsConfig.config.get('storefrontApiUrl'), (_, {headers}) => {
-          return {
-            headers: {
-              ...headers,
-              'X-Shopify-Storefront-Access-Token': cartPlatformDsConfig.config.get('storefrontAccessToken'),
-            },
-          };
-        });
-        yield call(initCartGenerator, dsConfig, cartPlatformDsConfig, queryRunner);
+        yield call(
+          queryRunner.initClient,
+          cartPlatformDsConfig.config.get('storefrontApiUrl'),
+          (_, {headers}) => {
+            return {
+              headers: {
+                ...headers,
+                'X-Shopify-Storefront-Access-Token':
+                  cartPlatformDsConfig.config.get('storefrontAccessToken'),
+              },
+            };
+          },
+        );
+        yield call(
+          initCartGenerator,
+          dsConfig,
+          cartPlatformDsConfig,
+          queryRunner,
+        );
       });
     }
   },
-  getQueries: function () {
+  getQueries: function (): Record<string, DatasourceQueryDetail> {
     return apiRecords;
   },
-  getQueryInputParams: function (queryName) {
-    const queryDetails = apiRecords && apiRecords[queryName] ? apiRecords[queryName] : null;
-    return queryDetails && queryDetails.editableInputParams ? queryDetails.editableInputParams : {};
+  getQueryInputParams: function (queryName: string) {
+    const queryDetails =
+      apiRecords && apiRecords[queryName] ? apiRecords[queryName] : null;
+    return queryDetails && queryDetails.editableInputParams
+      ? queryDetails.editableInputParams
+      : {};
   },
-  resolveCredentialConfigs: function (_credentials) {
+  resolveCredentialConfigs: function (
+    _credentials,
+  ): Partial<pluginConfigType> | boolean {
     return {};
   },
-  resolveClearCredentialConfigs: function () {
+  resolveClearCredentialConfigs: function (): string[] {
     return [];
   },
+  // getPlatformIdentifier: function (): IntegrationPlatformType {
   getPlatformIdentifier: function () {
     return 'cart';
   },
@@ -433,9 +574,9 @@ const shopifyCartDS = wrapDatasourceModel({
     _dsModel,
     _dsConfig,
     _dsModelValues,
-    _queryName,
-    _inputVariables,
-    _options,
+    _queryName: string,
+    _inputVariables: any,
+    _options?: AppPageTriggerOptions,
   ) {},
   options: {
     propertySettings,

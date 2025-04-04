@@ -1069,6 +1069,8 @@ PODS:
   - react-native-klaviyo (1.5.1):
     - KlaviyoSwift (= 3.1.0)
     - React-Core
+  - react-native-otp-verify (1.1.8):
+    - React-Core
   - react-native-render-html (6.3.4):
     - React-Core
   - react-native-restart (0.0.27):
@@ -1384,6 +1386,7 @@ DEPENDENCIES:
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-keep-awake (from `../node_modules/react-native-keep-awake`)
   - react-native-klaviyo (from `../node_modules/react-native-klaviyo`)
+  - react-native-otp-verify (from `../node_modules/react-native-otp-verify`)
   - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -1554,6 +1557,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-keep-awake"
   react-native-klaviyo:
     :path: "../node_modules/react-native-klaviyo"
+  react-native-otp-verify:
+    :path: "../node_modules/react-native-otp-verify"
   react-native-render-html:
     :path: "../node_modules/react-native-render-html"
   react-native-restart:
@@ -1725,6 +1730,7 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
   react-native-keep-awake: afad8a51dfef9fe9655a6344771be32c8596d774
   react-native-klaviyo: 2e6370f59402bf35e19365e68bbebf2a919d1bfd
+  react-native-otp-verify: b524a7f44b691644bea08376d6a4782a2df57e09
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
   react-native-safe-area-context: a240ad4b683349e48b1d51fed1611138d1bdad97

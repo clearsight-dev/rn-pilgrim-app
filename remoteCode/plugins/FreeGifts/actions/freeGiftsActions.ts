@@ -1,8 +1,9 @@
 import _ from 'lodash';
+import {Rule, GiftingConfig} from './types';
 import RULE_EXECUTION_MAP from '../rules';
 
 class FreeGiftsActions {
-  getLinesWithoutFreeGift = (lineItems = []) => {
+  getLinesWithoutFreeGift = (lineItems: any[] = []) => {
     return lineItems.filter(
       entry =>
         !_.get(entry, 'attributes', []).some(
@@ -11,7 +12,7 @@ class FreeGiftsActions {
     );
   };
 
-  separateGiftsAndLineItems = (lineItems = []) => {
+  separateGiftsAndLineItems = (lineItems: any[] = []) => {
     const lineItemsWithoutGifts = [];
     const giftLineItems = [];
 
@@ -33,7 +34,11 @@ class FreeGiftsActions {
     };
   };
 
-  attachFreebieToCartLineItems = (model, cartObject, cartLineCache = {}) => {
+  attachFreebieToCartLineItems = (
+    model: any,
+    cartObject: any,
+    cartLineCache: any = {},
+  ) => {
     const freeGiftConfig = model?.get('config') || {};
 
     if (_.isEmpty(freeGiftConfig)) {
@@ -70,10 +75,10 @@ class FreeGiftsActions {
   };
 
   ruleExecutor = (
-    rules = [],
-    lineItems = [],
-    giftConfig = {},
-    cartLineCache = {},
+    rules: Rule[] = [],
+    lineItems: any[] = [],
+    giftConfig: GiftingConfig = {},
+    cartLineCache: any = {},
   ) => {
     const {isMultipleFreeGiftAllowed} = giftConfig;
     let giftsToAdd = [];
@@ -83,15 +88,18 @@ class FreeGiftsActions {
       this.separateGiftsAndLineItems(lineItems);
     let currentLineItems = [...lineItemsWithoutGifts];
 
-    const currentCampaignGiftsPriceMap = rules.reduce((result, rule) => {
-      const merchandiseId = _.get(rule, 'giftItems.variant.variantId');
-      const itemPrice = _.get(rule, 'giftItems.variant.price');
+    const currentCampaignGiftsPriceMap: {[key: string]: number} = rules.reduce(
+      (result, rule) => {
+        const merchandiseId = _.get(rule, 'giftItems.variant.variantId');
+        const itemPrice = _.get(rule, 'giftItems.variant.price');
 
-      if (!_.isNil(merchandiseId) && !_.isNil(itemPrice)) {
-        result[merchandiseId] = itemPrice;
-      }
-      return result;
-    }, {});
+        if (!_.isNil(merchandiseId) && !_.isNil(itemPrice)) {
+          result[merchandiseId] = itemPrice;
+        }
+        return result;
+      },
+      {},
+    );
 
     // Execute each rule to update the line items accordingly
     rules.forEach(entry => {

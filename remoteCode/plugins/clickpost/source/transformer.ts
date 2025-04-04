@@ -9,10 +9,15 @@ import {
   IClickpostGetUnusedDiscountResponse,
 } from './types';
 
-export const transformGetRewardPointsResponse = (data, context) => {
-  if (!data) return;
+export const transformGetRewardPointsResponse = (
+  data: IClickpostGetRewardPointResponse,
+  context: any,
+) => {
+  if (!data) {
+    return;
+  }
 
-  const rewardSchema = [
+  const rewardSchema: JSONMapperSchema = [
     {
       field: 'lifetimePoints',
       path: 'lifetime_points',
@@ -50,16 +55,23 @@ export const transformGetRewardPointsResponse = (data, context) => {
   };
 };
 
-export const TransformGetRewardPoints = (response, context) => {
+export const TransformGetRewardPoints = (response: any, context: any) => {
   const {data} = response;
-  if (!data) return;
+  if (!data) {
+    return;
+  }
   const result = transformGetRewardPointsResponse(data, context);
   return formatQueryReturn(result, data);
 };
 
-export const TransformGetUnusedDiscounts = (response, context) => {
+export const TransformGetUnusedDiscounts = (
+  response: IClickpostGetUnusedDiscountResponse,
+  context: any,
+) => {
   const {data} = response;
-  if (!data) return;
+  if (!data) {
+    return;
+  }
 
   const discountCodeSchema = [
     {
@@ -96,9 +108,14 @@ export const TransformGetUnusedDiscounts = (response, context) => {
   return formatQueryReturn(tData, data);
 };
 
-export const TransformGetDiscountDetails = (response, context) => {
+export const TransformGetDiscountDetails = (
+  response: IClickpostGetUnusedDiscountResponse,
+  context: any,
+) => {
   const {data} = response;
-  if (!data) return;
+  if (!data) {
+    return;
+  }
 
   const discountCodeSchema = [
     {

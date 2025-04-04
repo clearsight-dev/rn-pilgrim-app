@@ -13,12 +13,14 @@ import clickpost from "./plugins/clickpost/source/widget";
 import bottomcontent from "./plugins/bottomcontent/source/widget";
 import amansworkpage from "./plugins/amansworkpage/source/widget";
 import ShopifyCart from "./plugins/ShopifyCart/source/widget";
+import OTPInputTextWidget from "./plugins/OTPInputTextWidget/source/widget";
 import FreeGifts from "./plugins/FreeGifts/source/widget";
 import DynamicImage from "./plugins/DynamicImage/source/widget";
 export function initPlugins() {
 return [
     DynamicImage,
     FreeGifts,
+    OTPInputTextWidget,
     ShopifyCart,
     amansworkpage,
     bottomcontent,
