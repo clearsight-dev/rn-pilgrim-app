@@ -13,6 +13,7 @@ import RelatedProductsCarousel, {formatProductsForCarousel} from '../../../../..
 import { cheaplyGetShopifyQueryRunner, useShopifyQueryAndAddtoCart, useShopifyQueryRunner } from '../../../../../extractedQueries/selectors';
 import Header from '../Header';
 import ShadeSelector from '../../../../../extractedQueries/ShadeSelector';
+import VariantSelector from '../../../../../extractedQueries/VariantSelector';
 
 function ChipCollectionCarousel({ 
   data,
@@ -22,7 +23,8 @@ function ChipCollectionCarousel({
   style
 }) {
   console.log("Rendering chip collection carousel: ", collectionHandle);
-  const bottomSheetRef = useRef(null);
+  const shadeBottomSheetRef = useRef(null);
+  const variantBottomSheetRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
   // const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
@@ -240,7 +242,13 @@ function ChipCollectionCarousel({
   // Handle Select Shade button click
   const handleSelectShade = (product) => {
     setSelectedProduct(product);
-    bottomSheetRef.current?.show();
+    shadeBottomSheetRef.current?.show();
+  };
+  
+  // Handle Choose Variant button click
+  const handleSelectVariant = (product, optionName) => {
+    setSelectedProduct(product);
+    variantBottomSheetRef.current?.show();
   };
 
   // Format products for the carousel
@@ -290,14 +298,23 @@ function ChipCollectionCarousel({
           // initialProductsToLoad={5}
           style={styles.carousel}
           onSelectShade={handleSelectShade}
+          onSelectVariant={handleSelectVariant}
         />
       )}
       
       {/* Shade Selector Modal */}
       <ShadeSelector 
-        bottomSheetRef={bottomSheetRef}
+        bottomSheetRef={shadeBottomSheetRef}
         product={selectedProduct}
         onAddToCart={addLineItemToCart}
+      />
+      
+      {/* Variant Selector Modal */}
+      <VariantSelector 
+        bottomSheetRef={variantBottomSheetRef}
+        product={selectedProduct}
+        onAddToCart={addLineItemToCart}
+        optionName={"Size"}
       />
     </View>
   );

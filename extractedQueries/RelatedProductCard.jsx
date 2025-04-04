@@ -13,7 +13,7 @@ import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 
-function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectShade}) {
+function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectShade, onSelectVariant}) {
   console.log('Rendering relatedproductcard');
   const {
     handle,
@@ -50,6 +50,17 @@ function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectS
 
   const dispatch = useDispatch();
 
+  // Find the first non-color option for variant selection
+  let variantOptionName = 'Shade';
+  if (product.options && product.options.length > 0) {
+    const nonColorOption = product.options.find(option => 
+      option.name.toLowerCase() !== 'color'
+    );
+    if (nonColorOption) {
+      variantOptionName = nonColorOption.name;
+    }
+  }
+
   // Determine the CTA button text and action
   const isSelectShade = variantsCount > 1 && productType.startsWith('Makeup');
   const isChooseVariant =
@@ -70,6 +81,8 @@ function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectS
           e.stopPropagation();
           if (isSelectShade && onSelectShade) {
             onSelectShade(product);
+          } else if (isChooseVariant && onSelectVariant) {
+            onSelectVariant(product);
           } else {
             onAddToCart(product);
           }

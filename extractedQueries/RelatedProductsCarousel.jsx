@@ -36,15 +36,15 @@ export function formatProductsForCarousel(products) {
   });
 };
 
-const RelatedProductsCarousel = ({
+function RelatedProductsCarousel({
   title = 'Customers also liked',
   products = [],
   style,
   // initialProductsToLoad = 2, // Default to loading 2 products initially
-  onSelectShade,
-}) => {
+  onSelectShade = () => {console.log("Handler for select shade not provided")},
+  onSelectVariant = () => {console.log("Handler for select variant not provided")},
+}) {
   console.log('Rendering RelatedProductsCarousel');
-  const bottomSheetRef = useRef(null);
   // const {queryRunner, addLineItemToCart} = useShopifyQueryAndAddtoCart();
 
   // Function to fetch product data
@@ -83,18 +83,6 @@ const RelatedProductsCarousel = ({
     []
   );
 
-  const handleSelectShade = useCallback(
-    product => {
-      if (onSelectShade) {
-        onSelectShade(product, bottomSheetRef);
-      } else {
-        // Default behavior if no custom handler is provided
-        bottomSheetRef.current?.show();
-      }
-    },
-    [onSelectShade],
-  );
-
   // Initialize with the specified number of products
   // useEffect(() => {
   //   const initialProducts = products.slice(
@@ -131,7 +119,8 @@ const RelatedProductsCarousel = ({
             key={product.handle + index}
             product={product}
             onAddToCart={handleAddToCart}
-            onSelectShade={handleSelectShade}
+            onSelectShade={onSelectShade}
+            onSelectVariant={onSelectVariant}
           />
         )}
         keyExtractor={(product, index) => product.handle || index.toString()}
