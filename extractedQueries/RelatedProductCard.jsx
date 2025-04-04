@@ -13,7 +13,7 @@ import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 
-function RelatedProductCard({product, style, onAddToCart, onSelectShade}) {
+function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectShade}) {
   console.log('Rendering relatedproductcard');
   const {
     handle,
@@ -123,7 +123,7 @@ function RelatedProductCard({product, style, onAddToCart, onSelectShade}) {
       </View> 
 
       {/* Product Details */}
-      <View style={styles.detailsContainer}>
+      <View style={[styles.detailsContainer, cardVariant === "large" ? {alignItems: "center"} : {}]}>
         {
           isBestSeller && (
             <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>

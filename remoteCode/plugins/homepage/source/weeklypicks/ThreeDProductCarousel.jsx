@@ -139,6 +139,7 @@ function ThreeDProductCarousel({
                 ]}
               >
                 <RelatedProductCard 
+                  cardVariant={"large"}
                   product={item}
                   onAddToCart={onAddToCart}
                   onSelectShade={onSelectShade}
