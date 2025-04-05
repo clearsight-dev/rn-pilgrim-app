@@ -1,5 +1,6 @@
 package com.apptileseed
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import com.apptileseed.src.utils.APPTILE_LOG_TAG
@@ -31,5 +32,15 @@ class MainActivity : ReactActivity() {
     fun removeSplash() {
         Log.d(APPTILE_LOG_TAG, "Splash overlay remove called from main activity ")
         SplashOverlayManager.removeOverlay(this)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Log.d(APPTILE_LOG_TAG, "Intent received on MainActivity: $intent")
+        Log.d(APPTILE_LOG_TAG, "Action: ${intent.action}")
+        Log.d(APPTILE_LOG_TAG, "Data: ${intent.data}")
+        Log.d(APPTILE_LOG_TAG, "Extras: ${intent.extras}")
+
+        setIntent(intent) // Ensure React Native gets the new intent
     }
 }
