@@ -78,7 +78,7 @@ export function ReactComponent({ model }) {
       }
     }, 100);
     
-    fetchCollectionData(collectionHandle, 100, cursor, sortKey, reverse)
+    fetchCollectionData(collectionHandle, 12, cursor, sortKey, reverse)
       .then(res => {
         clearTimeout(timeout);
         // Set collection title
@@ -340,7 +340,7 @@ export function ReactComponent({ model }) {
       setLoading(true);
     }
     
-    fetchCollectionData(collectionHandle, 12, cursor, sortKey, reverse, filters)
+    fetchCollectionData(collectionHandle, 20, cursor, sortKey, reverse, filters)
       .then(res => {
         // Set collection title
         if (res.data.collection?.title) {
@@ -609,7 +609,7 @@ export function ReactComponent({ model }) {
           columnWrapperStyle={styles.row}
           showsVerticalScrollIndicator={false}
           onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.5} // Trigger when 30% from the end
+          onEndReachedThreshold={1.5} // Trigger when 30% from the end
           ListFooterComponent={renderFooter}
           ListEmptyComponent={
             <Text style={styles.emptyText}>No products found</Text>
