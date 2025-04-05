@@ -287,6 +287,9 @@ export const fetchVariantBySelectedOptions = async (productHandle, selectedOptio
           price {
             amount
           }
+          compareAtPrice {
+            amount
+          }
           weight
           weightUnit
         }

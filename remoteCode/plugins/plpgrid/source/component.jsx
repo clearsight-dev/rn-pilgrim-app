@@ -11,7 +11,6 @@ import { useRoute } from '@react-navigation/native';
 import { datasourceTypeModelSel, Icon } from 'apptile-core';
 import { ProductCountSkeleton,  ProductGridSkeleton } from './Skeletons';
 import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
-import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import {formatProductsForCarousel} from '../../../../extractedQueries/RelatedProductsCarousel';
 import Footer from './Footer';
@@ -51,66 +50,6 @@ export function ReactComponent({ model }) {
     { label: 'Price: High to Low', value: 'PRICE', reverse: true },
     { label: 'What\'s new', value: 'CREATED', reverse: false }
   ];
-
-  // Create initial filters based on selected category and subcategory
-  const createInitialFilters = useCallback(() => {
-    const initialFilters = [];
-    
-    // If we have a selected category, add it as a filter
-    if (selectedCategory) {
-      console.log(`[AGENT] Adding category filter: ${selectedCategory}`);
-      
-      // Find the filter ID for categories
-      const categoryFilterId = filterData.find(f => 
-        f.label?.toLowerCase() === 'category' || 
-        f.label?.toLowerCase() === 'categories'
-      )?.id;
-      
-      if (categoryFilterId) {
-        // Find the value ID for this category
-        const categoryFilter = filterData.find(f => f.id === categoryFilterId);
-        const categoryValueId = categoryFilter?.values?.find(v => 
-          v.label?.toLowerCase() === selectedCategory.toLowerCase()
-        )?.id;
-        
-        if (categoryValueId) {
-          initialFilters.push({
-            id: categoryFilterId,
-            values: [categoryValueId]
-          });
-        }
-      }
-    }
-    
-    // If we have a selected subcategory, add it as a filter
-    if (selectedSubcategory) {
-      console.log(`[AGENT] Adding subcategory filter: ${selectedSubcategory}`);
-      
-      // Find the filter ID for subcategories
-      const subcategoryFilterId = filterData.find(f => 
-        f.label?.toLowerCase() === 'subcategory' || 
-        f.label?.toLowerCase() === 'subcategories' ||
-        f.label?.toLowerCase() === 'type'
-      )?.id;
-      
-      if (subcategoryFilterId) {
-        // Find the value ID for this subcategory
-        const subcategoryFilter = filterData.find(f => f.id === subcategoryFilterId);
-        const subcategoryValueId = subcategoryFilter?.values?.find(v => 
-          v.label?.toLowerCase() === selectedSubcategory.toLowerCase()
-        )?.id;
-        
-        if (subcategoryValueId) {
-          initialFilters.push({
-            id: subcategoryFilterId,
-            values: [subcategoryValueId]
-          });
-        }
-      }
-    }
-    
-    return initialFilters;
-  }, [selectedCategory, selectedSubcategory, filterData]);
 
   const handleSortOptionSelect = useCallback((option) => {
     setSortOption(option.value);
@@ -167,18 +106,6 @@ export function ReactComponent({ model }) {
         // Store filter data if available
         if (res.data.collection?.products?.filters) {
           setFilterData(res.data.collection.products.filters);
-          
-          // If we have selected category or subcategory, apply them as filters
-          if ((selectedCategory || selectedSubcategory) && !isLoadingMore) {
-            // We need to wait for filter data to be set before creating initial filters
-            setTimeout(() => {
-              const initialFilters = createInitialFilters();
-              if (initialFilters.length > 0) {
-                console.log('[AGENT] Applying initial filters:', initialFilters);
-                applyFilters(initialFilters);
-              }
-            }, 500);
-          }
         }
         
         setHasNextPage(res.data.pagination.hasNextPage);
@@ -194,7 +121,7 @@ export function ReactComponent({ model }) {
           setLoading(false);
         }
       });
-  }, [collectionHandle, sortOption, sortReverse, selectedCategory, selectedSubcategory, createInitialFilters]);
+  }, [collectionHandle, sortOption, sortReverse, selectedCategory, selectedSubcategory]);
 
   // Function to convert selected filters to Shopify filter format
   const getShopifyFilters = useCallback(() => {
