@@ -283,7 +283,6 @@ export const fetchVariantBySelectedOptions = async (productHandle, selectedOptio
           title
           image {
             url
-            id
           }
           price {
             amount

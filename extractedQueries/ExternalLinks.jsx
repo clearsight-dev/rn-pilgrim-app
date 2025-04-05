@@ -5,9 +5,9 @@ import {
   TouchableOpacity, 
   StyleSheet,
 } from 'react-native';
-import {Image} from '../../../../extractedQueries/ImageComponent';
-import GradientBackground from '../../../../extractedQueries/GradientBackground';
-import RadialGradientBackground from '../../../../extractedQueries/RadialGradientBackground';
+import {Image} from './ImageComponent';
+import GradientBackground from './GradientBackground';
+import RadialGradientBackground from './RadialGradientBackground';
 
 // Link Item component
 const LinkItem = ({ title }) => {
@@ -19,7 +19,15 @@ const LinkItem = ({ title }) => {
 };
 
 // External Links Component
-export function ExternalLinks({staticImages}) {
+export function ExternalLinks() {
+  const staticImages = {
+    girl: ["https://cdn.apptile.io/2299b5c8-77d8-4500-9723-c0ccfe91694d/14ece980-9a1d-4e30-8b19-6a267508bd36/original-480x480.png"],
+    pilgrim: ["https://cdn.apptile.io/2299b5c8-77d8-4500-9723-c0ccfe91694d/c3ab033c-7e9a-419c-b882-eb4fdf5b3ad0/original-480x480.png"],
+    fb: ["https://cdn.apptile.io/2299b5c8-77d8-4500-9723-c0ccfe91694d/17d8fb0d-6391-4660-beb6-9cc691b8e129/original-480x480.png"],
+    insta: ["https://cdn.apptile.io/2299b5c8-77d8-4500-9723-c0ccfe91694d/7aa2d4d8-fbdb-48a1-b9c9-c2329e7555d9/original-480x480.png"],
+    youtube: ["https://cdn.apptile.io/2299b5c8-77d8-4500-9723-c0ccfe91694d/b0826a0a-9185-44fc-9cba-548dd00072c4/original-480x480.png"],
+    linkedin: ["https://cdn.apptile.io/2299b5c8-77d8-4500-9723-c0ccfe91694d/7aa2d4d8-fbdb-48a1-b9c9-c2329e7555d9/original-480x480.png"]
+  };
   // Information links data
   const informationLinks = [
     "Track your order",

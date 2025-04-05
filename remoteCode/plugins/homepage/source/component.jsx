@@ -24,6 +24,8 @@ import BannerCarousel from './BannerCarousel';
 import {PilgrimContext} from '../../../../PilgrimContext';
 import { cheaplyGetShopifyQueryRunner } from '../../../../extractedQueries/selectors';
 import WeeklyPicksSection from './weeklypicks/WeeklyPicksSection';
+import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
+import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 
 async function decayingWait(checkFn) {
   // By the end this will wait upto ~7 seconds
@@ -291,6 +293,18 @@ export function ReactComponent({ model }) {
       type: 'new-launch',
       key: 'new-launch',
       data: [{}]
+    },
+    {
+      title: "Pilgrim Code",
+      type: 'pilgrim-code',
+      key: 'pilgrim-code',
+      data: [{}]
+    },
+    {
+      title: "External links",
+      type: 'external-links',
+      key: 'external-links',
+      data: [{}]
     }
   ];
 
@@ -354,6 +368,14 @@ export function ReactComponent({ model }) {
             data={childrenData.newLaunch}
           />
         );
+      case 'pilgrim-code':
+        return (
+          <PilgrimCode />
+        );
+      case 'external-links':
+        return (
+          <ExternalLinks />
+        )
       default:
         return null;
     }
