@@ -319,7 +319,8 @@ export const fetchVariantBySelectedOptions = async (productHandle, selectedOptio
 };
 
 // Function to fetch only the count of products matching specific filters
-export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, filters = []) => {
+export async function fetchFilteredProductsCount(collectionHandle, filters = []) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
@@ -329,7 +330,13 @@ export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, 
     query FilteredProductsCount($handle: String, $filters: [ProductFilter!], $first: Int!) {
       collection(handle: $handle) {
         id
-        products(filters: $filters, first: $first) ${PRODUCT_CARD_INFO}
+        products(filters: $filters, first: $first) {
+          edges {
+            node {
+              id
+            }
+          }
+        }
       }
     }
   `;

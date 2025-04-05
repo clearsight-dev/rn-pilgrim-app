@@ -14,7 +14,7 @@ import Star from './Star';
 import ProductFlag from './ProductFlag';
 
 function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectShade, onSelectVariant}) {
-  console.log('Rendering relatedproductcard');
+  // console.log('Rendering relatedproductcard');
   const {
     handle,
     title,

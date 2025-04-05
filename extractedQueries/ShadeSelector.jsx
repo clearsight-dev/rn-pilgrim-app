@@ -130,7 +130,6 @@ const ShadeSelector = ({
     if (!selectedShade || !product) return;
     
     const fetchVariantDetails = async () => {
-      debugger
       // Only show loading after 200ms to avoid flicker for cached data
       const loadingTimer = setTimeout(() => {
         setLoadingVariant(true);

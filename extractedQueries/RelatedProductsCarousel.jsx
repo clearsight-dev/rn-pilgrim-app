@@ -44,7 +44,7 @@ function RelatedProductsCarousel({
   onSelectShade = () => {console.log("Handler for select shade not provided")},
   onSelectVariant = () => {console.log("Handler for select variant not provided")},
 }) {
-  console.log('Rendering RelatedProductsCarousel');
+  // console.log('Rendering RelatedProductsCarousel');
   // const {queryRunner, addLineItemToCart} = useShopifyQueryAndAddtoCart();
 
   // Function to fetch product data

@@ -13,6 +13,7 @@ import { ProductCountSkeleton,  ProductGridSkeleton } from './Skeletons';
 import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
 import { fetchProductData } from '../../../../extractedQueries/pdpquery';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
+import {formatProductsForCarousel} from '../../../../extractedQueries/RelatedProductsCarousel';
 import Footer from './Footer';
 import Header from './Header';
 import styles from './styles';
@@ -20,7 +21,7 @@ import styles from './styles';
 export function ReactComponent({ model }) {
   // const collectionHandle = model.get('collectionHandle') || '';
   const route = useRoute();
-  const collectionHandle = route.params?.collectionHandle ?? '3-redensyl-4-anagain-hair-growth-serum';
+  const collectionHandle = route.params?.collectionHandle ?? 'bestsellers';
   const selectedCategory = route.params?.category;
   const selectedSubcategory = route.params?.subcategory;
   const footerRef = useRef(null);
@@ -33,20 +34,15 @@ export function ReactComponent({ model }) {
   const [collectionTitle, setCollectionTitle] = useState('Collection Products');
   const [sortOption, setSortOption] = useState('BEST_SELLING');
   const [sortReverse, setSortReverse] = useState(false);
-  const [pdpData, setPdpData] = useState({});
-  const [loadingPdpData, setLoadingPdpData] = useState(false);
   const [filterData, setFilterData] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
   const [appliedFilters, setAppliedFilters] = useState([]); // Track applied filters separately
   const [filteredProductsCount, setFilteredProductsCount] = useState(0);
   const [isLoadingFilteredCount, setIsLoadingFilteredCount] = useState(false);
   const [isMaxFilteredCount, setIsMaxFilteredCount] = useState(false);
-  const [totalProductsCount, setTotalProductsCount] = useState(0);
+  const [totalProductsCount, setTotalProductsCount] = useState({isMaxCount: false, count: 0});
   const [isLoadingTotalCount, setIsLoadingTotalCount] = useState(false);
-  const [isMaxTotalCount, setIsMaxTotalCount] = useState(false);
   const flatListRef = useRef(null);
-  const currentlyVisibleItems = useRef([]);
-  const visibleItemsTimeoutRef = useRef(null);
   
   // Sort options
   const sortOptions = [
@@ -116,54 +112,7 @@ export function ReactComponent({ model }) {
     return initialFilters;
   }, [selectedCategory, selectedSubcategory, filterData]);
 
-  // Function to fetch PDP data for a specific product handle
-  const fetchProductPdpData = useCallback(async (productHandle) => {
-    if (!shopifyDSModel) return;
-    
-    const queryRunner = shopifyDSModel.get('queryRunner');
-    try {
-      const result = await fetchProductData(queryRunner, productHandle);
-      return result.data;
-    } catch (error) {
-      console.error(`Error fetching PDP data for ${productHandle}:`, error);
-      return null;
-    }
-  }, [shopifyDSModel]);
-  
-  // Function to fetch PDP data for the first 4 products
-  const fetchFirstFourProductsPdpData = useCallback(async (productsList) => {
-    if (!productsList || productsList.length === 0) return;
-    
-    setLoadingPdpData(true);
-    
-    try {
-      // Get the first 4 products (or fewer if there are less than 4)
-      const firstFourProducts = productsList.slice(0, 4);
-      
-      // Create an object to store the PDP data
-      const pdpDataObj = {};
-      
-      // Fetch PDP data for each product
-      await Promise.all(
-        firstFourProducts.map(async (product) => {
-          const data = await fetchProductPdpData(product.handle);
-          if (data) {
-            pdpDataObj[product.handle] = data;
-          }
-        })
-      );
-      
-      // Update the PDP data state
-      setPdpData(pdpDataObj);
-      console.log('Fetched PDP data for first 4 products:', Object.keys(pdpDataObj));
-    } catch (error) {
-      console.error('Error fetching PDP data for first 4 products:', error);
-    } finally {
-      setLoadingPdpData(false);
-    }
-  }, [fetchProductPdpData]);
-
-  const handleSortOptionSelect = (option) => {
+  const handleSortOptionSelect = useCallback((option) => {
     setSortOption(option.value);
     setSortReverse(option.reverse);
     
@@ -175,12 +124,11 @@ export function ReactComponent({ model }) {
     // Reload products with new sort option
     setProducts([]);
     setCurrentCursor(null);
-    setPdpData({});
     fetchData(null, false, option.value, option.reverse);
     
     // Refresh the total count when sort option changes
     fetchTotalProductsCount();
-  };
+  }, [collectionHandle]);
 
   const fetchData = useCallback((cursor = null, isLoadingMore = false, sortKey = sortOption, reverse = sortReverse) => {
     if (isLoadingMore) {
@@ -189,9 +137,7 @@ export function ReactComponent({ model }) {
       setLoading(true);
     }
     
-    const queryRunner = shopifyDSModel?.get('queryRunner');
-    
-    fetchCollectionData(queryRunner, collectionHandle, 12, cursor, sortKey, reverse)
+    fetchCollectionData(collectionHandle, 12, cursor, sortKey, reverse)
       .then(res => {
         // Set collection title
         if (res.data.collection?.title) {
@@ -200,37 +146,12 @@ export function ReactComponent({ model }) {
         
         // Extract products from the collection data
         const productEdges = res.data.collection?.products?.edges || [];
-        const formattedProducts = productEdges.map(edge => {
-          // Find the rating metafield
-          const ratingMetafield = edge.node.metafields?.find(m => m?.key === 'rating');
-          
-          // Parse the rating JSON string if it exists
-          let rating = '4.5'; // Default rating
-          if (ratingMetafield?.value) {
-            try {
-              // Parse the JSON string to get the rating object
-              const ratingData = JSON.parse(ratingMetafield.value);
-              // Extract the actual rating value (assuming it's under a 'value' key)
-              if (ratingData && ratingData.value) {
-                rating = parseFloat(ratingData.value).toFixed(1);
-              }
-            } catch (error) {
-              console.error('Error parsing rating JSON:', error);
-            }
-          }
-          
-          return {
-            handle: edge.node.handle,
-            title: edge.node.title,
-            description: edge.node.description,
-            featuredImage: edge.node.featuredImage,
-            priceRange: edge.node.priceRange,
-            compareAtPriceRange: edge.node.compareAtPriceRange,
-            metafield: edge.node.metafields?.find(m => m?.key === 'product_label_1'),
-            availableForSale: edge.node.availableForSale,
-            rating: rating
-          };
-        });
+        let unformattedProducts = [];
+        for (let i = 0; i < productEdges.length; ++i) {
+          unformattedProducts.push(productEdges[i].node);
+        }
+
+        const formattedProducts = formatProductsForCarousel(unformattedProducts);
         
         if (isLoadingMore) {
           // Append new products to existing ones
@@ -241,11 +162,6 @@ export function ReactComponent({ model }) {
         } else {
           // Replace products with new ones
           setProducts(formattedProducts);
-          
-          // Fetch PDP data for the first 4 products
-          if (formattedProducts.length > 0 && !isLoadingMore) {
-            fetchFirstFourProductsPdpData(formattedProducts);
-          }
         }
         
         // Store filter data if available
@@ -278,7 +194,7 @@ export function ReactComponent({ model }) {
           setLoading(false);
         }
       });
-  }, [collectionHandle, shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData, selectedCategory, selectedSubcategory, createInitialFilters]);
+  }, [collectionHandle, sortOption, sortReverse, selectedCategory, selectedSubcategory, createInitialFilters]);
 
   // Function to convert selected filters to Shopify filter format
   const getShopifyFilters = useCallback(() => {
@@ -384,11 +300,10 @@ export function ReactComponent({ model }) {
     setIsLoadingFilteredCount(true);
     
     try {
-      const queryRunner = shopifyDSModel.get('queryRunner');
       const filters = getShopifyFilters();
       console.log("[AGENT] Fetching filtered count with filters:", filters);
       
-      const result = await fetchFilteredProductsCount(queryRunner, collectionHandle, filters);
+      const result = await fetchFilteredProductsCount(collectionHandle, filters);
       console.log("[AGENT] Filtered count result:", result);
       
       setFilteredProductsCount(result.count);
@@ -398,30 +313,29 @@ export function ReactComponent({ model }) {
     } finally {
       setIsLoadingFilteredCount(false);
     }
-  }, [shopifyDSModel, selectedFilters, getShopifyFilters, collectionHandle]);
+  }, [selectedFilters, getShopifyFilters, collectionHandle]);
   
   // Function to fetch total products count
-  const fetchTotalProductsCount = useCallback(async () => {
-    if (!shopifyDSModel) return;
-    
-    setIsLoadingTotalCount(true);
+  async function fetchTotalProductsCount(collectionHandle) {
+    let timeout = setTimeout(() => {
+      setIsLoadingTotalCount(true);
+    }, 100)
     
     try {
-      const queryRunner = shopifyDSModel.get('queryRunner');
       // Fetch count with no filters
-      const result = await fetchFilteredProductsCount(queryRunner, collectionHandle, []);
-      
-      setTotalProductsCount(result.count);
-      setIsMaxTotalCount(result.isMaxCount);
+      const result = await fetchFilteredProductsCount(collectionHandle, []);
+      console.log("Setting product count", result);
+      setTotalProductsCount(result);
     } catch (error) {
       console.error('Error fetching total products count:', error);
     } finally {
+      clearTimeout(timeout);
       setIsLoadingTotalCount(false);
     }
-  }, [shopifyDSModel, collectionHandle]);
+  }
   
   // Function to apply filters
-  const applyFilters = (newSelectedFilters) => {
+  const applyFilters = useCallback((newSelectedFilters) => {
     // Hide the filter bottom sheet
     if (footerRef.current) {
       footerRef.current.hideFilterBottomSheet();
@@ -436,7 +350,6 @@ export function ReactComponent({ model }) {
     // Reload products with selected filters
     setProducts([]);
     setCurrentCursor(null);
-    setPdpData({});
     
     // Get the Shopify filters format based on the new selected filters
     const shopifyFilters = newSelectedFilters.map(filter => {
@@ -486,7 +399,7 @@ export function ReactComponent({ model }) {
     if (newSelectedFilters.length === 0) {
       fetchTotalProductsCount();
     }
-  };
+  }, [collectionHandle]);
   
   // Function to fetch data with filters
   const fetchDataWithFilters = useCallback((cursor = null, isLoadingMore = false, sortKey = sortOption, reverse = sortReverse, filters = []) => {
@@ -496,9 +409,7 @@ export function ReactComponent({ model }) {
       setLoading(true);
     }
     
-    const queryRunner = shopifyDSModel?.get('queryRunner');
-    
-    fetchCollectionData(queryRunner, collectionHandle, 12, cursor, sortKey, reverse, filters)
+    fetchCollectionData(collectionHandle, 12, cursor, sortKey, reverse, filters)
       .then(res => {
         // Set collection title
         if (res.data.collection?.title) {
@@ -548,11 +459,6 @@ export function ReactComponent({ model }) {
         } else {
           // Replace products with new ones
           setProducts(formattedProducts);
-          
-          // Fetch PDP data for the first 4 products
-          if (formattedProducts.length > 0 && !isLoadingMore) {
-            fetchFirstFourProductsPdpData(formattedProducts);
-          }
         }
         
         // Store filter data if available
@@ -573,7 +479,7 @@ export function ReactComponent({ model }) {
           setLoading(false);
         }
       });
-  }, [collectionHandle, shopifyDSModel, sortOption, sortReverse, fetchFirstFourProductsPdpData]);
+  }, [collectionHandle, sortOption, sortReverse]);
 
   // Update filtered products count when selected filters change
   useEffect(() => {
@@ -581,120 +487,14 @@ export function ReactComponent({ model }) {
     fetchFilteredCount();
   }, [selectedFilters, fetchFilteredCount]);
   
-  // Fetch total products count when component loads
   useEffect(() => {
-    if (shopifyDSModel) {
-      fetchTotalProductsCount();
-    }
-  }, [shopifyDSModel, fetchTotalProductsCount]);
+    fetchData(null);
+  }, [collectionHandle]);
+  
+  useEffect(() => {
+    fetchTotalProductsCount(collectionHandle);
+  }, [collectionHandle]);
 
-  useEffect(() => {
-    if (shopifyDSModel) {
-      fetchData(null);
-    }
-  }, [shopifyDSModel, fetchData, collectionHandle]);
-  
-  // Log when PDP data is loaded
-  useEffect(() => {
-    if (Object.keys(pdpData).length > 0) {
-      console.log('PDP data loaded for products:', Object.keys(pdpData));
-    }
-  }, [pdpData]);
-
-  // Function to process visible items and fetch PDP data
-  const processVisibleItems = useCallback(() => {
-    if (!products || products.length === 0 || loadingPdpData) return;
-    
-    // Get the handles of currently visible products
-    const visibleHandles = currentlyVisibleItems.current;
-    
-    if (visibleHandles.length === 0) return;
-    
-    // Get the products that are currently visible
-    const visibleProducts = products.filter(product => 
-      product && product.handle && visibleHandles.includes(product.handle)
-    );
-    
-    if (visibleProducts.length === 0) return;
-    
-    // Filter out products that already have PDP data
-    const productsToFetch = visibleProducts.filter(product => !pdpData[product.handle]);
-    
-    if (productsToFetch.length === 0) return;
-    
-    console.log('Fetching PDP data for visible products:', productsToFetch.map(p => p.handle));
-    setLoadingPdpData(true);
-    
-    // Create an object to store the PDP data
-    const newPdpDataObj = { ...pdpData };
-    
-    // Fetch PDP data for each product
-    Promise.all(
-      productsToFetch.map(async (product) => {
-        try {
-          const data = await fetchProductPdpData(product.handle);
-          if (data) {
-            newPdpDataObj[product.handle] = data;
-          }
-        } catch (error) {
-          console.error(`Error fetching PDP data for ${product.handle}:`, error);
-        }
-      })
-    )
-    .then(() => {
-      // Update the PDP data state
-      setPdpData(newPdpDataObj);
-      console.log('Fetched PDP data for visible products:', productsToFetch.map(p => p.handle));
-    })
-    .catch(error => {
-      console.error('Error fetching PDP data for visible products:', error);
-    })
-    .finally(() => {
-      setLoadingPdpData(false);
-    });
-  }, [products, pdpData, loadingPdpData, fetchProductPdpData]);
-  
-  // Create a stable reference to the viewable items handler
-  const stableViewableItemsHandler = useRef(null);
-  
-  // Initialize the stable handler
-  useEffect(() => {
-    stableViewableItemsHandler.current = ({ viewableItems }) => {
-      if (viewableItems.length === 0) return;
-      
-      // Update the list of currently visible items
-      currentlyVisibleItems.current = viewableItems
-        .map(viewableItem => viewableItem.item?.handle)
-        .filter(Boolean);
-      
-      // Clear any existing timeout
-      if (visibleItemsTimeoutRef.current) {
-        clearTimeout(visibleItemsTimeoutRef.current);
-      }
-      
-      // Schedule a new timeout to process visible items
-      visibleItemsTimeoutRef.current = setTimeout(() => {
-        processVisibleItems();
-      }, 2000); // 2 seconds debounce
-    };
-  }, [processVisibleItems]);
-  
-  // Stable wrapper function that doesn't change on re-renders
-  const handleViewableItemsChanged = useCallback(info => {
-    if (stableViewableItemsHandler.current) {
-      stableViewableItemsHandler.current(info);
-    }
-  }, []);
-  
-  // Clean up timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (visibleItemsTimeoutRef.current) {
-        clearTimeout(visibleItemsTimeoutRef.current);
-      }
-    };
-  }, []);
-  
   // Handle loading more products when reaching the end of the list
   const handleLoadMore = () => {
     if (hasNextPage && !loadingMore && !loading) {
@@ -738,13 +538,12 @@ export function ReactComponent({ model }) {
     // Reload products with no filters
     setProducts([]);
     setCurrentCursor(null);
-    setPdpData({});
     
     // Fetch data without filters
     fetchData(null, false, sortOption, sortReverse);
     
     // Refresh the total count
-    fetchTotalProductsCount();
+    fetchTotalProductsCount(collectionHandle);
   };
   
   // Function to handle selecting a filter from the header chips
@@ -778,7 +577,7 @@ export function ReactComponent({ model }) {
   };
   
   // Function to handle removing a filter from the header chips
-  const handleFilterRemove = (filterId, valueId) => {
+  const handleFilterRemove = useCallback((filterId, valueId) => {
     // Create a copy of the current applied filters
     const updatedFilters = [...appliedFilters];
     
@@ -814,7 +613,6 @@ export function ReactComponent({ model }) {
         // Reload products with updated filters
         setProducts([]);
         setCurrentCursor(null);
-        setPdpData({});
         
         // Get the Shopify filters format
         const shopifyFilters = getAppliedShopifyFilters();
@@ -824,11 +622,11 @@ export function ReactComponent({ model }) {
         
         // If no filters are applied, refresh the total count
         if (updatedFilters.length === 0) {
-          fetchTotalProductsCount();
+          fetchTotalProductsCount(collectionHandle);
         }
       }
     }
-  };
+  }, [collectionHandle]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -850,7 +648,7 @@ export function ReactComponent({ model }) {
             <ProductCountSkeleton />
           ) : (
             <Text style={styles.productsCount}>
-              {isMaxTotalCount ? '90+ Products' : `${totalProductsCount} Products`}
+              {totalProductsCount.isMaxCount ? '90+ Products' : `${totalProductsCount.count} Products`}
             </Text>
           )
         )}
@@ -884,11 +682,6 @@ export function ReactComponent({ model }) {
           showsVerticalScrollIndicator={false}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5} // Trigger when 30% from the end
-          // onViewableItemsChanged={handleViewableItemsChanged}
-          // viewabilityConfig={{
-          //   itemVisiblePercentThreshold: 50, // Item is considered visible when 50% of it is visible
-          //   minimumViewTime: 300 // Item must be visible for at least 300ms
-          // }}
           ListFooterComponent={renderFooter}
           ListEmptyComponent={
             <Text style={styles.emptyText}>No products found</Text>
@@ -905,8 +698,8 @@ export function ReactComponent({ model }) {
         filterData={filterData}
         selectedFilters={selectedFilters}
         applyFilters={applyFilters}
-        totalProductsCount={totalProductsCount}
-        isMaxTotalCount={isMaxTotalCount}
+        totalProductsCount={totalProductsCount.count}
+        isMaxTotalCount={totalProductsCount.isMaxCount}
       />
     </SafeAreaView>
   );
