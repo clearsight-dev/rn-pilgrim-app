@@ -24,7 +24,8 @@ const Footer = React.forwardRef(({
   selectedFilters,
   applyFilters,
   totalProductsCount,
-  isMaxTotalCount
+  isMaxTotalCount,
+  collectionHandle
 }, ref) => {
   const [editableCopyOfSelectedFilters, setEditableCopyOfSelectedFilters] = useState([]);
   const [activeFilterTab, setActiveFilterTab] = useState(0);
@@ -38,7 +39,6 @@ const Footer = React.forwardRef(({
   
   const filterBottomSheetRef = useRef(null);
   const sortBottomSheetRef = useRef(null);
-  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
 
   // Function to convert selected filters to Shopify filter format
   const getShopifyFilters = (filters) => {
@@ -85,7 +85,7 @@ const Footer = React.forwardRef(({
 
   // Function to fetch filtered products count
   const fetchFilteredCount = async (filters) => {
-    if (!shopifyDSModel || filters.length === 0) {
+    if (filters.length === 0) {
       setFilteredProductsCount({
         state: 'loaded',
         value: 0
@@ -101,10 +101,9 @@ const Footer = React.forwardRef(({
     });
     
     try {
-      const queryRunner = shopifyDSModel.get('queryRunner');
       const shopifyFilters = getShopifyFilters(filters);
       
-      const result = await fetchFilteredProductsCount(queryRunner, "hair-care", shopifyFilters);
+      const result = await fetchFilteredProductsCount(collectionHandle, shopifyFilters);
       
       setFilteredProductsCount({
         state: 'loaded',

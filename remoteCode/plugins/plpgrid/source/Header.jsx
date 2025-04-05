@@ -8,13 +8,13 @@ import {
 } from 'react-native';
 import { Icon } from 'apptile-core';
 
-const Header = ({ 
+function Header({ 
   filterData, 
   selectedFilters, 
   onFilterRemove,
   onFilterSelect,
   onClearAllFilters
-}) => {
+}) {
   // Function to get the label for a filter value
   const getFilterValueLabel = (filterId, valueId) => {
     const filter = filterData.find(f => f.id === filterId);

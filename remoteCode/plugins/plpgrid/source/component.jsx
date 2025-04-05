@@ -70,14 +70,17 @@ export function ReactComponent({ model }) {
   }, [collectionHandle]);
 
   const fetchData = useCallback((cursor = null, isLoadingMore = false, sortKey = sortOption, reverse = sortReverse) => {
-    if (isLoadingMore) {
-      setLoadingMore(true);
-    } else {
-      setLoading(true);
-    }
+    let timeout = setTimeout(() => {
+      if (isLoadingMore) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+    }, 100);
     
-    fetchCollectionData(collectionHandle, 12, cursor, sortKey, reverse)
+    fetchCollectionData(collectionHandle, 100, cursor, sortKey, reverse)
       .then(res => {
+        clearTimeout(timeout);
         // Set collection title
         if (res.data.collection?.title) {
           setCollectionTitle(res.data.collection.title);
@@ -115,6 +118,7 @@ export function ReactComponent({ model }) {
         console.error(err.toString());
       })
       .finally(() => {
+        clearTimeout(timeout);
         if (isLoadingMore) {
           setLoadingMore(false);
         } else {
@@ -415,13 +419,10 @@ export function ReactComponent({ model }) {
   }, [selectedFilters, fetchFilteredCount]);
   
   useEffect(() => {
+    fetchTotalProductsCount(collectionHandle);
     fetchData(null);
   }, [collectionHandle]);
   
-  useEffect(() => {
-    fetchTotalProductsCount(collectionHandle);
-  }, [collectionHandle]);
-
   // Handle loading more products when reaching the end of the list
   const handleLoadMore = () => {
     if (hasNextPage && !loadingMore && !loading) {
@@ -556,7 +557,7 @@ export function ReactComponent({ model }) {
   }, [collectionHandle]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>{collectionTitle}</Text>
       
       <View style={styles.headerContainer}>
@@ -619,6 +620,7 @@ export function ReactComponent({ model }) {
       <Footer 
         ref={footerRef}
         sortOptions={sortOptions}
+        collectionHandle={collectionHandle}
         handleSortOptionSelect={handleSortOptionSelect}
         sortOption={sortOption}
         sortReverse={sortReverse}
@@ -628,7 +630,7 @@ export function ReactComponent({ model }) {
         totalProductsCount={totalProductsCount.count}
         isMaxTotalCount={totalProductsCount.isMaxCount}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
