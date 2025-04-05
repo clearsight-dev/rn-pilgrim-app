@@ -27,52 +27,6 @@ import WeeklyPicksSection from './weeklypicks/WeeklyPicksSection';
 import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 
-async function decayingWait(checkFn) {
-  // By the end this will wait upto ~7 seconds
-  const decayIntervals = [10, 100, 300, 500, 1000, 2000, 3000];
-  let currentInterval = 0;
-  let failure = "";
-  let result = null;
-  let shouldWait = true;
-
-  try {
-    const checkResponse = checkFn();
-    failure = checkResponse.failure;
-    result = checkResponse.result;
-    shouldWait = checkResponse.shouldWait;
-  } catch (err) {
-    failure = "check fn threw an error";
-    console.error("failure in decayWait: ", err);
-  }
-
-  while (shouldWait) {
-    await new Promise((resolve) => {
-      setTimeout(
-        () => {
-          try {
-            const checkResponse = checkFn();
-            failure = checkResponse.failure;
-            result = checkResponse.result;
-            shouldWait = checkResponse.shouldWait;
-          } catch (err) {
-            failure = "check fn threw an error";
-            shouldWait = true;
-            console.error("failure in decayWait: ", err);
-          }
-          resolve({})
-        }, 
-        decayIntervals[currentInterval++]
-      );
-    })
-  }
-  
-  if (failure) {
-    throw new Error(failure);
-  } else {
-    return result;
-  }
-}
-
 async function fetchDataForChipCarousel(collectionHandle) {
   const result = {
     products: [],
@@ -283,37 +237,6 @@ export function ReactComponent({ model }) {
   //   }
   // }, [quickCollectionsData])
 
-  const handleScroll = useCallback(
-    (ev) => {
-      const currentY = ev.nativeEvent.contentOffset.y;
-
-      const delY = currentY - prevScrollY.current;
-
-      // Determine scroll direction
-      const isScrollingDown = delY > 100;
-      const isScrollingUp = delY < -100;
-
-      if (currentY < 80 && pilgrimGlobals.homePageScrolledDown) {
-        console.log("Setting scrollup to show the searchbar because we reached the top");
-        // setPilgrimGlobals((prev) => ({...prev, homePageScrolledDown: false}));
-      } else if (currentY >= 80) {
-        // Update state only if needed
-        if (isScrollingDown && !pilgrimGlobals.homePageScrolledDown) {
-          console.log("Setting scrolldown to hide the searchbar");
-          // setPilgrimGlobals((prev) => ({ ...prev, homePageScrolledDown: true }));
-        } else if (isScrollingUp && pilgrimGlobals.homePageScrolledDown) {
-          console.log("Setting scrollup to show the scrollbar");
-          // setPilgrimGlobals((prev) => ({ ...prev, homePageScrolledDown: false }));
-        }
-      }
-
-      if (Math.abs(delY) > 100) {
-        prevScrollY.current = currentY; 
-      }
-    },
-    [pilgrimGlobals, setPilgrimGlobals]
-  );
-
   // Define sections for SectionList
   const sections = [
     {
@@ -386,26 +309,40 @@ export function ReactComponent({ model }) {
     switch (section.type) {
       case 'quick-collections':
         return (
-          <QuickCollections
-            collections={quickCollectionsData}
-          />
+          <>
+            <QuickCollections
+              collections={quickCollectionsData}
+            />
+            <BannerCarousel 
+              items={imageCarouselImages}
+              screenWidth={screenWidth}
+              onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
+            />
+            <WeeklyPicksSection
+              products={childrenData.newLaunch.products}
+              loading={childrenData.newLaunch.status !== "loaded"}
+              error={childrenData.newLaunch.error}
+            />
+          </>
         );
       case 'banner-carousel':
-        return (
-          <BannerCarousel 
-            items={imageCarouselImages}
-            screenWidth={screenWidth}
-            onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
-          />
-        );
+        return null;
+        // return (
+        //   <BannerCarousel 
+        //     items={imageCarouselImages}
+        //     screenWidth={screenWidth}
+        //     onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
+        //   />
+        // );
       case 'weekly-picks':
-        return (
-          <WeeklyPicksSection
-            products={childrenData.newLaunch.products}
-            loading={childrenData.newLaunch.status !== "loaded"}
-            error={childrenData.newLaunch.error}
-          />
-        );
+        return null;
+        // return (
+        //   <WeeklyPicksSection
+        //     products={childrenData.newLaunch.products}
+        //     loading={childrenData.newLaunch.status !== "loaded"}
+        //     error={childrenData.newLaunch.error}
+        //   />
+        // );
       case 'bestsellers':
         return (
           <ChipCollectionCarousel

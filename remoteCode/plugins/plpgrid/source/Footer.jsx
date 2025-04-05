@@ -335,7 +335,7 @@ const Footer = React.forwardRef(({
       <BottomSheet 
         ref={filterBottomSheetRef}
         title="Filter"
-        sheetHeight={0.7}
+        sheetHeightFraction={0.7}
       >
         <View style={styles.filterBottomSheetContent}>
           <View style={styles.filterOptions}>
@@ -396,7 +396,7 @@ const Footer = React.forwardRef(({
       <BottomSheet 
         ref={sortBottomSheetRef}
         title="Sort By"
-        sheetHeight={0.5}
+        sheetHeightFraction={0.5}
       >
         <View style={styles.bottomSheetContent}>
           {sortOptions.map(renderSortOption)}

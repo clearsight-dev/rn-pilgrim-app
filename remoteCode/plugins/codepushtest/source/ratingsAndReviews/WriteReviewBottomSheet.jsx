@@ -119,7 +119,7 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
     <BottomSheet 
       ref={ref}
       title="Write a Review"
-      sheetHeight={0.7}
+      sheetHeightFraction={0.7}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView style={styles.scrollView}>

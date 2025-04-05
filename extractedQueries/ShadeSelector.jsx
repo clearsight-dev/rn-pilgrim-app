@@ -221,7 +221,7 @@ const ShadeSelector = ({
     <BottomSheet 
       ref={bottomSheetRef}
       title={"Select Shade"}
-      sheetHeight={0.8} // 80% of screen height
+      sheetHeightFraction={0.8} // 80% of screen height
     >
       {product && (
         <View style={styles.bottomSheetContent}>

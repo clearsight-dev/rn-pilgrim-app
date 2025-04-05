@@ -30,7 +30,7 @@ const PhotosBottomSheet = forwardRef(function ({ reviews = [] }, ref) {
     <BottomSheet 
       ref={ref}
       title="Customer Reviews"
-      sheetHeight={0.7}
+      sheetHeightFraction={0.7}
     >
       {renderContent()}
     </BottomSheet>

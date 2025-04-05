@@ -1,5 +1,5 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, StatusBar } from 'react-native';
 import { Portal } from '@gorhom/portal';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useApptileWindowDims } from 'apptile-core';
@@ -7,7 +7,7 @@ import { useApptileWindowDims } from 'apptile-core';
 const BottomSheet = forwardRef(function ({ 
   title = 'Bottom Sheet',
   children,
-  sheetHeight = 0.5, // Default to 50% of screen height
+  sheetHeightFraction = 0.5, // Default to 50% of screen height
 }, ref) {
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
   const [sheetIsRendered, setSheetIsRendered] = useState(false);
@@ -71,12 +71,14 @@ const BottomSheet = forwardRef(function ({
     }
   };
 
+  const containerHeight = screenHeight + (StatusBar.currentHeight || 0);
+
   return (
     <Portal hostName={'root'}>
       <GestureHandlerRootView 
         style={{
           width: screenWidth, 
-          height: screenHeight, 
+          height: containerHeight ,
           position: 'absolute', 
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
         }}
@@ -85,7 +87,7 @@ const BottomSheet = forwardRef(function ({
         <TouchableOpacity
           style={{
             width: screenWidth, 
-            height: (1 - sheetHeight) * screenHeight,
+            height: (1 - sheetHeightFraction) * containerHeight,
             position: 'absolute',
             top: 0,
           }}
@@ -97,7 +99,7 @@ const BottomSheet = forwardRef(function ({
         <Animated.View
           style={{
             width: screenWidth,
-            height: sheetHeight * screenHeight,
+            height: sheetHeightFraction * containerHeight,
             position: 'absolute',
             bottom: 0,
             backgroundColor: 'white',
@@ -108,7 +110,7 @@ const BottomSheet = forwardRef(function ({
                 translateY: Animated.add(
                   sheetVisibility.interpolate({
                     inputRange: [0, 1], 
-                    outputRange: [sheetHeight * screenHeight, 0]
+                    outputRange: [sheetHeightFraction * containerHeight, 0]
                   }),
                   // Only allow positive translation (downward)
                   translateY.interpolate({

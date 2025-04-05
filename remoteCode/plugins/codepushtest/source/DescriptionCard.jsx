@@ -127,7 +127,7 @@ const DescriptionCard = ({ productData, loading }) => {
         <BottomSheet 
           ref={bottomSheetRef}
           title="Full Description"
-          sheetHeight={0.7}
+          sheetHeightFraction={0.7}
         >
           {Platform.OS === 'web' ? (
             <iframe 
