@@ -4,7 +4,7 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
-  SafeAreaView
+  Platform
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useRoute } from '@react-navigation/native';
@@ -24,7 +24,6 @@ export function ReactComponent({ model }) {
   const selectedCategory = route.params?.category;
   const selectedSubcategory = route.params?.subcategory;
   const footerRef = useRef(null);
-  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -78,7 +77,7 @@ export function ReactComponent({ model }) {
       }
     }, 100);
     
-    fetchCollectionData(collectionHandle, 12, cursor, sortKey, reverse)
+    fetchCollectionData(collectionHandle, isLoadingMore ? 20 : 12, cursor, sortKey, reverse)
       .then(res => {
         clearTimeout(timeout);
         // Set collection title
@@ -221,7 +220,7 @@ export function ReactComponent({ model }) {
   const fetchFilteredCount = useCallback(async () => {
     console.log("[AGENT] fetchFilteredCount called with selectedFilters:", selectedFilters);
     
-    if (!shopifyDSModel || selectedFilters.length === 0) {
+    if (selectedFilters.length === 0) {
       console.log("[AGENT] No filters or shopifyDSModel, setting count to 0");
       setFilteredProductsCount(0);
       setIsMaxFilteredCount(false);
@@ -340,7 +339,7 @@ export function ReactComponent({ model }) {
       setLoading(true);
     }
     
-    fetchCollectionData(collectionHandle, 20, cursor, sortKey, reverse, filters)
+    fetchCollectionData(collectionHandle, isLoadingMore ? 20 : 12, cursor, sortKey, reverse, filters)
       .then(res => {
         // Set collection title
         if (res.data.collection?.title) {
@@ -419,8 +418,19 @@ export function ReactComponent({ model }) {
   }, [selectedFilters, fetchFilteredCount]);
   
   useEffect(() => {
-    fetchTotalProductsCount(collectionHandle);
-    fetchData(null);
+    // setTimeout(() => {
+    //   fetchTotalProductsCount(collectionHandle);
+    //   fetchData(null);
+    // }, 50)
+    if (Platform.OS === "android") {
+      setTimeout(() => {
+        fetchTotalProductsCount(collectionHandle);
+        fetchData(null);
+      }, 50);
+    } else {
+      fetchTotalProductsCount(collectionHandle);
+      fetchData(null);
+    }
   }, [collectionHandle]);
   
   // Handle loading more products when reaching the end of the list
