@@ -15,7 +15,7 @@ import {
   useApptileWindowDims 
 } from 'apptile-core';
 import { useSelector, useDispatch } from 'react-redux';
-import { cacheCollectionData, fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
+import { cacheCollectionData, fetchCollectionCarouselData, fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel/index';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
@@ -114,6 +114,14 @@ async function fetchHomepageChipCarouselData() {
   return Promise.all([bestsellersP, makeupP, newLaunchP]);
 }
 
+async function fetchMultiCollectionCarouselData() {
+  console.log("Starting fetch for multicollection carousel");
+  const poreCareP = fetchCollectionCarouselData("pore-care");
+  const hairCareP = fetchCollectionCarouselData("pore-care");
+  const makeupP = fetchCollectionCarouselData("pore-care");
+  return Promise.all([poreCareP, hairCareP, makeupP]);
+}
+
 export function ReactComponent({ model }) {
   const {pilgrimGlobals, setPilgrimGlobals} = useContext(PilgrimContext);
   const prevScrollY = useRef(0);
@@ -144,6 +152,23 @@ export function ReactComponent({ model }) {
       error: ""
     }
   });
+  const [multiCollectionCarouselData, setMultiCollectionCarouselData] = useState({
+    'pore-care': {
+      status: "notstarted",
+      data: {},
+      error: ""
+    },
+    'hair-care': {
+      status: "notstarted",
+      data: {},
+      error: ""
+    },
+    makeup: {
+      status: "notstarted",
+      data: {},
+      error: ""
+    }
+  })
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
@@ -152,9 +177,54 @@ export function ReactComponent({ model }) {
         RNApptile.notifyJSReady();
       }, 50);
     }
+
+    fetchMultiCollectionCarouselData()
+      .then(([poreCare, hairCare, makeup]) => {
+        console.log("Finish loading data for multicollection carousel");
+        setMultiCollectionCarouselData({
+          'pore-care': {
+            status: "loaded",
+            data: poreCare,
+            error: ""
+          },
+          'hair-care': {
+            status: "loaded",
+            data: hairCare,
+            error: ""
+          },
+          makeup: {
+            status: "loaded",
+            data: makeup,
+            error: ""
+          }
+        });
+      })
+      .catch(err => {
+        const errorMessage = "Error: " + err.toString();
+        setMultiCollectionCarouselData(prev => {
+          return {
+            'pore-care': {
+              ...prev.poreCare,
+              status: "error",
+              error: errorMessage
+            },
+            'hair-care': {
+              ...prev.hairCare,
+              status: "error",
+              error: errorMessage
+            },
+            makeup: {
+              ...prev.makeup,
+              status: "error",
+              error: errorMessage
+            }
+          };
+        });
+      })
+
     fetchHomepageChipCarouselData()
       .then(([bestsellers, makeup, newLaunch]) => {
-        console.log("Finishing carousel data fetch for chipcarousels")
+        console.log("Finishing carousel data fetch for chipcarousels");
         setChildrenData({
           bestsellers: {
             status: "loaded",
@@ -350,7 +420,9 @@ export function ReactComponent({ model }) {
         );
       case 'multi-collection':
         return (
-          <MultiCollectionCarousel />
+          <MultiCollectionCarousel 
+            collectionsData={multiCollectionCarouselData}
+          />
         );
       case 'makeup':
         return (

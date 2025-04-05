@@ -41,11 +41,7 @@ function WeeklyPicksSection ({
     // Implement your shade selection logic here
   }, []);
 
-  if (loading) {
-    return null; // Or a loading indicator
-  }
-
-  if (error || !formattedProducts || formattedProducts.length === 0) {
+  if (error || !formattedProducts) {
     return null; // Or an error message
   }
 
@@ -58,6 +54,7 @@ function WeeklyPicksSection ({
         width={width}
         onAddToCart={handleAddToCart}
         onSelectShade={handleSelectShade}
+        loading={loading}
       />
     </View>
   );

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {View, StyleSheet, ActivityIndicator, Text} from 'react-native';
 import CollectionCarouselComponent from './CollectionCarousel';
-import {useSelector, shallowEqual} from 'react-redux';
-import {datasourceTypeModelSel} from 'apptile-core';
 import {fetchCollectionCarouselData} from '../../../../extractedQueries/collectionqueries';
 
 /**
@@ -10,72 +8,12 @@ import {fetchCollectionCarouselData} from '../../../../extractedQueries/collecti
  * for the specified collection handles.
  * Data fetching is now centralized in this component to prevent re-renders in child components.
  */
-export default function MultiCollectionCarousel() {
+export default function MultiCollectionCarousel({collectionsData}) {
   // Collection handles to display
-  const collectionHandles = ['pore-care', 'hair-care', 'makeup'];
-  const [collectionsData, setCollectionsData] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Fetch data for all collections
-  useEffect(() => {
-    console.log("[AGENT] Fetching data for all collections in MultiCollectionCarousel");
-    
-    const fetchAllCollectionsData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch data for all collections in parallel
-        const results = await Promise.all(
-          collectionHandles.map(async (handle) => {
-            try {
-              const result = await fetchCollectionCarouselData(handle);
-              return { handle, data: result, error: null };
-            } catch (err) {
-              console.error(`Error fetching data for collection ${handle}:`, err);
-              return { handle, data: null, error: err.message || 'Failed to load collection data' };
-            }
-          })
-        );
-        
-        // Convert results to an object with collection handles as keys
-        const dataObject = results.reduce((acc, { handle, data, error }) => {
-          acc[handle] = { data, error };
-          return acc;
-        }, {});
-        
-        setCollectionsData(dataObject);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching collections data:', err);
-        setError('Failed to load collections data');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchAllCollectionsData();
-  }, []);
+  const collectionHandles = Object.keys(collectionsData);
 
   console.log("[AGENT] rendering multicollection carousel")
   
-  if (loading) {
-    return (
-      <View style={[styles.container, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color="#00909E" />
-        <Text style={styles.loadingText}>Loading collections...</Text>
-      </View>
-    );
-  }
-  
-  if (error) {
-    return (
-      <View style={[styles.container, styles.errorContainer]}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       {collectionHandles.map((handle) => {

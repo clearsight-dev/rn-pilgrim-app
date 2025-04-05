@@ -13,6 +13,7 @@ function ThreeDProductCarousel({
   width,
   onAddToCart,
   onSelectShade,
+  loading
 }) {
   const gradientColors = [
     { offset: "0%", color: "#D0F3F6", opacity: 0.7 },
@@ -138,13 +139,23 @@ function ThreeDProductCarousel({
                   }
                 ]}
               >
-                <RelatedProductCard 
-                  cardVariant={"large"}
-                  product={item}
-                  onAddToCart={onAddToCart}
-                  onSelectShade={onSelectShade}
-                  style={styles.productCard}
-                />
+                {loading ? (
+                    <View 
+                      style={[
+                        styles.productCard,
+                        {minHeight: 400, backgroundColor: 'white'}
+                      ]}
+                    >
+                    </View>
+                  ): (
+                  <RelatedProductCard 
+                    cardVariant={"large"}
+                    product={item}
+                    onAddToCart={onAddToCart}
+                    onSelectShade={onSelectShade}
+                    style={styles.productCard}
+                  />
+                )}
               </Animated.View>
             );
           }}

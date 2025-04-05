@@ -109,8 +109,6 @@ function CustomTabHeader({navigation, route, options}) {
           height: (FIRST_ROW_HEIGHT + 10),
           flexDirection: "column",
           backgroundColor: "white",
-          // borderWidth: 1, 
-          // borderColor: 'red' 
         },
         // {
         //   shadowColor: '#000',

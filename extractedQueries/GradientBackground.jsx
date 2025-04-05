@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 
@@ -34,15 +34,17 @@ const GradientBackground = ({
     ? { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }
     : { x1: "0%", y1: "0%", x2: "100%", y2: "0%" };
 
+  const handleResize = useCallback((ev) => {
+    const { width, height } = ev.nativeEvent.layout;
+    if (Math.abs(width - dimensions.width) > 20 || Math.abs(height - dimensions.height) > 20) {
+      setDimensions({ width, height });
+    }
+  }, [dimensions]);
+
   return (
     <View 
       style={[{ position: 'relative'}, style]}
-      onLayout={ev => {
-        const { width, height } = ev.nativeEvent.layout;
-        if (Math.abs(width - dimensions.width) > 20 || Math.abs(height - dimensions.height) > 20) {
-          setDimensions({ width, height });
-        }
-      }}
+      onLayout={handleResize}
     >
       {/* SVG Gradient Background */}
       {dimensions.width > 0 && dimensions.height > 0 && (
