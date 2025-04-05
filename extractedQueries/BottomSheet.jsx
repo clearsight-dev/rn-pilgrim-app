@@ -1,5 +1,5 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, StatusBar, Dimensions } from 'react-native';
 import { Portal } from '@gorhom/portal';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useApptileWindowDims } from 'apptile-core';
@@ -14,6 +14,7 @@ const BottomSheet = forwardRef(function ({
   const sheetVisibility = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
 
+  const screenDims = Dimensions.get('screen');
   // Threshold for considering a swipe as dismissal (1/5 of the screen height)
   const SWIPE_THRESHOLD = screenHeight * 0.2;
 
@@ -71,7 +72,7 @@ const BottomSheet = forwardRef(function ({
     }
   };
 
-  const containerHeight = screenHeight + (StatusBar.currentHeight || 0);
+  const containerHeight = screenDims.height;
 
   return (
     <Portal hostName={'root'}>
@@ -81,6 +82,7 @@ const BottomSheet = forwardRef(function ({
           height: containerHeight ,
           position: 'absolute', 
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          top: -(StatusBar.currentHeight || 0)
         }}
       >
         {/* Overlay area with tap to close the sheet */}
@@ -129,6 +131,7 @@ const BottomSheet = forwardRef(function ({
             onHandlerStateChange={onHandlerStateChange}
           >
             <Animated.View>
+              {/* <Text>{screenDims.height}:{containerHeight}:{screenHeight}</Text> */}
               {/* Drag handle */}
               <View style={styles.dragHandleContainer}>
                 <View style={styles.dragHandle} />
