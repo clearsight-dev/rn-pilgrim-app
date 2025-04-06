@@ -13,6 +13,7 @@ import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
  * @param {Object} props.children - Child components to render on top of the gradient
  */
 const GradientBackground = ({ 
+  id,
   style = {}, 
   gradientColors = [], 
   gradientDirection = 'vertical',
@@ -36,10 +37,12 @@ const GradientBackground = ({
 
   const handleResize = useCallback((ev) => {
     const { width, height } = ev.nativeEvent.layout;
+    console.log("handling resize for: ", id, dimensions.height, width)
     if (Math.abs(width - dimensions.width) > 20 || Math.abs(height - dimensions.height) > 20) {
+      console.log("setting: ", width, height)
       setDimensions({ width, height });
     }
-  }, [dimensions]);
+  }, [setDimensions]);
 
   return (
     <View 
@@ -55,7 +58,7 @@ const GradientBackground = ({
             left: 0, 
             bottom: 0, 
             right: 0,
-            zIndex: 0
+            zIndex: 0,
           }} 
           width={dimensions.width}
           height={dimensions.height}
@@ -75,8 +78,8 @@ const GradientBackground = ({
           <Rect
             x="0"
             y="0"
-            width="100%"
-            height="100%"
+            width={dimensions.width}
+            height={dimensions.height}
             rx={borderRadius}
             ry={borderRadius}
             fill="url(#gradient)"

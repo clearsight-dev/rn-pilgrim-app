@@ -4,7 +4,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import Underline from '../../../../extractedQueries/Underline';
@@ -12,6 +11,7 @@ import {useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {navigateToScreen} from 'apptile-core';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
+import {Image} from '../../../../extractedQueries/ImageComponent';
 
 // Subtitles for each collection
 const COLLECTION_SUBTITLES = {
@@ -110,7 +110,7 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
             }}
           />
         </View>
-        <Image
+        {carouselData.coverImage && <Image
           source={{uri: carouselData.coverImage}}
           style={{
             width: 160,
@@ -119,7 +119,7 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
             right: -30,
             bottom: -50,
           }}
-        />
+        />}
       </GradientBackground>
 
       {/* Tab Navigation */}

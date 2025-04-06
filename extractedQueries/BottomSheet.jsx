@@ -1,5 +1,14 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, StatusBar, Dimensions } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Animated, 
+  StatusBar, 
+  Dimensions, 
+  Platform 
+} from 'react-native';
 import { Portal } from '@gorhom/portal';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useApptileWindowDims } from 'apptile-core';
@@ -72,7 +81,10 @@ const BottomSheet = forwardRef(function ({
     }
   };
 
-  const containerHeight = screenDims.height;
+  const containerHeight = Platform.select({
+    web: screenHeight,
+    default: screenDims.height
+  });
 
   return (
     <Portal hostName={'root'}>

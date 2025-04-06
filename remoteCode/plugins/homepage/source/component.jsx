@@ -126,6 +126,7 @@ export function ReactComponent({ model }) {
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
+      console.log("[AGENT] Dismissing splash");
       setTimeout(() => {
         const { RNApptile } = NativeModules;
         RNApptile.notifyJSReady();

@@ -73,6 +73,7 @@ function ThreeDProductCarousel({
 
       {/* Gradient Background for Carousel */}
       <GradientBackground 
+        id="weeklypicks"
         style={styles.carouselContainer} 
         gradientColors={gradientColors}
         gradientDirection="vertical"
