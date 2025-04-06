@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Pressable,
 } from 'react-native';
+import PilgrimCartButton from './PilgrimCartButton';
 import {Image} from './ImageComponent';
 import {navigateToScreen} from 'apptile-core';
 import {useDispatch} from 'react-redux';
@@ -71,39 +72,15 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
     ? 'Choose Variant'
     : 'Add to Cart';
 
-  const cardCTA = (
-    <View
-      style={{
-        paddingHorizontal: 8,
-      }}>
-      <Pressable
-        onPress={e => {
-          e.stopPropagation();
-          if (isSelectShade && onSelectShade) {
-            onSelectShade(product);
-          } else if (isChooseVariant && onSelectVariant) {
-            onSelectVariant(product);
-          } else {
-            addLineItemToCart(product.firstVariantId);
-          }
-        }}
-        style={{
-          height: 33,
-          backgroundColor: '#FACA0C',
-          borderRadius: 8,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: '500',
-          }}>
-          {buttonText}
-        </Text>
-      </Pressable>
-    </View>
-  );
+  const handleButtonPress = (e) => {
+    if (isSelectShade && onSelectShade) {
+      return onSelectShade(product);
+    } else if (isChooseVariant && onSelectVariant) {
+      return onSelectVariant(product);
+    } else {
+      return addLineItemToCart(product.firstVariantId);
+    }
+  };
 
   return (
     <Pressable
@@ -165,7 +142,10 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
           </View>
         </View>
       </View>
-      {cardCTA}
+      <PilgrimCartButton
+        buttonText={buttonText}
+        onPress={handleButtonPress}
+      />
     </Pressable>
   );
 };
