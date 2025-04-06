@@ -10,7 +10,6 @@ import {
   Platform 
 } from 'react-native';
 import { 
-  datasourceTypeModelSel, 
   navigateToScreen, 
   useApptileWindowDims 
 } from 'apptile-core';
@@ -432,6 +431,7 @@ export function ReactComponent({ model }) {
         windowSize={3}
         removeClippedSubviews={Platform.OS !== 'web'}
       />
+
       {/* Shade Selector Modal */}
       <ShadeSelector 
         bottomSheetRef={shadeBottomSheetRef}

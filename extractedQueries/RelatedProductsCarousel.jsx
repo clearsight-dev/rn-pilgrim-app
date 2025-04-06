@@ -117,7 +117,6 @@ function RelatedProductsCarousel({
           <RelatedProductCard
             key={product.handle + index}
             product={product}
-            onAddToCart={product => addLineItemToCart(product.firstVariantId)}
             onSelectShade={onSelectShade}
             onSelectVariant={onSelectVariant}
           />

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
+import React, { memo } from 'react';
 import { 
   View, 
   Text,
@@ -6,30 +6,25 @@ import {
   TouchableOpacity,
   ActivityIndicator
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import { datasourceTypeModelSel, navigateToScreen } from 'apptile-core';
+import { useDispatch } from 'react-redux';
+import { navigateToScreen } from 'apptile-core';
 import { fetchCollectionData } from '../../../../../extractedQueries/collectionqueries';
 import RelatedProductsCarousel, {formatProductsForCarousel} from '../../../../../extractedQueries/RelatedProductsCarousel';
-import { cheaplyGetShopifyQueryRunner, useShopifyQueryAndAddtoCart, useShopifyQueryRunner } from '../../../../../extractedQueries/selectors';
 import Header from '../Header';
-import ShadeSelector from '../../../../../extractedQueries/ShadeSelector';
-import VariantSelector from '../../../../../extractedQueries/VariantSelector';
 
 function ChipCollectionCarousel({ 
   data,
   collectionHandle = 'bestsellers',
   numberOfProducts = 5,
   title,
-  style
+  style,
+  onSelectShade,
+  onSelectVariant
 }) {
   console.log("Rendering chip collection carousel: ", collectionHandle);
-  const shadeBottomSheetRef = useRef(null);
-  const variantBottomSheetRef = useRef(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
   // const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   // const { queryRunner, addLineItemToCart } = useShopifyQueryAndAddtoCart();
-  const addLineItemToCart = () => {};
   // const queryRunner = useShopifyQueryRunner();
   // const [products, setProducts] = useState([]);
   const products = data.products;
@@ -239,18 +234,6 @@ function ChipCollectionCarousel({
     dispatch(navigateToScreen('NewCollection', { collectionHandle }));
   };
   
-  // Handle Select Shade button click
-  const handleSelectShade = (product) => {
-    setSelectedProduct(product);
-    shadeBottomSheetRef.current?.show();
-  };
-  
-  // Handle Choose Variant button click
-  const handleSelectVariant = (product, optionName) => {
-    setSelectedProduct(product);
-    variantBottomSheetRef.current?.show();
-  };
-
   // Format products for the carousel
   const formattedProducts = formatProductsForCarousel(products);
 
@@ -297,25 +280,10 @@ function ChipCollectionCarousel({
           products={formattedProducts}
           // initialProductsToLoad={5}
           style={styles.carousel}
-          onSelectShade={handleSelectShade}
-          onSelectVariant={handleSelectVariant}
+          onSelectShade={onSelectShade}
+          onSelectVariant={onSelectVariant}
         />
       )}
-      
-      {/* Shade Selector Modal */}
-      <ShadeSelector 
-        bottomSheetRef={shadeBottomSheetRef}
-        product={selectedProduct}
-        onAddToCart={addLineItemToCart}
-      />
-      
-      {/* Variant Selector Modal */}
-      <VariantSelector 
-        bottomSheetRef={variantBottomSheetRef}
-        product={selectedProduct}
-        onAddToCart={addLineItemToCart}
-        optionName={"Size"}
-      />
     </View>
   );
 };

@@ -12,6 +12,8 @@ import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../ext
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import {formatProductsForCarousel} from '../../../../extractedQueries/RelatedProductsCarousel';
 import { addLineItemToCart } from '../../../../extractedQueries/selectors';
+import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
+import VariantSelector from '../../../../extractedQueries/VariantSelector';
 import Footer from './Footer';
 import Header from './Header';
 import styles from './styles';
@@ -19,6 +21,9 @@ import styles from './styles';
 export function ReactComponent({ model }) {
   // const collectionHandle = model.get('collectionHandle') || '';
   const route = useRoute();
+  const shadeBottomSheetRef = useRef(null);
+  const variantBottomSheetRef = useRef(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const collectionHandle = route.params?.collectionHandle ?? 'bestsellers';
   const selectedCategory = route.params?.category;
   const selectedSubcategory = route.params?.subcategory;
@@ -40,6 +45,17 @@ export function ReactComponent({ model }) {
   const [totalProductsCount, setTotalProductsCount] = useState({isMaxCount: false, count: 0});
   const [isLoadingTotalCount, setIsLoadingTotalCount] = useState(false);
   const flatListRef = useRef(null);
+
+  const onSelectShade = (product) => {
+    setSelectedProduct(product);
+    shadeBottomSheetRef.current?.show();
+  };
+  
+  // Handle Choose Variant button click
+  const onSelectVariant = (product) => {
+    setSelectedProduct(product);
+    variantBottomSheetRef.current?.show();
+  };
   
   // Sort options
   const sortOptions = [
@@ -450,8 +466,9 @@ export function ReactComponent({ model }) {
   const renderProductItem = ({ item, index }) => (
     <RelatedProductCard 
       product={item}
-      onAddToCart={product => addLineItemToCart(product.firstVariantId)}
       style={styles.productCard}
+      onSelectShade={onSelectShade}
+      onSelectVariant={onSelectVariant}
     />
   );
 
@@ -639,6 +656,18 @@ export function ReactComponent({ model }) {
         applyFilters={applyFilters}
         totalProductsCount={totalProductsCount.count}
         isMaxTotalCount={totalProductsCount.isMaxCount}
+      />
+      {/* Shade Selector Modal */}
+      <ShadeSelector 
+        bottomSheetRef={shadeBottomSheetRef}
+        product={selectedProduct}
+      />
+      
+      {/* Variant Selector Modal */}
+      <VariantSelector 
+        bottomSheetRef={variantBottomSheetRef}
+        product={selectedProduct}
+        optionName={"Size"}
       />
     </View>
   );
