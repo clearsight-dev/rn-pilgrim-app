@@ -520,7 +520,7 @@ const shopifyCartDS = wrapDatasourceModel({
         });
 
         shopifyCheckout.addEventListener('error', event => {
-          logger.info('[Checkout] failure', event);
+          console.log('[Checkout] failure', event);
         });
       }
 

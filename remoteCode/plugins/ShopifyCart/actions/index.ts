@@ -795,7 +795,7 @@ class CartActions {
           });
 
           if (item.quantity > 1 && isFreeProduct) {
-            logger.info('Marker Free Gift Multiple Quantity Detected');
+            console.log('Marker Free Gift Multiple Quantity Detected');
             return true;
           }
 
@@ -814,7 +814,7 @@ class CartActions {
           );
 
           if (isFreeProduct && finalPrice > 0) {
-            logger.info('Marker Free Gift is Added In Full Price');
+            console.log('Marker Free Gift is Added In Full Price');
             return true;
           }
 
@@ -1654,7 +1654,7 @@ class CartActions {
     this.swapCart = cartObject;
 
     if (checkoutUrl && Platform.OS !== 'web' && isCartUpdated) {
-      logger.info('[Preloading checkout url]', checkoutUrl);
+      console.log('[Preloading checkout url]', checkoutUrl);
       shopifyCheckout.preload(checkoutUrl);
     }
   };
@@ -1675,7 +1675,7 @@ class CartActions {
 
     const {doBuyerIdentityUpdate} = params;
     if (_.isBoolean(doBuyerIdentityUpdate) && doBuyerIdentityUpdate) {
-      logger.info('Force updating buyer identity in initiate checkout');
+      console.log('Force updating buyer identity in initiate checkout');
       await this.updateBuyerIdentity(
         dispatch,
         config,
@@ -1733,7 +1733,7 @@ class CartActions {
     }
 
     if (checkoutUrl) {
-      logger.info('[Presenting checkout url]', checkoutUrl);
+      console.log('[Presenting checkout url]', checkoutUrl);
       shopifyCheckout.present(checkoutUrl);
     }
   };

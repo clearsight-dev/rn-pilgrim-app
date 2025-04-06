@@ -2,7 +2,11 @@ import React from 'react';
 import {StyleSheet, Text as TextElement} from 'react-native';
 
 export const ImageZoom = () => {
-  return <TextElement style={styles.textStyles}>This feature can only be seen in mobile devices!</TextElement>;
+  return (
+    <TextElement style={styles.textStyles}>
+      This feature can only be seen in mobile devices!
+    </TextElement>
+  );
 };
 
 const styles = StyleSheet.create({

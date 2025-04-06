@@ -42,7 +42,7 @@ class FreeGiftsActions {
     const freeGiftConfig = model?.get('config') || {};
 
     if (_.isEmpty(freeGiftConfig)) {
-      logger.error('Please define free gift config');
+      console.error('Please define free gift config');
       return {
         giftsToAdd: [],
         giftsToRemove: [],
