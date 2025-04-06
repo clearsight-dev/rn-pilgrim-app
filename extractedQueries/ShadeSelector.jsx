@@ -13,11 +13,13 @@ import BottomSheet from './BottomSheet';
 import { colorSwatches, imageSwatches } from './colorswatchinfo';
 import { fetchProductOptions, fetchVariantBySelectedOptions } from './collectionqueries';
 import {addLineItemToCart} from './selectors';
+import PilgrimCartButton from './PilgrimCartButton';
 
-const ShadeSelector = ({ 
+function ShadeSelector({ 
   bottomSheetRef, 
   product, 
-}) => {
+  onClose
+}) {
   const [selectedShade, setSelectedShade] = useState(null);
   const [shades, setShades] = useState([]);
   const [selectedVariantId, setSelectedVariantId] = useState(null);
@@ -167,9 +169,13 @@ const ShadeSelector = ({
   }, [selectedShade, product]);
 
   const handleAddToCart = () => {
-    if (selectedVariantId) {
-      addLineItemToCart(selectedVariantId);
-    }
+    return new Promise((resolve, reject) => {
+      if (selectedVariantId) {
+        resolve(addLineItemToCart(selectedVariantId));
+      } else {
+        reject(new Error("Cannot add to cart because there is no selected variant"));
+      }
+    });
   };
 
   // Render a shade item
@@ -220,6 +226,10 @@ const ShadeSelector = ({
       ref={bottomSheetRef}
       title={"Select Shade"}
       sheetHeightFraction={0.8} // 80% of screen height
+      onClose={() => {
+        setSelectedShade(null);
+        onClose();
+      }}
     >
       {product && (
         <View style={styles.bottomSheetContent}>
@@ -279,17 +289,12 @@ const ShadeSelector = ({
           />
           
           {/* Add to Cart Button */}
-          <Pressable 
-            style={[
-              styles.addToCartButton,
-              !selectedShade && styles.addToCartButtonDisabled
-            ]}
+          <PilgrimCartButton 
+            buttonText={selectedShade ? "Add to Cart" : "Select a Shade"}
             onPress={handleAddToCart}
-          >
-            <Text style={styles.addToCartText}>
-              {selectedShade ? "Add to Cart" : "Select a Shade"}
-            </Text>
-          </Pressable>
+            disabled={!selectedShade}
+            variant='large'
+          />
         </View>
       )}
     </BottomSheet>
@@ -398,9 +403,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
     marginBottom: 24,
-  },
-  addToCartButtonDisabled: {
-    backgroundColor: '#F0F0F0',
   },
   addToCartText: {
     fontSize: 16,

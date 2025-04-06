@@ -14,6 +14,8 @@ function PilgrimCartButton({
   style,
   textStyle,
   containerStyle,
+  disabled = false,
+  variant = "regular"
 }) {
   // State to track if we're in loading state
   const [isLoading, setIsLoading] = useState(false);
@@ -76,6 +78,10 @@ function PilgrimCartButton({
 
   const handlePress = async (e) => {
     e.stopPropagation();
+
+    if (disabled) {
+      return;
+    }
     
     // If already loading, just restart the animation but don't call onPress again
     if (isLoading) {
@@ -151,13 +157,18 @@ function PilgrimCartButton({
   });
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={[
+      styles.container, 
+      containerStyle, 
+    ]}>
       <Pressable
         onPress={handlePress}
         style={({ pressed }) => [
           styles.button,
+          (variant === "large") && styles.buttonLarge,
           style,
-          pressed && !isLoading && styles.buttonPressed
+          pressed && !isLoading && styles.buttonPressed,
+          (disabled && styles.buttonDisabled)
         ]}>
         {/* Progress bar overlay */}
         {isLoading && !showActivityIndicator && (
@@ -173,6 +184,7 @@ function PilgrimCartButton({
         <Text 
           style={[
             styles.buttonText, 
+            (variant === "large") && styles.buttonLargeText,
             textStyle
           ]}
         >
@@ -203,6 +215,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden', // Important for the progress bar to be contained
     position: 'relative', // For positioning the activity indicator
   },
+  buttonLarge: {
+    height: 48
+  },
   buttonPressed: {
     // Inset shadow effect when pressed
     backgroundColor: '#af8f0f',
@@ -212,6 +227,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     zIndex: 2, // Ensure text is above the progress bar
+  },
+  buttonLargeText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333333',
   },
   progressBar: {
     position: 'absolute',
@@ -227,6 +247,9 @@ const styles = StyleSheet.create({
     right: 5,
     zIndex: 3,
   },
+  buttonDisabled: {
+    backgroundColor: '#F0F0F0'
+  }
 });
 
 export default PilgrimCartButton;

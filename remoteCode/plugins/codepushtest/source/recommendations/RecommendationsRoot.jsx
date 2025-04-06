@@ -97,11 +97,13 @@ function RecommendationsRoot({
       <ShadeSelector 
         bottomSheetRef={bottomSheetRef}
         product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
       />
       <VariantSelector
         product={selectedProduct}
         optionName={"Size"}
         bottomSheetRef={variantSelectorRef}
+        onClose={() => setSelectedProduct(null)}
       />
     </View>
   );

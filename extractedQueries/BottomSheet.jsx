@@ -17,6 +17,7 @@ const BottomSheet = forwardRef(function ({
   title = 'Bottom Sheet',
   children,
   sheetHeightFraction = 0.5, // Default to 50% of screen height
+  onClose = () => {}
 }, ref) {
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
   const [sheetIsRendered, setSheetIsRendered] = useState(false);
@@ -35,6 +36,7 @@ const BottomSheet = forwardRef(function ({
     }).start(finished => {
       if (finished) {
         setSheetIsRendered(false);
+        onClose();
       }
     });
   }

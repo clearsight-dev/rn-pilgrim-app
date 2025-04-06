@@ -436,6 +436,7 @@ export function ReactComponent({ model }) {
       <ShadeSelector 
         bottomSheetRef={shadeBottomSheetRef}
         product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
       />
       
       {/* Variant Selector Modal */}
@@ -443,6 +444,7 @@ export function ReactComponent({ model }) {
         bottomSheetRef={variantBottomSheetRef}
         product={selectedProduct}
         optionName={"Size"}
+        onClose={() => setSelectedProduct(null)}
       />
     </>
   );

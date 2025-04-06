@@ -13,11 +13,13 @@ import BottomSheet from './BottomSheet';
 import { fetchProductOptions, fetchVariantBySelectedOptions } from './collectionqueries';
 import VariantCard from './VariantCard';
 import {addLineItemToCart} from './selectors';
+import PilgrimCartButton from './PilgrimCartButton';
 
 function VariantSelector({ 
   bottomSheetRef, 
   product, 
-  optionName
+  optionName,
+  onClose
 }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [variants, setVariants] = useState([]);
@@ -154,10 +156,13 @@ function VariantSelector({
   }, [selectedVariant, product, optionName]);
 
   const handleAddToCart = () => {
-    if (selectedVariantId) {
-      addLineItemToCart(selectedVariantId);
-      // Don't hide the modal or reset the selection
-    }
+    return new Promise((resolve, reject) => {
+      if (selectedVariantId) {
+        resolve(addLineItemToCart(selectedVariantId));
+      } else {
+        reject(new Error("Cannot add to cart because there is no selected variant"));
+      }
+    });
   };
 
   // Render a variant item
@@ -181,6 +186,10 @@ function VariantSelector({
       ref={bottomSheetRef}
       title={`Select ${optionName}`}
       sheetHeightFraction={0.8} // 80% of screen height
+      onClose={() => {
+        setSelectedVariant(null);
+        onClose();
+      }}
     >
       {product && (
         <View style={styles.bottomSheetContent}>
@@ -240,17 +249,12 @@ function VariantSelector({
           />
           
           {/* Add to Cart Button */}
-          <Pressable 
-            style={[
-              styles.addToCartButton,
-              !selectedVariant && styles.addToCartButtonDisabled
-            ]}
+          <PilgrimCartButton 
+            buttonText={selectedVariant ? "Add to Cart" : "Choose a variant"}
             onPress={handleAddToCart}
-          >
-            <Text style={styles.addToCartText}>
-              {selectedVariant ? "Add to Cart" : `Select a ${optionName}`}
-            </Text>
-          </Pressable>
+            disabled={!selectedVariant}
+            variant='large'
+          />
         </View>
       )}
     </BottomSheet>

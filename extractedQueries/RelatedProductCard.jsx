@@ -3,8 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
   Pressable,
 } from 'react-native';
 import PilgrimCartButton from './PilgrimCartButton';
