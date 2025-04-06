@@ -78,95 +78,50 @@ const queryRunnerSelector = createSelector(
   }
 )
 
-export function useShopifyQueryRunner() {
-  const queryRunner = useSelector(queryRunnerSelector, shallowEqual);
-  console.log("Query runner: ", queryRunner);
-  return queryRunner;
+// This one will only look at the store when the add to cart is triggered 
+// instead of trying to update what the function does reactively. This is 
+// probably cheaper than incurring the cost of constantly updating the 
+// addToCart function in every component as the store updates.
+export async function addLineItemToCart(productId) {
+  console.log("adding item to cart: ", productId)
+  const state = store.getState();
+  const globalPluginConfigs = globalPluginsSelector(state);
+  const appConfig = selectAppConfig(state);
+  const appModel = selectAppModel(state);
+  const shopifyCartDSModel = datasourceTypeModelSel(state, 'shopifyCart');
+  const addCartLineItem = shopifyCartDSModel?.get('addCartLineItem');
+  if (addCartLineItem) {
+    return addCartLineItem(
+      store.dispatch,
+      globalPluginConfigs.get('shopifyCart'),
+      shopifyCartDSModel,
+      ['shopifyCart'],
+      {
+        quantity: 1,
+        merchandiseId: productId,
+        syncWithShopify: true,
+        successToastText: 'Item added to cart'
+      },
+      appConfig,
+      appModel
+    )
+  } else {
+    console.error("Could not add item to cart because model did not return addCartLineItem function");
+  } 
 }
 
-export function useShopifyQueryAndAddtoCart() {
-  const dispatch = useDispatch();
-  const globalPluginsConfigs = useSelector(globalPluginsSelector);
-  const appConfig = useSelector(selectAppConfig);
-  const appModel = useSelector(selectAppModel);
-
-  const results = useSelector(state => {
-    const shopifyDSModel = datasourceTypeModelSel(state, 'shopifyV_22_10');
-    const shopifyCartDSModel = datasourceTypeModelSel(state, 'shopifyCart');
-    const queryRunner = shopifyDSModel?.get('queryRunner');
-    
-    const addCartLineItem = shopifyCartDSModel?.get('addCartLineItem');
-
-    let addLineItemToCart = () => console.error("Cannot add to cart yet!");
-    if (addCartLineItem) {
-      addLineItemToCart = async (productId) => {
-        return addCartLineItem(
-          dispatch, 
-          globalPluginsConfigs.get('shopifyCart'),
-          shopifyCartDSModel,
-          ['shopifyCart'],
-          {
-            quantity: 1,
-            merchandiseId: productId,
-            syncWithShopify: true, 
-            successToastText: '', 
-          },
-          appConfig,
-          appModel
-        )
-        .then(() => {
-          console.log("Added to cart!");
-        })
-        .catch(err => {
-          console.error("Failed to add to cart!", err);
-        });
-      };
-    }
-
-    return {queryRunner, addLineItemToCart};
-  }, shallowEqual);
-  return results;
-}
-
-export function useCartIconData() {
-  const dispatch = useDispatch();
-  const globalPluginsConfigs = useSelector(globalPluginsSelector);
-  const appConfig = useSelector(selectAppConfig);
-  const appModel = useSelector(selectAppModel);
-
-  const result = useSelector(state => {
+const quantitySelector = createSelector(
+  state => datasourceTypeModelSel(state, "shopifyCart"),
+  (shopifyCart) => {
     let numCurrentCartItems = 0;
-    let clearCart = async () => console.log("Cannot clear the cart yet!");
-
-    const shopifyDS = datasourceTypeModelSel(state, "shopifyCart");
-    const cartLineCache = shopifyDS?.get('cartLineCache');;
-
-    if (cartLineCache && !cartLineCache.then && typeof cartLineCache === "object") {
-      numCurrentCartItems = Object.keys(cartLineCache).length || 0;
-    //   const clearCartAction = shopifyDS?.get('clearCart')
-    //   if (clearCartAction) {
-    //     clearCart = async () => {
-    //       return clearCartAction(
-    //         dispatch, 
-    //         globalPluginsConfigs.get('shopifyCart'),
-    //         shopifyDS,
-    //         ['shopifyCart'],
-    //         {},
-    //         appConfig,
-    //         appModel
-    //       )
-    //       .then(() => {
-    //         console.log("Added to cart!");
-    //       })
-    //       .catch(err => {
-    //         console.error("Failed to add to cart!", err);
-    //       });
-    //     };
-    //   }
+    if (shopifyCart && shopifyCart.get && shopifyCart.get.call) {
+      numCurrentCartItems = shopifyCart.get("currentCart")?.totalQuantity ?? 0;
     }
+    return numCurrentCartItems;
+  }
+);
 
-    return {numCurrentCartItems, clearCart};
-  })
-  
-  return result;
+export function useCartQuantity() {
+  const numCurrentCartItems = useSelector(quantitySelector, shallowEqual);
+  return numCurrentCartItems;
 }

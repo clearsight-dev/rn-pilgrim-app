@@ -8,6 +8,7 @@ import {
   useStartApptile,
   ApolloQueryRunner
 } from 'apptile-core';
+import {NativeModules} from 'react-native';
 
 import JSSplash from './components/JSSplash';
 import UpdateModal from './components/UpdateModal';
@@ -20,6 +21,8 @@ export type ScreenParams = {
   NativeUtils: { appId: string };
   AdminPage: { appId: string };
 };
+
+// const {RNApptile} = NativeModules;
 
 // Import the generated code. The folder analytics is generated when you run the app.
 import { init as initAnalytics } from './analytics';
@@ -76,7 +79,7 @@ function App(): React.JSX.Element {
         }}
       >
         {body}
-        {(!status.modelReady) && <JSSplash/>}
+        {/* {(!status.modelReady) && <JSSplash/>} */}
       </ApptileWrapper>
     </PilgrimContext.Provider>
   );

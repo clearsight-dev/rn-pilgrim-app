@@ -2,7 +2,7 @@ import React, {useEffect, useState, useCallback, useRef} from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
 import {fetchProductData} from './pdpquery';
 import RelatedProductCard from './RelatedProductCard';
-import {useShopifyQueryAndAddtoCart} from './selectors';
+import {addLineItemToCart} from './selectors';
 
 export function formatProductsForCarousel(products) {
   if (!products || !Array.isArray(products)) return [];
@@ -70,18 +70,18 @@ function RelatedProductsCarousel({
   //   }
   // }
 
-  const handleAddToCart = useCallback(
-    product => {
-      console.log('Adding product: ', product);
-      // if (addLineItemToCart) {
-      //   addLineItemToCart(product.firstVariantId);
-      // } else {
-      //   console.error('no function found for adding to cart!');
-      // }
-    },
-    // [addLineItemToCart],
-    []
-  );
+  // const handleAddToCart = useCallback(
+  //   product => {
+  //     console.log('Adding product: ', product);
+  //     // if (addLineItemToCart) {
+  //     //   addLineItemToCart(product.firstVariantId);
+  //     // } else {
+  //     //   console.error('no function found for adding to cart!');
+  //     // }
+  //   },
+  //   // [addLineItemToCart],
+  //   []
+  // );
 
   // Initialize with the specified number of products
   // useEffect(() => {
@@ -118,7 +118,7 @@ function RelatedProductsCarousel({
           <RelatedProductCard
             key={product.handle + index}
             product={product}
-            onAddToCart={handleAddToCart}
+            onAddToCart={product => addLineItemToCart(product.firstVariantId)}
             onSelectShade={onSelectShade}
             onSelectVariant={onSelectVariant}
           />

@@ -37,9 +37,7 @@ const GradientBackground = ({
 
   const handleResize = useCallback((ev) => {
     const { width, height } = ev.nativeEvent.layout;
-    console.log("handling resize for: ", id, dimensions.height, width)
     if (Math.abs(width - dimensions.width) > 20 || Math.abs(height - dimensions.height) > 20) {
-      console.log("setting: ", width, height)
       setDimensions({ width, height });
     }
   }, [setDimensions]);

@@ -14,7 +14,8 @@ import {useSelector, shallowEqual} from 'react-redux';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Image} from '../../../../extractedQueries/ImageComponent';
 import {PilgrimContext} from '../../../../PilgrimContext';
-import {useCartIconData} from '../../../../extractedQueries/selectors';
+// import {useCartIconData} from '../../../../extractedQueries/selectors';
+import { useCartQuantity } from '../../../../extractedQueries/selectors';
 import {
   createScreenFromConfig, 
   createNavigatorsFromConfig, 
@@ -186,7 +187,12 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
             <Icon iconType="MaterialIcons" name="local-shipping" size={24} color="#333" />
           </Pressable>
           
-          <Pressable style={styles.iconContainer}>
+          <Pressable 
+            style={styles.iconContainer}
+            onPress={() => {
+              navigation.navigate('Cart');
+            }}
+          >
             <Icon iconType="MaterialIcons" name="shopping-cart" size={24} color="#333" />
             {numCartItems ? (
               <View style={styles.badge}>
@@ -237,7 +243,7 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
 
 function CustomHeaderSmart({route, navigation}) {
   const insets = useSafeAreaInsets();
-  // const {numCurrentCartItems} = useCartIconData();
+  const numCurrentCartItems = useCartQuantity();
   const {pilgrimGlobals} = useContext(PilgrimContext);
   const headerComponent = useRef(null);
 
@@ -265,7 +271,7 @@ function CustomHeaderSmart({route, navigation}) {
     <CustomHeader
       navigation={navigation}
       topInset={insets?.top ?? 0}
-      numCartItems={0}
+      numCartItems={numCurrentCartItems}
       showBackbutton={route.name !== "Nav1"}
       ref={headerComponent}
     />
