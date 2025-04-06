@@ -12,8 +12,9 @@ import {navigateToScreen} from 'apptile-core';
 import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
+import {addLineItemToCart} from './selectors';
 
-function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectShade, onSelectVariant}) {
+function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelectVariant}) {
   const {
     handle,
     title,
@@ -26,7 +27,7 @@ function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectS
     productLabel1,
     productLabel2,
     weight,
-    weightUnit
+    weightUnit,
   } = product;
 
   // Calculate discount percentage if compareAtPrice exists
@@ -83,7 +84,7 @@ function RelatedProductCard({product, style, cardVariant, onAddToCart, onSelectS
           } else if (isChooseVariant && onSelectVariant) {
             onSelectVariant(product);
           } else {
-            onAddToCart(product);
+            addLineItemToCart(product.firstVariantId);
           }
         }}
         style={{

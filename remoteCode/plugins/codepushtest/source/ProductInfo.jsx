@@ -15,7 +15,7 @@ const ProductInfo = ({
   setSelectedVariant 
 }) => {
   // Enhanced variant selector component using the new VariantCard
-  const VariantSelector = ({ variants, selectedIndex, onSelect }) => {
+  const InlineVariantSelector = ({ variants, selectedIndex, onSelect }) => {
     // Determine which variants should show the timer
     // For this example, we'll show the timer on the first variant only
     const shouldShowTimer = (index) => index === 0;
@@ -116,7 +116,7 @@ const ProductInfo = ({
       </View>
       
       {/* Variant Selector */}
-      <VariantSelector 
+      <InlineVariantSelector 
         variants={variantOptions} 
         selectedIndex={selectedVariant} 
         onSelect={setSelectedVariant} 

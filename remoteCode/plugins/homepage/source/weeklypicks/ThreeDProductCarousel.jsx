@@ -11,8 +11,8 @@ function ThreeDProductCarousel({
   itemWidth, 
   spacing, 
   width,
-  onAddToCart,
   onSelectShade,
+  onSelectVariant,
   loading
 }) {
   const gradientColors = [
@@ -152,8 +152,8 @@ function ThreeDProductCarousel({
                   <RelatedProductCard 
                     cardVariant={"large"}
                     product={item}
-                    onAddToCart={onAddToCart}
                     onSelectShade={onSelectShade}
+                    onSelectVariant={onSelectVariant}
                     style={styles.productCard}
                   />
                 )}

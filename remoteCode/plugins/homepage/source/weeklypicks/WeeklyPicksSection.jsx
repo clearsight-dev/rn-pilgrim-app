@@ -3,7 +3,6 @@ import { View, StyleSheet } from 'react-native';
 import { useApptileWindowDims } from 'apptile-core';
 import ThreeDProductCarousel from './ThreeDProductCarousel';
 import { formatProductsForCarousel } from '../../../../../extractedQueries/RelatedProductsCarousel';
-import { addLineItemToCart } from '../../../../../extractedQueries/selectors';
 
 /**
  * WeeklyPicksSection - A component that displays a 3D carousel of product recommendations
@@ -20,7 +19,9 @@ function WeeklyPicksSection ({
   loading = false,
   error = null,
   cardWidthPercentage = 70,
-  cardSpacing = 10
+  cardSpacing = 10,
+  onSelectShade,
+  onSelectVariant
 }) {
   const { width } = useApptileWindowDims();
   
@@ -30,17 +31,6 @@ function WeeklyPicksSection ({
 
   // Format products for the carousel
   const formattedProducts = formatProductsForCarousel(products);
-
-  // Handlers for product interactions
-  const handleAddToCart = useCallback((product) => {
-    console.log('Adding to cart:', product.title);
-    // Implement your add to cart logic here
-  }, []);
-
-  const handleSelectShade = useCallback((product) => {
-    console.log('Selecting shade for:', product.title);
-    // Implement your shade selection logic here
-  }, []);
 
   if (error || !formattedProducts) {
     return null; // Or an error message
@@ -53,8 +43,8 @@ function WeeklyPicksSection ({
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}
         width={width}
-        onAddToCart={product => addLineItemToCart(product.firstVariantId)}
-        onSelectShade={handleSelectShade}
+        onSelectShade={onSelectShade}
+        onSelectVariant={onSelectVariant}
         loading={loading}
       />
     </View>

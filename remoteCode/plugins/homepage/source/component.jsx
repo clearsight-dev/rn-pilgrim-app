@@ -14,18 +14,19 @@ import {
   navigateToScreen, 
   useApptileWindowDims 
 } from 'apptile-core';
-import { useSelector, useDispatch } from 'react-redux';
-import { cacheCollectionData, fetchCollectionCarouselData, fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
+import { useDispatch } from 'react-redux';
+import { fetchCollectionCarouselData, fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel/index';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
 import BannerCarousel from './BannerCarousel';
-import {PilgrimContext} from '../../../../PilgrimContext';
-import { cheaplyGetShopifyQueryRunner } from '../../../../extractedQueries/selectors';
+// import {PilgrimContext} from '../../../../PilgrimContext';
 import WeeklyPicksSection from './weeklypicks/WeeklyPicksSection';
 import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
+import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
+import VariantSelector from '../../../../extractedQueries/VariantSelector';
 
 async function fetchDataForChipCarousel(collectionHandle) {
   const result = {
@@ -77,8 +78,11 @@ async function fetchMultiCollectionCarouselData() {
 }
 
 export function ReactComponent({ model }) {
-  const {pilgrimGlobals, setPilgrimGlobals} = useContext(PilgrimContext);
-  const prevScrollY = useRef(0);
+  // const {pilgrimGlobals, setPilgrimGlobals} = useContext(PilgrimContext);
+  // const prevScrollY = useRef(0);
+  const shadeBottomSheetRef = useRef(null);
+  const variantBottomSheetRef = useRef(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const dispatch = useDispatch();
   // Get collection handle and number of products from model props or use defaults
   const numberOfProducts = 5;
@@ -225,6 +229,17 @@ export function ReactComponent({ model }) {
         })
       })
   }, []);
+
+  const onSelectShade = (product) => {
+    setSelectedProduct(product);
+    shadeBottomSheetRef.current?.show();
+  };
+  
+  // Handle Choose Variant button click
+  const onSelectVariant = (product) => {
+    setSelectedProduct(product);
+    variantBottomSheetRef.current?.show();
+  };
   // const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
 
   // useEffect(() => {
@@ -323,6 +338,8 @@ export function ReactComponent({ model }) {
               products={childrenData.newLaunch.products}
               loading={childrenData.newLaunch.status !== "loaded"}
               error={childrenData.newLaunch.error}
+              onSelectShade={onSelectShade}
+              onSelectVariant={onSelectVariant}
             />
           </>
         );
@@ -350,6 +367,8 @@ export function ReactComponent({ model }) {
             collectionHandle={'bestsellers'}
             numberOfProducts={numberOfProducts}
             data={childrenData.bestsellers}
+            onSelectShade={onSelectShade}
+            onSelectVariant={onSelectVariant}
           />
         );
       case 'celeb-picks':
@@ -368,6 +387,8 @@ export function ReactComponent({ model }) {
             collectionHandle={'makeup'}
             numberOfProducts={numberOfProducts}
             data={childrenData.makeup}
+            onSelectShade={onSelectShade}
+            onSelectVariant={onSelectVariant}
           />
         );
       case 'new-launch':
@@ -376,6 +397,8 @@ export function ReactComponent({ model }) {
             collectionHandle={'new-launch'}
             numberOfProducts={numberOfProducts}
             data={childrenData.newLaunch}
+            onSelectShade={onSelectShade}
+            onSelectVariant={onSelectVariant}
           />
         );
       case 'pilgrim-code':
@@ -392,22 +415,36 @@ export function ReactComponent({ model }) {
   };
 
   return (
-    <SectionList
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      sections={sections}
-      renderItem={renderItem}
-      renderSectionHeader={renderSectionHeader}
-      keyExtractor={(item, index) => index.toString()}
-      stickySectionHeadersEnabled={false}
-      showsVerticalScrollIndicator={true}
-      // onScroll={handleScroll}
-      scrollEventThrottle={50}
-      initialNumToRender={3}
-      maxToRenderPerBatch={3}
-      windowSize={3}
-      removeClippedSubviews={Platform.OS !== 'web'}
-    />
+    <>
+      <SectionList
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        sections={sections}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        keyExtractor={(item, index) => index.toString()}
+        stickySectionHeadersEnabled={false}
+        showsVerticalScrollIndicator={true}
+        // onScroll={handleScroll}
+        scrollEventThrottle={50}
+        initialNumToRender={3}
+        maxToRenderPerBatch={3}
+        windowSize={3}
+        removeClippedSubviews={Platform.OS !== 'web'}
+      />
+      {/* Shade Selector Modal */}
+      <ShadeSelector 
+        bottomSheetRef={shadeBottomSheetRef}
+        product={selectedProduct}
+      />
+      
+      {/* Variant Selector Modal */}
+      <VariantSelector 
+        bottomSheetRef={variantBottomSheetRef}
+        product={selectedProduct}
+        optionName={"Size"}
+      />
+    </>
   );
 }
 

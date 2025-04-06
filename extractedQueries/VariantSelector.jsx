@@ -8,16 +8,15 @@ import {
   Image,
   ActivityIndicator
 } from 'react-native';
-import { useSelector } from 'react-redux';
-import { datasourceTypeModelSel, useApptileWindowDims, Icon } from 'apptile-core';
+import { useApptileWindowDims } from 'apptile-core';
 import BottomSheet from './BottomSheet';
 import { fetchProductOptions, fetchVariantBySelectedOptions } from './collectionqueries';
 import VariantCard from './VariantCard';
+import {addLineItemToCart} from './selectors';
 
 function VariantSelector({ 
   bottomSheetRef, 
   product, 
-  onAddToCart,
   optionName
 }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -155,8 +154,8 @@ function VariantSelector({
   }, [selectedVariant, product, optionName]);
 
   const handleAddToCart = () => {
-    if (selectedVariantId && onAddToCart) {
-      onAddToCart(selectedVariantId);
+    if (selectedVariantId) {
+      addLineItemToCart(selectedVariantId);
       // Don't hide the modal or reset the selection
     }
   };

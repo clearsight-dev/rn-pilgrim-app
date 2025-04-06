@@ -7,6 +7,7 @@ import {
 import RelatedProductsCarousel, {formatProductsForCarousel} from '../../../../../extractedQueries/RelatedProductsCarousel';
 import ShadeSelector from '../../../../../extractedQueries/ShadeSelector';
 import FrequentlyBoughtTogether from './FrequentlyBoughtTogether';
+import VariantSelector from '../../../../../extractedQueries/VariantSelector';
 
 function RecommendationsRoot({ 
   loading, 
@@ -17,12 +18,19 @@ function RecommendationsRoot({
   }
 }) {
   const bottomSheetRef = useRef(null);
+  const variantSelectorRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleSelectShade = (product) => {
     setSelectedProduct(product);
     bottomSheetRef.current?.show();
   };
+
+  const handleSelectVariant = product => {
+    setSelectedProduct(product);
+    variantSelectorRef.current?.show();
+  };
+
   // If data is still loading, show a loading message
   if (loading) {
     return (
@@ -83,12 +91,17 @@ function RecommendationsRoot({
           title=""
           products={relatedProducts}
           onSelectShade={handleSelectShade}
+          onSelectVariant={handleSelectVariant}
         />
       )}
       <ShadeSelector 
         bottomSheetRef={bottomSheetRef}
         product={selectedProduct}
-        onAddToCart={handleAddToCart}
+      />
+      <VariantSelector
+        product={selectedProduct}
+        optionName={"Size"}
+        bottomSheetRef={variantSelectorRef}
       />
     </View>
   );

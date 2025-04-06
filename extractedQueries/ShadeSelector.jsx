@@ -8,16 +8,15 @@ import {
   Image,
   ActivityIndicator
 } from 'react-native';
-import { useSelector } from 'react-redux';
-import { datasourceTypeModelSel, useApptileWindowDims, Icon } from 'apptile-core';
+import { useApptileWindowDims, Icon } from 'apptile-core';
 import BottomSheet from './BottomSheet';
 import { colorSwatches, imageSwatches } from './colorswatchinfo';
 import { fetchProductOptions, fetchVariantBySelectedOptions } from './collectionqueries';
+import {addLineItemToCart} from './selectors';
 
 const ShadeSelector = ({ 
   bottomSheetRef, 
   product, 
-  onAddToCart 
 }) => {
   const [selectedShade, setSelectedShade] = useState(null);
   const [shades, setShades] = useState([]);
@@ -168,9 +167,8 @@ const ShadeSelector = ({
   }, [selectedShade, product]);
 
   const handleAddToCart = () => {
-    if (selectedVariantId && onAddToCart) {
-      onAddToCart(selectedVariantId);
-      // Don't hide the modal or reset the selection
+    if (selectedVariantId) {
+      addLineItemToCart(selectedVariantId);
     }
   };
 
