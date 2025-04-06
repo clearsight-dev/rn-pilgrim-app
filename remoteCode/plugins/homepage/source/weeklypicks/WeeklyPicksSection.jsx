@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { useApptileWindowDims } from 'apptile-core';
 import ThreeDProductCarousel from './ThreeDProductCarousel';
 import { formatProductsForCarousel } from '../../../../../extractedQueries/RelatedProductsCarousel';
+import { addLineItemToCart } from '../../../../../extractedQueries/selectors';
 
 /**
  * WeeklyPicksSection - A component that displays a 3D carousel of product recommendations
@@ -52,7 +53,7 @@ function WeeklyPicksSection ({
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}
         width={width}
-        onAddToCart={handleAddToCart}
+        onAddToCart={product => addLineItemToCart(product.firstVariantId)}
         onSelectShade={handleSelectShade}
         loading={loading}
       />

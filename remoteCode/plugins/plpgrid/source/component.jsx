@@ -6,13 +6,12 @@ import {
   ActivityIndicator,
   Platform
 } from 'react-native';
-import { useSelector } from 'react-redux';
 import { useRoute } from '@react-navigation/native';
-import { datasourceTypeModelSel, Icon } from 'apptile-core';
 import { ProductCountSkeleton,  ProductGridSkeleton } from './Skeletons';
 import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import {formatProductsForCarousel} from '../../../../extractedQueries/RelatedProductsCarousel';
+import { addLineItemToCart } from '../../../../extractedQueries/selectors';
 import Footer from './Footer';
 import Header from './Header';
 import styles from './styles';
@@ -451,6 +450,7 @@ export function ReactComponent({ model }) {
   const renderProductItem = ({ item, index }) => (
     <RelatedProductCard 
       product={item}
+      onAddToCart={product => addLineItemToCart(product.firstVariantId)}
       style={styles.productCard}
     />
   );

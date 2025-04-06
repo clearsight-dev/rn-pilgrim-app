@@ -1,6 +1,5 @@
-import React, {useEffect, useState, useCallback, useRef} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
-import {fetchProductData} from './pdpquery';
 import RelatedProductCard from './RelatedProductCard';
 import {addLineItemToCart} from './selectors';
 
