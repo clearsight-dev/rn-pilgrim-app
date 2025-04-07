@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SectionList, Text, InteractionManager, Platform } from 'react-native';
-import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
+import { StyleSheet, SectionList, Platform, Text } from 'react-native';
+import { useApptileWindowDims } from 'apptile-core';
 import { useRoute } from '@react-navigation/native';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
 import AboveThefoldContent from './AboveThefoldContent';
@@ -80,8 +80,8 @@ export function ReactComponent({ model }) {
         const result = await fetchProductData(productHandle);
 
         function startHeavyRendering() {
-          const productByHandle = formatProduct(result.productByHandle)
           clearTimeout(timeout);
+          const productByHandle = formatProduct(result.productByHandle)
           setProductData({
             productByHandle
           });
@@ -89,25 +89,8 @@ export function ReactComponent({ model }) {
           getVariants(productByHandle, setVariants, setSelectedVariant);
         }
 
-        // Beware adventurer! android ahead
-        // On low end androids the render cycle is long enough to give a significant
-        // pause before navigation if the render starts too early. So we delay here
-        // to allow the navigation to finish and let the skeleton show for a bit,
-        // before staring the render
         if (Platform.OS === "android") {
           setTimeout(() => {
-            // We don't use InteractionManager because that will stop the render from
-            // starting while the transition is happening. This introduces a tradeoff
-            // between the page transition animation finishing completely but smoothly
-            // and the skeleton showing till the render is finished, or there being a 
-            // bit of a jank in the page transition animation but the page contents 
-            // loading by the time the animation finishes. When loading from apollo cache
-            // it looks better IMO when the page loads as the animation finishes, 
-            // even if there is a bit of a jank
-            // The delay is 50 because its seems to be the optimal choice on xiaomi
-            // and pixel 6 to have the jank occur at the last possible moment of the 
-            // animation
-            // InteractionManager.runAfterInteractions(() => {
             startHeavyRendering();
           }, 50);
         } else {
@@ -126,44 +109,6 @@ export function ReactComponent({ model }) {
       loadProductData();
     }
   }, [productHandle]);
-
-  // Extract offer data from metafields
-  const extractOffers = (metafields) => {
-    if (!metafields || !Array.isArray(metafields)) return [];
-    
-    const offerMetafields = metafields.filter(meta => 
-      meta && meta.key && meta.key.startsWith('pd_page_offer_') && meta.references && meta.references.nodes
-    );
-    
-    const offers = [];
-    
-    offerMetafields.forEach(metafield => {
-      if (metafield.references && metafield.references.nodes) {
-        metafield.references.nodes.forEach(node => {
-          if (node && node.fields && Array.isArray(node.fields)) {
-            let offer = {};
-            
-            node.fields.forEach(field => {
-              if (field.key === 'offer_headin_1') {
-                offer.title = field.value;
-              } else if (field.key === 'offer_description_1') {
-                offer.description = field.value;
-              } else if (field.key === 'offer_code_1') {
-                offer.code = field.value;
-              }
-            });
-            
-            if (offer.title && offer.description) {
-              offers.push(offer);
-            }
-          }
-        });
-      }
-    });
-    
-    return offers;
-  };
-
 
   // Extract product details
   const getProductDetails = (data) => {
@@ -231,20 +176,6 @@ export function ReactComponent({ model }) {
     return null;
   };
   
-  // Main render
-  const product = getProductDetails(productData);
-  const offers = product ? extractOffers(product.metafields) : [];
-  
-  // Process benefits data when product data changes
-  useEffect(() => {
-    if (product && product.metafields) {
-      const benefitsData = processBenefitsData(product.metafields);
-      if (benefitsData) {
-        setBenefits(benefitsData);
-      }
-    }
-  }, [product]);
-  
   // Prepare sections for SectionList
   const sections = [
     // Actual content sections
@@ -297,7 +228,6 @@ export function ReactComponent({ model }) {
             loading={loading}
             error={error}
             product={productData?.productByHandle}
-            offers={offers}
             variants={variants}
             selectedVariant={selectedVariant}
             setSelectedVariant={setSelectedVariant}
@@ -307,7 +237,7 @@ export function ReactComponent({ model }) {
       case 'description':
         return (
           <DescriptionCard 
-            productData={productData.data.productByHandle} 
+            productData={productData?.productByHandle} 
             loading={loading} 
           />
         );
@@ -345,6 +275,7 @@ export function ReactComponent({ model }) {
   };
 
   return (
+    <>
     <SectionList
       style={[styles.container, { height: screenHeight }]}
       contentContainerStyle={styles.contentContainer}
@@ -359,6 +290,7 @@ export function ReactComponent({ model }) {
       windowSize={5} // Reduce window size for better performance
       removeClippedSubviews={true} // Important for performance
     />
+    </>
   );
 }
 

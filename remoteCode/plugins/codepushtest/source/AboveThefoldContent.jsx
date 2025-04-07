@@ -9,8 +9,6 @@ function AboveThefoldContent({
   loading, 
   error, 
   product, 
-  productLabel, 
-  offers,
   variants,
   selectedVariant, 
   setSelectedVariant,
@@ -59,7 +57,7 @@ function AboveThefoldContent({
       <ProductInfo 
         product={product}
         productLabel={product?.productLabel2?.value || product?.productLabel1?.value || null}
-        offers={offers}
+        offers={product?.offers}
         variants={variants}
         selectedVariant={selectedVariant}
         setSelectedVariant={variant => {
