@@ -15,6 +15,19 @@ import { fetchProductOptions, fetchVariantBySelectedOptions } from './collection
 import {addLineItemToCart} from './selectors';
 import PilgrimCartButton from './PilgrimCartButton';
 
+export function normalizeOption (value) {
+  const normalizedName = value?.toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const colorHex = colorSwatches[normalizedName]?.colorHex;
+  let imageUrl = null;
+  if (!colorHex) {
+    imageUrl = imageSwatches[normalizedName];
+  }
+  return {colorHex, imageUrl};
+}
+
 function ShadeSelector({ 
   bottomSheetRef, 
   product, 
@@ -88,13 +101,6 @@ function ShadeSelector({
     }
   }, [product]);
 
-  function normalizeOption (value) {
-    return value?.toLowerCase()
-      .replace(/[^a-z0-9\s]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
   const handleAddToCart = () => {
     return new Promise((resolve, reject) => {
       if (selectedVariant) {
@@ -107,12 +113,7 @@ function ShadeSelector({
 
   // Render a shade item
   const renderShadeItem = ({ item }) => {
-    const normalizedName = normalizeOption(item.title)
-    const colorHex = colorSwatches[normalizedName]?.colorHex;
-    let imageUrl = null;
-    if (!colorHex) {
-      imageUrl = imageSwatches[normalizedName];
-    }
+    const {colorHex, imageUrl} = normalizeOption(item.title)
     return (
       <Pressable 
         style={styles.shadeItem}

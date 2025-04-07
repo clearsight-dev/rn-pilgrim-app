@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import ImageCarousel from './ProductCarousel';
+import {Carousel} from '../../../../extractedQueries/ImageCarousel';
+import { Image } from '../../../../extractedQueries/ImageComponent';
 import ProductInfo from './ProductInfo';
 import AboveThefoldSkeleton from './AboveThefoldSkeleton';
 
-const AboveThefoldContent = ({ 
+function AboveThefoldContent({ 
   loading, 
   error, 
   product, 
@@ -14,7 +15,8 @@ const AboveThefoldContent = ({
   selectedVariant, 
   setSelectedVariant,
   screenWidth
-}) => {
+}) {
+  const carouselRef = useRef(null);
   if (loading) {
     return <AboveThefoldSkeleton />;
   }
@@ -27,21 +29,49 @@ const AboveThefoldContent = ({
     );
   }
 
+  const productImages = product?.images ?? [];
+  for (let i = 0; i < variants.length; ++i) {
+    productImages.push({...variants[i].image, variantId: variants[i].id});
+  }
+
   return (
     <View style={styles.scrollContainer}>
-      <ImageCarousel 
-        images={product?.images} 
-        screenWidth={screenWidth} 
-        productLabel={productLabel}
+      <Carousel
+        ref={carouselRef}
+        flatlistData={productImages}
+        renderChildren={({item}, index) => {
+          return (
+            <Image 
+              source={{uri: item.url + "-" + index}}
+              resizeMode="contain"
+              style={{
+                width: screenWidth,
+                aspectRatio: 1,
+                minHeight: 100,
+              }}
+            />   
+          );
+        }}
+        width={screenWidth}
+        aspectRatio={1}
       />
-      
+      {/* <Text>{JSON.stringify(productImages, null, 2)}</Text> */}
       <ProductInfo 
         product={product}
         productLabel={product?.productLabel2?.value || product?.productLabel1?.value || null}
         offers={offers}
         variants={variants}
         selectedVariant={selectedVariant}
-        setSelectedVariant={setSelectedVariant}
+        setSelectedVariant={variant => {
+          setSelectedVariant(variant);
+          if (carouselRef.current) {
+            const requiredImage = variant.image?.url;
+            const index = productImages.findIndex(productImg => productImg.url === requiredImage);
+            if (index >= 0) {
+              carouselRef.current.scrollToIndex(index);
+            }
+          }
+        }}
       />
     </View>
   );

@@ -79,6 +79,16 @@ export function ReactComponent({ model }) {
 
         const result = await fetchProductData(productHandle);
 
+        function startHeavyRendering() {
+          const productByHandle = formatProduct(result.productByHandle)
+          clearTimeout(timeout);
+          setProductData({
+            productByHandle
+          });
+          setLoading(false);
+          getVariants(productByHandle, setVariants, setSelectedVariant);
+        }
+
         // Beware adventurer! android ahead
         // On low end androids the render cycle is long enough to give a significant
         // pause before navigation if the render starts too early. So we delay here
@@ -86,35 +96,24 @@ export function ReactComponent({ model }) {
         // before staring the render
         if (Platform.OS === "android") {
           setTimeout(() => {
-          // We don't use InteractionManager because that will stop the render from
-          // starting while the transition is happening. This introduces a tradeoff
-          // between the page transition animation finishing completely but smoothly
-          // and the skeleton showing till the render is finished, or there being a 
-          // bit of a jank in the page transition animation but the page contents 
-          // loading by the time the animation finishes. When loading from apollo cache
-          // it looks better IMO when the page loads as the animation finishes, 
-          // even if there is a bit of a jank
-          // The delay is 50 because its seems to be the optimal choice on xiaomi
-          // and pixel 6 to have the jank occur at the last possible moment of the 
-          // animation
-          // InteractionManager.runAfterInteractions(() => {
-            const productByHandle = formatProduct(result.productByHandle)
-            clearTimeout(timeout);
-            setProductData({
-              productByHandle
-            });
-            setLoading(false);
+            // We don't use InteractionManager because that will stop the render from
+            // starting while the transition is happening. This introduces a tradeoff
+            // between the page transition animation finishing completely but smoothly
+            // and the skeleton showing till the render is finished, or there being a 
+            // bit of a jank in the page transition animation but the page contents 
+            // loading by the time the animation finishes. When loading from apollo cache
+            // it looks better IMO when the page loads as the animation finishes, 
+            // even if there is a bit of a jank
+            // The delay is 50 because its seems to be the optimal choice on xiaomi
+            // and pixel 6 to have the jank occur at the last possible moment of the 
+            // animation
+            // InteractionManager.runAfterInteractions(() => {
+            startHeavyRendering();
           }, 50);
         } else {
-          const productByHandle = formatProduct(result.productByHandle)
-          clearTimeout(timeout);
-          setProductData({
-            productByHandle
-          });
-          setLoading(false);
-          debugger
-          getVariants(productByHandle, setVariants, setSelectedVariant);
+          startHeavyRendering();
         }
+
       } catch (err) {
         console.error("[APPTILE_AGENT] Error fetching product data:", err);
         setError(err.message || "Failed to fetch product data");
@@ -165,32 +164,7 @@ export function ReactComponent({ model }) {
     return offers;
   };
 
-  // Extract product images
-  const getProductImages = (product) => {
-    const images = [];
-    
-    
-    if (Array.isArray(product.variants?.edges)) {
-      for (let i = 0; i < product.variants.edges.length; ++i) {
-        const imageNode = product.variants.edges[i].node.image;
-        images.push(imageNode.url);
-      }
-    }
 
-    if (images.length == 0 && product.featuredImage?.url) {
-      images.unshift(product.featuredImage.url);
-    }
-
-    return images;
-  };
-
-  // Mock variants data - in a real app, you would extract this from the product data
-  const variantOptions = [
-    { name: "50ml", price: 855, compareAtPrice: 342, popular: true },
-    { name: "30ml", price: 545, compareAtPrice: 342, popular: false },
-    { name: "15ml", price: 159, compareAtPrice: 342, discount: "4%", originalPrice: "895", popular: false }
-  ];
-  
   // Extract product details
   const getProductDetails = (data) => {
     if (!data || !data.data || !data.data.productByHandle) {

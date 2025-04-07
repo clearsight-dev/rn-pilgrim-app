@@ -1,4 +1,11 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { 
+  useRef, 
+  useEffect, 
+  useState, 
+  useCallback, 
+  useImperativeHandle, 
+  forwardRef 
+} from 'react';
 import { 
   View, 
   Image,
@@ -8,12 +15,25 @@ import AutoScrollBubbles from './AutoScrollBubbles';
 import ScrollBubbles from './ScrollBubbles';
 
 // Reusable image carousel component with auto-scrolling and manual interaction
-export function Carousel({ width, flatlistData, renderChildren }) {
-  const scrollView = useRef();
+export const Carousel = forwardRef(({ width, flatlistData, renderChildren }, ref) => {
+  const scrollView = useRef(null);
   const scrollBubblesRef = useRef();
   const currentIndexRef = useRef(0);
   const [userInteracted, setUserInteracted] = useState(false);
   const inactivityTimerRef = useRef(null);
+
+  useImperativeHandle(ref, () => {
+    return {
+      scrollToIndex: (index) => {
+        if (scrollView.current && index >= 0 && index <= flatlistData.length) {
+          scrollView.current.scrollToIndex({
+            index, 
+            animated: true
+          });
+        }
+      }
+    }
+  }, [scrollView.current]);
   
   // Function to handle automatic index changes
   const handleAutoIndexChange = useCallback((index) => {
@@ -113,7 +133,7 @@ export function Carousel({ width, flatlistData, renderChildren }) {
         }}
         horizontal={true}
         pagingEnabled={true}
-        keyExtractor={item => item.id || item.url}
+        keyExtractor={(item, i) => item.id + item.url + i}
         getItemLayout={getItemLayout}
         initialNumToRender={3}
         onScrollToIndexFailed={(info) => {
@@ -130,7 +150,7 @@ export function Carousel({ width, flatlistData, renderChildren }) {
         }}
         renderItem={renderChildren}
         showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
+        showsHorizontalScrollIndicator={true}
         onMomentumScrollEnd={handleScroll}
       />
       <View
@@ -142,12 +162,12 @@ export function Carousel({ width, flatlistData, renderChildren }) {
           left: 0.25 * width,
         }}
       >
-        <ScrollBubbles 
+        {/* <ScrollBubbles 
           ref={scrollBubblesRef}
           numBubbles={flatlistData.length} 
           currentIndex={currentIndexRef.current}
           onBubblePress={handleBubblePress}
-        />
+        /> */}
         {/* {userInteracted ? (
           <ScrollBubbles 
             ref={scrollBubblesRef}
@@ -165,16 +185,16 @@ export function Carousel({ width, flatlistData, renderChildren }) {
       </View>
     </View>
   );
-}
+});
 
 export default function ImageCarousel({ images, width, aspectRatio = 1 }) {
   return (
     <Carousel
       flatlistData={images}
-      renderChildren={({item}) => {
+      renderChildren={({item}, index) => {
         return (
           <Image 
-            source={{uri: item.url}}
+            source={{uri: item.url + "-" + index}}
             resizeMode="contain"
             style={{
               width: width,
