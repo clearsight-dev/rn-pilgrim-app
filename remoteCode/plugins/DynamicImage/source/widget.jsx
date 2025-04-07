@@ -3,20 +3,10 @@ import {
   imageWidgetStyleEditorsConfig,
   propertySettings,
   widgetEditors,
+  ImageWidgetConfig
 } from './component';
 import docs from './docs';
 import {connectWidget} from 'apptile-core';
-
-export const ImageWidgetConfig = {
-  value: '',
-  resizeMode: 'contain',
-  sourceType: 'url',
-  assetId: '',
-  dynamicWidth: false,
-  width: '',
-  allowPreview: false,
-  isLoading: false,
-};
 
 const pluginListing = {
   labelPrefix: 'image',

@@ -24,7 +24,6 @@ import {makeBoolean} from 'apptile-core';
 import {Placeholder} from 'apptile-core';
 
 import {ImageZoom} from './ImageZoom';
-import {ImageWidgetConfig} from './widget';
 
 const ImagePreviewGestureHandlers = ({imgSource}) => {
   return (
