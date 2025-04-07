@@ -119,6 +119,38 @@ export const PRODUCT_CARD_INFO =
       }
     }
   }
+  text_benefits_title: metafield(key: "key_benefits_heading", namespace: "custom") {
+    id
+    value
+  }
+  text_benefits_body: metafield(key: "key_benefits", namespace: "custom") {
+    id
+    value
+  }
+  benefits_url_1: metafield(key: "test_benefit_url", namespace: "my_fields") {
+    id
+    value
+  } 
+  benefits_url_2: metafield(key: "after_atc_benefit2_url", namespace: "my_fields") {
+    id
+    value
+  }
+  benefits_url_3: metafield(key: "after_atc_benefit3_url", namespace: "my_fields") {
+    id
+    value
+  }
+  ingredients_url_1: metafield(key: "ingredients1_url", namespace: "my_fields") {
+    id
+    value
+  }
+  ingredients_url_2: metafield(key: "ingredients2_url", namespace: "my_fields") {
+    id
+    value
+  }
+  ingredients_url_3: metafield(key: "ingredients3_url", namespace: "my_fields") {
+    id
+    value
+  }
 }
 `;
 

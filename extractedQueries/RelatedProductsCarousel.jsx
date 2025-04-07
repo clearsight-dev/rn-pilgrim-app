@@ -37,6 +37,41 @@ export function formatProduct(product) {
   extractOffers(product.offers2?.references?.nodes);
   extractOffers(product.offers3?.references?.nodes);
 
+  const benefitsImages = [];
+  if (product.benefits_url_1?.value) {
+    benefitsImages.push({imageUrl: product.benefits_url_1?.value});
+  }
+  
+  if (product.benefits_url_2?.value) {
+    benefitsImages.push({imageUrl: product.benefits_url_2?.value});
+  }
+
+  if (product.benefits_url_3?.value) {
+    benefitsImages.push({imageUrl: product.benefits_url_3?.value});
+  }
+
+  const textBenefits = {title: "", items: []};
+  if (product.text_benefits_title?.value) {
+    textBenefits.title = product.text_benefits_title?.value;
+  }
+
+  if (product.text_benefits_body?.value) {
+    textBenefits.items = (product.text_benefits_body?.value ?? "").split("•");
+  }
+
+  const ingredients = [];
+  if (product.ingredients_url_1?.value) {
+    ingredients.push(product.ingredients_url_1?.value);
+  }
+
+  if (product.ingredients_url_2?.value) {
+    ingredients.push(product.ingredients_url_2?.value);
+  }
+
+  if (product.ingredients_url_3?.value) {
+    ingredients.push(product.ingredients_url_3?.value);
+  }
+
   return {
     id: product.id,
     firstVariantId: firstVariant?.id ?? null,
@@ -57,7 +92,10 @@ export function formatProduct(product) {
     weight: firstVariant?.weight,
     weightUnit: firstVariant?.weightUnit,
     subtitle: product.subtitle,
-    offers
+    offers,
+    benefitsImages,
+    textBenefits,
+    ingredients
   }
 }
 

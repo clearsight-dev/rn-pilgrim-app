@@ -52,15 +52,6 @@ export function ReactComponent({ model }) {
   const [error, setError] = useState(null);
   const [variants, setVariants] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const [benefits, setBenefits] = useState({
-    carouselItems: [],
-    title: "",
-    benefitsList: [],
-    ingredients: {
-      title: "",
-      images: []
-    }
-  });
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
 
   console.log("Rendering pdp");
@@ -110,72 +101,6 @@ export function ReactComponent({ model }) {
     }
   }, [productHandle]);
 
-  // Extract product details
-  const getProductDetails = (data) => {
-    if (!data || !data.data || !data.data.productByHandle) {
-      return null;
-    }
-    
-    return data.data.productByHandle;
-  };
-  
-  // Process benefits data from metafields
-  const processBenefitsData = (metafields) => {
-    if (!metafields || !Array.isArray(metafields)) {
-      return null;
-    }
-    
-    // Extract carousel benefit data from metafields
-    const carouselData = metafields
-      .filter(mf => mf && (
-        mf.key === 'test_benefit_url' ||
-        mf.key === 'after_atc_benefit2_url' ||
-        mf.key === 'after_atc_benefit3_url'
-      ))
-      .map((mf) => {
-        return {
-          imageUrl: mf.value
-        };
-      });
-    
-    // Extract key benefits title and list for BenefitsCard
-    const keyBenefitsTitle = metafields.find(field => 
-      field?.key?.includes('key_benefits_heading') 
-    );
-    
-    const keyBenefitsList = metafields
-      .filter(field => field?.key?.includes('key_benefits') && field?.type === 'multi_line_text_field')
-      .flatMap(item => item.value.split('•'))
-      .filter(line => line.trim() !== ''); // Filter out empty lines
-
-    const ingredients = metafields.filter(field => {
-      return field?.key?.startsWith('ingredients') && 
-        field?.key?.endsWith('_url')
-    })
-    .map(it => {
-      return {
-        imageUrl: it.value
-      };
-    });
-
-    const ingredientsHeading = metafields
-      .find(it => it?.key === "ingredients_heading")?.value ?? "";
-    
-    if (carouselData.length > 0) {
-      return {
-        carouselItems: carouselData,
-        title: keyBenefitsTitle?.value,
-        benefitsList: keyBenefitsList,
-        ingredients: {
-          title: ingredientsHeading,
-          images: ingredients
-        }
-      };
-    }
-    
-    return null;
-  };
-  
   // Prepare sections for SectionList
   const sections = [
     // Actual content sections
@@ -246,7 +171,7 @@ export function ReactComponent({ model }) {
           <BenefitsRoot
             loading={loading}
             error={error}
-            benefits={benefits}
+            product={productData?.productByHandle}
             backgroundColor={backgroundColor}
             aspectRatio={aspectRatio}
             cardWidthPercentage={cardWidthPercentage}

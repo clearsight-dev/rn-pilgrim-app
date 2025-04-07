@@ -6,16 +6,16 @@ import BenefitsCard from './BenefitsCard';
 import ThreeDCarousel from './ThreeDCarousel';
 import GradientText from '../../../../../extractedQueries/GradientText';
 
-const BenefitsRoot = ({ 
+function BenefitsRoot({ 
   loading, 
   error, 
-  benefits, 
+  product, 
   backgroundColor = '#C5FAFF4D',
   aspectRatio = '1/1.5',
   cardWidthPercentage = 70,
   cardSpacing = 10,
   imageBand = []
-}) => {
+}) {
   const { width } = useApptileWindowDims();
   
   const ITEM_WIDTH = width * (cardWidthPercentage / 100); // Card width as percentage of screen width
@@ -56,37 +56,19 @@ const BenefitsRoot = ({
     );
   }
 
-  if (!benefits.carouselItems || benefits.carouselItems.length === 0) {
-    return (
-      <View style={{ backgroundColor, paddingVertical: 20 }}>
-        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
-          <GradientText
-            text="Key Benefits"
-            fontSize={32}
-            fontWeight="bold"
-            width="100%"
-            height={60}
-            y="40"
-          />
-        </View>
-        <RNText style={styles.errorText}>No benefits data available</RNText>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.mainContainer}>
       {/* Benefits Card */}
-      {benefits.benefitsList.length > 0 && (
+      {product?.textBenefits?.items?.length > 0 && (
         <BenefitsCard 
-          title={benefits.title} 
-          benefits={benefits.benefitsList} 
+          title={product?.textBenefits?.title} 
+          benefits={product?.textBenefits?.items} 
           style={{ marginBottom: 30 }}
         />
       )}
 
       <ThreeDCarousel
-        carouselItems={benefits.carouselItems}
+        carouselItems={product?.benefitsImages}
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}
         cardAspectRatio={cardAspectRatio}
