@@ -365,7 +365,9 @@ function deleteMetadata(androidManifest, androidName) {
   const metaDataNodes = androidManifest.manifest.application[0]['meta-data'];
   if (metaDataNodes) {
     const index = metaDataNodes.findIndex(it => it.$['android:name'] === androidName);
-    metaDataNodes.splice(index, 1);
+    if (index >= 0) {
+      metaDataNodes.splice(index, 1);
+    }
   }
 }
 
@@ -404,9 +406,71 @@ function deleteService(androidManifest, serviceName) {
   }
 }
 
+// Deletes the service that has the intent
+/**
+ * <intent-filter>
+ *  <action android:name="com.google.firebase.MESSAGING_EVENT" />
+ * </intent-filter>
+ */
+function deleteMessagingService(androidManifest) {
+  const application = androidManifest.manifest.application[0];
+  application.service = application.service || [];
+  const index = application.service.findIndex(service => {
+    service['intent-filter'] = service['intent-filter'] || [];
+    const intentFilters = service['intent-filter'];
+    const intent = intentFilters.find(intent => {
+      intent.action = intent.action || [];
+      let actionWithFirebaseMessagingEvent = intent.action.find(action => {
+        return action.$['android:name'] === 'com.google.firebase.MESSAGING_EVENT';
+      });
+      return !!actionWithFirebaseMessagingEvent;
+    });
+    return !!intent;
+  });
+
+  if (index >= 0) {
+    application.service.splice(index, 1);
+  }
+}
+
+const firebaseMessagingEventIntent = {
+  'intent-filter': [
+    {
+      action: [
+        {
+          $: {'android:name': 'com.google.firebase.MESSAGING_EVENT'}
+        }
+      ]
+    }
+  ] 
+};
+
+function addCleverTap(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig) {
+  debugger
+  const cleverTapIntegration = apptileConfig.integrations.cleverTap;
+  addMetadata(androidManifest, 'CLEVERTAP_ACCOUNT_ID', cleverTapIntegration.cleverTap_id);
+  addMetadata(androidManifest, 'CLEVERTAP_TOKEN', cleverTapIntegration.cleverTap_token);
+  addMetadata(androidManifest, 'CLEVERTAP_REGION', cleverTapIntegration.cleverTap_region);
+  deleteMessagingService(androidManifest);
+  addService(androidManifest, 
+    "com.clevertap.android.sdk.pushnotification.fcm.FcmMessageListenerService", 
+    {'android:exported': true}, 
+    firebaseMessagingEventIntent
+  );
+  addPermission(androidManifest, 'ACCESS_NETWORK_STATE');
+}
+
+function removeCleverTap(androidManifest, stringsObj, extraModules, parsedReactNativeConfig) {
+  deleteMetadata(androidManifest, 'CLEVERTAP_ACCOUNT_ID');
+  deleteMetadata(androidManifest, 'CLEVERTAP_TOKEN');
+  deleteMetadata(androidManifest, 'CLEVERTAP_REGION');
+  deleteService(androidManifest, "com.clevertap.android.sdk.pushnotification.fcm.FcmMessageListenerService");
+  deletePermission(androidManifest, 'ACCESS_NETWORK_STATE');
+}
+
 function addFacebook(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig) {
   const facebookIntegration = apptileConfig.integrations.metaAds;
-  upsertInStringsXML(stringsObj, 'facebook_app_id', facebookIntegration.FacebookAppID);
+  upsertInStringsXML(stringsObj, 'facebook_app_id', facebookIntegration.FacebookAppId);
   addMetadata(androidManifest, 'com.facebook.sdk.ApplicationId', '@string/facebook_app_id');
 
   upsertInStringsXML(stringsObj, 'facebook_client_token', facebookIntegration.FacebookClientToken);
@@ -440,18 +504,12 @@ function addMoengage(androidManifest, stringsObj, apptileConfig, extraModules, p
   const moengageIntegration = apptileConfig.integrations.moengage;
   upsertInStringsXML(stringsObj, 'moengage_app_id', moengageIntegration.appId);
   upsertInStringsXML(stringsObj, 'moengage_datacenter', moengageIntegration.datacenter);
-  deleteService(androidManifest, ".MyFirebaseMessagingService");
-  addService(androidManifest, "com.moengage.firebase.MoEFireBaseMessagingService", {'android:exported': true}, {
-    'intent-filter': [
-      {
-        action: [
-          {
-            $: {'android:name': 'com.google.firebase.MESSAGING_EVENT'}
-          }
-        ]
-      }
-    ] 
-  });
+  deleteMessagingService(androidManifest);
+  addService(androidManifest, 
+    "com.moengage.firebase.MoEFireBaseMessagingService", 
+    {'android:exported': true}, 
+    firebaseMessagingEventIntent
+  );
   addPermission(androidManifest, 'SCHEDULE_EXACT_ALARM');
   removeForceUnlinkForNativePackage('react-native-moengage', extraModules, parsedReactNativeConfig);
 }
@@ -460,17 +518,6 @@ function removeMoengage(androidManifest, stringsObj, extraModules, parsedReactNa
   removeFromStringsXML(stringsObj, 'moengage_app_id');
   removeFromStringsXML(stringsObj, 'moengage_datacenter');
   deleteService(androidManifest, "com.moengage.firebase.MoEFireBaseMessagingService");
-  addService(androidManifest, ".MyFirebaseMessagingService", {'android:exported': false}, {
-    'intent-filter': [
-      {
-        action: [
-          {
-            $: {'android:name': 'com.google.firebase.MESSAGING_EVENT'}
-          }
-        ]
-      }
-    ] 
-  });
   deletePermission(androidManifest, 'SCHEDULE_EXACT_ALARM');
   addForceUnlinkForNativePackage('react-native-moengage', extraModules, parsedReactNativeConfig);
 }
@@ -516,6 +563,11 @@ async function main() {
 
   const parsedReactNativeConfig = await readReactNativeConfigJs();
 
+  if (apptileConfig.feature_flags.ENABLE_CLEVERTAP) {
+    addCleverTap(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig)
+  } else {
+    removeCleverTap(androidManifest, stringsObj, extraModules, parsedReactNativeConfig); 
+  }
   if (apptileConfig.feature_flags.ENABLE_FBSDK) {
     addFacebook(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig)
   } else {

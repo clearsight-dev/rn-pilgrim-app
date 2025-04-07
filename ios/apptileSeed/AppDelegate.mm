@@ -1,5 +1,10 @@
 #import "AppDelegate.h"
 
+#import "CrashHandler.h"
+#import "StartupHandler.h"
+#import "apptileSeed-Swift.h"
+#import "SplashScreenViewController.h"
+
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
 #import <React/RCTI18nUtil.h>
@@ -25,10 +30,24 @@
 #import <AppsFlyerAttribution.h>
 #endif
 
+#if ENABLE_CLEVERTAP
+#import <CleverTapReactManager.h>
+#import <CleverTap.h>
+#endif
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+   // Setting up CrashHandlers
+   [CrashHandler setupSignalHandlers];
+    
+#if ENABLE_CLEVERTAP
+  [CleverTap autoIntegrate];
+  [[CleverTapReactManager sharedInstance] applicationDidLaunchWithOptions:launchOptions];
+#endif
+  self.jsLoaded = NO;
+  self.minDurationPassed = NO;
   self.moduleName = @"apptileSeed";
   self.initialProps = @{};
   
@@ -64,13 +83,40 @@
   sdkConfig.consoleLogConfig = [[MoEngageConsoleLogConfig alloc] initWithIsLoggingEnabled:false loglevel:MoEngageLoggerTypeVerbose];
   [[MoEngageInitializer sharedInstance] initializeDefaultSDKConfig:sdkConfig andLaunchOptions:launchOptions];
 #endif
-
-  BOOL result = [super application:application didFinishLaunchingWithOptions:launchOptions];
   
-  [self showNativeSplash];
+   // storing launch option for later use while opening react native from startup handler
+   self.storedLaunchOptions = launchOptions;
   
-  return result;
+   // Set SplashScreenViewController as the initial screen
+   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+   SplashScreenViewController *splashScreenVC = [[SplashScreenViewController alloc] init];
+   self.window.rootViewController = splashScreenVC;
+   [self.window makeKeyAndVisible];
+  
+  return YES;
 }
+
+
+// Function to start React Native manually after startup operations
+- (void)startReactNativeApp:(UIApplication *)application withOptions:(NSDictionary *)launchOptions
+{
+    NSLog(@"[ApptileStartupProcess] Starting React Native...");
+  
+    // Use stored launchOptions if not provided
+    if (!launchOptions) {
+        launchOptions = self.storedLaunchOptions;
+    }
+  
+    BOOL result = [super application:application didFinishLaunchingWithOptions:launchOptions];
+    [self showNativeSplash];
+
+    if (result) {
+        NSLog(@"[ApptileStartupProcess] React Native started successfully.");
+    } else {
+        NSLog(@"[ApptileStartupProcess] Failed to start React Native.");
+    }
+}
+
 
 #define ENABLE_NATIVE_SPLASH 1
 #define MIN_SPLASH_DURATION 1
@@ -113,27 +159,6 @@
   });
 #endif 
 #ifdef ENABLE_NATIVE_SPLASH
-  // Attempt to remove splash after minimum play duration
-  NSTimeInterval minSplashDuration = MIN_SPLASH_DURATION + 0.5;
-  dispatch_time_t minSplashTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(minSplashDuration * NSEC_PER_SEC));
-  dispatch_after(minSplashTime, dispatch_get_main_queue(), ^(void){
-    self.minDurationPassed = YES;
-    if (self.splash != NULL && self.jsLoaded == YES) {
-      [self.splash removeFromSuperview];
-      self.splash = NULL;
-    }
-  });
-  
-  // Remove the splash after max duration if its not removed yet
-  NSTimeInterval maxSplashDuration = MAX_SPLASH_DURATION + 0.5;
-  dispatch_time_t maxSplashTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(maxSplashDuration * NSEC_PER_SEC));
-  dispatch_after(maxSplashTime, dispatch_get_main_queue(), ^(void){
-    if (self.splash != NULL) {
-      [self.splash removeFromSuperview];
-      self.splash = NULL;
-    }
-  });
-  
   // append the splash image or gif to the window
   rctImageView.frame = self.window.frame;
   rctImageView.resizeMode = RCTResizeModeCover;
@@ -147,7 +172,7 @@
 {
 #ifdef ENABLE_NATIVE_SPLASH
   self.jsLoaded = YES;
-  if (self.splash != NULL && self.minDurationPassed == YES) {
+  if (self.splash != NULL) {
     [self.splash removeFromSuperview];
     self.splash = NULL;
   }
@@ -162,24 +187,35 @@
 - (NSURL *)getBundleURL
 {
 #if DEBUG
-  NSURL *url = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
-  return url;
+    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
 #else
-  // Get the path to the Documents directory
-  NSArray<NSURL *> *documentDirectories = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
-  NSURL *documentsDirectory = [documentDirectories firstObject];
+    // Get the path to the Documents directory
+    NSArray<NSURL *> *documentDirectories = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+    NSURL *documentsDirectory = [documentDirectories firstObject];
 
-  // Create the file URL for main.jsbundle inside the bundles subdirectory
-  NSURL *docBundlesDirectory = [documentsDirectory URLByAppendingPathComponent:@"bundles"];
-  NSURL *mainJSBundleURL = [docBundlesDirectory URLByAppendingPathComponent:@"main.jsbundle"];
+    // Construct the local bundle path
+    NSURL *bundlesDir = [documentsDirectory URLByAppendingPathComponent:@"bundles"];
+    NSURL *jsBundleFile = [bundlesDir URLByAppendingPathComponent:@"main.jsbundle"];
 
-  // Check if the file exists at the specified URL
-  if (![[NSFileManager defaultManager] fileExistsAtPath:[mainJSBundleURL path]]) {
-      mainJSBundleURL = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-  }
-  return mainJSBundleURL;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[jsBundleFile path]]) {
+        if ([BundleTrackerPrefs isBrokenBundle]) {
+            NSLog(@"[ApptileStartupProcess] ⚠️ Previous local bundle failed. ✅ Using embedded bundle.");
+            [BundleTrackerPrefs resetBundleState];
+            return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+        } else {
+            [BundleTrackerPrefs resetBundleState];
+            NSLog(@"[ApptileStartupProcess] ✅ Using local bundle: %@", [jsBundleFile path]);
+            return jsBundleFile;
+        }
+    }
+
+    NSLog(@"[ApptileStartupProcess] ⚠️ No local bundle found. ✅ Using embedded bundle.");
+    [BundleTrackerPrefs resetBundleState];
+
+    return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }
+
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
 {

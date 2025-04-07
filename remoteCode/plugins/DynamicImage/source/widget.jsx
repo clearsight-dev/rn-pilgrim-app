@@ -1,8 +1,13 @@
-import {ReactComponent, imageWidgetStyleEditorsConfig, propertySettings, widgetEditors} from './component';
+import {
+  ReactComponent,
+  imageWidgetStyleEditorsConfig,
+  propertySettings,
+  widgetEditors,
+} from './component';
 import docs from './docs';
 import {connectWidget} from 'apptile-core';
 
-const ImageWidgetConfig = {
+export const ImageWidgetConfig = {
   value: '',
   resizeMode: 'contain',
   sourceType: 'url',
@@ -26,15 +31,21 @@ const pluginListing = {
   icon: 'image',
   manifest: {
     directoryName: 'DynamicImage',
-  }
+  },
 };
 
 const emptyOnupdate = null;
 
-export default connectWidget('DynamicImageWidget', ReactComponent, ImageWidgetConfig, emptyOnupdate, widgetEditors, {
-  propertySettings,
-  widgetStyleConfig: imageWidgetStyleEditorsConfig,
-  pluginListing,
-  docs,
-});
-
+export default connectWidget(
+  'DynamicImageWidget',
+  ReactComponent,
+  ImageWidgetConfig,
+  emptyOnupdate,
+  widgetEditors,
+  {
+    propertySettings,
+    widgetStyleConfig: imageWidgetStyleEditorsConfig,
+    pluginListing,
+    docs,
+  },
+);

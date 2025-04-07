@@ -1,0 +1,135 @@
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
+import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
+import { useDispatch } from 'react-redux';
+
+const ProductCard = ({ product, style }) => {
+  // Extract product details
+  const { title, featuredImage, priceRange, compareAtPriceRange, metafield, handle } = product;
+  const {width: screenWidth} = useApptileWindowDims();
+  
+  // Get price information
+  const price = priceRange?.minVariantPrice?.amount || '0';
+  const compareAtPrice = compareAtPriceRange?.minVariantPrice?.amount || null;
+  
+  // Calculate discount percentage if compareAtPrice exists
+  const discountPercentage = compareAtPrice 
+    ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) 
+    : 0;
+  
+  // Get product label from metafield
+  const productLabel = metafield?.value || '';
+  const dispatch = useDispatch();
+
+  return (
+    <TouchableOpacity 
+      style={[styles.container, style, { width: screenWidth / 2.4 }]}
+      onPress={() => {
+        dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
+      }}
+    >
+      {/* Product Image */}
+      <View style={styles.imageContainer}>
+        <Image 
+          source={{ uri: featuredImage?.url }} 
+          style={styles.image}
+          resizeMode="contain"
+        />
+      </View>
+      
+      {/* Product Details */}
+      <View style={styles.detailsContainer}>
+        <Text style={styles.title} numberOfLines={2}>{title}</Text>
+        <Text style={styles.label}>{productLabel}</Text>
+        <View style={{flexGrow: 1}}></View>
+        
+        {/* Price Section */}
+        <View style={styles.priceContainer}>
+          <Text style={styles.price}>₹{parseInt(price).toLocaleString()}</Text>
+          
+          {compareAtPrice && (
+            <>
+              <Text style={styles.compareAtPrice}>₹{parseInt(compareAtPrice).toLocaleString()}</Text>
+              <Text style={styles.discount}>{discountPercentage}% Off</Text>
+            </>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    backgroundColor: '#F3F3F3CC',
+    borderRadius: 8,
+    overflow: 'hidden',
+    flexGrow: 1,
+    alignSelf: "stretch",
+    padding: 8,
+    elevation: 1,
+    shadowColor: '#666666',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.2,
+    shadowRadius: 2
+  },
+  imageContainer: {
+    width: '100%',
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
+    elevation: 1,
+    shadowColor: '#666666',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2
+  },
+  image: {
+    width: '100%',
+    aspectRatio: 1
+  },
+  detailsContainer: {
+    paddingVertical: 8,
+    flexGrow: 1
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333333',
+    marginBottom: 4,
+  },
+  label: {
+    fontSize: 12,
+    color: '#666666',
+    marginBottom: 8,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333333',
+    marginRight: 4,
+  },
+  compareAtPrice: {
+    fontSize: 12,
+    color: '#999999',
+    textDecorationLine: 'line-through',
+    marginRight: 4,
+  },
+  discount: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#00909E',
+  },
+});
+
+export default ProductCard;

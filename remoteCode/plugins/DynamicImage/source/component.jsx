@@ -7,8 +7,8 @@ import {
   PixelRatio,
   Platform,
   Animated,
-  Dimensions, 
-  ImageBackground
+  Dimensions,
+  ImageBackground,
 } from 'react-native';
 import {Portal} from '@gorhom/portal';
 
@@ -24,6 +24,7 @@ import {makeBoolean} from 'apptile-core';
 import {Placeholder} from 'apptile-core';
 
 import {ImageZoom} from './ImageZoom';
+import {ImageWidgetConfig} from './widget';
 
 const ImagePreviewGestureHandlers = ({imgSource}) => {
   return (
@@ -34,7 +35,11 @@ const ImagePreviewGestureHandlers = ({imgSource}) => {
       imageWidth={Dimensions.get('window').width}
       useNativeDriver={true}
       panToMove={true}>
-      <ImageBackground source={{uri: imgSource}} resizeMode="contain" style={styles.image} />
+      <ImageBackground
+        source={{uri: imgSource}}
+        resizeMode="contain"
+        style={styles.image}
+      />
     </ImageZoom>
   );
 };
@@ -64,14 +69,25 @@ const styles = StyleSheet.create({
 });
 
 export const ReactComponent = React.forwardRef((props, ref) => {
-  const {model, modelStyles, config, getDeviceImage, isAnimated, animations} = props;
+  const {model, modelStyles, config, getDeviceImage, isAnimated, animations} =
+    props;
   const isLoading = !!model.get('isLoading');
   const {value, resizeMode, sourceType, assetId} = model.toJS();
   const layout = config.get('layout');
   const layoutStyles = layout ? layout.getFlexProperties() : {flex: 1};
 
-  const {borderRadius, margin, padding, elevation: elevationStr, ...genericStyles} = modelStyles ?? {};
-  const modelPlatformStyles = getPlatformStyles({borderRadius, margin, padding});
+  const {
+    borderRadius,
+    margin,
+    padding,
+    elevation: elevationStr,
+    ...genericStyles
+  } = modelStyles ?? {};
+  const modelPlatformStyles = getPlatformStyles({
+    borderRadius,
+    margin,
+    padding,
+  });
   const BACKDROP_COLOR = genericStyles?.backdropColor || 'rgba(0,0,0,0.8)';
 
   const allowPreview = model.get('allowPreview');
@@ -110,7 +126,7 @@ export const ReactComponent = React.forwardRef((props, ref) => {
     }
   }, [imageRecord, assetId, sourceType, value, layoutSize]);
 
-  const onLayout = (event) => {
+  const onLayout = event => {
     const {height, width} = event.nativeEvent.layout;
     const newWidth = PixelRatio.getPixelSizeForLayoutSize(width);
     const newHeight = PixelRatio.getPixelSizeForLayoutSize(height);
@@ -136,36 +152,61 @@ export const ReactComponent = React.forwardRef((props, ref) => {
     };
 
     if (Platform.OS !== 'web') {
-      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
       return () => backHandler.remove();
     }
   }, [showModal, closeModal]);
 
   return imageSource && !isLoading ? (
-    <Animated.View style={[layoutStyles, modelPlatformStyles]} onLayout={onLayout}>
+    <Animated.View
+      style={[layoutStyles, modelPlatformStyles]}
+      onLayout={onLayout}>
       {allowPreview ? (
         <>
           <Pressable onPress={() => setShowModal(true)}>
             <ImageComponent
               ref={ref}
-              style={[layoutStyles, imageStyles, dynamicWidth && {width: isNaN(Number(width)) ? 30 : Number(width)}]}
+              style={[
+                layoutStyles,
+                imageStyles,
+                dynamicWidth && {
+                  width: isNaN(Number(width)) ? 30 : Number(width),
+                },
+              ]}
               source={{uri: imageSource}}
               resizeMode={
-                ['contain', 'cover', 'stretch'].includes(resizeMode) ? resizeMode : ImageWidgetConfig.resizeMode
+                ['contain', 'cover', 'stretch'].includes(resizeMode)
+                  ? resizeMode
+                  : ImageWidgetConfig.resizeMode
               }
             />
           </Pressable>
           <CurrentScreenContext.Consumer>
             {screen => (
-              <Portal hostName={screen.isModal ? (model.get('pageKey')) : 'root'}>
+              <Portal hostName={screen.isModal ? model.get('pageKey') : 'root'}>
                 {showModal && (
                   <CustomModal
                     position="center"
                     onClose={closeModal}
                     outerComponents={
                       <View
-                        style={[styles.iconWrapper, {top: (Platform.OS === 'ios' && !screen.isModal ? 54 : 0) + 4}]}>
-                        <MaterialCommunityIcons name="close" style={[styles.closeIcon]} onPress={closeModal} />
+                        style={[
+                          styles.iconWrapper,
+                          {
+                            top:
+                              (Platform.OS === 'ios' && !screen.isModal
+                                ? 54
+                                : 0) + 4,
+                          },
+                        ]}>
+                        <MaterialCommunityIcons
+                          name="close"
+                          style={[styles.closeIcon]}
+                          onPress={closeModal}
+                        />
                       </View>
                     }
                     backdropColor={BACKDROP_COLOR}>
@@ -179,9 +220,17 @@ export const ReactComponent = React.forwardRef((props, ref) => {
       ) : (
         <ImageComponent
           ref={ref}
-          style={[layoutStyles, imageStyles, dynamicWidth && {width: isNaN(Number(width)) ? 30 : Number(width)}]}
+          style={[
+            layoutStyles,
+            imageStyles,
+            dynamicWidth && {width: isNaN(Number(width)) ? 30 : Number(width)},
+          ]}
           source={{uri: imageSource}}
-          resizeMode={['contain', 'cover', 'stretch'].includes(resizeMode) ? resizeMode : ImageWidgetConfig.resizeMode}
+          resizeMode={
+            ['contain', 'cover', 'stretch'].includes(resizeMode)
+              ? resizeMode
+              : ImageWidgetConfig.resizeMode
+          }
         />
       )}
     </Animated.View>
@@ -266,6 +315,3 @@ export const propertySettings = {
     },
   },
 };
-
-
-

@@ -1,0 +1,12 @@
+export const CART_KEY_FOR_LOCAL_STORAGE_KEY = 'currentCartLSKey';
+export const ENABLE_CHECKOUT_SHEET_KEY = 'enableCheckoutSheet';
+export const ENABLE_CHECKOUT_PRELOAD_KEY = 'enableCheckoutPreload';
+export const CART_OBJECT_KEY = 'currentCart';
+export const CART_LINE_CACHE_KEY = 'cartLineCache';
+export const ENABLE_CART_LINE_CACHE_KEY = 'enabledCartLineCache';
+export const CART_SYNC_KEY = 'syncingCartStatus';
+export const CART_PREPARE_KEY = 'preparingCart';
+export const SYNCING_LINE_ITEM_KEY = 'syncingLineItems';
+export const CART_LINE_ITEMS_MAP_KEY = 'cartLineItemsMap';
+export const ENABLE_PRE_CHECKOUT_VALIDATION = 'enablePreCheckoutValidation';
+export const ENABLE_POST_CART_VALIDATION = 'enablePostCartValidation';
