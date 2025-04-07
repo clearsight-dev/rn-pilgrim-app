@@ -99,25 +99,6 @@ function ProductInfo({
   selectedVariant, 
   setSelectedVariant 
 }) {
-  // If no offers found in metafields, use a default offer
-  const displayOffers = offers.length > 0 ? offers : [
-    {
-      title: "B2G2 FREE + Free Jute Bag",
-      description: "Add any 4 products & get 2 lowest cost products Free + Free Jute Bag",
-      code: "Auto Applied"
-    },
-    {
-      title: "FLAT ₹250 OFF",
-      description: "Use code FLAT250 for orders above ₹999",
-      code: "FLAT250"
-    },
-    {
-      title: "FREE SHIPPING",
-      description: "Free shipping on all orders above ₹499",
-      code: "Auto-applied"
-    }
-  ];
-
   return (
     <View style={styles.productInfoContainer}>
       {/* Bestseller tag */}
@@ -177,25 +158,27 @@ function ProductInfo({
       )}
       
       {/* Active Offers Section - Using the new offer card design */}
-      <View style={styles.offersSection}>
-        <Text style={styles.offersSectionTitle}>Active Offers</Text>
-        
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          style={styles.offersScrollView}
-          contentContainerStyle={styles.offersScrollContent}
-        >
-          {displayOffers.map((offer, index) => (
-            <OfferCard 
-              key={`offer-${index}`}
-              title={offer.title}
-              description={offer.description}
-              code={offer.code}
-            />
-          ))}
-        </ScrollView>
-      </View>
+      {offers.length > 0 && (
+        <View style={styles.offersSection}>
+          <Text style={styles.offersSectionTitle}>Active Offers</Text>
+          
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            style={styles.offersScrollView}
+            contentContainerStyle={styles.offersScrollContent}
+          >
+            {offers.map((offer, index) => (
+              <OfferCard 
+                key={`offer-${index}`}
+                title={offer.title}
+                description={offer.description}
+                code={offer.code}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      )}
     </View>
   );
 };

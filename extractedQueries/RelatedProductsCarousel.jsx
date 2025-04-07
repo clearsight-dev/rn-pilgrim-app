@@ -12,6 +12,31 @@ export function formatProduct(product) {
     parsedRating = 0;
   }
 
+  let offers = [];
+  function extractOffers(offerNodes) {
+    if (Array.isArray(offerNodes)) {
+      for (let i = 0; i < offerNodes.length; ++i) {
+        const fields = offerNodes[i].fields;
+        const offer = fields.reduce((accum, item) => {
+          if (item.key.startsWith("offer_code_")) {
+            accum.code = item.value;
+          } else if (item.key.startsWith("offer_description_")) {
+            accum.description = item.value;
+          } else if (item.key.startsWith("offer_headin_")) {
+            accum.title = item.value;
+          }
+          return accum;
+        }, {});
+
+        offers.push(offer)
+      }
+    }
+  }
+
+  extractOffers(product.offers1?.references?.nodes);
+  extractOffers(product.offers2?.references?.nodes);
+  extractOffers(product.offers3?.references?.nodes);
+
   return {
     id: product.id,
     firstVariantId: firstVariant?.id ?? null,
@@ -31,7 +56,8 @@ export function formatProduct(product) {
     productLabel2: product.productLabel2,
     weight: firstVariant?.weight,
     weightUnit: firstVariant?.weightUnit,
-    subtitle: product.subtitle
+    subtitle: product.subtitle,
+    offers
   }
 }
 
