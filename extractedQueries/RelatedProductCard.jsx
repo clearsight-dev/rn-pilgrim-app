@@ -1,116 +1,154 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import Image from './ImageComponent';
-import { navigateToScreen } from 'apptile-core';
-import { useDispatch } from 'react-redux';
+import React, {memo} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
+import PilgrimCartButton from './PilgrimCartButton';
+import {Image} from './ImageComponent';
+import {navigateToScreen} from 'apptile-core';
+import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
+import {addLineItemToCart} from './selectors';
 
-const RelatedProductCard = ({ product, style, loadedProductHandles }) => {
-  // Extract product details - use fullData if available (from lazy loading)
-  const fullData = product.fullData || {};
-  const { 
-    title, 
-    featuredImage, 
-    priceRange, 
-    compareAtPriceRange, 
-    metafield, 
-    handle, 
-    rating 
-  } = {
-    ...product,
-    // Override with fullData if available
-    ...fullData
-  };
-  
-  // Get price information
-  const price = priceRange?.minVariantPrice?.amount || '0';
-  const compareAtPrice = compareAtPriceRange?.minVariantPrice?.amount || null;
-  
+function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelectVariant}) {
+  const {
+    handle,
+    title,
+    featuredImage,
+    price,
+    compareAtPrice,
+    rating,
+    productType,
+    variantsCount,
+    productLabel1,
+    productLabel2,
+    weight,
+    weightUnit,
+  } = product;
+
   // Calculate discount percentage if compareAtPrice exists
-  const discountPercentage = compareAtPrice 
-    ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100) 
+  let discountPercentage = compareAtPrice?.amount
+    ? Math.round(((compareAtPrice.amount - price.amount) / compareAtPrice.amount) * 100)
     : 0;
-  
+  if (isNaN(discountPercentage)) {
+    discountPercentage = 0;
+  }
+
+  let weightString = "";
+  if (weight && weightUnit && weightUnit.toString) {
+    weightString = `${weight}${weightUnit.toString().toLowerCase()}`;
+  }
+
+  let isBestSeller = false;
+  if (productLabel1?.value?.toString().toLowerCase().includes("bestseller")) {
+    isBestSeller = true;
+  }
+
   const dispatch = useDispatch();
 
+  // Find the first non-color option for variant selection
+  let variantOptionName = 'Shade';
+  if (product.options && product.options.length > 0) {
+    const nonColorOption = product.options.find(option => 
+      option.name.toLowerCase() !== 'color'
+    );
+    if (nonColorOption) {
+      variantOptionName = nonColorOption.name;
+    }
+  }
+
+  // Determine the CTA button text and action
+  const isSelectShade = variantsCount > 1 && productType.startsWith('Makeup');
+  const isChooseVariant =
+    variantsCount > 1 && !productType.startsWith('Makeup');
+  const buttonText = isSelectShade
+    ? 'Select Shade'
+    : isChooseVariant
+    ? 'Choose Variant'
+    : 'Add to Cart';
+
+  const handleButtonPress = (e) => {
+    if (isSelectShade && onSelectShade) {
+      return onSelectShade(product);
+    } else if (isChooseVariant && onSelectVariant) {
+      return onSelectVariant(product);
+    } else {
+      return addLineItemToCart(product.firstVariantId);
+    }
+  };
+
   return (
-    <TouchableOpacity 
-      style={[styles.container, style]}
+    <Pressable
+      style={({pressed}) => [
+        styles.container, 
+        pressed && {opacity: 0.4},
+        style
+      ]}
       onPress={() => {
-        dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
-      }}
-    >
+        dispatch(navigateToScreen('NewPDP', {productHandle: handle}));
+      }
+    }>
       {/* Promo Tag */}
-      <ProductFlag 
-        label={metafield?.value || "Buy 3@999"} 
-        color="#00726C" 
+      {productLabel2?.value && <ProductFlag
+        label={productLabel2?.value}
+        color="#00726C"
         style={styles.promoTagContainer}
         textStyle={styles.promoTagText}
         height={18}
         width={95}
-      />
+      />}
 
       {/* Product Image */}
       <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: featuredImage?.url }} 
+        <Image
+          source={{uri: featuredImage?.url}}
           style={styles.image}
           resizeMode="contain"
         />
-        {/* Rating */}
-        <View style={styles.ratingContainer}>
-          <Text style={styles.ratingText}>{rating || fullData?.rating || '4.8'}</Text>
+        {(rating > 0) && (<View style={styles.ratingContainer}>
+          <Text style={styles.ratingText}>{rating}</Text>
           <Star color={'#00909E'} size={12} fillPercentage={1} />
-        </View>
-        
-        {/* No loading indicator - optimistic loading */}
-      </View>
+        </View>)}
+      </View> 
 
       {/* Product Details */}
-      <View style={styles.detailsContainer}>
-        <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>BESTSELLER</Text>
-        <Text style={styles.title} numberOfLines={2}>{title}</Text>
-        <Text style={styles.subtitle}>2 Sizes</Text>
-        
+      <View style={[styles.detailsContainer, cardVariant === "large" ? {alignItems: "center"} : {}]}>
+        {
+          isBestSeller && (
+            <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>
+              BESTSELLER
+            </Text>
+          )
+      }
+        <Text style={styles.title} numberOfLines={2}>
+          {title}
+        </Text>
+        <Text style={styles.subtitle}>{weightString}</Text>
+
         {/* Price Section */}
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>₹{parseInt(price).toLocaleString()}</Text>
-          
-          {compareAtPrice && (
-            <>
-              <Text style={styles.compareAtPrice}>₹{parseInt(compareAtPrice).toLocaleString()}</Text>
-              <Text style={styles.discount}>{discountPercentage}% Off</Text>
-            </>
-          )}
+        <View style={{flexGrow: 1, flexDirection: 'column', justifyContent: 'flex-end'}}>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>₹{parseInt(price.amount).toLocaleString()}</Text>
+
+            {(compareAtPrice && discountPercentage > 0) && (
+              <>
+                <Text style={styles.compareAtPrice}>
+                  ₹{parseInt(compareAtPrice).toLocaleString()}
+                </Text>
+                <Text style={styles.discount}>{discountPercentage}% Off</Text>
+              </>
+            )}
+          </View>
         </View>
       </View>
-      <View
-        style={{
-          paddingHorizontal: 8
-        }}
-      >
-        <TouchableOpacity
-          onPress={e => e.stopPropagation()}
-          style={{
-            height: 33, 
-            backgroundColor: '#FACA0C',
-            borderRadius: 8,
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: '500'
-            }}
-          >
-            Add to Cart
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+      <PilgrimCartButton
+        buttonText={buttonText}
+        onPress={handleButtonPress}
+      />
+    </Pressable>
   );
 };
 
@@ -125,12 +163,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     left: 0,
-    zIndex: 1
+    zIndex: 1,
   },
   promoTagText: {
     color: '#FFFFFF',
     fontSize: 10,
-    fontWeight: '600'
+    fontWeight: '600',
   },
   imageContainer: {
     width: '100%',
@@ -143,7 +181,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     aspectRatio: 1,
-    borderRadius: 8
+    borderRadius: 8,
   },
   ratingContainer: {
     position: 'absolute',
@@ -157,20 +195,21 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: 24,
     borderColor: '#F3F3F3',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   ratingText: {
     fontSize: 12,
     color: '#1A1A1A',
     fontWeight: '600',
-    marginRight: 4
+    marginRight: 4,
   },
   detailsContainer: {
+    flexGrow: 1,
     fontSize: 12,
     color: '#767676',
     fontWeight: '400',
     padding: 12,
-    paddingTop: 4
+    paddingTop: 4,
   },
   title: {
     fontSize: 14,
@@ -178,7 +217,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: '#333333',
     marginBottom: 4,
-    lineHeight: 18
+    lineHeight: 18,
   },
   subtitle: {
     fontSize: 12,
@@ -189,7 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     flexWrap: 'wrap',
-    marginTop: 4
+    marginTop: 4,
   },
   price: {
     fontSize: 18,
@@ -217,8 +256,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8
+    borderRadius: 8,
   },
 });
 
-export default RelatedProductCard;
+export default memo(RelatedProductCard);

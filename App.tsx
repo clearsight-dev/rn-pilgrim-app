@@ -1,31 +1,35 @@
 import _ from 'lodash';
 import queryString from 'query-string';
-import React from 'react';
-import {Linking, NativeModules} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
+
 import {
   apptileNavigationRef,
   ApptileWrapper,
   ApptileAppRoot,
   useStartApptile,
 } from 'apptile-core';
+import {Linking, NativeModules} from 'react-native';
 
 import UpdateModal from './components/UpdateModal';
 import AdminPage from './components/AdminPage';
 import FloatingUpdateModal from './components/FloatingUpdateModal';
+import {PilgrimContext} from './PilgrimContext';
+import {fillCaches} from './extractedQueries/homepageQueries';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
-  NativeUtils: {appId: string};
-  AdminPage: {appId: string};
+  NativeUtils: { appId: string };
+  AdminPage: { appId: string };
 };
 
+const {RNApptile} = NativeModules;
+
 // Import the generated code. The folder analytics is generated when you run the app.
-import {init as initAnalytics} from './analytics';
+import { init as initAnalytics } from './analytics';
 
 const Stack = createNativeStackNavigator<ScreenParams>();
-const {RNApptile} = NativeModules;
 
 const getAppFlyerDeepLink = (uri: string) => {
   try {
@@ -54,7 +58,11 @@ const getAppFlyerDeepLink = (uri: string) => {
   }
 };
 function App(): React.JSX.Element {
+  const [pilgrimGlobals, setPilgrimGlobals] = useState({homePageScrolledDown: false});
   const status = useStartApptile(initAnalytics);
+  useEffect(() => {
+    fillCaches();
+  }, [])
 
   React.useEffect(() => {
     (async () => {
@@ -74,7 +82,11 @@ function App(): React.JSX.Element {
         }
 
         setTimeout(async () => {
-          await Linking.openURL(url);
+          if (url) {
+            await Linking.openURL(url);
+          } else {
+            console.error("url was not defined for deeplink");
+          }
         }, 100);
       }
     })();
@@ -85,61 +97,50 @@ function App(): React.JSX.Element {
       ref={apptileNavigationRef}
       theme={{
         ...DefaultTheme,
-        colors: status.theme,
+        colors: status.theme
       }}
-      linking={status.linking}>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="NocodeRoot"
-          component={ApptileAppRoot}
-          options={{headerShown: false}}
-        />
+      linking={status.linking}
+      onReady={() => {
+        console.log("Navigators are ready")
+        // RNApptile.notifyJSReady();
+      }}
+    >
+      <Stack.Navigator
+        screenOptions={{
+          animation: 'none'
+        }}
+      >
+        <Stack.Screen name="NocodeRoot" component={ApptileAppRoot} options={{ headerShown: false }} />
         <Stack.Screen
           name="NativeUtils"
           component={UpdateModal}
-          options={{headerShown: true}}
-          initialParams={{appId: status.appId}}
+          options={{ headerShown: true }}
+          initialParams={{ appId: status.appId }}
         />
         <Stack.Screen
           name="AdminPage"
           component={AdminPage}
-          options={{headerShown: true}}
-          initialParams={{appId: status.appId}}
+          options={{ headerShown: true }}
+          initialParams={{ appId: status.appId }}
         />
       </Stack.Navigator>
     </NavigationContainer>
   );
 
-  let updateModal = null;
-  if (status.hasUpdate === 'yes') {
-    // Note that you can use status.updateDownloaded === "yes" to show this,
-    // if you want to wait till the update is fully downloaded. In that case the
-    // app will restart as soon as the modal is dismissed
-    // If you want to show the update modal as soon as you have determined that there
-    // is an update and want the download to happen while the modal is being
-    // displayed then use the status.hasUpdate
-    updateModal = (
-      <FloatingUpdateModal
-        navigationRef={apptileNavigationRef}
-        appId={status.appId}
-        updateDownloaded={status.updateDownloaded}
-      />
-    );
-  }
-
   // The nocode layer will not do navigation to these screens so you can handle those navigations in the onNavigationEvent
   return (
-    <ApptileWrapper
-      noNavigatePaths={['NativeUtils', 'AdminPage']}
-      onNavigationEvent={ev => {
-        console.log('handle navigation event', ev);
-        apptileNavigationRef.current.navigate(ev.screenName, {
-          appId: status.appId,
-        });
-      }}>
-      {body}
-      {updateModal}
-    </ApptileWrapper>
+    <PilgrimContext.Provider value={{pilgrimGlobals, setPilgrimGlobals}}>
+      <ApptileWrapper
+        noNavigatePaths={["NativeUtils", "AdminPage"]}
+        onNavigationEvent={(ev) => {
+          console.log("handle navigation event", ev)
+          apptileNavigationRef.current.navigate(ev.screenName, { appId: status.appId });
+        }}
+      >
+        {body}
+        {/* {(!status.modelReady) && <JSSplash/>} */}
+      </ApptileWrapper>
+    </PilgrimContext.Provider>
   );
 }
 

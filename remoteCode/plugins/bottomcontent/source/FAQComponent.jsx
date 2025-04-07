@@ -6,7 +6,7 @@ import {
   StyleSheet
 } from 'react-native';
 import {Icon} from 'apptile-core';
-import Accordion from './Accordion';
+import Accordion from '../../../../extractedQueries/Accordion';
 
 // FAQ Item component with accordion functionality
 const FAQItem = ({ question, answer }) => {

@@ -1,5 +1,14 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Animated, 
+  StatusBar, 
+  Dimensions, 
+  Platform 
+} from 'react-native';
 import { Portal } from '@gorhom/portal';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useApptileWindowDims } from 'apptile-core';
@@ -7,13 +16,15 @@ import { useApptileWindowDims } from 'apptile-core';
 const BottomSheet = forwardRef(function ({ 
   title = 'Bottom Sheet',
   children,
-  sheetHeight = 0.5, // Default to 50% of screen height
+  sheetHeightFraction = 0.5, // Default to 50% of screen height
+  onClose = () => {}
 }, ref) {
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
   const [sheetIsRendered, setSheetIsRendered] = useState(false);
   const sheetVisibility = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
 
+  const screenDims = Dimensions.get('screen');
   // Threshold for considering a swipe as dismissal (1/5 of the screen height)
   const SWIPE_THRESHOLD = screenHeight * 0.2;
 
@@ -25,6 +36,7 @@ const BottomSheet = forwardRef(function ({
     }).start(finished => {
       if (finished) {
         setSheetIsRendered(false);
+        onClose();
       }
     });
   }
@@ -71,78 +83,88 @@ const BottomSheet = forwardRef(function ({
     }
   };
 
+  const containerHeight = Platform.select({
+    web: screenHeight,
+    default: screenDims.height
+  });
+
   return (
     <Portal hostName={'root'}>
       <GestureHandlerRootView 
         style={{
           width: screenWidth, 
-          height: screenHeight, 
+          height: containerHeight ,
           position: 'absolute', 
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          top: -(StatusBar.currentHeight || 0)
         }}
       >
-        {/* Overlay area with pan gesture to close the sheet */}
-        <PanGestureHandler
-          onGestureEvent={onPanGestureEvent}
-          onHandlerStateChange={onHandlerStateChange}
-        >
-          <Animated.View 
-            style={{
-              width: screenWidth, 
-              height: (1 - sheetHeight) * screenHeight,
-              position: 'absolute',
-              top: 0,
-            }}
-          />
-        </PanGestureHandler>
+        {/* Overlay area with tap to close the sheet */}
+        <TouchableOpacity
+          style={{
+            width: screenWidth, 
+            height: (1 - sheetHeightFraction) * containerHeight,
+            position: 'absolute',
+            top: 0,
+          }}
+          onPress={handleClose}
+          activeOpacity={1}
+        />
         
         {/* Bottom sheet content */}
-        <PanGestureHandler
-          onGestureEvent={onPanGestureEvent}
-          onHandlerStateChange={onHandlerStateChange}
+        <Animated.View
+          style={{
+            width: screenWidth,
+            height: sheetHeightFraction * containerHeight,
+            position: 'absolute',
+            bottom: 0,
+            backgroundColor: 'white',
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            transform: [
+              {
+                translateY: Animated.add(
+                  sheetVisibility.interpolate({
+                    inputRange: [0, 1], 
+                    outputRange: [sheetHeightFraction * containerHeight, 0]
+                  }),
+                  // Only allow positive translation (downward)
+                  translateY.interpolate({
+                    inputRange: [-100, 0, 100, 200],
+                    outputRange: [0, 0, 100, 200],
+                    extrapolate: 'clamp'
+                  })
+                )
+              }
+            ]
+          }}
         >
-          <Animated.View
-            style={{
-              width: screenWidth,
-              height: sheetHeight * screenHeight,
-              position: 'absolute',
-              bottom: 0,
-              backgroundColor: 'white',
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              transform: [
-                {
-                  translateY: Animated.add(
-                    sheetVisibility.interpolate({
-                      inputRange: [0, 1], 
-                      outputRange: [sheetHeight * screenHeight, 0]
-                    }),
-                    // Only allow positive translation (downward)
-                    translateY.interpolate({
-                      inputRange: [-100, 0, 100, 200],
-                      outputRange: [0, 0, 100, 200],
-                      extrapolate: 'clamp'
-                    })
-                  )
-                }
-              ]
-            }}
+          {/* Drag handle and header with pan gesture */}
+          <PanGestureHandler
+            onGestureEvent={onPanGestureEvent}
+            onHandlerStateChange={onHandlerStateChange}
           >
-            {/* Drag handle */}
-            <View style={styles.dragHandleContainer}>
-              <View style={styles.dragHandle} />
-            </View>
-            
-            <View style={styles.header}>
-              <Text style={styles.title}>{title}</Text>
-              <TouchableOpacity onPress={handleClose}>
-                <Text style={styles.closeButton}>Close</Text>
-              </TouchableOpacity>
-            </View>
-            
+            <Animated.View>
+              {/* <Text>{screenDims.height}:{containerHeight}:{screenHeight}</Text> */}
+              {/* Drag handle */}
+              <View style={styles.dragHandleContainer}>
+                <View style={styles.dragHandle} />
+              </View>
+              
+              <View style={styles.header}>
+                <Text style={styles.title}>{title}</Text>
+                <TouchableOpacity onPress={handleClose}>
+                  <Text style={styles.closeButton}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          </PanGestureHandler>
+          
+          {/* Content area - no pan gesture */}
+          <View style={styles.contentContainer}>
             {children}
-          </Animated.View>
-        </PanGestureHandler>
+          </View>
+        </Animated.View>
       </GestureHandlerRootView>
     </Portal>
   );
@@ -179,6 +201,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666666',
   },
+  contentContainer: {
+    flex: 1,
+  }
 });
 
 export default BottomSheet;

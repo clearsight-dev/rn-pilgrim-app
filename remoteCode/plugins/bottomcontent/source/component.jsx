@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import PilgrimCode from './PilgrimCode';
+import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import FAQComponent from './FAQComponent';
-import ExternalLinks from './ExternalLinks';
+import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 export function ReactComponent({ model }) {
   const content = model.get('labelledIcons') || [];
   const staticImages = model.get('staticImages') || {};

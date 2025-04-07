@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 
@@ -13,11 +13,13 @@ import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
  * @param {Object} props.children - Child components to render on top of the gradient
  */
 const GradientBackground = ({ 
+  id,
   style = {}, 
   gradientColors = [], 
   gradientDirection = 'vertical',
   borderRadius = 0,
-  children 
+  children,
+  childrenContainerStyle = {}
 }) => {
   // State to track the dimensions of the container
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -33,15 +35,17 @@ const GradientBackground = ({
     ? { x1: "0%", y1: "0%", x2: "0%", y2: "100%" }
     : { x1: "0%", y1: "0%", x2: "100%", y2: "0%" };
 
+  const handleResize = useCallback((ev) => {
+    const { width, height } = ev.nativeEvent.layout;
+    if (Math.abs(width - dimensions.width) > 20 || Math.abs(height - dimensions.height) > 20) {
+      setDimensions({ width, height });
+    }
+  }, [setDimensions]);
+
   return (
     <View 
       style={[{ position: 'relative'}, style]}
-      onLayout={ev => {
-        const { width, height } = ev.nativeEvent.layout;
-        if (Math.abs(width - dimensions.width) > 1 || Math.abs(height - dimensions.height) > 1) {
-          setDimensions({ width, height });
-        }
-      }}
+      onLayout={handleResize}
     >
       {/* SVG Gradient Background */}
       {dimensions.width > 0 && dimensions.height > 0 && (
@@ -52,7 +56,7 @@ const GradientBackground = ({
             left: 0, 
             bottom: 0, 
             right: 0,
-            zIndex: 0
+            zIndex: 0,
           }} 
           width={dimensions.width}
           height={dimensions.height}
@@ -72,8 +76,8 @@ const GradientBackground = ({
           <Rect
             x="0"
             y="0"
-            width="100%"
-            height="100%"
+            width={dimensions.width}
+            height={dimensions.height}
             rx={borderRadius}
             ry={borderRadius}
             fill="url(#gradient)"
@@ -82,7 +86,7 @@ const GradientBackground = ({
       )}
       
       {/* Child components */}
-      <View style={{ zIndex: 1 }}>
+      <View style={[childrenContainerStyle, { zIndex: 1 }]}>
         {children}
       </View>
     </View>

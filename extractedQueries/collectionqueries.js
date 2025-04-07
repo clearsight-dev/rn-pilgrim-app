@@ -1,8 +1,10 @@
 import gql from 'graphql-tag';
-
+import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
+import { cheaplyGetShopifyQueryRunner } from './selectors';
+import {VARIANT_INFO} from './commonGraphqlInfo';
 // Function to fetch collection data for the carousel component
-export const fetchCollectionCarouselData = async (queryRunner, collectionHandle) => {
-  console.log('[AGENT] running query for collection: ', collectionHandle)
+export async function fetchCollectionCarouselData(collectionHandle) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
@@ -15,10 +17,12 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
         handle
         title
         image {
+          id
           url
         }
         products(first: 1) {
           filters {
+            id
             label
             type
             values {
@@ -75,9 +79,13 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
         const SUBCATEGORY_PRODUCT_QUERY = gql`
           query SubcategoryProduct($handle: String, $filters: [ProductFilter!]) {
             collection(handle: $handle) {
+              id
               products(first: 1, filters: $filters) {
                 nodes {
+                  id
+                  handle
                   featuredImage {
+                    id
                     url
                   }
                   title
@@ -136,95 +144,55 @@ export const fetchCollectionCarouselData = async (queryRunner, collectionHandle)
   }
 };
 
-// Function to fetch collection data using the GraphQL query with pagination support
-export const fetchCollectionData = async (queryRunner, collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) => {
-  if (!queryRunner) {
-    throw new Error("Query runner not available");
-  }
-  
-  // Modify the query to include pagination parameters, sorting and filters
-  const COLLECTION_PRODUCTS_QUERY = gql`
-    query CollectionProducts($handle: String, $identifiers: [HasMetafieldsIdentifier!]!, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
-      collection(handle: $handle) {
+export const COLLECTION_PRODUCTS_QUERY = gql`
+query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
+  collection(handle: $handle) {
+    id
+    handle
+    title
+    products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }
+      filters {
+        label
         id
-        handle
-        title
-        products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
-          pageInfo {
-            hasNextPage
-            hasPreviousPage
-          }
-          filters {
-            label
+        presentation
+        type
+        values {
+          id
+          label
+          image {
             id
-            presentation
-            type
-            values {
+            image {
               id
-              label
-              image {
-                image {
-                  url
-                }
-              }
+              url
             }
-          }
-          edges {
-            node {
-              handle
-              featuredImage {
-                url
-              }
-              description
-              title
-              priceRange {
-                maxVariantPrice {
-                  amount
-                }
-                minVariantPrice {
-                  amount
-                }
-              }
-              metafields(identifiers: $identifiers) {
-                key
-                value
-              }
-              compareAtPriceRange {
-                maxVariantPrice {
-                  amount
-                }
-                minVariantPrice {
-                  amount
-                }
-              }
-              availableForSale
-            }
-            cursor
           }
         }
       }
+      edges {
+        node ${PRODUCT_CARD_INFO}
+        cursor
+      }
     }
-  `;
+  }
+}
+`;
+
+// Function to fetch collection data using the GraphQL query with pagination support
+export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
   
   const data = await queryRunner.runQuery(
     'query',
     COLLECTION_PRODUCTS_QUERY,
     {
       handle: collectionHandle,
-      identifiers: [
-        {
-          key: "rating",
-          namespace: "reviews"
-        },
-        {
-          key: "product_label_1",
-          namespace: "custom"
-        },
-        {
-          key: "product_label_2",
-          namespace: "custom"
-        }
-      ],
       first: first,
       after: afterCursor,
       sortKey: sortKey,
@@ -257,8 +225,123 @@ export const fetchCollectionData = async (queryRunner, collectionHandle, first =
   };
 }
 
+export const OPTIONS_QUERY = gql`
+query GetOptionsForProduct($handle: String, $numVariants: Int!) {
+  product(handle: $handle) {
+    id
+    handle
+    options {
+      id
+      name
+      optionValues {
+        id
+        name
+        swatch {
+          color
+        }
+      }
+    }
+    variants(first: $numVariants) {
+      edges {
+        node {
+          id
+          title
+          image {
+            id
+            url
+          }
+          price {
+            amount
+          }
+          compareAtPrice {
+            amount
+          }
+          weight
+          weightUnit
+          selectedOptions {
+            name
+            value
+          }
+          variantSubtitle: metafield(key: "variant_subtitle", namespace: "custom") {
+            id
+            key
+            value
+            namespace
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+export async function fetchProductOptions(handle, numVariants) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
+
+  const res = await queryRunner.runQuery(
+    'query',
+    OPTIONS_QUERY,
+    {
+      handle,
+      numVariants
+    },
+    {
+      cachePolicy: 'cache-first'
+    }
+  );
+  
+  return {
+    options: res.data.product?.options,
+    variants: res.data.product?.variants?.edges ?? []
+  };
+}
+
+// Function to fetch product variant by selected options
+export const fetchVariantBySelectedOptions = async (productHandle, selectedOptions) => {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
+  
+  const VARIANT_BY_SELECTED_OPTIONS_QUERY = gql`
+    query VariantBySelectedOptions($handle: String, $selectedOptions: [SelectedOptionInput!]!) {
+      product(handle: $handle) {
+        id
+        variantBySelectedOptions(selectedOptions: $selectedOptions) ${VARIANT_INFO}
+      }
+    }
+  `;
+  
+  try {
+    const res = await queryRunner.runQuery(
+      'query',
+      VARIANT_BY_SELECTED_OPTIONS_QUERY,
+      {
+        handle: productHandle,
+        selectedOptions: selectedOptions
+      },
+      {
+        cachePolicy: 'cache-first'
+      }
+    );
+    
+    return {
+      data: {
+        variant: res.data.product?.variantBySelectedOptions
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching variant by selected options:', error);
+    throw error;
+  }
+};
+
 // Function to fetch only the count of products matching specific filters
-export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, filters = []) => {
+export async function fetchFilteredProductsCount(collectionHandle, filters = []) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
@@ -267,10 +350,11 @@ export const fetchFilteredProductsCount = async (queryRunner, collectionHandle, 
   const FILTERED_PRODUCTS_COUNT_QUERY = gql`
     query FilteredProductsCount($handle: String, $filters: [ProductFilter!], $first: Int!) {
       collection(handle: $handle) {
+        id
         products(filters: $filters, first: $first) {
           edges {
             node {
-              handle
+              id
             }
           }
         }
