@@ -29,7 +29,7 @@ const StackNavigator = createStackNavigator();
 function isOnHome(state) {
   try {
     const currentRoute = state.routes?.[state?.index ?? 0] ?? null;
-    if (currentRoute?.name === "Nav1") {
+    if (currentRoute?.name === "Main") {
       const nav1State = currentRoute.state;
 
       if (nav1State && nav1State.index) {
@@ -272,7 +272,7 @@ function CustomHeaderSmart({route, navigation}) {
       navigation={navigation}
       topInset={insets?.top ?? 0}
       numCartItems={numCurrentCartItems}
-      showBackbutton={route.name !== "Nav1"}
+      showBackbutton={route.name !== "Main"}
       ref={headerComponent}
     />
   );

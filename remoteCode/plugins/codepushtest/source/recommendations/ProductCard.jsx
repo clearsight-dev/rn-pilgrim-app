@@ -26,7 +26,7 @@ const ProductCard = ({ product, style }) => {
     <TouchableOpacity 
       style={[styles.container, style, { width: screenWidth / 2.4 }]}
       onPress={() => {
-        dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
+        dispatch(navigateToScreen('Product', {productHandle: handle}))
       }}
     >
       {/* Product Image */}

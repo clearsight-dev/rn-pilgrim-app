@@ -23,7 +23,7 @@ const QuickCollections = ({
   
   // Handle collection press
   const handleCollectionPress = (collectionHandle) => {
-    dispatch(navigateToScreen('NewCollection', { collectionHandle }));
+    dispatch(navigateToScreen('Collection', { collectionHandle }));
   };
   
   return (
