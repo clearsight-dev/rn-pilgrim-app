@@ -15,6 +15,7 @@ import UpdateModal from './components/UpdateModal';
 import AdminPage from './components/AdminPage';
 import FloatingUpdateModal from './components/FloatingUpdateModal';
 import {PilgrimContext} from './PilgrimContext';
+import {fillCaches} from './extractedQueries/homepageQueries';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
@@ -32,6 +33,9 @@ const Stack = createNativeStackNavigator<ScreenParams>();
 function App(): React.JSX.Element {
   const [pilgrimGlobals, setPilgrimGlobals] = useState({homePageScrolledDown: false});
   const status = useStartApptile(initAnalytics);
+  useEffect(() => {
+    fillCaches();
+  }, [])
 
   let body = (
     <NavigationContainer
