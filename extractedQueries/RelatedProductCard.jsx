@@ -82,10 +82,15 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
 
   return (
     <Pressable
-      style={[styles.container, style]}
+      style={({pressed}) => [
+        styles.container, 
+        pressed && {opacity: 0.4},
+        style
+      ]}
       onPress={() => {
         dispatch(navigateToScreen('NewPDP', {productHandle: handle}));
-      }}>
+      }
+    }>
       {/* Promo Tag */}
       {productLabel2?.value && <ProductFlag
         label={productLabel2?.value}

@@ -16,7 +16,7 @@ import {
 let queryRunner = null;
 export async function cheaplyGetShopifyQueryRunner(reevaluate) {
   const decayIntervals = [10, 50, 100, 300, 500, 1000, 2000, 3000];
-  const currentDelay = 0;
+  let currentDelay = 0;
   if (queryRunner && queryRunner.runQuery && queryRunner.runQuery.call && !reevaluate) {
     return queryRunner;
   } else {

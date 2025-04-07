@@ -11,7 +11,6 @@ import { ProductCountSkeleton,  ProductGridSkeleton } from './Skeletons';
 import { fetchCollectionData, fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import {formatProductsForCarousel} from '../../../../extractedQueries/RelatedProductsCarousel';
-import { addLineItemToCart } from '../../../../extractedQueries/selectors';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
 import Footer from './Footer';
@@ -84,13 +83,14 @@ export function ReactComponent({ model }) {
   }, [collectionHandle]);
 
   const fetchData = useCallback((cursor = null, isLoadingMore = false, sortKey = sortOption, reverse = sortReverse) => {
-    let timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (isLoadingMore) {
         setLoadingMore(true);
       } else {
         setLoading(true);
       }
     }, 100);
+
     
     fetchCollectionData(collectionHandle, isLoadingMore ? 20 : 12, cursor, sortKey, reverse)
       .then(res => {
@@ -262,13 +262,14 @@ export function ReactComponent({ model }) {
   
   // Function to fetch total products count
   async function fetchTotalProductsCount(collectionHandle) {
-    let timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       setIsLoadingTotalCount(true);
     }, 100)
     
     try {
       // Fetch count with no filters
       const result = await fetchFilteredProductsCount(collectionHandle, []);
+      clearTimeout(timeout);
       console.log("Setting product count", result);
       setTotalProductsCount(result);
     } catch (error) {
@@ -433,10 +434,6 @@ export function ReactComponent({ model }) {
   }, [selectedFilters, fetchFilteredCount]);
   
   useEffect(() => {
-    // setTimeout(() => {
-    //   fetchTotalProductsCount(collectionHandle);
-    //   fetchData(null);
-    // }, 50)
     if (Platform.OS === "android") {
       setTimeout(() => {
         fetchTotalProductsCount(collectionHandle);

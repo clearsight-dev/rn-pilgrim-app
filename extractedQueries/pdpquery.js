@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import { cheaplyGetShopifyQueryRunner } from './selectors';
 import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
 
-const PRODUCT_QUERY = gql`
+export const PRODUCT_QUERY = gql`
   query GetProduct(
     $productHandle: String!
   ) {

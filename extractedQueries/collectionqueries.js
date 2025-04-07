@@ -144,50 +144,49 @@ export async function fetchCollectionCarouselData(collectionHandle) {
   }
 };
 
+export const COLLECTION_PRODUCTS_QUERY = gql`
+query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
+  collection(handle: $handle) {
+    id
+    handle
+    title
+    products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }
+      filters {
+        label
+        id
+        presentation
+        type
+        values {
+          id
+          label
+          image {
+            id
+            image {
+              id
+              url
+            }
+          }
+        }
+      }
+      edges {
+        node ${PRODUCT_CARD_INFO}
+        cursor
+      }
+    }
+  }
+}
+`;
+
 // Function to fetch collection data using the GraphQL query with pagination support
 export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
-  
-  // Modify the query to include pagination parameters, sorting and filters
-  const COLLECTION_PRODUCTS_QUERY = gql`
-    query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
-      collection(handle: $handle) {
-        id
-        handle
-        title
-        products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
-          pageInfo {
-            hasNextPage
-            hasPreviousPage
-          }
-          filters {
-            label
-            id
-            presentation
-            type
-            values {
-              id
-              label
-              image {
-                id
-                image {
-                  id
-                  url
-                }
-              }
-            }
-          }
-          edges {
-            node ${PRODUCT_CARD_INFO}
-            cursor
-          }
-        }
-      }
-    }
-  `;
   
   const data = await queryRunner.runQuery(
     'query',
@@ -226,61 +225,61 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
   };
 }
 
+export const OPTIONS_QUERY = gql`
+query GetOptionsForProduct($handle: String, $numVariants: Int!) {
+  product(handle: $handle) {
+    id
+    handle
+    options {
+      id
+      name
+      optionValues {
+        id
+        name
+        swatch {
+          color
+        }
+      }
+    }
+    variants(first: $numVariants) {
+      edges {
+        node {
+          id
+          title
+          image {
+            id
+            url
+          }
+          price {
+            amount
+          }
+          compareAtPrice {
+            amount
+          }
+          weight
+          weightUnit
+          selectedOptions {
+            name
+            value
+          }
+          variantSubtitle: metafield(key: "variant_subtitle", namespace: "custom") {
+            id
+            key
+            value
+            namespace
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
 export async function fetchProductOptions(handle, numVariants) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
-
-  const OPTIONS_QUERY = gql`
-    query GetOptionsForProduct($handle: String, $numVariants: Int!) {
-      product(handle: $handle) {
-        id
-        handle
-        options {
-          id
-          name
-          optionValues {
-            id
-            name
-            swatch {
-              color
-            }
-          }
-        }
-        variants(first: $numVariants) {
-          edges {
-            node {
-              id
-              title
-              image {
-                id
-                url
-              }
-              price {
-                amount
-              }
-              compareAtPrice {
-                amount
-              }
-              weight
-              weightUnit
-              selectedOptions {
-                name
-                value
-              }
-              variantSubtitle: metafield(key: "variant_subtitle", namespace: "custom") {
-                id
-                key
-                value
-                namespace
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
 
   const res = await queryRunner.runQuery(
     'query',
