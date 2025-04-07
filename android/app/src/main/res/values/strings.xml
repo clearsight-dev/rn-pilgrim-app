@@ -12,4 +12,6 @@
   <string name="facebook_client_token">c652a661acf3d9fc9c503d386c00a27b</string>
   <string name="moengage_app_id">WF38NKW2X6FKWGZRC749OAF5</string>
   <string name="moengage_datacenter">data_center_3</string>
+  <string name="APPSFLYER_DEVKEY">CKRqFz9GSQfSNWLFSbds4J</string>
+  <string name="APPSFLYER_APPID">id1663450529</string>
 </resources>

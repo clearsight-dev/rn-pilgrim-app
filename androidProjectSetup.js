@@ -477,6 +477,21 @@ function removeCleverTap(androidManifest, stringsObj, extraModules, parsedReactN
   addForceUnlinkForNativePackage('clevertap-react-native', extraModules, parsedReactNativeConfig);
 }
 
+function addAppsflyer(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig) {
+  const appsflyerIntegration = apptileConfig.integrations.appsflyer;
+  upsertInStringsXML(stringsObj, 'APPSFLYER_DEVKEY', appsflyerIntegration.devkey);
+  upsertInStringsXML(stringsObj, 'APPSFLYER_APPID', appsflyerIntegration.appId);
+
+  removeForceUnlinkForNativePackage('react-native-appsflyer', extraModules, parsedReactNativeConfig);
+}
+
+function removeAppsflyer(androidManifest, stringsObj, extraModules, parsedReactNativeConfig) {
+  removeFromStringsXML(stringsObj, 'APPSFLYER_DEVKEY');
+  removeFromStringsXML(stringsObj, 'APPSFLYER_APPID');
+
+  addForceUnlinkForNativePackage('react-native-appsflyer', extraModules, parsedReactNativeConfig);
+}
+
 function addFacebook(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig) {
   const facebookIntegration = apptileConfig.integrations.metaAds;
   upsertInStringsXML(stringsObj, 'facebook_app_id', facebookIntegration.FacebookAppId);
@@ -581,6 +596,12 @@ async function main() {
     addFacebook(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig)
   } else {
     removeFacebook(androidManifest, stringsObj, extraModules, parsedReactNativeConfig); 
+  }
+
+  if (apptileConfig.feature_flags.ENABLE_APPSFLYER) {
+    addAppsflyer(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig)
+  } else {
+    removeAppsflyer(androidManifest, stringsObj, extraModules, parsedReactNativeConfig); 
   }
 
   if (apptileConfig.feature_flags.ENABLE_ONESIGNAL) {

@@ -71,3 +71,6 @@ ios/main.jsbundle
 ios/bundleassets
 remoteCode/generated
 extra_modules.json
+
+# generated
+android/index.android.bundle

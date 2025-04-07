@@ -45,7 +45,11 @@
       "appId": "WF38NKW2X6FKWGZRC749OAF5",
       "datacenter": "data_center_3"
     },
-    "shopify": {}
+    "shopify": {},
+    "appsflyer": {
+      "devkey": "CKRqFz9GSQfSNWLFSbds4J",
+      "appId": "id1663450529"
+    }
   },
   "assets": [
     {
@@ -61,14 +65,14 @@
   ],
   "secrets": [],
   "feature_flags": {
+    "ENABLE_MOENGAGE": true,
+    "ENABLE_APPSFLYER": true,
+    "ENABLE_FIREBASE_ANALYTICS": true,
+    "ENABLE_FBSDK": true,
     "ENABLE_ONESIGNAL": false,
     "ENABLE_SEGMENT_ANALYTICS": false,
-    "ENABLE_FBSDK": true,
     "ENABLE_CLEVERTAP": false,
-    "ENABLE_KALVIYO": false,
-    "ENABLE_MOENGAGE": true,
-    "ENABLE_APPSFLYER": false,
-    "ENABLE_FIREBASE_ANALYTICS": true
+    "ENABLE_KALVIYO": false
   },
   "SDK_PATH": "/Users/vadivazhagan/apptile-cli-home/ReactNativeTSProjeect",
   "APP_ID": "6a1f4f33-744a-418c-947e-30247efdbe91",

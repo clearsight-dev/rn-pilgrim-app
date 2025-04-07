@@ -3,6 +3,7 @@ import {checkATTPermission, ApptileAnalytics, addCustomEventListener} from 'appt
 import {
   Firebase as FirebaseAnalytics, 
   Facebook as FacebookAnalytics,
+  AppsFlyer as AppsFlyerAnalytics,
   Moengage as MoengageAnalytics,
   // __ENABLED_ANALYTICS_IMPORTS__
 } from 'apptile-core';
@@ -38,6 +39,7 @@ export async function init() {
     await ApptileAnalytics.initialize([
       FirebaseAnalytics, 
       FacebookAnalytics,
+      AppsFlyerAnalytics,
       MoengageAnalytics,
       // __ENABLED_ANALYTICS__
     ]);

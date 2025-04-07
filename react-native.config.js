@@ -6,12 +6,6 @@ module.exports = {
         "ios": null
       }
     },
-    "react-native-appsflyer": {
-      "platforms": {
-        "android": null,
-        "ios": null
-      }
-    },
     "react-native-onesignal": {
       "platforms": {
         "android": null,
