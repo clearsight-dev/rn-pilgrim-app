@@ -8,11 +8,9 @@ const AboveThefoldContent = ({
   loading, 
   error, 
   product, 
-  productImages, 
   productLabel, 
-  rating, 
-  offers, 
-  variantOptions, 
+  offers,
+  variants,
   selectedVariant, 
   setSelectedVariant,
   screenWidth
@@ -32,17 +30,16 @@ const AboveThefoldContent = ({
   return (
     <View style={styles.scrollContainer}>
       <ImageCarousel 
-        images={productImages} 
+        images={product?.images} 
         screenWidth={screenWidth} 
         productLabel={productLabel}
       />
       
       <ProductInfo 
         product={product}
-        productLabel={productLabel}
-        rating={rating}
+        productLabel={product?.productLabel2?.value || product?.productLabel1?.value || null}
         offers={offers}
-        variantOptions={variantOptions}
+        variants={variants}
         selectedVariant={selectedVariant}
         setSelectedVariant={setSelectedVariant}
       />

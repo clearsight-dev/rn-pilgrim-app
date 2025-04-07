@@ -6,7 +6,6 @@ import {
   Pressable, 
   FlatList,
   Image,
-  ActivityIndicator
 } from 'react-native';
 import { useApptileWindowDims } from 'apptile-core';
 import BottomSheet from './BottomSheet';
@@ -23,12 +22,11 @@ function VariantSelector({
 }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [variants, setVariants] = useState([]);
-  const [selectedVariantId, setSelectedVariantId] = useState(null);
-  const [selectedVariantDetails, setSelectedVariantDetails] = useState(null);
-  const [loadingVariant, setLoadingVariant] = useState(false);
   const originalBottomSheetRef = useRef(bottomSheetRef);
   const {width: screenWidth} = useApptileWindowDims();
 
+  // TODO(gaurav): This is probably doing nothing. Remove and see if it makes any
+  // difference
   // Reset state when modal is closed
   useEffect(() => {
     // Store the original ref
@@ -40,10 +38,6 @@ function VariantSelector({
       bottomSheetRef.current.hide = () => {
         // Call the original hide method
         originalHide();
-        // Reset state
-        setSelectedVariant(null);
-        setSelectedVariantDetails(null);
-        setSelectedVariantId(null);
       };
     }
     
@@ -60,105 +54,43 @@ function VariantSelector({
     if (!product) return;
 
     async function getVariants() {
-      const res = await fetchProductOptions(product.handle);
-      const options = res?.data?.options ?? [];
+      const res = await fetchProductOptions(product.handle, product.variantsCount);
+      const options = res?.options ?? [];
+      const variants = res?.variants ?? [];
 
-      // Find the specified option (not color)
+      // Find the specified option 
       const option = options?.find(option => 
         option.name.toLowerCase() === optionName.toLowerCase()
       );
       
       if (!option) return;
 
-      const normalizeOption = (value) => {
-        return value?.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-      }
-      
-      // Process each variant value
-      const processedVariants = option.optionValues.map((value, index) => {
-        // Normalize the variant name
-        const normalizedName = normalizeOption(value.name);
-        
-        // Find matching variant
-        const variant = product.variants[0];
-        
-        return {
-          id: index.toString(),
-          name: value.name,
-          normalizedName,
-          price: variant?.price?.amount || "",
-          originalPrice: variant?.compareAtPrice?.amount || "",
-          discount: (variant?.compareAtPrice?.amount !== variant.price.amount) ? 
-            Math.round((1 - (variant.price.amount / variant.compareAtPrice.amount)) * 100) + "% " : null,
-          variantId: variant?.id,
-          image: variant?.image?.url || product.featuredImage?.url
-        };
-      });
-      
-      setVariants(processedVariants);
-      
-      // Select the first variant by default when product changes
-      if (Array.isArray(product.variants[0]?.selectedOptions)) {
-        const selectedOption = product.variants[0].selectedOptions[0];
-        const selectedVariantIndex = processedVariants.findIndex(it => it.name === selectedOption.value);
-        if (selectedVariantIndex >= 0) {
-          setSelectedVariant(processedVariants[selectedVariantIndex]);
+      let processedVariants = [];
+      for (let index = 0; index < option.optionValues.length; ++index) {
+        const value = option.optionValues[index];
+        const variant = variants.find(it => {
+          return it?.node?.selectedOptions?.[0]?.value === value.name;
+        });
+
+        if (variant) {
+          processedVariants.push(variant.node);
         }
       }
+      
+      setVariants(processedVariants);
+      setSelectedVariant(processedVariants[0]);
     }
 
     getVariants();
+    return () => {
+      setSelectedVariant(null);
+    }
   }, [product, optionName]);
-
-  // Fetch variant details when a variant is selected
-  useEffect(() => {
-    if (!selectedVariant || !product) return;
-    
-    const fetchVariantDetails = async () => {
-      // Only show loading after 200ms to avoid flicker for cached data
-      const loadingTimer = setTimeout(() => {
-        setLoadingVariant(true);
-      }, 200);
-      
-      try {
-        const selectedOptions = [{
-          name: optionName,
-          value: selectedVariant.name
-        }];
-        
-        const result = await fetchVariantBySelectedOptions(
-          product.handle,
-          selectedOptions
-        );
-        
-        const variant = result.data.variant;
-        if (variant) {
-          setSelectedVariantDetails(variant);
-          setSelectedVariantId(variant.id);
-        } else {
-          // Fallback to the variant ID we already have
-          setSelectedVariantId(selectedVariant.variantId || product.firstVariantId);
-        }
-      } catch (error) {
-        console.error('Error fetching variant details:', error);
-        // Fallback to the variant ID we already have
-        setSelectedVariantId(selectedVariant.variantId || product.firstVariantId);
-      } finally {
-        clearTimeout(loadingTimer);
-        setLoadingVariant(false);
-      }
-    };
-    
-    fetchVariantDetails();
-  }, [selectedVariant, product, optionName]);
 
   const handleAddToCart = () => {
     return new Promise((resolve, reject) => {
-      if (selectedVariantId) {
-        resolve(addLineItemToCart(selectedVariantId));
+      if (selectedVariant) {
+        resolve(addLineItemToCart(selectedVariant.id));
       } else {
         reject(new Error("Cannot add to cart because there is no selected variant"));
       }
@@ -176,7 +108,6 @@ function VariantSelector({
         optionName={optionName}
         isSelected={selectedVariant?.id === item.id}
         isPopular={index === 0} // First item is always popular choice
-        onSelect={() => setSelectedVariant(item)}
       />
     </Pressable>
   );
@@ -195,43 +126,36 @@ function VariantSelector({
         <View style={styles.bottomSheetContent}>
           {/* Product Header */}
           <View style={styles.productHeader}>
-            {loadingVariant ? (
-              <View style={[
-                styles.loadingContainer,
-                {minHeight: screenWidth / 2.1}
-              ]}>
-                <ActivityIndicator size="small" color="#00909E" />
-              </View>
-            ) : (
-              <>
-                <Image 
-                  source={{ uri: selectedVariantDetails?.image?.url || selectedVariant?.image || product.featuredImage?.url }} 
-                  style={[
-                    styles.productImage,
-                    {
-                      height: screenWidth / 2.1
-                    }
-                  ]}
-                  resizeMode="contain"
-                />
-                <View style={styles.productInfo}>
-                  <Text style={styles.productTitle} numberOfLines={2}>
-                    {product.title}
-                  </Text>
-                  <Text style={styles.productPrice}>
-                    ₹{parseInt(selectedVariantDetails?.price?.amount || "0").toLocaleString()}
-                  </Text>
-                  {selectedVariantDetails?.weight > 0 && (
-                    <Text style={styles.productWeight}>
-                      {selectedVariantDetails.weight} {selectedVariantDetails.weightUnit.toLowerCase()}
-                    </Text>
-                  )}
-                  <Text style={styles.productWeight}>
-                    {optionName}: {selectedVariantDetails?.title || selectedVariant?.name}
-                  </Text>
-                </View>
-              </>
+            {(!!selectedVariant?.image?.url) ? (<Image 
+              source={{ uri: selectedVariant?.image?.url || "" }} 
+              style={[
+                styles.productImage,
+                {
+                  height: screenWidth / 2.1
+                }
+              ]}
+              resizeMode="contain"
+            />):(
+              <View
+                style={[styles.productImage, {height: screenWidth / 2.1, aspectRatio: 1}]}
+              />
             )}
+            <View style={styles.productInfo}>
+              <Text style={styles.productTitle} numberOfLines={2}>
+                {product.title}
+              </Text>
+              <Text style={styles.productPrice}>
+                ₹{parseInt(selectedVariant?.price?.amount || "0").toLocaleString()}
+              </Text>
+              {selectedVariant?.weight > 0 && (
+                <Text style={styles.productWeight}>
+                  {selectedVariant.weight} {selectedVariant.weightUnit.toLowerCase()}
+                </Text>
+              )}
+              <Text style={styles.productWeight}>
+                {optionName}: {selectedVariant?.title || selectedVariant?.name}
+              </Text>
+            </View>
           </View>
           
           {/* Divider */}

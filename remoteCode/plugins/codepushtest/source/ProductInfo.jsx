@@ -1,54 +1,56 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Icon } from 'apptile-core';
 import RatingPill from '../../../../extractedQueries/RatingPill';
 import OfferCard from './OfferCard';
 import VariantCard from '../../../../extractedQueries/VariantCard';
 
-const ProductInfo = ({ 
-  product, 
-  productLabel, 
-  rating, 
-  offers, 
-  variantOptions, 
-  selectedVariant, 
-  setSelectedVariant 
-}) => {
-  // Enhanced variant selector component using the new VariantCard
-  const InlineVariantSelector = ({ variants, selectedIndex, onSelect }) => {
-    // Determine which variants should show the timer
-    // For this example, we'll show the timer on the first variant only
-    const shouldShowTimer = (index) => index === 0;
-    
-    return (
-      <View style={styles.variantSelectorContainer}>
-        <Text style={styles.variantTitle}>Size: 50ml (1 Month Pack)</Text>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.variantOptionsContainer}
-        >
-          {variants.map((variant, index) => (
-            <TouchableOpacity
+// Enhanced variant selector component using the new VariantCard
+function InlineVariantSelector ({ 
+  variants,
+  selectedVariant,
+  setSelectedVariant,
+}) {
+  return (
+    <View style={styles.variantSelectorContainer}>
+      { selectedVariant?.title && (
+        <Text style={styles.variantTitle}>
+          Size: {selectedVariant.title}
+        </Text>
+      )}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.variantOptionsContainer}
+      >
+        {variants.map((variant, index) => {
+          return (
+            <Pressable
               key={`variant-${index}`}
-              onPress={() => onSelect(index)}
+              onPress={() => setSelectedVariant(variant)}
               activeOpacity={0.7}
             >
               <VariantCard
                 variant={variant}
                 optionName={"Size"}
-                isSelected={selectedIndex === index}
-                isPopular={variant.popular}
-                showTimer={shouldShowTimer(index)}
-                onSelect={() => {}}
+                isSelected={selectedVariant?.id === variant.id}
+                isPopular={index == 0}
               />
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-    );
-  };
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+};
 
+function ProductInfo({ 
+  product, 
+  offers, 
+  variants,
+  selectedVariant, 
+  setSelectedVariant 
+}) {
   // If no offers found in metafields, use a default offer
   const displayOffers = offers.length > 0 ? offers : [
     {
@@ -71,17 +73,19 @@ const ProductInfo = ({
   return (
     <View style={styles.productInfoContainer}>
       {/* Bestseller tag */}
-      <View style={styles.bestsellerContainer}>
-        <Text style={styles.bestsellerText}>BESTSELLER</Text>
-      </View>
+      {
+        (product?.productLabel1?.value ?? "").toString().toLowerCase().includes("bestseller") && 
+        <View style={styles.bestsellerContainer}>
+          <Text style={styles.bestsellerText}>BESTSELLER</Text>
+        </View>
+      }
       
       {/* Product Title */}
       <Text style={styles.productTitle}>{product?.title || "Product Name"}</Text>
       
       {/* Product Subtitle */}
       <Text style={styles.productSubtitle}>
-        {product?.metafields?.find(m => m?.key === "subtitle")?.value || 
-         "Clinically tested to show new hair growth in 28 days"}
+        {product?.subtitle?.value}
       </Text>
       
       {/* Price - VERTICALLY ARRANGED */}
@@ -89,7 +93,7 @@ const ProductInfo = ({
         <View style={styles.priceRow}>
           <Text style={styles.priceSymbol}>₹</Text>
           <Text style={styles.price}>
-            {variantOptions[selectedVariant].price}
+            {selectedVariant?.price?.amount}
           </Text>
         </View>
         <Text style={styles.taxInfo}>MRP inclusive of all taxes</Text>
@@ -97,10 +101,10 @@ const ProductInfo = ({
       
       {/* Rating - Using parsed JSON value */}
       <View style={styles.ratingContainer}>
-        <RatingPill rating={rating} size={16} backgroundColor="#25a69a" />
+        <RatingPill rating={product?.rating} size={16} backgroundColor="#25a69a" />
         <View style={styles.reviewCount}>
           <Text style={{marginRight: 5}}>
-            {product?.metafields?.find(m => m?.key === "rating_count")?.value || "7,332"} 
+            {product?.reviews?.value} 
           </Text>
           <Icon 
             iconType={'Material Icon'} 
@@ -111,16 +115,18 @@ const ProductInfo = ({
               color: '#00AEEF'
             }}
           />
-          <Text style={styles.verifiedText}> Verified reviews</Text>
+          <Text style={styles.verifiedText}>Verified reviews</Text>
         </View>
       </View>
       
       {/* Variant Selector */}
-      <InlineVariantSelector 
-        variants={variantOptions} 
-        selectedIndex={selectedVariant} 
-        onSelect={setSelectedVariant} 
-      />
+      {product?.variantsCount > 1 && (
+        <InlineVariantSelector 
+          variants={variants}
+          selectedVariant={selectedVariant}
+          setSelectedVariant={setSelectedVariant} 
+        />
+      )}
       
       {/* Active Offers Section - Using the new offer card design */}
       <View style={styles.offersSection}>

@@ -1,38 +1,43 @@
 import React from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
 import RelatedProductCard from './RelatedProductCard';
-import {addLineItemToCart} from './selectors';
+
+export function formatProduct(product) {
+  const firstVariant = product.variants?.edges?.[0]?.node;
+  let parsedRating = 0;
+  try {
+    parsedRating = parseFloat(JSON.parse(product.rating.value)?.value ?? 0);
+    parsedRating = parseFloat(parsedRating.toFixed(1));
+  } catch (err) {
+    parsedRating = 0;
+  }
+
+  return {
+    id: product.id,
+    firstVariantId: firstVariant?.id ?? null,
+    title: product.title,
+    handle: product.handle,
+    featuredImage: product.featuredImage,
+    images: (product.images?.edges ?? []).map(edge => edge.node),
+    price: firstVariant?.price ?? {amount: 0},
+    compareAtPrice: firstVariant?.compareAtPrice ?? {amount: 0},
+    variantsCount: product.variantsCount?.count ?? 0,
+    productType: product.productType,
+    options: product.options?.[0]?.optionValues || [],
+    variants: [product.variants?.edges?.[0]?.node ?? {}],
+    rating: parsedRating,
+    reviews: product?.reviews,
+    productLabel1: product.productLabel1,
+    productLabel2: product.productLabel2,
+    weight: firstVariant?.weight,
+    weightUnit: firstVariant?.weightUnit,
+    subtitle: product.subtitle
+  }
+}
 
 export function formatProductsForCarousel(products) {
   if (!products || !Array.isArray(products)) return [];
-  return products.map(product => {
-    const firstVariant = product.variants?.edges?.[0]?.node;
-    let parsedRating = 0;
-    try {
-      parsedRating = parseFloat(JSON.parse(product.rating)?.value);
-    } catch (err) {
-      parsedRating = 0;
-    }
-
-    return {
-      id: product.id,
-      firstVariantId: firstVariant?.id ?? null,
-      title: product.title,
-      handle: product.handle,
-      featuredImage: product.featuredImage,
-      price: firstVariant?.price ?? {amount: 0},
-      compareAtPrice: firstVariant?.compareAtPrice ?? {amount: 0},
-      variantsCount: product.variantsCount?.count ?? 0,
-      productType: product.productType,
-      options: product.options || [],
-      variants: [product.variants?.edges?.[0]?.node],
-      rating: parsedRating,
-      productLabel1: product.productLabel1,
-      productLabel2: product.productLabel2,
-      weight: firstVariant?.weight,
-      weightUnit: firstVariant?.weightUnit
-    }
-  });
+  return products.map(product => formatProduct(product));
 };
 
 function RelatedProductsCarousel({

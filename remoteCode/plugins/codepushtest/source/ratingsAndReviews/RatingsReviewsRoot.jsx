@@ -201,8 +201,7 @@ const RatingsReviewsRoot = ({ productHandle }) => {
   }, [judgemeDSModel, productHandle])
 
   useEffect(() => {
-    const queryRunner = shopifyDSModel?.get('queryRunner');
-    fetchProductData(queryRunner, productHandle)
+    fetchProductData(productHandle)
       .then(res => {
         // Extract rating, rating_count, and consumer study results from metafields
         if (res?.data?.productByHandle?.metafields) {
@@ -266,7 +265,7 @@ const RatingsReviewsRoot = ({ productHandle }) => {
       .catch(err => {
         console.error(err.toString());
       });
-  }, [shopifyDSModel, productHandle]);
+  }, [productHandle]);
 
   return (
     <RatingCard 

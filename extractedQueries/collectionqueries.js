@@ -1,6 +1,7 @@
 import gql from 'graphql-tag';
-import {PRODUCT_CARD_INFO} from './pdpquery';
+import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
 import { cheaplyGetShopifyQueryRunner } from './selectors';
+import {VARIANT_INFO} from './commonGraphqlInfo';
 // Function to fetch collection data for the carousel component
 export async function fetchCollectionCarouselData(collectionHandle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
@@ -225,23 +226,55 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
   };
 }
 
-export async function fetchProductOptions(handle) {
+export async function fetchProductOptions(handle, numVariants) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
 
   const OPTIONS_QUERY = gql`
-    query GetOptionsForProduct($handle: String) {
+    query GetOptionsForProduct($handle: String, $numVariants: Int!) {
       product(handle: $handle) {
         id
         handle
         options {
+          id
           name
           optionValues {
+            id
             name
             swatch {
               color
+            }
+          }
+        }
+        variants(first: $numVariants) {
+          edges {
+            node {
+              id
+              title
+              image {
+                id
+                url
+              }
+              price {
+                amount
+              }
+              compareAtPrice {
+                amount
+              }
+              weight
+              weightUnit
+              selectedOptions {
+                name
+                value
+              }
+              variantSubtitle: metafield(key: "variant_subtitle", namespace: "custom") {
+                id
+                key
+                value
+                namespace
+              }
             }
           }
         }
@@ -254,6 +287,7 @@ export async function fetchProductOptions(handle) {
     OPTIONS_QUERY,
     {
       handle,
+      numVariants
     },
     {
       cachePolicy: 'cache-first'
@@ -261,9 +295,8 @@ export async function fetchProductOptions(handle) {
   );
   
   return {
-    data: {
-      options: res.data.product?.options
-    }
+    options: res.data.product?.options,
+    variants: res.data.product?.variants?.edges ?? []
   };
 }
 
@@ -278,21 +311,7 @@ export const fetchVariantBySelectedOptions = async (productHandle, selectedOptio
     query VariantBySelectedOptions($handle: String, $selectedOptions: [SelectedOptionInput!]!) {
       product(handle: $handle) {
         id
-        variantBySelectedOptions(selectedOptions: $selectedOptions) {
-          id
-          title
-          image {
-            url
-          }
-          price {
-            amount
-          }
-          compareAtPrice {
-            amount
-          }
-          weight
-          weightUnit
-        }
+        variantBySelectedOptions(selectedOptions: $selectedOptions) ${VARIANT_INFO}
       }
     }
   `;

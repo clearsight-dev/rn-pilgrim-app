@@ -22,7 +22,6 @@ function ShadeSelector({
 }) {
   const [selectedShade, setSelectedShade] = useState(null);
   const [shades, setShades] = useState([]);
-  const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loadingVariant, setLoadingVariant] = useState(false);
   const originalBottomSheetRef = useRef(bottomSheetRef);
@@ -39,10 +38,6 @@ function ShadeSelector({
       bottomSheetRef.current.hide = () => {
         // Call the original hide method
         originalHide();
-        // Reset state
-        setSelectedShade(null);
-        setSelectedVariant(null);
-        setSelectedVariantId(null);
       };
     }
     
@@ -59,8 +54,10 @@ function ShadeSelector({
     if (!product) return;
 
     async function getShades() {
-      const res = await fetchProductOptions(product.handle);
-      const options = res?.data?.options ?? [];
+      debugger
+      const res = await fetchProductOptions(product.handle, product.variantsCount);
+      const options = res?.options ?? [];
+      const variants = res?.variants ?? [];
 
       // Find the color option
       const option = options?.find(option => 
@@ -68,110 +65,40 @@ function ShadeSelector({
       );
       
       if (!option) return;
-
-      const normalizeOption = (value) => {
-        return value?.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-      }
-      
       // Process each color value
-      const processedShades = option.optionValues.map((value, index) => {
-        // Normalize the color name (remove non-alphanumeric chars, replace with spaces, condense spaces)
-        const normalizedName = normalizeOption(value.name);
-        
-        // Find matching variant
-        const variant = product.variants[0];
-        
-        // Try to find color in colorSwatches
-        let colorHex = null;
-        if (colorSwatches[normalizedName]) {
-          colorHex = colorSwatches[normalizedName].colorHex;
-        }
-        
-        // If no color found, try to find image in imageSwatches
-        let imageUrl = null;
-        if (!colorHex && imageSwatches[normalizedName]) {
-          imageUrl = imageSwatches[normalizedName];
-        }
-        
-        // If still no image, use variant image
-        if (!imageUrl && variant?.image?.url) {
-          imageUrl = variant.image.url;
-        }
-        
-        return {
-          id: index.toString(),
-          name: value.name,
-          normalizedName,
-          colorHex,
-          imageUrl,
-          variantId: variant?.id
-        };
-      });
-      
-      setShades(processedShades);
-      
-      // Select the first shade by default when product changes
-      if (Array.isArray(product.variants[0]?.selectedOptions)) {
-        const selectedOption = product.variants[0].selectedOptions[0];
-        const selectedShadeIndex = processedShades.find(it => it.name === selectedOption.value)
-        if (selectedShadeIndex >= 0) {
-          setSelectedShade(selectedShadeIndex);
+      const processedVariants = [];
+      for (let index = 0; index < option.optionValues.length; ++index) {
+        const value = option.optionValues[index];
+        const variant = variants.find(it => {
+          return it?.node?.selectedOptions?.[0]?.value === value.name;
+        })
+
+        if (variant) {
+          processedVariants.push(variant.node);
         }
       }
+
+      setShades(processedVariants);
+      setSelectedVariant(processedVariants[0]);
     }
 
     getShades();
+    return () => {
+      setSelectedVariant(null);
+    }
   }, [product]);
 
-  // Fetch variant details when a shade is selected
-  useEffect(() => {
-    if (!selectedShade || !product) return;
-    
-    const fetchVariantDetails = async () => {
-      // Only show loading after 200ms to avoid flicker for cached data
-      const loadingTimer = setTimeout(() => {
-        setLoadingVariant(true);
-      }, 200);
-      
-      try {
-        const selectedOptions = [{
-          name: 'Color',
-          value: selectedShade.name
-        }];
-        
-        const result = await fetchVariantBySelectedOptions(
-          product.handle,
-          selectedOptions
-        );
-        
-        const variant = result.data.variant;
-        if (variant) {
-          setSelectedVariant(variant);
-          setSelectedVariantId(variant.id);
-        } else {
-          // Fallback to the variant ID we already have
-          setSelectedVariantId(selectedShade.variantId || product.firstVariantId);
-        }
-      } catch (error) {
-        console.error('Error fetching variant details:', error);
-        // Fallback to the variant ID we already have
-        setSelectedVariantId(selectedShade.variantId || product.firstVariantId);
-      } finally {
-        clearTimeout(loadingTimer);
-        setLoadingVariant(false);
-      }
-    };
-    
-    fetchVariantDetails();
-  }, [selectedShade, product]);
+  function normalizeOption (value) {
+    return value?.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
 
   const handleAddToCart = () => {
     return new Promise((resolve, reject) => {
-      if (selectedVariantId) {
-        resolve(addLineItemToCart(selectedVariantId));
+      if (selectedVariant) {
+        resolve(addLineItemToCart(selectedVariant.id));
       } else {
         reject(new Error("Cannot add to cart because there is no selected variant"));
       }
@@ -179,47 +106,55 @@ function ShadeSelector({
   };
 
   // Render a shade item
-  const renderShadeItem = ({ item }) => (
-    <Pressable 
-      style={styles.shadeItem}
-      onPress={() => setSelectedShade(item)}
-    >
-      <View style={styles.shadeContainer}>
-        {item.colorHex ? (
-          <View style={[
-            styles.shadeTablet, 
-            { backgroundColor: item.colorHex }
-          ]} />
-        ) : item.imageUrl ? (
-          <Image 
-            source={{ uri: item.imageUrl }} 
-            style={styles.shadeImage}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={[
-            styles.shadeTablet, 
-            { backgroundColor: '#CCCCCC' }
-          ]} />
-        )}
-        
-        {/* Checkmark overlay for selected shade */}
-        {selectedShade?.id === item.id && (
-          <View style={styles.checkmarkContainer}>
-            <Icon 
-              name="check" 
-              size={24} 
-              color="#FFFFFF" 
+  const renderShadeItem = ({ item }) => {
+    const normalizedName = normalizeOption(item.title)
+    const colorHex = colorSwatches[normalizedName]?.colorHex;
+    let imageUrl = null;
+    if (!colorHex) {
+      imageUrl = imageSwatches[normalizedName];
+    }
+    return (
+      <Pressable 
+        style={styles.shadeItem}
+        onPress={() => setSelectedVariant(item)}
+      >
+        <View style={styles.shadeContainer}>
+          {colorHex ? (
+            <View style={[
+              styles.shadeTablet, 
+              { backgroundColor: colorHex }
+            ]} />
+          ) : imageUrl ? (
+            <Image 
+              source={{ uri: imageUrl }} 
+              style={styles.shadeImage}
+              resizeMode="cover"
             />
-          </View>
-        )}
-      </View>
-      <Text style={[
-        styles.shadeName,
-        (selectedShade?.id === item.id) ? styles.selectedShadeName : {}
-      ]}>{item.name}</Text>
-    </Pressable>
-  );
+          ) : (
+            <View style={[
+              styles.shadeTablet, 
+              { backgroundColor: '#CCCCCC' }
+            ]} />
+          )}
+          
+          {/* Checkmark overlay for selected shade */}
+          {selectedVariant?.id === item.id && (
+            <View style={styles.checkmarkContainer}>
+              <Icon 
+                name="check" 
+                size={24} 
+                color="#FFFFFF" 
+              />
+            </View>
+          )}
+        </View>
+        <Text style={[
+          styles.shadeName,
+          (selectedVariant?.id === item.id) ? styles.selectedShadeName : {}
+        ]}>{item.title}</Text>
+      </Pressable>
+    )
+  };
 
   return (
     <BottomSheet 
@@ -233,6 +168,7 @@ function ShadeSelector({
     >
       {product && (
         <View style={styles.bottomSheetContent}>
+          {/* <Text>test insert: {JSON.stringify(selectedVariant, null, 2)}</Text> */}
           {/* Product Header */}
           <View style={styles.productHeader}>
             {loadingVariant ? (
@@ -245,7 +181,7 @@ function ShadeSelector({
             ) : (
               <>
                 <Image 
-                  source={{ uri: selectedVariant?.image?.url || product.featuredImage?.url }} 
+                  source={{ uri: selectedVariant?.image?.url }} 
                   style={[
                     styles.productImage,
                     {
@@ -269,6 +205,9 @@ function ShadeSelector({
                   <Text style={styles.productWeight}>
                     Shade: {selectedVariant?.title}
                   </Text>
+                  <Text style={styles.productWeight}>
+                    {selectedVariant?.variantSubtitle?.value}
+                  </Text>
                 </View>
               </>
             )}
@@ -290,9 +229,9 @@ function ShadeSelector({
           
           {/* Add to Cart Button */}
           <PilgrimCartButton 
-            buttonText={selectedShade ? "Add to Cart" : "Select a Shade"}
+            buttonText={selectedVariant ? "Add to Cart" : "Select a Shade"}
             onPress={handleAddToCart}
-            disabled={!selectedShade}
+            disabled={!selectedVariant}
             variant='large'
           />
         </View>

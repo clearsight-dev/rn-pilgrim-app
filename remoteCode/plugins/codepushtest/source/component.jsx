@@ -3,13 +3,39 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, SectionList, Text, InteractionManager, Platform } from 'react-native';
 import { datasourceTypeModelSel, useApptileWindowDims } from 'apptile-core';
 import { useRoute } from '@react-navigation/native';
-import { useSelector, shallowEqual } from 'react-redux';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
 import AboveThefoldContent from './AboveThefoldContent';
 import DescriptionCard from './DescriptionCard';
 import RecommendationsRoot from './recommendations/RecommendationsRoot';
 import BenefitsRoot from './keybenefits/BenefitsRoot';
 import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
+import { formatProduct } from '../../../../extractedQueries/RelatedProductsCarousel';
+import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
+
+async function getVariants(product, setVariants, setSelectedVariant) {
+  const res = await fetchProductOptions(product.handle, product.variantsCount);
+  const options = res?.options ?? [];
+  const variants = res?.variants ?? [];
+
+  const option = options[0];
+
+  if (!option) return;
+
+  let processedVariants = [];
+  for (let index = 0; index < option.optionValues.length; ++index) {
+    const value = option.optionValues[index];
+    const variant = variants.find(it => {
+      return it?.node?.selectedOptions?.[0]?.value === value.name;
+    })
+
+    if (variant) {
+      processedVariants.push(variant.node);
+    }
+  }
+
+  setVariants(processedVariants);
+  setSelectedVariant(processedVariants[0]);
+}
 
 export function ReactComponent({ model }) {
   const route = useRoute();
@@ -24,7 +50,8 @@ export function ReactComponent({ model }) {
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedVariant, setSelectedVariant] = useState(0);
+  const [variants, setVariants] = useState([]);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   const [benefits, setBenefits] = useState({
     carouselItems: [],
     title: "",
@@ -36,24 +63,21 @@ export function ReactComponent({ model }) {
   });
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
 
-  const queryRunner = useSelector(state => {
-    const shopifyDSModel = datasourceTypeModelSel(state, 'shopifyV_22_10')
-    const queryRunner = shopifyDSModel.get('queryRunner');
-    return queryRunner;
-  }, shallowEqual);
-
   console.log("Rendering pdp");
   useEffect(() => {
     const loadProductData = async () => {
-      setLoading(true);
+      const timeout = setTimeout(() => {
+        setLoading(true);
+      }, 100);
+
       try {
-        if (!queryRunner || !productHandle) {
+        if (!productHandle) {
           // TODO(gaurav): actually retry
-          console.error("[APPTILE_AGENT] No query runner or product handle. Will retry in 100ms");
+          console.error("[APPTILE_AGENT] No product handle.");
           return;
         }
 
-        const result = await fetchProductData(queryRunner, productHandle);
+        const result = await fetchProductData(productHandle);
 
         // Beware adventurer! android ahead
         // On low end androids the render cycle is long enough to give a significant
@@ -74,62 +98,35 @@ export function ReactComponent({ model }) {
           // and pixel 6 to have the jank occur at the last possible moment of the 
           // animation
           // InteractionManager.runAfterInteractions(() => {
-            setProductData(result);
+            const productByHandle = formatProduct(result.productByHandle)
+            clearTimeout(timeout);
+            setProductData({
+              productByHandle
+            });
             setLoading(false);
           }, 50);
         } else {
-          setProductData(result);
+          const productByHandle = formatProduct(result.productByHandle)
+          clearTimeout(timeout);
+          setProductData({
+            productByHandle
+          });
           setLoading(false);
+          debugger
+          getVariants(productByHandle, setVariants, setSelectedVariant);
         }
-
       } catch (err) {
         console.error("[APPTILE_AGENT] Error fetching product data:", err);
         setError(err.message || "Failed to fetch product data");
+        clearTimeout(timeout);
         setLoading(false);
       }
     };
   
-    if (queryRunner && productHandle) {
+    if (productHandle) {
       loadProductData();
     }
-  }, [queryRunner, productHandle]);
-
-  // Extract and format product label
-  const formatProductLabel = (metafields) => {
-    if (!metafields || !Array.isArray(metafields)) return null;
-    
-    const labelMetafield = metafields.find(meta => 
-      meta && meta.key === 'product_label_1' && meta.namespace === 'custom'
-    );
-    
-    if (!labelMetafield || !labelMetafield.value) return null;
-    
-    // Capitalize and remove non-alphabetical characters
-    return labelMetafield.value
-      .replace(/[^a-zA-Z ]/g, '')
-      .toUpperCase();
-  };
-
-  // Parse rating JSON from metafield
-  const parseRating = (metafields) => {
-    if (!metafields || !Array.isArray(metafields)) return "4.8";
-    
-    const ratingMetafield = metafields.find(meta => 
-      meta && meta.key === 'rating' && meta.namespace === 'reviews'
-    );
-    
-    if (!ratingMetafield || !ratingMetafield.value) return "4.8";
-    
-    try {
-      // Parse the JSON string to get the rating object
-      const ratingObj = JSON.parse(ratingMetafield.value);
-      // Return the value, or fallback to 4.8 if not found
-      return ratingObj.value || "4.8";
-    } catch (e) {
-      console.error("[APPTILE_AGENT] Error parsing rating JSON:", e);
-      return "4.8";
-    }
-  };
+  }, [productHandle]);
 
   // Extract offer data from metafields
   const extractOffers = (metafields) => {
@@ -262,9 +259,6 @@ export function ReactComponent({ model }) {
   
   // Main render
   const product = getProductDetails(productData);
-  const productImages = product ? getProductImages(product) : [];
-  const productLabel = product ? formatProductLabel(product.metafields) : null;
-  const rating = product ? parseRating(product.metafields) : "4.8";
   const offers = product ? extractOffers(product.metafields) : [];
   
   // Process benefits data when product data changes
@@ -328,12 +322,9 @@ export function ReactComponent({ model }) {
           <AboveThefoldContent
             loading={loading}
             error={error}
-            product={product}
-            productImages={productImages}
-            productLabel={productLabel}
-            rating={rating}
+            product={productData?.productByHandle}
             offers={offers}
-            variantOptions={variantOptions}
+            variants={variants}
             selectedVariant={selectedVariant}
             setSelectedVariant={setSelectedVariant}
             screenWidth={screenWidth}

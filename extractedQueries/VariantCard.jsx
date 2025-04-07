@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Defs, LinearGradient, Stop, Rect, Path } from 'react-native-svg';
 import GradientText from './GradientText';
 
-const DiscountBadge = ({ discount }) => {
+function DiscountBadge({ discount }) {
   // Badge dimensions
   const width = 40;
   const height = 40;
@@ -85,17 +85,25 @@ const PopularChoiceFooter = () => (
   </View>
 );
 
-const VariantCard = ({ 
+function VariantCard({ 
   variant,
   optionName = "Size",
   isSelected = false,
   isPopular = false,
   onSelect,
-}) => {
-  let truncatedVariantName = variant.name;
-  if (variant.name.indexOf("(") >= 0) {
-    truncatedVariantName = variant.name.slice(0, variant.name.indexOf("("));
+}) {
+  if (!variant) {
+    return <Text>"no variant!"</Text>;
   }
+  let truncatedVariantName = variant.title ?? "";
+  if ((variant.title || "").indexOf("(") >= 0) {
+    truncatedVariantName = variant.title.slice(0, variant.title.indexOf("("));
+  }
+  let discount = (1 - (parseFloat(variant?.compareAtPrice?.amount)/parseFloat(variant?.price?.amount)))*100;
+  if (discount > 0) {
+    discount = `${discount}%`;
+  }
+
   return (
     <View style={styles.variantCardContainer}>   
       {/* Main Card Content */}
@@ -104,7 +112,7 @@ const VariantCard = ({
         isSelected ? styles.variantCardSelected : styles.variantCardDefault
       ]}>
         {/* Discount Badge - Only shown if discount is provided */}
-        {variant.discount && <DiscountBadge discount={variant.discount} />}
+        {(discount > 0) && <DiscountBadge discount={discount} />}
         
         {/* Size and Price Information */}
         <View style={styles.variantInfoContainer}>
@@ -114,9 +122,9 @@ const VariantCard = ({
           </View>
           
           <View style={styles.priceContainer}>
-            <Text style={styles.currentPrice}>₹{variant.price}</Text>
-            {(variant.originalPrice !== variant.price) && (
-              <Text style={styles.originalPrice}>₹{variant.originalPrice}</Text>
+            <Text style={styles.currentPrice}>₹{variant.price?.amount}</Text>
+            {(variant.compareAtPrice?.amount !== variant.price?.amount) && (
+              <Text style={styles.originalPrice}>₹{variant.compareAtPrice?.amount}</Text>
             )}
           </View>
         </View>
@@ -124,13 +132,6 @@ const VariantCard = ({
 
       {/* Popular Choice Footer - Only shown if isPopular is true */}
       {isPopular && <PopularChoiceFooter/>}
-
-      {/* Timer Component - Only shown if showTimer is true */}
-      {variant.showTimer && (
-        <View style={styles.timerWrapper}>
-          {/* TimerComponent is not included here as it's specific to the original location */}
-        </View>
-      )}
     </View>
   );
 };
@@ -239,12 +240,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#A3A3A3',
     textDecorationLine: 'line-through',
-  },
-  timerWrapper: {
-    position: 'absolute',
-    top: -12,
-    left: 8,
-    zIndex: 3,
   },
 });
 

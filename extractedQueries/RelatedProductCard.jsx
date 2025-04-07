@@ -95,7 +95,6 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
         height={18}
         width={95}
       />}
-      {/* <Text>{JSON.stringify(price)}{JSON.stringify(compareAtPrice}</Text> */}
 
       {/* Product Image */}
       <View style={styles.imageContainer}>

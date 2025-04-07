@@ -1,66 +1,6 @@
 import gql from 'graphql-tag';
-
-export const PRODUCT_CARD_INFO = 
-`
-{
-  id
-  handle
-  title
-  productType
-  featuredImage {
-    id
-    url
-  }
-  variantsCount {
-    count
-  }
-  variants(first: 1) {
-    edges {
-      node {
-        id
-        title
-        price {
-          amount
-        }
-        compareAtPrice {
-          amount
-        }
-        image {
-          id
-          url
-        }
-        weight
-        weightUnit
-        selectedOptions {
-          name
-          value
-        }
-        variantSubtitle: metafield(key: "variant_subtitle", namespace: "custom") {
-          id
-          key
-          value
-          namespace
-        }
-      }
-    }
-  }
-  rating: metafield(key: "rating", namespace: "reviews") {
-    key
-    namespace
-    value
-  }
-  productLabel1: metafield(key: "product_label_1", namespace: "custom") {
-    key
-    namespace
-    value
-  }
-  productLabel2: metafield(key: "product_label_2", namespace: "custom") {
-    key
-    namespace
-    value
-  }
-}
-`;
+import { cheaplyGetShopifyQueryRunner } from './selectors';
+import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
 
 const PRODUCT_QUERY = gql`
   query GetProduct(
@@ -73,7 +13,8 @@ const PRODUCT_QUERY = gql`
 `;
 
 // Function to fetch product data using the GraphQL query
-export const fetchProductData = async (queryRunner, productHandle) => {
+export async function fetchProductData(productHandle) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
   }
@@ -131,11 +72,8 @@ export const fetchProductData = async (queryRunner, productHandle) => {
   );
   
   return {
-    data: {
-      ...data.data,
-      productByHandle: data.data.product,
-      complementaryRecommendations: data.data.complementaryRecommendations,
-      relatedRecommendations: data.data.relatedRecommendations
-    }
+    productByHandle: data.data.product,
+    complementaryRecommendations: data.data.complementaryRecommendations,
+    relatedRecommendations: data.data.relatedRecommendations
   };
 }
