@@ -52,7 +52,7 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
     console.log(`[AGENT] Navigating to NewCollection with handle: ${collectionHandle}, category: ${category.title}, subcategory: ${subcategory}`);
     
     // Navigate to the NewCollection page with parameters
-    dispatch(navigateToScreen('NewCollection', {
+    dispatch(navigateToScreen('Collection', {
       collectionHandle: collectionHandle,
       category: category.title,
       subcategory: subcategory

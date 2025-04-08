@@ -9,7 +9,7 @@ import ReviewCard from './ReviewCard';
 import { ReviewCardSkeleton } from './SkeletonLoaders';
 
 // Component for displaying consumer study results
-const ConsumerStudyResults = ({ results = [] }) => {
+function ConsumerStudyResults ({ results = [] }) {
   if (results.length === 0) return null;
   
   // Function to extract percentage and text from the result string
@@ -52,7 +52,7 @@ const ConsumerStudyResults = ({ results = [] }) => {
   );
 };
 
-const RatingCard = ({ 
+function RatingCard ({ 
   rating = 2, 
   ratingCount = 0, 
   photos = [], 
@@ -60,7 +60,7 @@ const RatingCard = ({
   isLoading = false,
   consumerStudyResults = [],
   onSubmitReview = async (rating, title, body) => {console.log("no submit review function provided");}
-}) => {
+}) {
   const reviewsBottomSheet = useRef(null);
   const photosBottomSheet = useRef(null);
 

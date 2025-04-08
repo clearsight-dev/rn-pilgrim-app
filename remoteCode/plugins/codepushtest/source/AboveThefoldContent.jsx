@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useCallback, useRef} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import {Carousel} from '../../../../extractedQueries/ImageCarousel';
 import { Image } from '../../../../extractedQueries/ImageComponent';
@@ -9,14 +9,36 @@ function AboveThefoldContent({
   loading, 
   error, 
   product, 
-  productLabel, 
-  offers,
   variants,
   selectedVariant, 
   setSelectedVariant,
   screenWidth
 }) {
   const carouselRef = useRef(null);
+  let productImages;
+  if (Array.isArray(product?.images)) {
+    productImages = product.images.slice();
+  } else {
+    productImages = [];
+  }
+
+  for (let i = 0; i < variants.length; ++i) {
+    productImages.push({...variants[i].image, variantId: variants[i].id});
+  }
+
+  const handleVariantSelect = useCallback((variant) => {
+    setSelectedVariant(variant);
+    if (carouselRef.current) {
+      const requiredImage = variant.image?.url;
+      const index = productImages.findIndex(productImg => productImg.url === requiredImage);
+      if (index >= 0) {
+        carouselRef.current.scrollToIndex(index);
+      } else {
+        console.error("Could not find image: ", requiredImage, productImages)
+      }
+    }
+  }, [productImages, carouselRef]);
+
   if (loading) {
     return <AboveThefoldSkeleton />;
   }
@@ -27,12 +49,7 @@ function AboveThefoldContent({
         <Text style={styles.errorText}>Error: {error}</Text>
       </View>
     );
-  }
-
-  const productImages = product?.images ?? [];
-  for (let i = 0; i < variants.length; ++i) {
-    productImages.push({...variants[i].image, variantId: variants[i].id});
-  }
+  } 
 
   return (
     <View style={styles.scrollContainer}>
@@ -59,19 +76,10 @@ function AboveThefoldContent({
       <ProductInfo 
         product={product}
         productLabel={product?.productLabel2?.value || product?.productLabel1?.value || null}
-        offers={offers}
+        offers={product?.offers}
         variants={variants}
         selectedVariant={selectedVariant}
-        setSelectedVariant={variant => {
-          setSelectedVariant(variant);
-          if (carouselRef.current) {
-            const requiredImage = variant.image?.url;
-            const index = productImages.findIndex(productImg => productImg.url === requiredImage);
-            if (index >= 0) {
-              carouselRef.current.scrollToIndex(index);
-            }
-          }
-        }}
+        setSelectedVariant={handleVariantSelect}
       />
     </View>
   );

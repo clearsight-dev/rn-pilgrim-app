@@ -231,7 +231,7 @@ function ChipCollectionCarousel({
 
   // Handle "See All" button click
   const handleSeeAllClick = () => {
-    dispatch(navigateToScreen('NewCollection', { collectionHandle }));
+    dispatch(navigateToScreen('Collection', { collectionHandle }));
   };
   
   // Format products for the carousel

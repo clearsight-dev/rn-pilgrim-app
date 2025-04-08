@@ -12,6 +12,38 @@ export const PRODUCT_QUERY = gql`
   }
 `;
 
+export async function fetchProductDescriptionHtml(productHandle) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
+
+  const PRODUCT_HTML_QUERY = gql`
+  query GetProductDescriptionHtml(
+    $productHandle: String!
+  ) {
+    product(handle: $productHandle) {
+      id
+      descriptionHtml
+      description
+    }
+  }
+`;
+
+  const data = await queryRunner.runQuery(
+    'query',
+    PRODUCT_HTML_QUERY,
+    {
+      productHandle
+    }
+  )
+
+  return {
+    valueHtml: data.data?.product?.descriptionHtml,
+    valueText: data.data?.product?.description,
+  };
+}
+
 // Function to fetch product data using the GraphQL query
 export async function fetchProductData(productHandle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
@@ -25,41 +57,41 @@ export async function fetchProductData(productHandle) {
     {
       productHandle: productHandle,
       // productMetafields: [
-      //   {key:'rating', namespace:'reviews'},
-      //   {key:'rating_count', namespace:'reviews'},
-      //   {key: 'key_benefits', namespace: 'custom'},
-      //   {key: 'ingredients1_url', namespace: 'my_fields'},
-      //   {key: 'ingredients2_url', namespace: 'my_fields'},
-      //   {key: 'ingredients3_url', namespace: 'my_fields'},
-      //   {key: 'how_to_use', namespace: 'my_fields'},
-      //   {key: 'question1', namespace: 'my_fields'},
-      //   {key: 'question2', namespace: 'my_fields'},
-      //   {key: 'question3', namespace: 'my_fields'},
-      //   {key: 'answer1', namespace: 'my_fields'},
-      //   {key: 'answer2', namespace: 'my_fields'},
-      //   {key: 'answer3', namespace: 'my_fields'},
-      //   {key: 'test_benefit_url', namespace: 'my_fields'},
-      //   {key: 'after_atc_benefit2_url', namespace: 'my_fields'},
-      //   {key: 'after_atc_benefit3_url', namespace: 'my_fields'},
-      //   {key: 'consumer_study_results_1', namespace: 'custom'},
-      //   {key: 'consumer_study_results_2', namespace: 'custom'},
-      //   {key: 'consumer_study_results_3', namespace: 'custom'},
-      //   {key: 'consumer_study_results_foot_note', namespace: 'custom'}, 
-      //   {key: 'product_label_1', namespace: 'custom'},
-      //   {key: 'product_label_2', namespace: 'custom'},
-      //   {key: 'pd_page_offer_1', namespace: 'custom'}, 
-      //   {key: 'pd_page_offer_2', namespace: 'custom'},
-      //   {key: 'pd_page_offer_3', namespace: 'custom'},
-      //   {key:'featured_product_concern_based_kit_1_',namespace:'custom'}, 
-      //   {key: "after_atc_single_line_text", namespace: "my_fields"}, 
-      //   {key: 'subtitle', namespace: 'descriptors'},
-      //   {key: 'key_benefits_heading', namespace: 'custom'},
-      //   {key:'after_atc_benefit_heading', namespace:'custom'},
-      //   {key:'ingredients_heading', namespace:'custom'},
-      //   {key: 'product_label_3', namespace: 'custom'},
-      //   {key: 'product_maximum_quantity', namespace: 'custom'},
-      //   {key: 'hidden', namespace: 'seo'},
-      //   {key: 'after_atc_test_ingredients', namespace: 'my_fields'}
+        // {key: 'rating', namespace: 'reviews'},
+        // {key: 'rating_count', namespace: 'reviews'},
+        // {key: 'key_benefits', namespace: 'custom'},
+        // {key: 'ingredients1_url', namespace: 'my_fields'},
+        // {key: 'ingredients2_url', namespace: 'my_fields'},
+        // {key: 'ingredients3_url', namespace: 'my_fields'},
+        // {key: 'how_to_use', namespace: 'my_fields'},
+        // {key: 'question1', namespace: 'my_fields'},
+        // {key: 'question2', namespace: 'my_fields'},
+        // {key: 'question3', namespace: 'my_fields'},
+        // {key: 'answer1', namespace: 'my_fields'},
+        // {key: 'answer2', namespace: 'my_fields'},
+        // {key: 'answer3', namespace: 'my_fields'},
+        // {key: 'test_benefit_url', namespace: 'my_fields'},
+        // {key: 'after_atc_benefit2_url', namespace: 'my_fields'},
+        // {key: 'after_atc_benefit3_url', namespace: 'my_fields'},
+        // {key: 'consumer_study_results_1', namespace: 'custom'},
+        // {key: 'consumer_study_results_2', namespace: 'custom'},
+        // {key: 'consumer_study_results_3', namespace: 'custom'},
+        // {key: 'consumer_study_results_foot_note', namespace: 'custom'}, 
+        // {key: 'product_label_1', namespace: 'custom'},
+        // {key: 'product_label_2', namespace: 'custom'},
+        // {key: 'pd_page_offer_1', namespace: 'custom'}, 
+        // {key: 'pd_page_offer_2', namespace: 'custom'},
+        // {key: 'pd_page_offer_3', namespace: 'custom'},
+        // {key: 'featured_product_concern_based_kit_1_',namespace:'custom'}, 
+        // {key: "after_atc_single_line_text", namespace: "my_fields"}, 
+        // {key: 'subtitle', namespace: 'descriptors'},
+        // {key: 'key_benefits_heading', namespace: 'custom'},
+        // {key: 'after_atc_benefit_heading', namespace:'custom'},
+        // {key: 'ingredients_heading', namespace:'custom'},
+        // {key: 'product_label_3', namespace: 'custom'},
+        // {key: 'product_maximum_quantity', namespace: 'custom'},
+        // {key: 'hidden', namespace: 'seo'},
+        // {key: 'after_atc_test_ingredients', namespace: 'my_fields'}
       // ],
       // variantMetafields: [
       //   { key: "variant_subtitle", namespace: "custom" },

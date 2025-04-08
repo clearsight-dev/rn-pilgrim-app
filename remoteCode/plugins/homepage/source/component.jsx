@@ -260,18 +260,18 @@ export function ReactComponent({ model }) {
       key: 'quick-collections',
       data: [{}]
     },
-    {
-      title: "Banner Carousel",
-      type: 'banner-carousel',
-      key: 'banner-carousel',
-      data: [{}]
-    },
-    {
-      title: "Weekly Picks",
-      type: 'weekly-picks',
-      key: 'weekly-picks',
-      data: [{}]
-    },
+    // {
+    //   title: "Banner Carousel",
+    //   type: 'banner-carousel',
+    //   key: 'banner-carousel',
+    //   data: [{}]
+    // },
+    // {
+    //   title: "Weekly Picks",
+    //   type: 'weekly-picks',
+    //   key: 'weekly-picks',
+    //   data: [{}]
+    // },
     {
       title: "Bestsellers",
       type: 'bestsellers',
@@ -407,7 +407,7 @@ export function ReactComponent({ model }) {
       case 'external-links':
         return (
           <ExternalLinks />
-        )
+        );
       default:
         return null;
     }

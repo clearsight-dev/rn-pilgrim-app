@@ -9,9 +9,9 @@ const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Customer Photos</Text>
-        <TouchableOpacity onPress={onSeeAllPress}>
+        {/* <TouchableOpacity onPress={onSeeAllPress}>
           <Text style={styles.seeAllButton}>See all</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       
       <ScrollView 

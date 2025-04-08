@@ -1,17 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import {Image} from '../../../../../extractedQueries/ImageComponent';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import { useDispatch } from 'react-redux';
 
-const ProductCard = ({ product, style }) => {
+function ProductCard({ product, style, isPressable = false }) {
   // Extract product details
-  const { title, featuredImage, priceRange, compareAtPriceRange, metafield, handle } = product;
+  const { title, featuredImage, price: priceMoney, compareAtPrice: compareAtPriceMoney, metafield, handle } = product;
   const {width: screenWidth} = useApptileWindowDims();
   
   // Get price information
-  const price = priceRange?.minVariantPrice?.amount || '0';
-  const compareAtPrice = compareAtPriceRange?.minVariantPrice?.amount || null;
+  const price = parseFloat(priceMoney?.amount ?? 0);
+  const compareAtPrice = parseFloat(compareAtPriceMoney?.amount ?? 0);
   
   // Calculate discount percentage if compareAtPrice exists
   const discountPercentage = compareAtPrice 
@@ -23,10 +23,15 @@ const ProductCard = ({ product, style }) => {
   const dispatch = useDispatch();
 
   return (
-    <TouchableOpacity 
-      style={[styles.container, style, { width: screenWidth / 2.4 }]}
+    <Pressable 
+      style={({pressed}) => [
+        styles.container, 
+        style, 
+        { width: screenWidth / 2.4 },
+        pressed && isPressable && {opacity: 0.5}
+      ]}
       onPress={() => {
-        dispatch(navigateToScreen('NewPDP', {productHandle: handle}))
+        dispatch(navigateToScreen('Product', {productHandle: handle}))
       }}
     >
       {/* Product Image */}
@@ -48,7 +53,7 @@ const ProductCard = ({ product, style }) => {
         <View style={styles.priceContainer}>
           <Text style={styles.price}>₹{parseInt(price).toLocaleString()}</Text>
           
-          {compareAtPrice && (
+          {(compareAtPrice && discountPercentage > 0) && (
             <>
               <Text style={styles.compareAtPrice}>₹{parseInt(compareAtPrice).toLocaleString()}</Text>
               <Text style={styles.discount}>{discountPercentage}% Off</Text>
@@ -56,7 +61,7 @@ const ProductCard = ({ product, style }) => {
           )}
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

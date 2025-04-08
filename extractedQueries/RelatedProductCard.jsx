@@ -88,7 +88,7 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
         style
       ]}
       onPress={() => {
-        dispatch(navigateToScreen('NewPDP', {productHandle: handle}));
+        dispatch(navigateToScreen('Product', {productHandle: handle}));
       }
     }>
       {/* Promo Tag */}

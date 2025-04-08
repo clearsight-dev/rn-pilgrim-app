@@ -12,6 +12,79 @@ export function formatProduct(product) {
     parsedRating = 0;
   }
 
+  let offers = [];
+  function extractOffers(offerNodes) {
+    if (Array.isArray(offerNodes)) {
+      for (let i = 0; i < offerNodes.length; ++i) {
+        const fields = offerNodes[i].fields;
+        const offer = fields.reduce((accum, item) => {
+          if (item.key.startsWith("offer_code_")) {
+            accum.code = item.value;
+          } else if (item.key.startsWith("offer_description_")) {
+            accum.description = item.value;
+          } else if (item.key.startsWith("offer_headin_")) {
+            accum.title = item.value;
+          }
+          return accum;
+        }, {});
+
+        offers.push(offer)
+      }
+    }
+  }
+
+  extractOffers(product.offers1?.references?.nodes);
+  extractOffers(product.offers2?.references?.nodes);
+  extractOffers(product.offers3?.references?.nodes);
+
+  const benefitsImages = [];
+  if (product.benefits_url_1?.value) {
+    benefitsImages.push({imageUrl: product.benefits_url_1?.value});
+  }
+  
+  if (product.benefits_url_2?.value) {
+    benefitsImages.push({imageUrl: product.benefits_url_2?.value});
+  }
+
+  if (product.benefits_url_3?.value) {
+    benefitsImages.push({imageUrl: product.benefits_url_3?.value});
+  }
+
+  const textBenefits = {title: "", items: []};
+  if (product.text_benefits_title?.value) {
+    textBenefits.title = product.text_benefits_title?.value;
+  }
+
+  if (product.text_benefits_body?.value) {
+    textBenefits.items = (product.text_benefits_body?.value ?? "").split("•");
+  }
+
+  const ingredients = [];
+  if (product.ingredients_url_1?.value) {
+    ingredients.push(product.ingredients_url_1?.value);
+  }
+
+  if (product.ingredients_url_2?.value) {
+    ingredients.push(product.ingredients_url_2?.value);
+  }
+
+  if (product.ingredients_url_3?.value) {
+    ingredients.push(product.ingredients_url_3?.value);
+  }
+
+  const studyResults = [];
+  if (product.consumer_study_results_1?.value) {
+    studyResults.push(product.consumer_study_results_1?.value);
+  }
+
+  if (product.consumer_study_results_2?.value) {
+    studyResults.push(product.consumer_study_results_2?.value);
+  }
+
+  if (product.consumer_study_results_2?.value) {
+    studyResults.push(product.consumer_study_results_2?.value);
+  }
+
   return {
     id: product.id,
     firstVariantId: firstVariant?.id ?? null,
@@ -31,7 +104,13 @@ export function formatProduct(product) {
     productLabel2: product.productLabel2,
     weight: firstVariant?.weight,
     weightUnit: firstVariant?.weightUnit,
-    subtitle: product.subtitle
+    subtitle: product.subtitle,
+    offers,
+    benefitsImages,
+    textBenefits,
+    ingredients,
+    howToUse: product.how_to_use?.value,
+    studyResults
   }
 }
 

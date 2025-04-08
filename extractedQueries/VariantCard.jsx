@@ -87,10 +87,8 @@ const PopularChoiceFooter = () => (
 
 function VariantCard({ 
   variant,
-  optionName = "Size",
   isSelected = false,
   isPopular = false,
-  onSelect,
 }) {
   if (!variant) {
     return <Text>"no variant!"</Text>;
@@ -117,7 +115,7 @@ function VariantCard({
         {/* Size and Price Information */}
         <View style={styles.variantInfoContainer}>
           <View style={styles.sizeContainer}>
-            <Text style={styles.sizeLabel}>{optionName}:</Text>
+            <Text style={styles.sizeLabel}>{variant.selectedOptions?.[0]?.name ?? "Size"}:</Text>
             <Text style={styles.sizeValue}>{truncatedVariantName}</Text>
           </View>
           

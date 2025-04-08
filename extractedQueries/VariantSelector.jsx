@@ -17,7 +17,6 @@ import PilgrimCartButton from './PilgrimCartButton';
 function VariantSelector({ 
   bottomSheetRef, 
   product, 
-  optionName,
   onClose
 }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -59,9 +58,7 @@ function VariantSelector({
       const variants = res?.variants ?? [];
 
       // Find the specified option 
-      const option = options?.find(option => 
-        option.name.toLowerCase() === optionName.toLowerCase()
-      );
+      const option = options?.[0];
       
       if (!option) return;
 
@@ -85,7 +82,7 @@ function VariantSelector({
     return () => {
       setSelectedVariant(null);
     }
-  }, [product, optionName]);
+  }, [product]);
 
   const handleAddToCart = () => {
     return new Promise((resolve, reject) => {
@@ -105,7 +102,6 @@ function VariantSelector({
     >
       <VariantCard
         variant={item}
-        optionName={optionName}
         isSelected={selectedVariant?.id === item.id}
         isPopular={index === 0} // First item is always popular choice
       />
@@ -115,7 +111,7 @@ function VariantSelector({
   return (
     <BottomSheet 
       ref={bottomSheetRef}
-      title={`Select ${optionName}`}
+      title={`Select variant`}
       sheetHeightFraction={0.8} // 80% of screen height
       onClose={() => {
         setSelectedVariant(null);
@@ -153,7 +149,7 @@ function VariantSelector({
                 </Text>
               )}
               <Text style={styles.productWeight}>
-                {optionName}: {selectedVariant?.title || selectedVariant?.name}
+                Variant: {selectedVariant?.title || selectedVariant?.name}
               </Text>
             </View>
           </View>

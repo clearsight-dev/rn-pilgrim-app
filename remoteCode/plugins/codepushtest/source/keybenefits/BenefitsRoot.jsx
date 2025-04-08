@@ -6,16 +6,32 @@ import BenefitsCard from './BenefitsCard';
 import ThreeDCarousel from './ThreeDCarousel';
 import GradientText from '../../../../../extractedQueries/GradientText';
 
-const BenefitsRoot = ({ 
+function BenefitsRoot({ 
   loading, 
   error, 
-  benefits, 
+  product, 
   backgroundColor = '#C5FAFF4D',
   aspectRatio = '1/1.5',
   cardWidthPercentage = 70,
   cardSpacing = 10,
-  imageBand = []
-}) => {
+}) {
+  const imageBand = [
+    {
+      urls: ["https://cdn.apptile.io/6a1f4f33-744a-418c-947e-30247efdbe91/dbf4466e-2076-4ca5-9738-c96a431782d9/original-480x480.png"],
+      heading: "100%",
+      subtitle: "Genuine"      
+    },
+    {
+      urls: ["https://cdn.apptile.io/6a1f4f33-744a-418c-947e-30247efdbe91/5da618c4-c129-4449-af96-6cd38572006c/original-480x480.png"],
+      heading: "Secure",
+      subtitle: "Payment"
+    },
+    {
+      urls: ["https://cdn.apptile.io/6a1f4f33-744a-418c-947e-30247efdbe91/c74bcd33-66d7-431c-82d6-f02137cc8ccd/original-480x480.png"],
+      heading: "Free",
+      subtitle: "Shipping"
+    }
+  ];
   const { width } = useApptileWindowDims();
   
   const ITEM_WIDTH = width * (cardWidthPercentage / 100); // Card width as percentage of screen width
@@ -56,37 +72,19 @@ const BenefitsRoot = ({
     );
   }
 
-  if (!benefits.carouselItems || benefits.carouselItems.length === 0) {
-    return (
-      <View style={{ backgroundColor, paddingVertical: 20 }}>
-        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
-          <GradientText
-            text="Key Benefits"
-            fontSize={32}
-            fontWeight="bold"
-            width="100%"
-            height={60}
-            y="40"
-          />
-        </View>
-        <RNText style={styles.errorText}>No benefits data available</RNText>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.mainContainer}>
       {/* Benefits Card */}
-      {benefits.benefitsList.length > 0 && (
+      {product?.textBenefits?.items?.length > 0 && (
         <BenefitsCard 
-          title={benefits.title} 
-          benefits={benefits.benefitsList} 
+          title={product?.textBenefits?.title} 
+          benefits={product?.textBenefits?.items} 
           style={{ marginBottom: 30 }}
         />
       )}
 
       <ThreeDCarousel
-        carouselItems={benefits.carouselItems}
+        carouselItems={product?.benefitsImages}
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}
         cardAspectRatio={cardAspectRatio}

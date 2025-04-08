@@ -1,21 +1,61 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';
+import { fetchProductDescriptionHtml } from '../../../../extractedQueries/pdpquery';
 
 const DescriptionCard = ({ productData, loading }) => {
   const [activeTab, setActiveTab] = useState('description');
-  const bottomSheetRef = useRef(null);
+  const bottomSheetRef = useRef(null); 
+  const [description, setDescription] = useState({
+    status: "notstarted",
+    valueHtml: "",
+    valueText: ""
+  });
   
-  // Find the how_to_use metafield
-  const howToUseMetafield = productData?.metafields?.find(
-    meta => meta?.key === 'how_to_use' && meta?.namespace === 'my_fields'
-  );
-  
-  const howToUseContent = howToUseMetafield?.value || "No usage instructions available.";
-  
+  const howToUseContent = productData?.howToUse || "No usage instructions available.";
+
+  useEffect(() => {
+    if (!productData?.handle) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setDescription(prev => ({
+        ...prev,
+        status: "loading",
+      }));
+    }, 100);
+
+    fetchProductDescriptionHtml(productData.handle)
+      .then(({valueHtml, valueText}) => {
+        setDescription({
+          status: "loaded",
+          valueHtml,
+          valueText
+        });
+        clearTimeout(timeout);
+      })
+      .catch(err => {
+        clearTimeout(timeout);
+        setDescription(value => ({
+          ...value,
+          status: "error",
+        }));
+
+        console.error("Error when fetching html: ", err);
+      })
+      .finally(() => {
+        clearTimeout(timeout);
+      })
+
+    return () => {
+      clearTimeout(timeout);
+    }
+  }, [productData?.handle])
+
   // Render loading state
-  if (loading) {
+  if (loading || description.status != "loaded") {
     return (
       <View style={styles.container}>
         <Text>Loading product details...</Text>
@@ -90,16 +130,9 @@ const DescriptionCard = ({ productData, loading }) => {
       <View style={styles.contentContainer}>
         {activeTab === 'description' ? (
           <View>
-            <Text style={styles.suitableFor}>Suitable for: All Hair Types</Text>
-            
-            <Text style={styles.title}>
-              Bestselling Hair Growth Serum for Thicker, Fuller Hair in 28 Days
+            <Text numberOfLines={6}>
+              {description.valueText}
             </Text>
-            
-            <Text style={styles.description}>
-              Based on a clinical study conducted on 32 males & females presenting hair loss; when used as a regime
-            </Text>
-            
             <TouchableOpacity onPress={openBottomSheet} style={styles.readMoreButton}>
               <Text style={styles.readMoreText}>Read more </Text>
               <Text style={styles.readMoreArrow}>›</Text>
@@ -146,13 +179,14 @@ const DescriptionCard = ({ productData, loading }) => {
                     </style>
                   </head>
                   <body>
-                    ${productData.descriptionHtml}
+                    ${description.valueHtml}
                   </body>
                 </html>
               `}
               style={styles.iframe}
             />
           ) : (
+            <>
             <WebView
               source={{ 
                 html: `
@@ -170,13 +204,14 @@ const DescriptionCard = ({ productData, loading }) => {
                       </style>
                     </head>
                     <body>
-                      ${productData.descriptionHtml}
+                      ${description.valueHtml}
                     </body>
                   </html>
                 `
               }}
               style={styles.webView}
             />
+            </>
           )}
         </BottomSheet>
       )}
@@ -189,6 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     width: '100%',
+    minHeight: 100,
   },
   header: {
     fontSize: 24,
@@ -256,12 +292,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   howToUseContainer: {
-    height: 250,
+    height: 100,
     width: '100%',
   },
   howToUseWebView: {
     flex: 1,
-    height: 250,
+    height: 100,
   },
   howToUseIframe: {
     width: '100%',

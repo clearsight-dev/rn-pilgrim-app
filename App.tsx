@@ -68,7 +68,6 @@ function App(): React.JSX.Element {
   React.useEffect(() => {
     (async () => {
       if (status.modelReady) {
-        RNApptile.notifyJSReady();
         let url = await Linking.getInitialURL();
 
         if (_.isEmpty(url)) {
@@ -85,6 +84,9 @@ function App(): React.JSX.Element {
         setTimeout(async () => {
           if (url) {
             triggerCustomEventListener('deeplink_request', url);
+            // For pages other than homepage we dismiss here 
+            // Home dismisses the splash when first component is rendered
+            RNApptile.notifyJSReady();
           } else {
             console.error("url was not defined for deeplink");
           }
