@@ -1,19 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';
 
 const DescriptionCard = ({ productData, loading }) => {
   const [activeTab, setActiveTab] = useState('description');
-  const bottomSheetRef = useRef(null);
+  const bottomSheetRef = useRef(null); 
   
-  // Find the how_to_use metafield
-  const howToUseMetafield = productData?.metafields?.find(
-    meta => meta?.key === 'how_to_use' && meta?.namespace === 'my_fields'
-  );
-  
-  const howToUseContent = howToUseMetafield?.value || "No usage instructions available.";
-  
+  const howToUseContent = productData?.howToUse || "No usage instructions available.";
+
   // Render loading state
   if (loading) {
     return (
@@ -146,7 +141,7 @@ const DescriptionCard = ({ productData, loading }) => {
                     </style>
                   </head>
                   <body>
-                    ${productData.descriptionHtml}
+                    ${productData?.descriptionHtml}
                   </body>
                 </html>
               `}
@@ -170,7 +165,7 @@ const DescriptionCard = ({ productData, loading }) => {
                       </style>
                     </head>
                     <body>
-                      ${productData.descriptionHtml}
+                      ${productData?.descriptionHtml}
                     </body>
                   </html>
                 `
@@ -189,6 +184,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     width: '100%',
+    minHeight: 100,
+    borderWidth: 1,
+    borderColor: 'red'
   },
   header: {
     fontSize: 24,

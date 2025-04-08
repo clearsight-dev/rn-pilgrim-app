@@ -105,7 +105,13 @@ export function ReactComponent({ model }) {
     };
   
     if (productHandle) {
-      loadProductData();
+      if (Platform.OS === "android") {
+        setTimeout(() => {
+          loadProductData();
+        }, 50)
+      } else {
+        loadProductData();
+      }
     }
   }, [productHandle]);
 
@@ -190,7 +196,7 @@ export function ReactComponent({ model }) {
       case 'ratings':
         return (
           <RatingsReviewsRoot 
-            productHandle={productHandle}
+            product={productData?.productByHandle}
           />
         );
       case 'recommendations':

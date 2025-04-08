@@ -1,17 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { datasourceTypeModelSel, GetRegisteredPlugin } from 'apptile-core';
-import { fetchProductData } from '../../../../../extractedQueries/pdpquery';
 import RatingCard from './RatingCard';
 
-const RatingsReviewsRoot = ({ productHandle }) => {
+function RatingsReviewsRoot({ product }) {
+  const productHandle = product?.handle;
   const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
   const [judgeMeProductId, setJudgeMeProductId] = useState();
-  const [rating, setRating] = useState(2); // Default rating is 2
-  const [ratingCount, setRatingCount] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [consumerStudyResults, setConsumerStudyResults] = useState([]);
   const judgemeDSModel = useSelector(state => datasourceTypeModelSel(state, 'judgeMe'));
 
   const onSubmitReview = useCallback(async (rating, title, body) => {
@@ -200,81 +197,14 @@ const RatingsReviewsRoot = ({ productHandle }) => {
     }
   }, [judgemeDSModel, productHandle])
 
-  useEffect(() => {
-    fetchProductData(productHandle)
-      .then(res => {
-        // Extract rating, rating_count, and consumer study results from metafields
-        if (res?.data?.productByHandle?.metafields) {
-          const metafields = res.data.productByHandle.metafields;
-          
-          // Find rating metafield
-          const ratingMetafield = metafields.find(
-            metafield => metafield?.key === 'rating' && metafield?.namespace === 'reviews'
-          );
-          
-          // Find rating_count metafield
-          const ratingCountMetafield = metafields.find(
-            metafield => metafield?.key === 'rating_count' && metafield?.namespace === 'reviews'
-          );
-          
-          // Find consumer study results metafields
-          const consumerStudyResults1 = metafields.find(
-            metafield => metafield?.key === 'consumer_study_results_1' && metafield?.namespace === 'custom'
-          );
-          
-          const consumerStudyResults2 = metafields.find(
-            metafield => metafield?.key === 'consumer_study_results_2' && metafield?.namespace === 'custom'
-          );
-          
-          const consumerStudyResults3 = metafields.find(
-            metafield => metafield?.key === 'consumer_study_results_3' && metafield?.namespace === 'custom'
-          );
-          
-          // Update state with metafield values if they exist
-          if (ratingMetafield && ratingMetafield.value) {
-            try {
-              const rating = JSON.parse(ratingMetafield.value);
-              setRating(parseFloat(rating.value));
-            } catch (err) {
-              console.error("Failed to parse rating");
-            }
-          }
-          
-          if (ratingCountMetafield && ratingCountMetafield.value) {
-            setRatingCount(parseInt(ratingCountMetafield.value, 10));
-          }
-          
-          // Collect consumer study results
-          const studyResults = [];
-          
-          if (consumerStudyResults1 && consumerStudyResults1.value) {
-            studyResults.push(consumerStudyResults1.value);
-          }
-          
-          if (consumerStudyResults2 && consumerStudyResults2.value) {
-            studyResults.push(consumerStudyResults2.value);
-          }
-          
-          if (consumerStudyResults3 && consumerStudyResults3.value) {
-            studyResults.push(consumerStudyResults3.value);
-          }
-          
-          setConsumerStudyResults(studyResults);
-        }
-      })
-      .catch(err => {
-        console.error(err.toString());
-      });
-  }, [productHandle]);
-
   return (
     <RatingCard 
-      rating={rating} 
-      ratingCount={ratingCount} 
+      rating={product?.rating} 
+      ratingCount={product?.reviews?.value} 
       photos={reviews.filter(review => review.has_published_pictures).flatMap(review => review.pictures)}
       reviews={reviews}
       isLoading={isLoading}
-      consumerStudyResults={consumerStudyResults}
+      consumerStudyResults={product?.studyResults}
       onSubmitReview={onSubmitReview}
     />
   );

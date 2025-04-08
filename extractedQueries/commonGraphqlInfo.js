@@ -153,6 +153,22 @@ export const PRODUCT_CARD_INFO =
     id
     value
   }
+  how_to_use: metafield(key: "how_to_use", namespace: "my_fields") {
+    id
+    value
+  }
+  consumer_study_results_1: metafield(key: "consumer_study_results_1", namespace: "custom") {
+    id
+    value
+  }
+  consumer_study_results_2: metafield(key: "consumer_study_results_2", namespace: "custom") {
+    id
+    value
+  }
+  consumer_study_results_3: metafield(key: "consumer_study_results_3", namespace: "custom") {
+    id
+    value
+  }
 }
 `;
 

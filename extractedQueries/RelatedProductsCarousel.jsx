@@ -72,6 +72,19 @@ export function formatProduct(product) {
     ingredients.push(product.ingredients_url_3?.value);
   }
 
+  const studyResults = [];
+  if (product.consumer_study_results_1?.value) {
+    studyResults.push(product.consumer_study_results_1?.value);
+  }
+
+  if (product.consumer_study_results_2?.value) {
+    studyResults.push(product.consumer_study_results_2?.value);
+  }
+
+  if (product.consumer_study_results_2?.value) {
+    studyResults.push(product.consumer_study_results_2?.value);
+  }
+
   return {
     id: product.id,
     firstVariantId: firstVariant?.id ?? null,
@@ -95,7 +108,9 @@ export function formatProduct(product) {
     offers,
     benefitsImages,
     textBenefits,
-    ingredients
+    ingredients,
+    howToUse: product.how_to_use?.value,
+    studyResults
   }
 }
 
