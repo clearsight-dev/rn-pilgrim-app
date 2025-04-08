@@ -43,7 +43,6 @@ export function ReactComponent({ model }) {
   const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
   const aspectRatio = model.get('aspectRatio') || '1/1.5';
   const cardWidthPercentage = parseFloat(model.get('cardWidthPercentage') || '70');
-  const imageBand = model.get('imageBand') || [];
   const cardSpacing = parseInt(model.get('cardSpacing') || '10', 10);
   
   const [productData, setProductData] = useState(null);
@@ -190,7 +189,6 @@ export function ReactComponent({ model }) {
             aspectRatio={aspectRatio}
             cardWidthPercentage={cardWidthPercentage}
             cardSpacing={cardSpacing}
-            imageBand={imageBand}
           />
         );
       case 'ratings':
@@ -303,9 +301,5 @@ export const WrapperTileConfig = {
       label: "Spacing Between Cards",
       defaultValue: "20"
     },
-    imageBand: {
-      label: "Image Band",
-      defaultValue: []
-    }
   },
 };
