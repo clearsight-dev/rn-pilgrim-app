@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, SectionList, Platform, Text } from 'react-native';
+import { StyleSheet, SectionList, Platform, Text, View } from 'react-native';
 import { useApptileWindowDims } from 'apptile-core';
 import { useRoute } from '@react-navigation/native';
 import {fetchProductData} from '../../../../extractedQueries/pdpquery';
@@ -9,6 +9,8 @@ import DescriptionCard from './DescriptionCard';
 import RecommendationsRoot from './recommendations/RecommendationsRoot';
 import BenefitsRoot from './keybenefits/BenefitsRoot';
 import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
+import PilgrimCartButton from '../../../../extractedQueries/PilgrimCartButton';
+import { addLineItemToCart } from '../../../../extractedQueries/selectors';
 import { formatProduct, formatProductsForCarousel } from '../../../../extractedQueries/RelatedProductsCarousel';
 import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
 
@@ -199,12 +201,17 @@ export function ReactComponent({ model }) {
         );
       case 'recommendations':
         return (
-          <RecommendationsRoot 
-            loading={loading}
-            error={error}
-            data={productData}
-            handleAddToCart={() => console.log("adding to cart")}
-          />
+          <>
+            <RecommendationsRoot 
+              loading={loading}
+              error={error}
+              data={productData}
+              handleAddToCart={() => console.log("adding to cart")}
+            />
+            <View 
+              style={styles.bottomSpacer}
+            />
+          </>
         );
       default:
         return null;
@@ -212,22 +219,38 @@ export function ReactComponent({ model }) {
   };
 
   return (
-    <>
-    <SectionList
-      style={[styles.container, { height: screenHeight }]}
-      contentContainerStyle={styles.contentContainer}
-      sections={sections}
-      renderItem={renderItem}
-      renderSectionHeader={renderSectionHeader}
-      keyExtractor={(item, index) => index.toString()}
-      stickySectionHeadersEnabled={false}
-      showsVerticalScrollIndicator={true}
-      initialNumToRender={2} // Start with fewer sections for faster initial render
-      maxToRenderPerBatch={4} // Render fewer items per batch
-      windowSize={5} // Reduce window size for better performance
-      removeClippedSubviews={true} // Important for performance
-    />
-    </>
+    <View style={{
+      width: screenWidth,
+      flex: 1,
+      position: "relative",
+    }}>
+      <SectionList
+        style={[styles.container, { height: screenHeight }]}
+        contentContainerStyle={styles.contentContainer}
+        sections={sections}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        keyExtractor={(item, index) => index.toString()}
+        stickySectionHeadersEnabled={false}
+        showsVerticalScrollIndicator={true}
+        initialNumToRender={2} // Start with fewer sections for faster initial render
+        maxToRenderPerBatch={4} // Render fewer items per batch
+        windowSize={5} // Reduce window size for better performance
+        removeClippedSubviews={true} // Important for performance
+      />
+      <PilgrimCartButton
+        containerStyle={{
+          paddingVertical: 8,
+          position: "absolute", 
+          bottom: 0, 
+          backgroundColor: "white",
+          width: "100%"
+        }}
+        buttonText={"Add to Cart"}
+        variant="large"
+        onPress={() => addLineItemToCart(selectedVariant.id)}
+      />
+    </View>
   );
 }
 
@@ -261,6 +284,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
+  },
+  bottomSpacer: {
+    height: 80,
+    width: '100%'
   }
 });
 
