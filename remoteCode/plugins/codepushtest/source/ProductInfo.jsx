@@ -15,28 +15,10 @@ function InlineVariantSelector ({
 }) {
   const optionName = variants?.[0]?.selectedOptions?.[0]?.name ?? "Size";
   let renderedVariantOptions;
-  if (optionName.toLowerCase() === "size") {
-    renderedVariantOptions = variants.map((variant, index) => {
-      return (
-        <Pressable
-          key={`variant-${index}`}
-          onPress={() => setSelectedVariant(variant)}
-          activeOpacity={0.7}
-        >
-          <VariantCard
-            variant={variant}
-            optionName={optionName}
-            isSelected={selectedVariant?.id === variant.id}
-            isPopular={index == 0}
-          />
-        </Pressable>
-      );
-    });
-  } else { // optionName is Color
+  if (optionName.toLowerCase() === "color") {
     renderedVariantOptions =  variants.map((variant, index) => {
       const {colorHex, imageUrl} = normalizeOption(variant.title);
       const isSelected = selectedVariant?.id === variant.id;
-
       return (
         <Pressable
           key={`variant-${index}`}
@@ -72,6 +54,24 @@ function InlineVariantSelector ({
         </Pressable>
       );
     });
+  } else { // optionName is Size or Variant
+    renderedVariantOptions = variants.map((variant, index) => {
+      return (
+        <Pressable
+          key={`variant-${index}`}
+          onPress={() => setSelectedVariant(variant)}
+          activeOpacity={0.7}
+        >
+          <VariantCard
+            variant={variant}
+            optionName={optionName}
+            isSelected={selectedVariant?.id === variant.id}
+            isPopular={index == 0}
+          />
+        </Pressable>
+      );
+    });
+    
   }
 
   return (
