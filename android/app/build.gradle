@@ -76,7 +76,9 @@ def enableProguardInReleaseBuilds = false
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 def configFile = file("../../apptile.config.json")
-def bundleId = "com.apptile.apptilepreviewdemo"
+def appBundleId = "com.apptile.apptilepreviewdemo"
+def appVersionCode = 1
+def appVersionName = "0.1.0"
 
 def enable_onesignal = false
 def enable_moengage = false
@@ -85,7 +87,15 @@ def enable_clevertap = false
 if (configFile.exists()) {
     def json = new JsonSlurper().parseText(configFile.text)
     if (json.android && json.android.bundle_id) {
-        bundleId = json.android.bundle_id
+        appBundleId = json.android.bundle_id
+    }
+
+    if(json.android && json.android.version_code){
+        appVersionCode = json.android.version_code
+    }
+
+    if(json.android && json.android.version_name){
+        appVersionName = json.android.version_name
     }
 
     if (json.feature_flags.ENABLE_ONESIGNAL) {
@@ -93,11 +103,11 @@ if (configFile.exists()) {
     }
 
     if (json.feature_flags.ENABLE_MOENGAGE) {
-      enable_moengage = json.feature_flags.ENABLE_ONESIGNAL
+      enable_moengage = json.feature_flags.ENABLE_MOENGAGE
     }
 
     if (json.feature_flags.ENABLE_CLEVERTAP) {
-      enable_clevertap = json.feature_flags.ENABLE_CLVERTAP
+      enable_clevertap = json.feature_flags.ENABLE_CLEVERTAP
     }
 }
 
@@ -108,11 +118,11 @@ android {
 
     namespace "com.apptileseed"
     defaultConfig {
-        applicationId bundleId
+        applicationId appBundleId
+        versionCode appVersionCode
+        versionName appVersionName
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
         multiDexEnabled true
         missingDimensionStrategy 'react-native-camera', 'general'
     }

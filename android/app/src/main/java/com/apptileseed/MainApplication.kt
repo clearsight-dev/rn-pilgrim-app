@@ -99,7 +99,7 @@ class MainApplication : Application(), ReactApplication {
         sharedI18nUtilInstance.forceRTL(this, false)
         sharedI18nUtilInstance.allowRTL(this, false)
 
-        createMoengageIntegration(this).initialize()
+        createMoengageIntegration(this@MainApplication).initialize()
 
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
             // If you opted-in for the New Architecture, we load the native entry point for this app.

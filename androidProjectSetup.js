@@ -445,14 +445,6 @@ const firebaseMessagingEventIntent = {
   ] 
 };
 
-async function addAppsflyer(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig) {
-  removeForceUnlinkForNativePackage('react-native-appsflyer', extraModules, parsedReactNativeConfig);
-}
-
-async function removeAppsflyer(androidManifest, stringsObj, extraModules, parsedReactNativeConfig) {
-  await addForceUnlinkForNativePackage('react-native-appsflyer', extraModules, parsedReactNativeConfig);
-}
-
 function addCleverTap(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig) {
   const cleverTapIntegration = apptileConfig.integrations.cleverTap;
   addMetadata(androidManifest, 'CLEVERTAP_ACCOUNT_ID', cleverTapIntegration.cleverTap_id);
@@ -580,10 +572,28 @@ async function main() {
   const rawManifest = await readFile(androidManifestPath, {encoding: 'utf8'});
   const androidManifest = await parser.parseStringPromise(rawManifest);
 
-  upsertInStringsXML(stringsObj, 'app_name', apptileConfig.app_name);
+  upsertInStringsXML(stringsObj, 'app_name', apptileConfig.android.app_name);
   upsertInStringsXML(stringsObj, 'APPTILE_API_ENDPOINT', apptileConfig.APPTILE_BACKEND_URL);
   upsertInStringsXML(stringsObj, 'APP_ID', apptileConfig.APP_ID);
   upsertInStringsXML(stringsObj, 'APPTILE_UPDATE_ENDPOINT', apptileConfig.APPCONFIG_SERVER_URL);
+
+  upsertInStringsXML(
+    stringsObj,
+    'APPTILE_URL_SCHEME',
+    `${apptileConfig.url_scheme}://`,
+  );
+
+  upsertInStringsXML(
+    stringsObj,
+    'APPTILE_APP_HOST',
+    `https://${apptileConfig.app_host}`,
+  );
+
+  upsertInStringsXML(
+    stringsObj,
+    'APPTILE_APP_HOST_2',
+    `https://${apptileConfig.app_host_2}`,
+  );
 
   const parsedReactNativeConfig = await readReactNativeConfigJs();
 
@@ -614,12 +624,6 @@ async function main() {
     addMoengage(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig)
   } else {
     removeMoengage(androidManifest, stringsObj, extraModules, parsedReactNativeConfig);
-  }
-
-  if (apptileConfig.feature_flags.ENABLE_APPSFLYER) {
-    addAppsflyer(androidManifest, stringsObj, apptileConfig, extraModules, parsedReactNativeConfig);
-  } else {
-    removeAppsflyer(androidManifest, stringsObj, extraModules, parsedReactNativeConfig);
   }
 
   const updatedValuesXml = builder.buildObject(stringsObj);

@@ -4,23 +4,26 @@
   "analytics_api_endpoint": "https://analytics.apptile.io",
   "apptile_update_endpoint": "https://appconfigs.apptile.io",
   "app_id": "6a1f4f33-744a-418c-947e-30247efdbe91",
-  "app_name": "Pilgrim SDK staging",
   "url_scheme": "discoverpilgrim",
-  "app_host": "pilgrim.com",
-  "app_host_2": "pilgrim.com",
+  "app_host": "discoverpilgrim.com",
+  "app_host_2": "discoverpilgrimindia.onelink.me",
   "build_ios": true,
   "build_android": true,
   "ios": {
     "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
     "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
     "bundle_id": "com.discoverpilgrim",
-    "team_id": "8SQ493N52G"
+    "team_id": "8SQ493N52G",
+    "app_name": "Pilgrim India"
   },
   "android": {
     "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
     "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
     "bundle_id": "com.discoverpilgrim",
-    "expected_output": "apk&aab"
+    "expected_output": "apk&aab",
+    "app_name": "Pilgrim",
+    "version_code": 4195005,
+    "version_name": "11.0.16"
   },
   "both": {
     "buildSourceGitHeadName": "origin/main",
@@ -37,7 +40,7 @@
     "metaAds": {
       "FacebookAppId": "275209841592926",
       "FacebookClientToken": "c652a661acf3d9fc9c503d386c00a27b",
-      "FacebookDisplayName": "Pilgrim Staging",
+      "FacebookDisplayName": "Pilgrim",
       "FacebookAutoLogAppEventsEnabled": "YES",
       "FacebookAdvertiserIDCollectionEnabled": "NO"
     },
@@ -48,7 +51,7 @@
     "shopify": {},
     "appsflyer": {
       "devkey": "CKRqFz9GSQfSNWLFSbds4J",
-      "appId": "id1663450529"
+      "appId": "com.discoverpilgrim"
     }
   },
   "assets": [

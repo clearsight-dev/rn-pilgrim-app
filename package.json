@@ -85,7 +85,7 @@
     "react-hotkeys": "2.0.0",
     "react-image-crop": "10.1.8",
     "react-native": "0.73.8",
-    "react-native-appsflyer": "6.12.2",
+    "react-native-appsflyer": "^6.15.1",
     "react-native-autolink": "4.1.0",
     "react-native-calendars": "1.1304.1",
     "react-native-circular-progress-indicator": "4.4.2",

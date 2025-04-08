@@ -9,6 +9,7 @@ import {
   ApptileWrapper,
   ApptileAppRoot,
   useStartApptile,
+  triggerCustomEventListener,
 } from 'apptile-core';
 import {Linking, NativeModules} from 'react-native';
 
@@ -77,13 +78,13 @@ function App(): React.JSX.Element {
         if (!_.isEmpty(url) && url?.includes('af')) {
           const appFlyerDp = getAppFlyerDeepLink(url);
           if (!_.isEmpty(appFlyerDp)) {
-            return appFlyerDp;
+            url = appFlyerDp;
           }
         }
 
         setTimeout(async () => {
           if (url) {
-            await Linking.openURL(url);
+            triggerCustomEventListener('deeplink_request', url);
           } else {
             console.error("url was not defined for deeplink");
           }
