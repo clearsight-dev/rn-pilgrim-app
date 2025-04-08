@@ -9,14 +9,13 @@ import DescriptionCard from './DescriptionCard';
 import RecommendationsRoot from './recommendations/RecommendationsRoot';
 import BenefitsRoot from './keybenefits/BenefitsRoot';
 import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
-import { formatProduct } from '../../../../extractedQueries/RelatedProductsCarousel';
+import { formatProduct, formatProductsForCarousel } from '../../../../extractedQueries/RelatedProductsCarousel';
 import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
 
 async function getVariants(product, setVariants, setSelectedVariant) {
   const res = await fetchProductOptions(product.handle, product.variantsCount);
   const options = res?.options ?? [];
   const variants = res?.variants ?? [];
-
   const option = options[0];
 
   if (!option) return;
@@ -52,6 +51,7 @@ export function ReactComponent({ model }) {
   const [error, setError] = useState(null);
   const [variants, setVariants] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
+
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
 
   console.log("Rendering pdp");
@@ -72,9 +72,17 @@ export function ReactComponent({ model }) {
 
         function startHeavyRendering() {
           clearTimeout(timeout);
-          const productByHandle = formatProduct(result.productByHandle)
+          const productByHandle = formatProduct(result.productByHandle);
+          let complementaryRecommendation = null;
+          if (result.complementaryRecommendations.length > 0) {
+            complementaryRecommendation = formatProduct(result.complementaryRecommendations[0]);
+          }
+          const relatedRecommendations = formatProductsForCarousel(result.relatedRecommendations);
+          debugger
           setProductData({
-            productByHandle
+            productByHandle,
+            complementaryRecommendation,
+            relatedRecommendations
           });
           setLoading(false);
           getVariants(productByHandle, setVariants, setSelectedVariant);

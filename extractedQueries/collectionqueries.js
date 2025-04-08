@@ -252,9 +252,11 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
           }
           price {
             amount
+            currencyCode
           }
           compareAtPrice {
             amount
+            currencyCode
           }
           weight
           weightUnit

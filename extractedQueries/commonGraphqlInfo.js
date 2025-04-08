@@ -27,9 +27,11 @@ export const PRODUCT_CARD_INFO =
         title
         price {
           amount
+          currencyCode
         }
         compareAtPrice {
           amount
+          currencyCode
         }
         image {
           id
@@ -169,6 +171,7 @@ export const VARIANT_INFO = `
       }
       compareAtPrice {
         amount
+        currencyCode
       }
       weight
       weightUnit

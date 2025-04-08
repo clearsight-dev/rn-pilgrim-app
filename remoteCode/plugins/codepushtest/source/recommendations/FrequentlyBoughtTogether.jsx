@@ -1,8 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useSelector } from 'react-redux';
-import { datasourceTypeModelSel } from 'apptile-core';
-import { fetchProductData } from '../../../../../extractedQueries/pdpquery';
 import ProductCard from './ProductCard';
 
 const FrequentlyBoughtTogether = ({ 
@@ -12,31 +9,14 @@ const FrequentlyBoughtTogether = ({
   onAddToCart,
   style
 }) => {
-  const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
-  
-  useEffect(() => {
-    // Only fetch if we have a second product and shopifyDSModel is available
-    if (products.length > 1 && shopifyDSModel) {
-      const secondProduct = products[1];
-      const queryRunner = shopifyDSModel?.get('queryRunner');
-      
-      // Set a timeout to fetch the second product data after 1 second
-      const timer = setTimeout(() => {
-        fetchProductData(queryRunner, secondProduct.handle)
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [products, shopifyDSModel]);
   
   // Calculate total price and savings
   const totalOriginalPrice = products.reduce((sum, product) => {
-    const compareAtPrice = product.compareAtPriceRange?.minVariantPrice?.amount || 0;
-    return sum + parseFloat(compareAtPrice || product.priceRange?.minVariantPrice?.amount || 0);
+    return sum + parseFloat(product.compareAtPrice?.amount || 0);
   }, 0);
 
   const totalDiscountedPrice = products.reduce((sum, product) => {
-    return sum + parseFloat(product.priceRange?.minVariantPrice?.amount || 0);
+    return sum + parseFloat(product.price?.amount || 0);
   }, 0);
 
   const totalSavings = totalOriginalPrice - totalDiscountedPrice;
@@ -59,7 +39,7 @@ const FrequentlyBoughtTogether = ({
             )}
             
             {/* Product Card */}
-            <ProductCard product={product} />
+            <ProductCard product={product} isPressable={index > 0} />
           </Fragment>
         ))}
       </View>

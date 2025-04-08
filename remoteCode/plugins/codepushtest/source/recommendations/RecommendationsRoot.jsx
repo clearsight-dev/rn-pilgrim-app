@@ -50,61 +50,45 @@ function RecommendationsRoot({
   }
 
   // Check if we have the main product, complementary recommendations, and related recommendations
-  const mainProduct = data?.data?.productByHandle;
-  const complementaryProducts = formatProductsForCarousel(data?.data?.complementaryRecommendations);
-  const relatedProducts = formatProductsForCarousel(data?.data?.relatedRecommendations);
+  const mainProduct = data?.productByHandle;
+  const complementaryProduct = data?.complementaryRecommendation;
+  const relatedProducts = data?.relatedRecommendations;
   
   if (!mainProduct) {
-    return (
-      <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Main product information not available.</Text>
-      </View>
-    );
+    return null;
   }
-
-  if (!complementaryProducts || complementaryProducts.length === 0) {
-    return (
-      <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>No complementary products available.</Text>
-      </View>
-    );
-  }
-
-  // Create an array with the main product first, followed by the first complementary product
-  const productsToShow = formatProductsForCarousel([
-    // Main product
-    mainProduct,
-    // First complementary product
-    complementaryProducts[0]
-  ]);
 
   return (
     <View>
-      <FrequentlyBoughtTogether 
-        products={productsToShow}
-        onAddToCart={handleAddToCart}
-      />
+      {complementaryProduct && (
+        <FrequentlyBoughtTogether 
+          products={[mainProduct, complementaryProduct]}
+          onAddToCart={handleAddToCart}
+        />
+      )}
       
       {/* Related Products Carousel */}
       {relatedProducts && relatedProducts.length > 0 && (
-        <RelatedProductsCarousel 
-          title=""
-          products={relatedProducts}
-          onSelectShade={handleSelectShade}
-          onSelectVariant={handleSelectVariant}
-        />
+        <>
+          <RelatedProductsCarousel 
+            title="Customers also liked"
+            products={relatedProducts}
+            onSelectShade={handleSelectShade}
+            onSelectVariant={handleSelectVariant}
+          />
+          <ShadeSelector 
+            bottomSheetRef={bottomSheetRef}
+            product={selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+          />
+          <VariantSelector
+            product={selectedProduct}
+            optionName={"Size"}
+            bottomSheetRef={variantSelectorRef}
+            onClose={() => setSelectedProduct(null)}
+          />
+        </>
       )}
-      <ShadeSelector 
-        bottomSheetRef={bottomSheetRef}
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-      />
-      <VariantSelector
-        product={selectedProduct}
-        optionName={"Size"}
-        bottomSheetRef={variantSelectorRef}
-        onClose={() => setSelectedProduct(null)}
-      />
     </View>
   );
 };
