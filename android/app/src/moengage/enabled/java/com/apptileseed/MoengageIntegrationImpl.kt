@@ -25,7 +25,7 @@ class MoengageIntegrationImpl(private val context: Context) : MoengageIntegratio
         }
 
         val moEngage = MoEngage.Builder(context as Application, moEngageAppId, moEngageDataCenter)
-            .configureLogs(LogConfig(LogLevel.VERBOSE, true)).configureNotificationMetaData(
+            .configureLogs(LogConfig(LogLevel.VERBOSE, false)).configureNotificationMetaData(
                 NotificationConfig(
                     R.mipmap.ic_launcher_round,
                     R.mipmap.ic_launcher_round,
