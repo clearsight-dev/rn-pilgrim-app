@@ -12,6 +12,38 @@ export const PRODUCT_QUERY = gql`
   }
 `;
 
+export async function fetchProductDescriptionHtml(productHandle) {
+  const queryRunner = await cheaplyGetShopifyQueryRunner();
+  if (!queryRunner) {
+    throw new Error("Query runner not available");
+  }
+
+  const PRODUCT_HTML_QUERY = gql`
+  query GetProductDescriptionHtml(
+    $productHandle: String!
+  ) {
+    product(handle: $productHandle) {
+      id
+      descriptionHtml
+      description
+    }
+  }
+`;
+
+  const data = await queryRunner.runQuery(
+    'query',
+    PRODUCT_HTML_QUERY,
+    {
+      productHandle
+    }
+  )
+
+  return {
+    valueHtml: data.data?.product?.descriptionHtml,
+    valueText: data.data?.product?.description,
+  };
+}
+
 // Function to fetch product data using the GraphQL query
 export async function fetchProductData(productHandle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();

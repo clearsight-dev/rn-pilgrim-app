@@ -128,7 +128,7 @@ export function ReactComponent({ model }) {
       title: "Product Description",
       type: 'description',
       key: 'description',
-      data: productData?.data?.productByHandle ? [{}] : []
+      data: productData?.productByHandle ? [{}] : []
     },
     {
       title: "Key Benefits",
