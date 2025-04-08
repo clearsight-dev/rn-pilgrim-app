@@ -15,6 +15,7 @@ import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import { addLineItemToCart } from '../../../../extractedQueries/selectors';
 import { formatProduct, formatProductsForCarousel } from '../../../../extractedQueries/RelatedProductsCarousel';
 import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
+import FAQComponent from './FAQComponent';
 
 async function getVariants(product, setVariants, setSelectedVariant) {
   const res = await fetchProductOptions(product.handle, product.variantsCount);
@@ -158,6 +159,12 @@ export function ReactComponent({ model }) {
       data: [{}]
     },
     {
+      title: "FAQ",
+      type: 'faq',
+      key: 'faq',
+      data: [{}]
+    },
+    {
       title: "External links",
       type: "external-links",
       key: "external-links",
@@ -222,16 +229,20 @@ export function ReactComponent({ model }) {
             handleAddToCart={() => console.log("adding to cart")}
           />
         );
-    case 'pilgrim-code':
-      return (
-        <PilgrimCode />
-      );
-    case 'external-links':
-      return (
-        <ExternalLinks />
-      )
-    default:
-      return null;
+      case 'pilgrim-code':
+        return (
+          <PilgrimCode />
+        );
+      case 'faq':
+        return (
+          <FAQComponent product={productData?.productByHandle} />
+        );
+      case 'external-links':
+        return (
+          <ExternalLinks />
+        )
+      default:
+        return null;
     }
   };
 

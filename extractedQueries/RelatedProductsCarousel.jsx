@@ -84,6 +84,7 @@ export function formatProduct(product) {
   if (product.consumer_study_results_2?.value) {
     studyResults.push(product.consumer_study_results_2?.value);
   }
+  debugger
 
   return {
     id: product.id,
@@ -110,7 +111,9 @@ export function formatProduct(product) {
     textBenefits,
     ingredients,
     howToUse: product.how_to_use?.value,
-    studyResults
+    studyResults,
+    questions: product.questions,
+    answers: product.answers
   }
 }
 
