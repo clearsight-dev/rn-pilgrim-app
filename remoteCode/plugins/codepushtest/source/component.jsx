@@ -10,6 +10,8 @@ import RecommendationsRoot from './recommendations/RecommendationsRoot';
 import BenefitsRoot from './keybenefits/BenefitsRoot';
 import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
 import PilgrimCartButton from '../../../../extractedQueries/PilgrimCartButton';
+import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
+import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import { addLineItemToCart } from '../../../../extractedQueries/selectors';
 import { formatProduct, formatProductsForCarousel } from '../../../../extractedQueries/RelatedProductsCarousel';
 import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
@@ -109,7 +111,7 @@ export function ReactComponent({ model }) {
       if (Platform.OS === "android") {
         setTimeout(() => {
           loadProductData();
-        }, 50)
+        }, 100)
       } else {
         loadProductData();
       }
@@ -147,6 +149,18 @@ export function ReactComponent({ model }) {
       title: "Recommended Products",
       type: 'recommendations',
       key: 'recommendations',
+      data: [{}]
+    },
+    {
+      title: "Pilgrim Code",
+      type: 'pilgrim-code',
+      key: 'pilgrim-code',
+      data: [{}]
+    },
+    {
+      title: "External links",
+      type: "external-links",
+      key: "external-links",
       data: [{}]
     }
   ];
@@ -201,20 +215,23 @@ export function ReactComponent({ model }) {
         );
       case 'recommendations':
         return (
-          <>
-            <RecommendationsRoot 
-              loading={loading}
-              error={error}
-              data={productData}
-              handleAddToCart={() => console.log("adding to cart")}
-            />
-            <View 
-              style={styles.bottomSpacer}
-            />
-          </>
+          <RecommendationsRoot 
+            loading={loading}
+            error={error}
+            data={productData}
+            handleAddToCart={() => console.log("adding to cart")}
+          />
         );
-      default:
-        return null;
+    case 'pilgrim-code':
+      return (
+        <PilgrimCode />
+      );
+    case 'external-links':
+      return (
+        <ExternalLinks />
+      )
+    default:
+      return null;
     }
   };
 
@@ -284,10 +301,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
-  },
-  bottomSpacer: {
-    height: 80,
-    width: '100%'
   }
 });
 

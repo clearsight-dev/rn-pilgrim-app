@@ -27,7 +27,13 @@ function AboveThefoldContent({
     );
   }
 
-  const productImages = product?.images ?? [];
+  let productImages;
+  if (Array.isArray(product?.images)) {
+    productImages = product.images.slice();
+  } else {
+    productImages = [];
+  }
+
   for (let i = 0; i < variants.length; ++i) {
     productImages.push({...variants[i].image, variantId: variants[i].id});
   }
