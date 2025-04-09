@@ -53,7 +53,8 @@
     "shopify": {},
     "appsflyer": {
       "devkey": "CKRqFz9GSQfSNWLFSbds4J",
-      "appId": "id1663450529"
+      "android_appId": "com.discoverpilgrim",
+      "ios_appId": "id1663450529"
     }
   },
   "assets": [

@@ -130,7 +130,7 @@ async function addAppsflyer(
 ) {
   const appsflyerIntegration = apptileConfig.integrations.appsflyer;
   infoPlist.APPSFLYER_DEVKEY = appsflyerIntegration.devkey;
-  infoPlist.APPSFLYER_APPID = appsflyerIntegration.appId;
+  infoPlist.APPSFLYER_APPID = appsflyerIntegration.ios_appId;
   
   removeForceUnlinkForNativePackage('react-native-appsflyer', extraModules, parsedReactNativeConfig);
 }

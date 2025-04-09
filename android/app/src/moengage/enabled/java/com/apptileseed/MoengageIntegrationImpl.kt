@@ -12,8 +12,8 @@ import com.moengage.react.MoEInitializer
 
 class MoengageIntegrationImpl(private val context: Context) : MoengageIntegrationInterface {
     override fun initialize() {
-        val moEngageAppId = context.getString(R.string.moengage_app_id)
-        val moEngageDataCenterString = context.getString(R.string.moengage_datacenter)
+        val moEngageAppId = context.getString(R.string.MOENGAGE_APPID)
+        val moEngageDataCenterString = context.getString(R.string.MOENGAGE_DATACENTER)
         val moEngageDataCenter = when (moEngageDataCenterString) {
             "data_center_1" -> DataCenter.DATA_CENTER_1
             "data_center_2" -> DataCenter.DATA_CENTER_2
