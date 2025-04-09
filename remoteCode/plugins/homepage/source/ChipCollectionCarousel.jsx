@@ -1,13 +1,14 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import { 
   View, 
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  Animated
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { navigateToScreen } from 'apptile-core';
+import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import RelatedProductsCarousel from '../../../../extractedQueries/RelatedProductsCarousel';
 import Header from './Header';
@@ -23,7 +24,12 @@ function ChipCollectionCarousel({
   onFilterRemove,
   onFilterClear
 }) {
-  console.log("Rendering chip collection carousel: ", collectionHandle);
+  // Get window dimensions
+  const { width: screenWidth } = useApptileWindowDims();
+  
+  // Animation for loading indicator
+  const loadingAnimation = useRef(new Animated.Value(-100)).current;
+  const animationRef = useRef(null);
   const dispatch = useDispatch();
   const products = data.products;
   let loading = false; 
@@ -43,6 +49,58 @@ function ChipCollectionCarousel({
   // Display title with capitalized first letter and spaces instead of hyphens
   const displayTitle = title || (collectionHandle.charAt(0).toUpperCase() + 
                                collectionHandle.slice(1).replace(/-/g, ' '));
+  
+  // Animation effect
+  useEffect(() => {
+    // Function to run the animation
+    const runAnimation = () => {
+      // Reset animation to start position
+      loadingAnimation.setValue(-screenWidth);
+      
+      // Start the animation
+      animationRef.current = Animated.timing(loadingAnimation, {
+        toValue: 0,
+        duration: 1000, // Duration for the animation to complete
+        useNativeDriver: true
+      });
+      
+      // Start animation and set up the loop with pause
+      animationRef.current.start(({finished}) => {
+        // When animation completes, wait 500ms before restarting
+        if (finished) {
+          if (!loading) {
+            loadingAnimation.setValue(-screenWidth);
+          }
+          setTimeout(() => {
+            if (loading) {
+              runAnimation();
+            } 
+          }, 500);
+        }
+      });
+    };
+
+    // Start or stop animation based on loading prop
+    if (loading) {
+      runAnimation();
+    } else {
+      // Stop any running animation
+      if (animationRef.current) {
+        animationRef.current.stop();
+        animationRef.current = null;
+      }
+      loadingAnimation.setValue(-screenWidth);
+    }
+
+    // Cleanup function to stop animation when component unmounts
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.stop();
+        animationRef.current = null;
+        loadingAnimation.setValue(-screenWidth);
+      }
+    };
+  }, [loading, loadingAnimation, screenWidth]);
 
   return (
     <View style={[styles.container, style]}>
@@ -74,7 +132,20 @@ function ChipCollectionCarousel({
         </View>
       ) : (
         <>
-          {loading && <View style={{height: 2, backgroundColor: "green", width: "100%"}}/>}
+          { (
+            <View style={{height: 2, width: "100%", overflow: 'hidden'}}>
+              <Animated.View 
+                style={{
+                  height: 2, 
+                  backgroundColor: "#00909E", 
+                  width: screenWidth, // Width of the moving line
+                  transform: [{
+                    translateX: loadingAnimation
+                  }]
+                }}
+              />
+            </View>
+          )}
           <RelatedProductsCarousel 
             title="" // We're already showing the title above
             products={products}
@@ -87,6 +158,8 @@ function ChipCollectionCarousel({
       )}
     </View>
   );
+
+  
 };
 
 const styles = StyleSheet.create({
