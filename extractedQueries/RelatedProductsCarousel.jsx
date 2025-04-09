@@ -61,15 +61,15 @@ export function formatProduct(product) {
 
   const ingredients = [];
   if (product.ingredients_url_1?.value) {
-    ingredients.push(product.ingredients_url_1?.value);
+    ingredients.push({imageUrl: product.ingredients_url_1?.value});
   }
 
   if (product.ingredients_url_2?.value) {
-    ingredients.push(product.ingredients_url_2?.value);
+    ingredients.push({imageUrl: product.ingredients_url_2?.value});
   }
 
   if (product.ingredients_url_3?.value) {
-    ingredients.push(product.ingredients_url_3?.value);
+    ingredients.push({imageUrl: product.ingredients_url_3?.value});
   }
 
   const studyResults = [];
