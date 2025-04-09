@@ -54,7 +54,7 @@ const FAQItem = ({ question, answer }) => {
 // Main FAQ Component
 export function FAQComponent({product}) {
   let numQuestions = (product?.questions ?? []).findIndex(question => !question?.value);
-  if (product?.questions?.length > 0) {
+  if (product?.questions?.length === 0) {
     return null;
   }
 
