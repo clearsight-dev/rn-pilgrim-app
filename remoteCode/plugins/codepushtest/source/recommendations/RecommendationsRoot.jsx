@@ -83,7 +83,6 @@ function RecommendationsRoot({
           />
           <VariantSelector
             product={selectedProduct}
-            optionName={"Size"}
             bottomSheetRef={variantSelectorRef}
             onClose={() => setSelectedProduct(null)}
           />

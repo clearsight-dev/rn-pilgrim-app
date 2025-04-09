@@ -223,13 +223,12 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
       >
         <View style={styles.searchContainer}>
           <Icon iconType="MaterialIcons" name="search" size={20} color="#999" style={styles.searchIcon} />
-          <TextInput
-            ref={textInputRef}
-            style={[styles.searchInput, {height: 40}]}
-            placeholder="Search products..."
-            returnKeyType="search"
-            onSubmitEditing={() => {}}
-          />
+          <Pressable 
+            style={styles.searchInput}
+            onPress={() => navigation.navigate('Search')}
+          >
+            <Text style={{fontSize: 16}}>Search products...</Text>
+          </Pressable>
           {(textInputRef.current?.value?.length ?? 0)> 0 && (
             <Pressable>
               <Icon iconType="MaterialIcons" name="close" size={20} color="#999" />
@@ -381,7 +380,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   searchInput: {
-    flex: 1,
-    fontSize: 16,
+    height: 40,
+    flexDirection: 'column',
+    justifyContent: 'center'
   }
 });

@@ -53,30 +53,6 @@ const FAQItem = ({ question, answer }) => {
 
 // Main FAQ Component
 export function FAQComponent({product}) {
-  // Sample FAQ data
-  const faqData = [
-    {
-      question: "How to use Pilgrim Hair growth Serum?",
-      answer: "To use Pilgrim Hair Growth Serum, ensure your scalp is clean and dry. Massage a few drops close to the hair roots. Let it remain overnight while you sleep. For visible results, needs to be applied for 28 days consecutively."
-    },
-    {
-      question: "Can this product be used by both men and women?",
-      answer: "Yes, Pilgrim products are formulated to be effective for all genders. Our Hair Growth Serum is designed to address hair concerns that affect both men and women."
-    },
-    {
-      question: "Is this product suitable for all hair types?",
-      answer: "Yes, our Hair Growth Serum is suitable for all hair types including straight, wavy, curly, and coily hair. The formula is designed to work effectively regardless of hair texture."
-    },
-    {
-      question: "Are Pilgrim products cruelty-free?",
-      answer: "Yes, all Pilgrim products are 100% cruelty-free. We never test on animals and are proud to be certified by PETA as a cruelty-free brand."
-    },
-    {
-      question: "What ingredients are in Pilgrim Hair Growth Serum?",
-      answer: "Our Hair Growth Serum contains natural ingredients like Redensyl, Procapil, Anagain, and Baicapil that work together to promote hair growth, reduce hair fall, and improve overall scalp health."
-    }
-  ];
-
   let numQuestions = (product?.questions ?? []).findIndex(question => !question?.value);
   if (product?.questions?.length > 0) {
     return null;
