@@ -67,7 +67,6 @@ function ShadeSelector({
     if (!product) return;
 
     async function getShades() {
-      debugger
       const res = await fetchProductOptions(product.handle, product.variantsCount);
       const options = res?.options ?? [];
       const variants = res?.variants ?? [];

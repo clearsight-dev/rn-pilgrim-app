@@ -2,6 +2,7 @@ import gql from 'graphql-tag';
 import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
 import { cheaplyGetShopifyQueryRunner } from './selectors';
 import {VARIANT_INFO} from './commonGraphqlInfo';
+import { PRODUCT_QUERY } from './pdpquery';
 // Function to fetch collection data for the carousel component
 export async function fetchCollectionCarouselData(collectionHandle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
@@ -211,6 +212,17 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
   // Get first and last cursor for pagination
   const firstCursor = products.length > 0 ? products[0].cursor : null;
   const lastCursor = products.length > 0 ? products[products.length - 1].cursor : null;
+
+  for (let i = 0; i < products.length; ++i) {
+    const product = products[i].node;
+    queryRunner.writeQuery({
+      query: PRODUCT_QUERY,
+      variables: { productHandle: product.handle },
+      data: {
+        product
+      }
+    })
+  }
   
   return {
     data: {

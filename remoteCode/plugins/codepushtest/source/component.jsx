@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, SectionList, Platform, Text, View } from 'react-native';
 import { useApptileWindowDims } from 'apptile-core';
 import { useRoute } from '@react-navigation/native';
-import {fetchProductData} from '../../../../extractedQueries/pdpquery';
+import {fetchProductData, fetchProductRecommendations} from '../../../../extractedQueries/pdpquery';
 import AboveThefoldContent from './AboveThefoldContent';
 import DescriptionCard from './DescriptionCard';
 import RecommendationsRoot from './recommendations/RecommendationsRoot';
@@ -41,6 +41,28 @@ async function getVariants(product, setVariants, setSelectedVariant) {
   setSelectedVariant(processedVariants[0]);
 }
 
+async function getProductRecommendations(productByHandle, setProductData) {
+  if (productByHandle?.handle) {
+    const result = await fetchProductRecommendations(productByHandle?.handle);
+
+    let complementaryRecommendation = null;
+    if (result.complementaryRecommendations.length > 0) {
+      complementaryRecommendation = formatProduct(result.complementaryRecommendations[0]);
+    }
+
+    const relatedRecommendations = formatProductsForCarousel(result.relatedRecommendations);
+    setProductData(prev => {
+      return {
+        ...prev,
+        relatedRecommendations,
+        complementaryRecommendation
+      };
+    })
+  } else {
+    console.error("Could not get recommendations as product handle was not provided")
+  }
+}
+
 export function ReactComponent({ model }) {
   const route = useRoute();
   const productHandle = route.params?.productHandle ?? '3-redensyl-4-anagain-hair-growth-serum';
@@ -60,7 +82,28 @@ export function ReactComponent({ model }) {
 
   console.log("Rendering pdp");
   useEffect(() => {
-    const loadProductData = async () => {
+    // When this function runs react's render cycle for the entire
+    // PDP page will get kicked off. So its isolated and called differently 
+    // on android and ios to allow the pdp screen transition to not be blocked
+    // by the react render cycle. 
+    function startHeavyRendering(timeout, result) {
+      clearTimeout(timeout);
+      const productByHandle = formatProduct(result.productByHandle);
+      
+      setProductData(prev => {
+        return {
+          ...prev,
+          productByHandle,
+        };
+      });
+      setLoading(false);
+      getVariants(productByHandle, setVariants, setSelectedVariant);
+      setTimeout(() => {
+        getProductRecommendations(productByHandle, setProductData);
+      }, 500);
+    }
+
+    async function loadProductData() {
       const timeout = setTimeout(() => {
         setLoading(true);
       }, 100);
@@ -74,30 +117,12 @@ export function ReactComponent({ model }) {
 
         const result = await fetchProductData(productHandle);
 
-        function startHeavyRendering() {
-          clearTimeout(timeout);
-          const productByHandle = formatProduct(result.productByHandle);
-          let complementaryRecommendation = null;
-          if (result.complementaryRecommendations.length > 0) {
-            complementaryRecommendation = formatProduct(result.complementaryRecommendations[0]);
-          }
-          const relatedRecommendations = formatProductsForCarousel(result.relatedRecommendations);
-          debugger
-          setProductData({
-            productByHandle,
-            complementaryRecommendation,
-            relatedRecommendations
-          });
-          setLoading(false);
-          getVariants(productByHandle, setVariants, setSelectedVariant);
-        }
-
         if (Platform.OS === "android") {
           setTimeout(() => {
-            startHeavyRendering();
+            startHeavyRendering(timeout, result);
           }, 50);
         } else {
-          startHeavyRendering();
+          startHeavyRendering(timeout, result);
         }
 
       } catch (err) {

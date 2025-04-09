@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import queryString from 'query-string';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 
@@ -15,9 +15,7 @@ import {Linking, NativeModules} from 'react-native';
 
 import UpdateModal from './components/UpdateModal';
 import AdminPage from './components/AdminPage';
-import FloatingUpdateModal from './components/FloatingUpdateModal';
 import {PilgrimContext} from './PilgrimContext';
-import {fillCaches} from './extractedQueries/homepageQueries';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
@@ -61,9 +59,6 @@ const getAppFlyerDeepLink = (uri: string) => {
 function App(): React.JSX.Element {
   const [pilgrimGlobals, setPilgrimGlobals] = useState({homePageScrolledDown: false});
   const status = useStartApptile(initAnalytics);
-  useEffect(() => {
-    fillCaches();
-  }, [])
 
   React.useEffect(() => {
     (async () => {
