@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import queryString from 'query-string';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 
@@ -16,6 +16,7 @@ import {Linking, NativeModules} from 'react-native';
 import UpdateModal from './components/UpdateModal';
 import AdminPage from './components/AdminPage';
 import {PilgrimContext} from './PilgrimContext';
+import { fillCaches } from './extractedQueries/homepageQueries';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
@@ -59,11 +60,17 @@ const getAppFlyerDeepLink = (uri: string) => {
 function App(): React.JSX.Element {
   const [pilgrimGlobals, setPilgrimGlobals] = useState({homePageScrolledDown: false});
   const status = useStartApptile(initAnalytics);
-
+  
   React.useEffect(() => {
     (async () => {
       if (status.modelReady) {
         let url = await Linking.getInitialURL();
+
+        try {
+          fillCaches();
+        } catch (error) {
+          console.error("Failed to revalidate caches");
+        }
 
         if (_.isEmpty(url)) {
           return;
@@ -85,6 +92,7 @@ function App(): React.JSX.Element {
           } else {
             console.error("url was not defined for deeplink");
           }
+ 
         }, 100);
       }
     })();

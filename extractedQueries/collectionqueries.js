@@ -183,7 +183,7 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
 `;
 
 // Function to fetch collection data using the GraphQL query with pagination support
-export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) {
+export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = [], revalidateCaches = false) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
@@ -201,7 +201,7 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
       filters: filters
     },
     {
-      cachePolicy: 'cache-first'
+      cachePolicy: revalidateCaches ? 'network-only' : 'cache-first'
     }
   );
   
