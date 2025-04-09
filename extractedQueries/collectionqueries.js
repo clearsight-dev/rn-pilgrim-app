@@ -2,6 +2,7 @@ import gql from 'graphql-tag';
 import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
 import { cheaplyGetShopifyQueryRunner } from './selectors';
 import {VARIANT_INFO} from './commonGraphqlInfo';
+import { PRODUCT_QUERY } from './pdpquery';
 // Function to fetch collection data for the carousel component
 export async function fetchCollectionCarouselData(collectionHandle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
@@ -182,7 +183,7 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
 `;
 
 // Function to fetch collection data using the GraphQL query with pagination support
-export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = []) {
+export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = [], revalidateCaches = false) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
@@ -200,7 +201,7 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
       filters: filters
     },
     {
-      cachePolicy: 'cache-first'
+      cachePolicy: revalidateCaches ? 'network-only' : 'cache-first'
     }
   );
   
@@ -211,6 +212,17 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
   // Get first and last cursor for pagination
   const firstCursor = products.length > 0 ? products[0].cursor : null;
   const lastCursor = products.length > 0 ? products[products.length - 1].cursor : null;
+
+  for (let i = 0; i < products.length; ++i) {
+    const product = products[i].node;
+    queryRunner.writeQuery({
+      query: PRODUCT_QUERY,
+      variables: { productHandle: product.handle },
+      data: {
+        product
+      }
+    })
+  }
   
   return {
     data: {

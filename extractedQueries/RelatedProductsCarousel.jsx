@@ -110,7 +110,9 @@ export function formatProduct(product) {
     textBenefits,
     ingredients,
     howToUse: product.how_to_use?.value,
-    studyResults
+    studyResults,
+    questions: product.questions,
+    answers: product.answers
   }
 }
 
@@ -127,54 +129,6 @@ function RelatedProductsCarousel({
   onSelectShade = () => {console.log("Handler for select shade not provided")},
   onSelectVariant = () => {console.log("Handler for select variant not provided")},
 }) {
-  // console.log('Rendering RelatedProductsCarousel');
-  // const {queryRunner, addLineItemToCart} = useShopifyQueryAndAddtoCart();
-
-  // Function to fetch product data
-  // async function cacheProductDetails(productHandle) {
-  //   if (!queryRunner) return;
-
-  //   try {
-  //     await fetchProductData(queryRunner, productHandle);
-  //   } catch (error) {
-  //     console.error(`Error fetching product ${productHandle}:`, error);
-  //   }
-  // }
-
-  // async function cacheMultipleProducts(products) {
-  //   if (!products || products.length === 0) return;
-  //   for (let i = 0; i < products.length; ++i) {
-  //     await cacheProductDetails(products[i].handle);
-  //     await new Promise(resolve => {
-  //       setTimeout(() => {
-  //         resolve();
-  //       }, 500);
-  //     });
-  //   }
-  // }
-
-  // const handleAddToCart = useCallback(
-  //   product => {
-  //     console.log('Adding product: ', product);
-  //     // if (addLineItemToCart) {
-  //     //   addLineItemToCart(product.firstVariantId);
-  //     // } else {
-  //     //   console.error('no function found for adding to cart!');
-  //     // }
-  //   },
-  //   // [addLineItemToCart],
-  //   []
-  // );
-
-  // Initialize with the specified number of products
-  // useEffect(() => {
-  //   const initialProducts = products.slice(
-  //     0,
-  //     Math.min(initialProductsToLoad, products.length),
-  //   );
-  //   // cacheMultipleProducts(initialProducts);
-  // }, [products]);
-
   if (!products || products.length === 0) {
     return null;
   }

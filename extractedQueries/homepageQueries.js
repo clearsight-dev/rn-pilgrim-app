@@ -1,5 +1,5 @@
 import { PRODUCT_QUERY } from "./pdpquery"; 
-import { OPTIONS_QUERY } from "./collectionqueries";
+import { fetchCollectionData, OPTIONS_QUERY } from "./collectionqueries";
 import { COLLECTION_PRODUCTS_QUERY } from "./collectionqueries";
 import { cheaplyGetShopifyQueryRunner } from "./selectors";
 
@@ -37,20 +37,14 @@ async function revalidateCollection(handle) {
   if (!queryRunner) {
     console.error("Failed to revalidate caches for product!");
   }
-  queryRunner.runQuery(
-    'query',
-    COLLECTION_PRODUCTS_QUERY,
-    {
-      handle,
-      first: 12,
-      after: null,
-      sortKey: 'BEST_SELLING',
-      reverse: false,
-      filters: []
-    },
-    {
-      cachePolicy: 'network-only'
-    }
+  return fetchCollectionData(
+    handle,  
+    12, // numitems
+    null, // cursor
+    'BEST_SELLING', // sortkey
+    false, // reverse
+    [], // filters
+    true // useNetworkOnly
   );
 }
 
@@ -58,16 +52,27 @@ export async function fillCaches() {
   // revalidateProduct();
 
   const collections = [
+    'bestsellers',
+    'new-launch',
     'hair-care', 
     'pore-care', 
+    'makeup',
+
     'face-care', 
     'night-care', 
-    'anti-ageing', 
-    'face-serums',
-    'bestsellers',
-    'makeup'
+    'hydration',
+    'night-care',
+    'hair-spa',
+    'sunscreen',
   ];
   for (let i = 0; i < collections.length; ++i) {
     revalidateCollection(collections[i]);
+    if (i % 5 === 0) {
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({});
+        }, 1000)
+      })
+    }
   }
 }

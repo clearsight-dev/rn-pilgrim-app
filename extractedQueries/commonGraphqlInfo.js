@@ -169,6 +169,96 @@ export const PRODUCT_CARD_INFO =
     id
     value
   }
+  questions: metafields(identifiers: [
+    {
+      key: "question1"
+      namespace: "my_fields"
+    },
+    {
+      key: "question2"
+      namespace: "my_fields"
+    },
+    {
+      key: "question3"
+      namespace: "my_fields"
+    },
+    {
+      key: "question4"
+      namespace: "my_fields"
+    },
+    {
+      key: "question5"
+      namespace: "my_fields"
+    },
+    {
+      key: "question6"
+      namespace: "my_fields"
+    },
+    {
+      key: "question7"
+      namespace: "my_fields"
+    },
+    {
+      key: "question8"
+      namespace: "my_fields"
+    },
+    {
+      key: "question9"
+      namespace: "my_fields"
+    },
+    {
+      key: "question10"
+      namespace: "my_fields"
+    }
+  ]) {
+    id
+    value
+  }
+  answers: metafields(identifiers: [
+    {
+      key: "answer1"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer2"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer3"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer4"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer5"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer6"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer7"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer8"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer9"
+      namespace: "my_fields"
+    },
+    {
+      key: "answer10"
+      namespace: "my_fields"
+    }
+  ]) {
+    id
+    value
+  }
 }
 `;
 
