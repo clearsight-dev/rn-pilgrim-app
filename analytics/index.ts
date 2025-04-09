@@ -5,6 +5,7 @@ import {
   Facebook as FacebookAnalytics,
   AppsFlyer as AppsFlyerAnalytics,
   Moengage as MoengageAnalytics,
+  registerForMoengageNotification
   // __ENABLED_ANALYTICS_IMPORTS__
 } from 'apptile-core';
 
@@ -43,6 +44,8 @@ export async function init() {
       MoengageAnalytics,
       // __ENABLED_ANALYTICS__
     ]);
+
+    registerForMoengageNotification();
   } catch (err) {
     console.error('Failure in initializing ApptileAnalytics');
   }

@@ -9,7 +9,7 @@ import {
   ApptileWrapper,
   ApptileAppRoot,
   useStartApptile,
-  triggerCustomEventListener,
+  triggerCustomEventListener
 } from 'apptile-core';
 import {Linking, NativeModules} from 'react-native';
 
@@ -28,7 +28,6 @@ const {RNApptile} = NativeModules;
 
 // Import the generated code. The folder analytics is generated when you run the app.
 import { init as initAnalytics } from './analytics';
-
 const Stack = createNativeStackNavigator<ScreenParams>();
 
 const getAppFlyerDeepLink = (uri: string) => {
