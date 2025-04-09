@@ -2,18 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>508312227012-kkaqmgm7end617m67jh38nqvespjoof2.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.508312227012-kkaqmgm7end617m67jh38nqvespjoof2</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAa0wUiJcwG_C-cC1NXkuv3_zSmxifzT4w</string>
+	<string>AIzaSyBD9Se5UxQTZIiRsJzyVf59TT1H7xHl9w8</string>
 	<key>GCM_SENDER_ID</key>
-	<string>593393856836</string>
+	<string>508312227012</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.discoverpilgrimstaging</string>
+	<string>com.discoverpilgrimindia</string>
 	<key>PROJECT_ID</key>
-	<string>pilgrim-staging</string>
+	<string>pilgrim-website---ga-4-propert</string>
 	<key>STORAGE_BUCKET</key>
-	<string>pilgrim-staging.appspot.com</string>
+	<string>pilgrim-website---ga-4-propert.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:593393856836:ios:64f16185cffcbeea866711</string>
+	<string>1:508312227012:ios:4ed960bee613db66af8d91</string>
 </dict>
 </plist>

@@ -255,9 +255,20 @@ async function main() {
     infoPlist.APPTILE_API_ENDPOINT = apptileConfig.APPTILE_BACKEND_URL;
     infoPlist.APPTILE_UPDATE_ENDPOINT = apptileConfig.APPCONFIG_SERVER_URL;
     infoPlist.APP_ID = apptileConfig.APP_ID;
-    infoPlist.CFBundleDisplayName = apptileConfig.app_name || 'Apptile Seed';
+    infoPlist.CFBundleDisplayName = apptileConfig.ios.app_name || 'Apptile Seed';
+    infoPlist.APPTILE_APP_HOST = `https://${apptileConfig.app_host}` || "apptile.com"
+    infoPlist.APPTILE_APP_HOST_2 = `https://${apptileConfig.app_host_2}` || "apptile.io"
+    infoPlist.APPTILE_URL_SCHEME = `${apptileConfig.url_scheme}://`
+    // infoPlist.CFBundleVersion = apptileConfig.ios.version_number
+    // infoPlist.CFBundleShortVersionString = apptileConfig.ios.version_semver
+
+    if(apptileConfig.url_scheme){
+      infoPlist.CFBundleURLTypes[0].CFBundleURLSchemes= [apptileConfig.url_scheme]
+    }
 
     const bundle_id = apptileConfig.ios.bundle_id || 'com.apptile.apptilepreviewdemo';
+    // infoPlist.CFBundleIdentifier = bundle_id
+    infoPlist.CFBundleURLTypes[0].CFBundleURLName = bundle_id;
 
     apptileSeedEntitlements['com.apple.security.application-groups'] = [`group.${bundle_id}.notification`];
     imageNotificationEntitlements['com.apple.security.application-groups'] = [`group.${bundle_id}.notification`];

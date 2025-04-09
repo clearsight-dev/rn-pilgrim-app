@@ -12,9 +12,11 @@
   "ios": {
     "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
     "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
-    "bundle_id": "com.discoverpilgrim",
+    "bundle_id": "com.discoverpilgrimindia",
     "team_id": "8SQ493N52G",
-    "app_name": "Pilgrim India"
+    "app_name": "Pilgrim India",
+    "version_number": 142,
+    "version_semver": "11.0.15"
   },
   "android": {
     "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
@@ -51,7 +53,7 @@
     "shopify": {},
     "appsflyer": {
       "devkey": "CKRqFz9GSQfSNWLFSbds4J",
-      "appId": "com.discoverpilgrim"
+      "appId": "id1663450529"
     }
   },
   "assets": [

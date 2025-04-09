@@ -6,7 +6,7 @@
     <string>development</string>
     <key>com.apple.security.application-groups</key>
     <array>
-      <string>group.com.discoverpilgrim.notification</string>
+      <string>group.com.discoverpilgrimindia.notification</string>
     </array>
   </dict>
 </plist>
