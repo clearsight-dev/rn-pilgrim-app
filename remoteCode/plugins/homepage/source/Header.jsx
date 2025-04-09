@@ -4,121 +4,33 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   ScrollView
 } from 'react-native';
 import { Icon } from 'apptile-core';
 
+/**
+ * 
+ * @param {filterData} param0 Array<{id: string, label: "Display text", value: "object that goes in the filters array"}>
+ * @param {selectedFilters} param1 string[], array of filter ids
+ * @returns 
+ */
 function ChipCarouselFilters ({ 
   filterData, 
   selectedFilters, 
   onFilterRemove,
   onFilterSelect,
   onClearAllFilters
-}){
-  // Function to get the label for a filter value
-  const getFilterValueLabel = (filterId, valueId) => {
-    const filter = filterData.find(f => f.id === filterId);
-    if (!filter) return '';
-    
-    const value = filter.values.find(v => v.id === valueId);
-    return value ? value.label : '';
-  };
-
-  // Function to get all selected filter values as chips
-  const getSelectedFilterChips = () => {
-    const chips = [];
-    
-    selectedFilters.forEach(filter => {
-      filter.values.forEach(valueId => {
-        const filterLabel = getFilterValueLabel(filter.id, valueId);
-        
-        chips.push({
-          id: `${filter.id}-${valueId}`,
-          filterId: filter.id,
-          valueId: valueId,
-          label: filterLabel
-        });
-      });
-    });
-    
-    return chips;
-  };
-
-  // Get filter options to show as chips (up to 10)
-  const getFilterOptions = () => {
-    if (!filterData || filterData.length === 0) return [];
-    
-    const filterOptions = [];
-    const selectedFilterIds = new Set();
-    
-    // Create a set of selected filter IDs for quick lookup
-    selectedFilters.forEach(filter => {
-      filter.values.forEach(valueId => {
-        selectedFilterIds.add(`${filter.id}-${valueId}`);
-      });
-    });
-    
-    // Find filters that belong to tabs with "subcategory" in their name
-    const subcategoryFilters = filterData.filter(filter => 
-      filter.label && filter.label.toLowerCase().includes('subcategory')
-    );
-    
-    // If no subcategory filters found, use the first available filter
-    const filtersToUse = subcategoryFilters.length > 0 ? 
-      subcategoryFilters : 
-      (filterData.length > 0 ? [filterData[0]] : []);
-    
-    // Try to get options from filters, up to 10 total
-    for (let i = 0; i < filtersToUse.length && filterOptions.length < 10; i++) {
-      const filter = filtersToUse[i];
-      
-      // Skip price filters
-      if (filter.id.includes('price') || filter.label?.toLowerCase().includes('price')) {
-        continue;
-      }
-      
-      // Only include LIST type filters or filters with values array
-      if (filter.type !== 'LIST' && filter.values && filter.values.length > 0) {
-        // If no explicit type, check if it has values array which is typical for LIST type
-        let isListType = false;
-        
-        // If no explicit type, check if it has values array which is typical for LIST type
-        if (filter.values && Array.isArray(filter.values)) {
-          isListType = true;
-        }
-        
-        if (!isListType) {
-          continue;
-        }
-      }
-      
-      // Add all values from this filter (up to the 10 total limit)
-      if (filter.values && filter.values.length > 0) {
-        for (let j = 0; j < filter.values.length && filterOptions.length < 10; j++) {
-          const value = filter.values[j];
-          const chipId = `${filter.id}-${value.id}`;
-          
-          // Only add if not already selected
-          if (!selectedFilterIds.has(chipId)) {
-            filterOptions.push({
-              id: `quick-${chipId}`,
-              filterId: filter.id,
-              valueId: value.id,
-              label: value.label,
-              isSelected: false
-            });
-          }
-        }
-      }
+}) {
+  const selectedOptions = [];
+  const unselectedOptions = [];
+  for (let i = 0; i < filterData.length; ++i) {
+    if (selectedFilters.indexOf(filterData[i].id) >= 0) {
+      selectedOptions.push(filterData[i]);
+    } else {
+      unselectedOptions.push(filterData[i]);
     }
-    
-    return filterOptions;
-  };
-
-  const selectedChips = getSelectedFilterChips();
-  const showAllChip = selectedChips.length === 0;
-  const filterOptions = getFilterOptions();
-
+  }
   return (
     <View style={styles.container}>
       <ScrollView 
@@ -127,28 +39,27 @@ function ChipCarouselFilters ({
         contentContainerStyle={styles.scrollContent}
       >
         {/* "All" chip that shows when no filters are selected */}
-        {showAllChip ? (
-          <TouchableOpacity 
-            style={[styles.chip, styles.selectedChip]}
-            onPress={onClearAllFilters}
-          >
-            <Text style={[styles.chipText, styles.selectedChipText]}>All</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity 
-            style={styles.chip}
-            onPress={onClearAllFilters}
-          >
-            <Text style={styles.chipText}>All</Text>
-          </TouchableOpacity>
-        )}
+        <Pressable 
+          style={({pressed}) => [
+            styles.chip, 
+            (selectedFilters.length === 0) && styles.selectedChip,
+            pressed && {opacity: 0.5}
+          ]}
+          onPress={onClearAllFilters}
+        >
+          <Text style={styles.chipText}>All</Text>
+        </Pressable>
         
         {/* Selected filter chips (shown first) */}
-        {selectedChips.map(chip => (
-          <TouchableOpacity 
+        {selectedOptions.map(chip => (
+          <Pressable 
             key={chip.id} 
-            style={[styles.chip, styles.selectedChip]}
-            onPress={() => onFilterRemove(chip.filterId, chip.valueId)}
+            style={({pressed}) => [
+              styles.chip, 
+              styles.selectedChip,
+              pressed && {opacity: 0.5}
+            ]}
+            onPress={() => onFilterRemove(chip.id)}
           >
             <Text style={[styles.chipText, styles.selectedChipText]}>{chip.label}</Text>
             <Icon 
@@ -156,18 +67,21 @@ function ChipCarouselFilters ({
               name={'close'} 
               style={styles.closeIcon}
             />
-          </TouchableOpacity>
+          </Pressable>
         ))}
         
         {/* Unselected filter options */}
-        {filterOptions.map(option => (
-          <TouchableOpacity 
+        {unselectedOptions.map(option => (
+          <Pressable 
             key={option.id} 
-            style={styles.chip}
-            onPress={() => onFilterSelect(option.filterId, option.valueId)}
+            style={({pressed}) => [
+              styles.chip,
+              pressed && {opacity: 0.5}
+            ]}
+            onPress={() => onFilterSelect(option.id)}
           >
             <Text style={styles.chipText}>{option.label}</Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </ScrollView>
     </View>
@@ -176,7 +90,6 @@ function ChipCarouselFilters ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
   },
   scrollContent: {
     paddingVertical: 8,

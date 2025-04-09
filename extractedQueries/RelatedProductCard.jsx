@@ -117,12 +117,14 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
       {/* Product Details */}
       <View style={[styles.detailsContainer, cardVariant === "large" ? {alignItems: "center"} : {}]}>
         {
-          isBestSeller && (
+          isBestSeller ? (
             <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>
               BESTSELLER
             </Text>
+          ) : (
+            <View style={{height: 11}}></View>
           )
-      }
+        }
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>

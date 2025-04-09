@@ -157,20 +157,12 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
         hasPreviousPage
       }
       filters {
-        label
         id
-        presentation
-        type
+        label
         values {
           id
+          input
           label
-          image {
-            id
-            image {
-              id
-              url
-            }
-          }
         }
       }
       edges {

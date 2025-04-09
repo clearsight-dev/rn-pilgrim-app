@@ -15,7 +15,7 @@ import {
 } from 'apptile-core';
 import { useDispatch } from 'react-redux';
 import { fetchCollectionCarouselData, fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
-import ChipCollectionCarousel from './ChipCollectionCarousel/index';
+import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
@@ -26,11 +26,12 @@ import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
+import { formatProduct } from '../../../../extractedQueries/RelatedProductsCarousel';
 
-async function fetchDataForChipCarousel(collectionHandle) {
+async function fetchDataForChipCarousel(collectionHandle, filters = []) {
   const result = {
     products: [],
-    filters: []
+    filters
   }; 
 
   try {
@@ -40,18 +41,23 @@ async function fetchDataForChipCarousel(collectionHandle) {
       null,
       'BEST_SELLING', // Sort by
       false, // reverse
-      [] // filters
+      filters
     );
 
     if (res?.data?.collection?.products?.edges) {
       for (let i = 0; i < res.data.collection.products.edges.length; ++i) {
         const edge = res.data.collection.products.edges[i];
-        result.products.push(edge.node);
+        
+        result.products.push(formatProduct(edge.node));
       }
     }
 
     if (res?.data?.collection?.products?.filters) {
-      result.filters = res.data.collection.products.filters;
+      const nonPriceFilters = res.data.collection.products.filters.filter(it => it.id !== "filter.v.price");
+      const applicableFilters = nonPriceFilters.flatMap(filterCategory => {
+        return filterCategory.values;
+      });
+      result.filters = applicableFilters;
     }
   } catch (err) {
     console.error("Failed to fetch data for chip carousel for the collection: ", collectionHandle);
@@ -89,23 +95,26 @@ export function ReactComponent({ model }) {
   const quickCollectionsData = model.get('quickCollections') || [];
   const imageCarouselImages = model.get('imageCarouselImages') || [];
   const celebPicksData = model.get('celebPicksData') || [];
-  const [childrenData, setChildrenData] = useState({
+  const [chipCollectionData, setChipCollectionData] = useState({
     bestsellers: {
       status: "notstarted",
       products: [],
       filters: [],
+      selectedFilters: [],
       error: ""
     },
     makeup: {
       loading: "notstarted",
       products: [],
       filters: [],
+      selectedFilters: [],
       error: ""
     },
-    newLaunch: {
+    "new-launch": {
       loading: "notstarted",
       products: [],
       filters: [],
+      selectedFilters: [],
       error: ""
     }
   });
@@ -126,6 +135,74 @@ export function ReactComponent({ model }) {
       error: ""
     }
   })
+
+  
+  // Gets filter id to add to the set of selectedFilters which is an array of filterId's
+  // that are already selected and adds the new filter object using allFilters
+  // Everything is passed in as arguments instead of dependencies in usecallback
+  // to avoid unnecessary re-renders of the children
+  async function getFilteredDataForCollection(collectionHandle, newSelectedFilters, allFilters) {
+    setChipCollectionData(prev => {
+      return {
+        ...prev,
+        [collectionHandle]: {
+          ...prev[collectionHandle],
+          status: "loading",
+          selectedFilters: newSelectedFilters
+        }
+      }
+    });
+
+    try {
+      // double loop but only runs when user clicks a filter. Should be fine.
+      const filtersById = new Map();
+      for (let i = 0; i < allFilters.length; ++i) {
+        filtersById.set(allFilters[i].id, allFilters[i]);
+      }
+      const filters = newSelectedFilters.map(filterId => {
+        const filterToSend = filtersById.get(filterId);
+        return JSON.parse(filterToSend.input);
+      });
+      
+      const res = await fetchDataForChipCarousel(collectionHandle, filters); 
+      setChipCollectionData(prev => {
+        return {
+          ...prev,
+          [collectionHandle]: {
+            ...prev[collectionHandle],
+            status: "loaded",
+            products: res.products,
+          }
+        }
+      });
+    } catch (err) {
+      console.error("Failed to fetch data for the applied filters: ", collectionHandle, err);
+      setChipCollectionData(prev => {
+        return {
+          ...prev,
+          [collectionHandle]: {
+            ...prev[collectionHandle],
+            status: "error",
+            products,
+          }
+        }
+      });
+    }
+  }
+
+  const onFilterSelect = useCallback((collectionHandle, filter, selectedFilters, allFilters) => {
+    const newSelectedFilters = selectedFilters.concat(filter);
+    getFilteredDataForCollection(collectionHandle, newSelectedFilters, allFilters);
+  }, []);
+
+  const onFilterRemove = useCallback((collectionHandle, filter, selectedFilters, allFilters) => {
+    const newSelectedFilters = selectedFilters.filter(id => id !== filter);
+    getFilteredDataForCollection(collectionHandle, newSelectedFilters, allFilters);
+  }, []);
+
+  const onClearAllFilters = useCallback((collectionHandle, filter, selectedFilters, allFilters) => {
+    getFilteredDataForCollection(collectionHandle, [], allFilters);
+  }, []);
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
@@ -183,23 +260,26 @@ export function ReactComponent({ model }) {
     fetchHomepageChipCarouselData()
       .then(([bestsellers, makeup, newLaunch]) => {
         console.log("Finishing carousel data fetch for chipcarousels");
-        setChildrenData({
+        setChipCollectionData({
           bestsellers: {
             status: "loaded",
             products: bestsellers.products,
             filters: bestsellers.filters,
+            selectedFilters: [],
             error: ""
           }, 
           makeup: {
             status: "loaded",
             products: makeup.products,
             filters: makeup.filters,
+            selectedFilters: [],
             error: ""
           },
-          newLaunch: {
+          "new-launch": {
             status: "loaded",
             products: newLaunch.products,
             filters: newLaunch.filters,
+            selectedFilters: [],
             error: ""
           },
         });
@@ -207,7 +287,7 @@ export function ReactComponent({ model }) {
       .catch(err => {
         console.error("Failed to fetch data for homepage", err);
         const errorMessage = "Error: " + err.toString();
-        setChildrenData(prev => {
+        setChipCollectionData(prev => {
           return {
             bestsellers: {
               ...prev.bestsellers,
@@ -219,8 +299,8 @@ export function ReactComponent({ model }) {
               status: "error",
               error: errorMessage
             },
-            newLaunch: {
-              ...prev.newLaunch,
+            "new-launch": {
+              ...prev["new-launch"],
               status: "error",
               error: errorMessage
             }
@@ -334,40 +414,25 @@ export function ReactComponent({ model }) {
               onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
             />
             <WeeklyPicksSection
-              products={childrenData.newLaunch.products}
-              loading={childrenData.newLaunch.status !== "loaded"}
-              error={childrenData.newLaunch.error}
+              products={chipCollectionData["new-launch"].products}
+              loading={chipCollectionData["new-launch"].status !== "loaded"}
+              error={chipCollectionData["new-launch"].error}
               onSelectShade={onSelectShade}
               onSelectVariant={onSelectVariant}
             />
           </>
         );
-      case 'banner-carousel':
-        return null;
-        // return (
-        //   <BannerCarousel 
-        //     items={imageCarouselImages}
-        //     screenWidth={screenWidth}
-        //     onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
-        //   />
-        // );
-      case 'weekly-picks':
-        return null;
-        // return (
-        //   <WeeklyPicksSection
-        //     products={childrenData.newLaunch.products}
-        //     loading={childrenData.newLaunch.status !== "loaded"}
-        //     error={childrenData.newLaunch.error}
-        //   />
-        // );
       case 'bestsellers':
         return (
           <ChipCollectionCarousel
             collectionHandle={'bestsellers'}
             numberOfProducts={numberOfProducts}
-            data={childrenData.bestsellers}
+            data={chipCollectionData.bestsellers}
             onSelectShade={onSelectShade}
             onSelectVariant={onSelectVariant}
+            onFilterSelect={onFilterSelect}
+            onFilterRemove={onFilterRemove}
+            onFilterClear={onClearAllFilters}
           />
         );
       case 'celeb-picks':
@@ -385,9 +450,12 @@ export function ReactComponent({ model }) {
           <ChipCollectionCarousel
             collectionHandle={'makeup'}
             numberOfProducts={numberOfProducts}
-            data={childrenData.makeup}
+            data={chipCollectionData.makeup}
             onSelectShade={onSelectShade}
             onSelectVariant={onSelectVariant}
+            onFilterSelect={onFilterSelect}
+            onFilterRemove={onFilterRemove}
+            onFilterClear={onClearAllFilters}
           />
         );
       case 'new-launch':
@@ -395,9 +463,12 @@ export function ReactComponent({ model }) {
           <ChipCollectionCarousel
             collectionHandle={'new-launch'}
             numberOfProducts={numberOfProducts}
-            data={childrenData.newLaunch}
+            data={chipCollectionData["new-launch"]}
             onSelectShade={onSelectShade}
             onSelectVariant={onSelectVariant}
+            onFilterSelect={onFilterSelect}
+            onFilterRemove={onFilterRemove}
+            onFilterClear={onClearAllFilters}
           />
         );
       case 'pilgrim-code':

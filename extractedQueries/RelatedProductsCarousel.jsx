@@ -136,7 +136,7 @@ function RelatedProductsCarousel({
   return (
     <View style={[styles.container, style]}>
       {/* Title */}
-      <Text style={styles.title}>{title}</Text>
+      {title && <Text style={styles.title}>{title}</Text>}
 
       {/* Horizontal Scrollable List */}
       <FlatList
@@ -169,7 +169,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     marginVertical: 16,
-    paddingVertical: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: '#F0F0F0',
