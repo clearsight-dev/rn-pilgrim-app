@@ -136,11 +136,11 @@ export function ReactComponent({ model }) {
   }
 
   // Function to convert selected filters to Shopify filter format
-  function getShopifyFilters(selectedFilters, filterData) {
+  function getShopifyFilters(filterIds, filterData) {
     const filters = [];
     for (let i = 0; i < filterData.filters.length; ++i) {
       const filter = filterData.filters[i];
-      if (selectedFilters.indexOf(filter.id) >= 0) {
+      if (filterIds.indexOf(filter.id) >= 0) {
         try {
           filters.push(JSON.parse(filter.input));
         } catch(err) {
@@ -152,8 +152,8 @@ export function ReactComponent({ model }) {
   }
   
   // Function to fetch filtered products count
-  async function fetchFilteredCount(collectionHandle, selectedFilters, filterData) {
-    if (selectedFilters.length === 0) {
+  async function fetchFilteredCount(collectionHandle, filters) {
+    if (filters.length === 0) {
       setFilteredProductsCount(0);
       setIsMaxFilteredCount(false);
       return;
@@ -162,7 +162,6 @@ export function ReactComponent({ model }) {
     setIsLoadingFilteredCount(true);
     
     try {
-      const filters = getShopifyFilters(selectedFilters, filterData);
       console.log("[AGENT] Fetching filtered count with filters:", filters);
       
       const result = await fetchFilteredProductsCount(collectionHandle, filters);
@@ -234,7 +233,7 @@ export function ReactComponent({ model }) {
     sortKey = "BEST_SELLING", 
     reverse = false, 
     filterIds = [],
-    allFilters = []
+    filterData
   ) {
     if (isLoadingMore) {
       setLoadingMore(true);
@@ -246,14 +245,15 @@ export function ReactComponent({ model }) {
 
     // double loop but only runs when user clicks a filter. Should be fine.
     const filtersById = new Map();
-    for (let i = 0; i < allFilters.length; ++i) {
-      filtersById.set(allFilters[i].id, allFilters[i]);
+    for (let i = 0; i < filterData.filters.length; ++i) {
+      filtersById.set(filterData.filters[i].id, filterData.filters[i]);
     }
     const filters = filterIds.map(filterId => {
       const filterToSend = filtersById.get(filterId);
       return JSON.parse(filterToSend.input);
     });
     
+    fetchFilteredCount(collectionHandle, filters, filterData);
     getFilterAndProductsForCollection(
       collectionHandle, 
       filters, 
@@ -346,7 +346,7 @@ export function ReactComponent({ model }) {
       sortOption, 
       sortReverse, 
       newSelectedFilters,
-      filterData.filters
+      filterData
     );
   }, [collectionHandle, sortReverse, sortOption, appliedFilters, filterData]);
 
@@ -359,7 +359,7 @@ export function ReactComponent({ model }) {
       sortOption, 
       sortReverse, 
       newSelectedFilters,
-      filterData.filters
+      filterData
     );
   }, [collectionHandle, sortReverse, sortOption, appliedFilters, filterData]);
 
@@ -371,7 +371,7 @@ export function ReactComponent({ model }) {
       sortOption, 
       sortReverse, 
       [],
-      []
+      filterData
     );
   }, [collectionHandle, sortOption, sortReverse]);
   
@@ -436,7 +436,7 @@ export function ReactComponent({ model }) {
         />
       )}
       
-      {/* <Footer 
+      <Footer 
         ref={footerRef}
         sortOptions={sortOptions}
         collectionHandle={collectionHandle}
@@ -448,7 +448,7 @@ export function ReactComponent({ model }) {
         applyFilters={applyFilters}
         totalProductsCount={totalProductsCount.count}
         isMaxTotalCount={totalProductsCount.isMaxCount}
-      /> */}
+      />
       {/* Shade Selector Modal */}
       <ShadeSelector 
         bottomSheetRef={shadeBottomSheetRef}
