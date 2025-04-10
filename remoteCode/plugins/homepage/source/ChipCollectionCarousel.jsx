@@ -4,14 +4,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   Animated
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
-import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import RelatedProductsCarousel from '../../../../extractedQueries/RelatedProductsCarousel';
-import Header from './Header';
+import Header from '../../../../extractedQueries/CollectionFilterChips';
 
 function ChipCollectionCarousel({ 
   data,

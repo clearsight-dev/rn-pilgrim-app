@@ -14,7 +14,7 @@ import {
   useApptileWindowDims 
 } from 'apptile-core';
 import { useDispatch } from 'react-redux';
-import { fetchCollectionCarouselData, fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
+import { fetchCollectionCarouselData, getFilterAndProductsForCollection } from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
@@ -26,51 +26,12 @@ import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
-import { formatProduct } from '../../../../extractedQueries/RelatedProductsCarousel';
-
-async function fetchDataForChipCarousel(collectionHandle, filters = []) {
-  const result = {
-    products: [],
-    filters
-  }; 
-
-  try {
-    const res = await fetchCollectionData(
-      collectionHandle,
-      5,
-      null,
-      'BEST_SELLING', // Sort by
-      false, // reverse
-      filters
-    );
-
-    if (res?.data?.collection?.products?.edges) {
-      for (let i = 0; i < res.data.collection.products.edges.length; ++i) {
-        const edge = res.data.collection.products.edges[i];
-        
-        result.products.push(formatProduct(edge.node));
-      }
-    }
-
-    if (res?.data?.collection?.products?.filters) {
-      const nonPriceFilters = res.data.collection.products.filters.filter(it => it.id !== "filter.v.price");
-      const applicableFilters = nonPriceFilters.flatMap(filterCategory => {
-        return filterCategory.values;
-      });
-      result.filters = applicableFilters;
-    }
-  } catch (err) {
-    console.error("Failed to fetch data for chip carousel for the collection: ", collectionHandle);
-  } 
-
-  return result;
-}
 
 async function fetchHomepageChipCarouselData() {
   console.log("Starting fetch for chipcarousels");
-  const bestsellersP = fetchDataForChipCarousel("bestsellers");
-  const makeupP = fetchDataForChipCarousel("makeup");
-  const newLaunchP = fetchDataForChipCarousel("new-launch");
+  const bestsellersP = getFilterAndProductsForCollection("bestsellers");
+  const makeupP = getFilterAndProductsForCollection("makeup");
+  const newLaunchP = getFilterAndProductsForCollection("new-launch");
   return Promise.all([bestsellersP, makeupP, newLaunchP]);
 }
 
@@ -164,7 +125,7 @@ export function ReactComponent({ model }) {
         return JSON.parse(filterToSend.input);
       });
       
-      const res = await fetchDataForChipCarousel(collectionHandle, filters); 
+      const res = await getFilterAndProductsForCollection(collectionHandle, filters); 
       setChipCollectionData(prev => {
         return {
           ...prev,

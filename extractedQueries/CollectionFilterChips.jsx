@@ -3,6 +3,7 @@ import {
   View, 
   Text,
   StyleSheet,
+  TouchableOpacity,
   Pressable,
   ScrollView
 } from 'react-native';
@@ -14,7 +15,7 @@ import { Icon } from 'apptile-core';
  * @param {selectedFilters} param1 string[], array of filter ids
  * @returns 
  */
-function ChipCarouselFilters ({ 
+function CollectionFilterChips ({ 
   filterData, 
   selectedFilters, 
   onFilterRemove,
@@ -123,4 +124,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChipCarouselFilters;
+export default CollectionFilterChips;

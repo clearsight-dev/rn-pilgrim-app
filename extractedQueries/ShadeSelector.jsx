@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -6,13 +6,12 @@ import {
   Pressable, 
   FlatList,
   Image,
-  ActivityIndicator
 } from 'react-native';
 import { useApptileWindowDims, Icon } from 'apptile-core';
 import BottomSheet from './BottomSheet';
 import { colorSwatches, imageSwatches } from './colorswatchinfo';
-import { fetchProductOptions, fetchVariantBySelectedOptions } from './collectionqueries';
-import {addLineItemToCart} from './selectors';
+import { fetchProductOptions } from './collectionqueries';
+import { addLineItemToCart } from './selectors';
 import PilgrimCartButton from './PilgrimCartButton';
 
 export function normalizeOption (value) {
@@ -33,35 +32,11 @@ function ShadeSelector({
   product, 
   onClose
 }) {
-  const [selectedShade, setSelectedShade] = useState(null);
   const [shades, setShades] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const [loadingVariant, setLoadingVariant] = useState(false);
-  const originalBottomSheetRef = useRef(bottomSheetRef);
   const {width: screenWidth} = useApptileWindowDims();
 
-  // Reset state when modal is closed
-  useEffect(() => {
-    // Store the original ref
-    originalBottomSheetRef.current = bottomSheetRef;
-    
-    // Add a custom hide method that resets state
-    const originalHide = bottomSheetRef.current?.hide;
-    if (bottomSheetRef.current && originalHide) {
-      bottomSheetRef.current.hide = () => {
-        // Call the original hide method
-        originalHide();
-      };
-    }
-    
-    // Cleanup function to restore original hide method
-    return () => {
-      if (bottomSheetRef.current && originalBottomSheetRef.current) {
-        bottomSheetRef.current.hide = originalBottomSheetRef.current.hide;
-      }
-    };
-  }, [bottomSheetRef]);
-
+  // This has no loader, maybe add on. Haven't seen the need for one yet though
   // Process product options to get shade data
   useEffect(() => {
     if (!product) return;
@@ -162,55 +137,42 @@ function ShadeSelector({
       title={"Select Shade"}
       sheetHeightFraction={0.8} // 80% of screen height
       onClose={() => {
-        setSelectedShade(null);
         onClose();
       }}
     >
       {product && (
         <View style={styles.bottomSheetContent}>
-          {/* <Text>test insert: {JSON.stringify(selectedVariant, null, 2)}</Text> */}
           {/* Product Header */}
           <View style={styles.productHeader}>
-            {loadingVariant ? (
-              <View style={[
-                styles.loadingContainer,
-                {minHeight: screenWidth / 2.1}
-              ]}>
-                <ActivityIndicator size="small" color="#00909E" />
-              </View>
-            ) : (
-              <>
-                <Image 
-                  source={{ uri: selectedVariant?.image?.url }} 
-                  style={[
-                    styles.productImage,
-                    {
-                      height: screenWidth / 2.1
-                    }
-                  ]}
-                  resizeMode="contain"
-                />
-                <View style={styles.productInfo}>
-                  <Text style={styles.productTitle} numberOfLines={2}>
-                    {product.title}
-                  </Text>
-                  <Text style={styles.productPrice}>
-                    ₹{parseInt(selectedVariant?.price?.amount).toLocaleString()}
-                  </Text>
-                  {selectedVariant?.weight > 0 && (
-                    <Text style={styles.productWeight}>
-                      {selectedVariant.weight} {selectedVariant.weightUnit.toLowerCase()}
-                    </Text>
-                  )}
-                  <Text style={styles.productWeight}>
-                    Shade: {selectedVariant?.title}
-                  </Text>
-                  <Text style={styles.productWeight}>
-                    {selectedVariant?.variantSubtitle?.value}
-                  </Text>
-                </View>
-              </>
-            )}
+            <Image 
+              source={{ uri: selectedVariant?.image?.url }} 
+              style={[
+                styles.productImage,
+                {
+                  height: screenWidth / 2.1
+                }
+              ]}
+              resizeMode="contain"
+            />
+            <View style={styles.productInfo}>
+              <Text style={styles.productTitle} numberOfLines={2}>
+                {product.title}
+              </Text>
+              <Text style={styles.productPrice}>
+                ₹{parseInt(selectedVariant?.price?.amount).toLocaleString()}
+              </Text>
+              {selectedVariant?.weight > 0 && (
+                <Text style={styles.productWeight}>
+                  {selectedVariant.weight} {selectedVariant.weightUnit.toLowerCase()}
+                </Text>
+              )}
+              <Text style={styles.productWeight}>
+                Shade: {selectedVariant?.title}
+              </Text>
+              <Text style={styles.productWeight}>
+                {selectedVariant?.variantSubtitle?.value}
+              </Text>
+            </View>
           </View>
           
           {/* Divider */}

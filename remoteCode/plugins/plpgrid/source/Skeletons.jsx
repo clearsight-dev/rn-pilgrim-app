@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingBottom: 80, // Add padding to account for bottom buttons
+    widht: '100%'
   },
   cardWrapper: {
     paddingHorizontal: 4,
