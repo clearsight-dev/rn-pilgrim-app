@@ -30,16 +30,15 @@ function WeeklyPicksSection ({
   const SPACING = parseInt(cardSpacing, 10);
 
   // Format products for the carousel
-  const formattedProducts = formatProductsForCarousel(products);
 
-  if (error || !formattedProducts) {
+  if (error || !products) {
     return null; // Or an error message
   }
 
   return (
     <View style={{width}}>
       <ThreeDProductCarousel
-        products={formattedProducts}
+        products={products}
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}
         width={width}

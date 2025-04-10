@@ -8,6 +8,7 @@ import AboveThefoldContent from './AboveThefoldContent';
 import DescriptionCard from './DescriptionCard';
 import RecommendationsRoot from './recommendations/RecommendationsRoot';
 import BenefitsRoot from './keybenefits/BenefitsRoot';
+import BenefitsCard from './keybenefits/BenefitsCard';
 import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
 import PilgrimCartButton from '../../../../extractedQueries/PilgrimCartButton';
 import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
@@ -16,6 +17,7 @@ import { addLineItemToCart } from '../../../../extractedQueries/selectors';
 import { formatProduct, formatProductsForCarousel } from '../../../../extractedQueries/RelatedProductsCarousel';
 import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
 import FAQComponent from './FAQComponent';
+import ImageBand from './keybenefits/ImageBand';
 
 async function getVariants(product, setVariants, setSelectedVariant) {
   const res = await fetchProductOptions(product.handle, product.variantsCount);
@@ -68,7 +70,6 @@ export function ReactComponent({ model }) {
   const productHandle = route.params?.productHandle ?? '3-redensyl-4-anagain-hair-growth-serum';
   // const productHandle = model.get('productHandle');
   const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
-  const aspectRatio = model.get('aspectRatio') || '1/1.5';
   const cardWidthPercentage = parseFloat(model.get('cardWidthPercentage') || '70');
   const cardSpacing = parseInt(model.get('cardSpacing') || '10', 10);
   
@@ -154,15 +155,21 @@ export function ReactComponent({ model }) {
       data: [{}]
     },
     {
+      title: "Key Benefits",
+      type: 'benefits',
+      key: 'benefits',
+      data: [{}]
+    },
+    {
       title: "Product Description",
       type: 'description',
       key: 'description',
       data: productData?.productByHandle ? [{}] : []
     },
     {
-      title: "Key Benefits",
-      type: 'benefits',
-      key: 'benefits',
+      title: "Key ingredients",
+      type: 'ingredients',
+      key: 'ingredients',
       data: [{}]
     },
     {
@@ -229,16 +236,42 @@ export function ReactComponent({ model }) {
         );
       case 'benefits':
         return (
-          <BenefitsRoot
-            loading={loading}
-            error={error}
-            product={productData?.productByHandle}
-            backgroundColor={backgroundColor}
-            aspectRatio={aspectRatio}
-            cardWidthPercentage={cardWidthPercentage}
-            cardSpacing={cardSpacing}
-          />
+          <>
+            <BenefitsCard 
+              title={productData?.productByHandle?.textBenefits?.title} 
+              benefits={productData?.productByHandle?.textBenefits?.items} 
+              style={{ marginBottom: 30 }}
+            />
+            {productData?.productByHandle?.benefitsImages?.length > 0 && (
+              <BenefitsRoot
+                loading={loading}
+                error={error}
+                backgroundColor={backgroundColor}
+                cardWidthPercentage={cardWidthPercentage}
+                cardSpacing={cardSpacing}
+                images={productData?.productByHandle?.benefitsImages}
+                title="Key benefits"
+              />
+            )}
+          </>
         );
+      case 'ingredients':
+        return (
+          <>
+            {productData?.productByHandle?.ingredients?.length > 0 && (
+              <BenefitsRoot
+                loading={loading}
+                error={error}
+                backgroundColor={backgroundColor}
+                cardWidthPercentage={cardWidthPercentage}
+                cardSpacing={cardSpacing}
+                images={productData?.productByHandle?.ingredients}
+                title="Key ingredients"
+              />
+            )}
+            <ImageBand/>
+          </>
+          );
       case 'ratings':
         return (
           <RatingsReviewsRoot 
@@ -364,10 +397,6 @@ export const WrapperTileConfig = {
     backgroundColor: {
       label: "Background Color",
       defaultValue: "#C5FAFF4D"
-    },
-    aspectRatio: {
-      label: "Card Aspect Ratio",
-      defaultValue: "1/1.5"
     },
     cardWidthPercentage: {
       label: "Card Width (% of screen)",

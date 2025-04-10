@@ -61,15 +61,15 @@ export function formatProduct(product) {
 
   const ingredients = [];
   if (product.ingredients_url_1?.value) {
-    ingredients.push(product.ingredients_url_1?.value);
+    ingredients.push({imageUrl: product.ingredients_url_1?.value});
   }
 
   if (product.ingredients_url_2?.value) {
-    ingredients.push(product.ingredients_url_2?.value);
+    ingredients.push({imageUrl: product.ingredients_url_2?.value});
   }
 
   if (product.ingredients_url_3?.value) {
-    ingredients.push(product.ingredients_url_3?.value);
+    ingredients.push({imageUrl: product.ingredients_url_3?.value});
   }
 
   const studyResults = [];
@@ -136,7 +136,7 @@ function RelatedProductsCarousel({
   return (
     <View style={[styles.container, style]}>
       {/* Title */}
-      <Text style={styles.title}>{title}</Text>
+      {title && <Text style={styles.title}>{title}</Text>}
 
       {/* Horizontal Scrollable List */}
       <FlatList
@@ -169,7 +169,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     marginVertical: 16,
-    paddingVertical: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: '#F0F0F0',
