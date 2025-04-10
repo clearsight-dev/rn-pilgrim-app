@@ -99,7 +99,7 @@
       <string>group.com.discoverpilgrimindia.notification</string>
     </dict>
     <key>MoEngageAppDelegateProxyEnabled</key>
-    <false/>
+    <true/>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
@@ -157,6 +157,8 @@
       <string>UIInterfaceOrientationPortraitUpsideDown</string>
     </array>
     <key>UIViewControllerBasedStatusBarAppearance</key>
+    <false/>
+    <key>MoEngageAppDelegateProxyEnabled</key>
     <false/>
   </dict>
 </plist>
