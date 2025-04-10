@@ -3,17 +3,31 @@ import {
   View, 
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   FlatList,
   ActivityIndicator
 } from 'react-native';
-import { useSelector } from 'react-redux';
-import { datasourceTypeModelSel, Icon } from 'apptile-core';
+import { Icon } from 'apptile-core';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';
 import RadioButton from '../../../../extractedQueries/RadioButton';
 import Checkbox from '../../../../extractedQueries/Checkbox';
 import { fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
+
+export function getShopifyFilters(filterIds, filterData) {
+  const filters = [];
+  for (let i = 0; i < filterData.filters.length; ++i) {
+    const filter = filterData.filters[i];
+    if (filterIds.indexOf(filter.id) >= 0) {
+      try {
+        filters.push(JSON.parse(filter.input));
+      } catch(err) {
+        console.error("Failed to parse filter input");
+      }
+    }
+  }
+  return filters;
+}
 
 const Footer = React.forwardRef(({
   sortOptions, 
@@ -21,11 +35,11 @@ const Footer = React.forwardRef(({
   sortOption, 
   sortReverse,
   filterData,
-  selectedFilters,
   applyFilters,
   totalProductsCount,
   isMaxTotalCount,
-  collectionHandle
+  collectionHandle,
+  appliedFilters
 }, ref) => {
   const [editableCopyOfSelectedFilters, setEditableCopyOfSelectedFilters] = useState([]);
   const [activeFilterTab, setActiveFilterTab] = useState(0);
@@ -40,60 +54,8 @@ const Footer = React.forwardRef(({
   const filterBottomSheetRef = useRef(null);
   const sortBottomSheetRef = useRef(null);
 
-  // Function to convert selected filters to Shopify filter format
-  const getShopifyFilters = (filters) => {
-    return filters.map(filter => {
-      // Check if this is a metafield filter (contains 'p.m' in the ID)
-      if (filter.id.includes('p.m')) {
-        // Split the ID by dots
-        const parts = filter.id.split('.');
-        
-        // For metafield filters, the format is typically:
-        // filter.p.m.[namespace].[key].[value-identifier]
-        // We need to extract the namespace and key
-        if (parts.length >= 4) {
-          const namespace = parts[parts.length - 2];
-          const key = parts[parts.length - 1];
-          
-          // For metafield filters, we need to use the label as the value
-          // and create a filter for each selected value
-          return filter.values.map(valueId => {
-            // Find the corresponding filter value object to get the label
-            const filterDataItem = filterData.find(f => f.id === filter.id);
-            const valueObj = filterDataItem?.values?.find(v => v.id === valueId);
-            
-            return {
-              productMetafield: {
-                namespace,
-                key,
-                value: valueObj?.label || valueId
-              }
-            };
-          });
-        }
-      }
-      
-      // Default case: use the standard product filter format
-      return {
-        productFilter: {
-          filterType: filter.id,
-          values: filter.values
-        }
-      };
-    }).flat(); // Flatten the array since metafield filters might return arrays
-  };
-
   // Function to fetch filtered products count
-  const fetchFilteredCount = async (filters) => {
-    if (filters.length === 0) {
-      setFilteredProductsCount({
-        state: 'loaded',
-        value: 0
-      });
-      setIsMaxFilteredCount(false);
-      return;
-    }
-    
+  async function fetchFilteredCount(filters) {
     setIsLoadingFilteredCount(true);
     setFilteredProductsCount({
       state: 'loading',
@@ -101,7 +63,7 @@ const Footer = React.forwardRef(({
     });
     
     try {
-      const shopifyFilters = getShopifyFilters(filters);
+      const shopifyFilters = getShopifyFilters(filters, filterData);
       
       const result = await fetchFilteredProductsCount(collectionHandle, shopifyFilters);
       
@@ -122,16 +84,16 @@ const Footer = React.forwardRef(({
   };
 
   // Function to handle filter selection
-  const handleFilterSelect = (filterId, valueId) => {
+  const handleFilterSelect = (categoryId, filterId) => {
     setEditableCopyOfSelectedFilters(prev => {
       // Check if this filter is already selected
-      const existingFilterIndex = prev.findIndex(f => f.id === filterId);
+      const existingFilterIndex = prev.findIndex(f => f.id === categoryId);
       
       let newFilters;
       if (existingFilterIndex >= 0) {
         // Filter exists, check if value is already selected
         const existingFilter = prev[existingFilterIndex];
-        const valueIndex = existingFilter.values.indexOf(valueId);
+        const valueIndex = existingFilter.values.indexOf(filterId);
         
         if (valueIndex >= 0) {
           // Value exists, remove it
@@ -155,16 +117,17 @@ const Footer = React.forwardRef(({
           newFilters = [...prev];
           newFilters[existingFilterIndex] = {
             ...existingFilter,
-            values: [...existingFilter.values, valueId]
+            values: [...existingFilter.values, filterId]
           };
         }
       } else {
         // Filter doesn't exist, add it with the value
-        newFilters = [...prev, { id: filterId, values: [valueId] }];
+        newFilters = [...prev, { id: categoryId, values: [filterId] }];
       }
       
       // Update the filtered count
-      fetchFilteredCount(newFilters);
+      const filterIds = newFilters.flatMap(filter => filter.values)
+      fetchFilteredCount(filterIds);
       
       return newFilters;
     });
@@ -181,7 +144,7 @@ const Footer = React.forwardRef(({
     // We get a copy of the selectedFilters and edit those 
     // in the bottomsheet. Once the applyFilter is clicked we close the 
     // bottomsheet so this copy is unused after that point.
-    setEditableCopyOfSelectedFilters([...selectedFilters]);
+    // setEditableCopyOfSelectedFilters([...selectedFilters]);
     setActiveFilterTab(0);
     
     // Reset the filtered count
@@ -191,8 +154,8 @@ const Footer = React.forwardRef(({
     });
     
     // If there are filters, fetch the count
-    if (selectedFilters.length > 0) {
-      fetchFilteredCount(selectedFilters);
+    if (appliedFilters.length > 0) {
+      fetchFilteredCount(appliedFilters);
     }
     
     if (filterBottomSheetRef.current) {
@@ -224,9 +187,11 @@ const Footer = React.forwardRef(({
   // Render filter category tab
   const renderFilterTab = (filter, index) => {
     const isActive = activeFilterTab === index;
-    
+    debugger
+    const currentEditableCopyOfCategory = editableCopyOfSelectedFilters.find(it => it?.id === filter?.id)
+    const numSelected = currentEditableCopyOfCategory?.values?.length;
     return (
-      <TouchableOpacity
+      <Pressable
         key={`filter-tab-${index}`}
         style={[styles.filterTab, isActive && styles.activeFilterTab]}
         onPress={() => setActiveFilterTab(index)}
@@ -234,7 +199,8 @@ const Footer = React.forwardRef(({
         <Text style={[styles.filterTabText, isActive && styles.activeFilterTabText]}>
           {filter.label}
         </Text>
-      </TouchableOpacity>
+        {numSelected > 0 && <Text style={[styles.filterTabText, {color: "#009FAD"}]}>{numSelected}</Text>}
+      </Pressable>
     );
   };
 
@@ -261,8 +227,8 @@ const Footer = React.forwardRef(({
   };
 
   // Render filter value item with Checkbox
-  const renderFilterValueWithCheckbox = (filter, value) => {
-    const isSelected = isFilterValueSelected(filter.id, value.id);
+  const renderFilterValueWithCheckbox = (category, value) => {
+    const isSelected = isFilterValueSelected(category.id, value.id);
     
     return (
       <View key={`filter-value-${value.id}`} style={styles.filterValueItem}>
@@ -270,7 +236,7 @@ const Footer = React.forwardRef(({
           label={value.label}
           initialValue={isSelected}
           onChange={(prevValue, newValue) => {
-            handleFilterSelect(filter.id, value.id);
+            handleFilterSelect(category.id, value.id);
           }}
           style={styles.filterCheckbox}
           labelStyle={[styles.filterValueText, isSelected && styles.selectedFilterValueText]}
@@ -282,24 +248,48 @@ const Footer = React.forwardRef(({
 
   // Function to handle apply filters
   const handleApplyFilters = () => {
-    applyFilters(editableCopyOfSelectedFilters);
+    const filterIds = editableCopyOfSelectedFilters.flatMap(it => it.values);
+    applyFilters(filterIds);
   };
 
   const currentSortLabel = sortOptions.find(it => it.value === sortOption && it.reverse === sortReverse)
   let numFiltersText = 'No Filter Applied';
-  const flattenedFilters = selectedFilters.flatMap(it => it.values);
-  if (flattenedFilters?.length === 1) {
+  if (appliedFilters?.length === 1) {
     numFiltersText = '1 Filter Applied';
-  } else if (flattenedFilters?.length > 1) {
-    numFiltersText = `${flattenedFilters.length} Filters Applied`;
+  } else if (appliedFilters?.length > 1) {
+    numFiltersText = `${appliedFilters.length} Filters Applied`;
   }
+
+  useEffect(() => {
+    // console.log("selected filters: ", selectedFilters)
+    let editableCopy = [];
+    for (let i = 0; i < filterData.unflattenedFilters.length; ++i) {
+      const category = filterData.unflattenedFilters[i];
+      const copyOfCategory = {
+        id: category.id,
+        values: []
+      };
+
+      for (let j = 0; j < category.values.length; ++j) {
+        const filter = category.values[j];
+        if (appliedFilters.indexOf(filter.id) >= 0) {
+          copyOfCategory.values.push(filter.id);
+        }
+      }
+      editableCopy.push(copyOfCategory);
+    }
+    setEditableCopyOfSelectedFilters(editableCopy);
+  }, [appliedFilters])
 
   return (
     <>
       {/* Bottom buttons for sort and filter */}
       <View style={styles.bottomButtonsContainer}>
-        <TouchableOpacity 
-          style={styles.bottomButton}
+        <Pressable 
+          style={({pressed}) => [
+            styles.bottomButton,
+            pressed && {opacity: 0.5}
+          ]}
           onPress={openSortBottomSheet}
         >
           <Icon 
@@ -311,12 +301,15 @@ const Footer = React.forwardRef(({
             <Text style={styles.buttonText}>Sort By</Text>
             {currentSortLabel && <Text style={styles.buttonSubtext}>{currentSortLabel.label}</Text>}
           </View>
-        </TouchableOpacity>
+        </Pressable>
 
         <View style={styles.bottomButtonsSeparator}></View>
         
-        <TouchableOpacity 
-          style={styles.bottomButton}
+        <Pressable 
+          style={({pressable}) => [
+            styles.bottomButton,
+            pressable && {opacity: 0.5}
+          ]}
           onPress={openFilterBottomSheet}
         >
           <Icon 
@@ -328,7 +321,7 @@ const Footer = React.forwardRef(({
             <Text style={styles.buttonText}>Filter</Text>
             <Text style={styles.buttonSubtext}>{numFiltersText}</Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </View>
       
       {/* Bottom sheets */}
@@ -342,16 +335,16 @@ const Footer = React.forwardRef(({
             {/* Filter tabs */}
             <View style={styles.filterTabsContainer}>
               <ScrollView>
-                {filterData.map(renderFilterTab)}
+                {filterData.unflattenedFilters.map(renderFilterTab)}
               </ScrollView>
             </View>
             
             {/* Filter values */}
             <View style={styles.filterValuesContainer}>
-              {filterData.length > 0 && activeFilterTab < filterData.length && (
+              {filterData.unflattenedFilters.length > 0 && activeFilterTab < filterData.unflattenedFilters.length && (
                 <FlatList
-                  data={filterData[activeFilterTab].values}
-                  renderItem={({ item }) => renderFilterValueWithCheckbox(filterData[activeFilterTab], item)}
+                  data={filterData.unflattenedFilters[activeFilterTab].values}
+                  renderItem={({ item }) => renderFilterValueWithCheckbox(filterData.unflattenedFilters[activeFilterTab], item)}
                   keyExtractor={(item) => item.id}
                   showsVerticalScrollIndicator={false}
                 />
@@ -380,14 +373,17 @@ const Footer = React.forwardRef(({
             </View>
             
             <View style={styles.filterButtonsContainer}>
-              <TouchableOpacity 
-                style={styles.applyButton}
+              <Pressable 
+                style={({pressed}) => [
+                  styles.applyButton,
+                  pressed && {opacity: 0.5}
+                ]}
                 onPress={handleApplyFilters}
               >
                 <Text style={styles.applyButtonText}>
                   Apply
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </View>
@@ -506,6 +502,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     backgroundColor: '#F5F5F5',
+    justifyContent: "space-between",
+    flexDirection: "row"
   },
   activeFilterTab: {
     backgroundColor: 'white',

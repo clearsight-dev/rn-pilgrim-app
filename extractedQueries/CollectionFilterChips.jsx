@@ -17,7 +17,7 @@ import { Icon } from 'apptile-core';
  */
 function CollectionFilterChips ({ 
   filterData, 
-  selectedFilters, 
+  appliedFilters, 
   onFilterRemove,
   onFilterSelect,
   onClearAllFilters
@@ -25,7 +25,7 @@ function CollectionFilterChips ({
   const selectedOptions = [];
   const unselectedOptions = [];
   for (let i = 0; i < filterData.length; ++i) {
-    if (selectedFilters.indexOf(filterData[i].id) >= 0) {
+    if (appliedFilters.indexOf(filterData[i].id) >= 0) {
       selectedOptions.push(filterData[i]);
     } else {
       unselectedOptions.push(filterData[i]);
@@ -42,7 +42,7 @@ function CollectionFilterChips ({
         <Pressable 
           style={({pressed}) => [
             styles.chip, 
-            (selectedFilters.length === 0) && styles.selectedChip,
+            (appliedFilters.length === 0) && styles.selectedChip,
             pressed && {opacity: 0.5}
           ]}
           onPress={onClearAllFilters}

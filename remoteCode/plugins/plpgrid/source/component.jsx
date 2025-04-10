@@ -8,12 +8,12 @@ import {
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { ProductCountSkeleton,  ProductGridSkeleton } from './Skeletons';
-import { fetchCollectionData, fetchFilteredProductsCount, getFilterAndProductsForCollection } from '../../../../extractedQueries/collectionqueries';
+import { fetchFilteredProductsCount, getFilterAndProductsForCollection } from '../../../../extractedQueries/collectionqueries';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
 import Header from '../../../../extractedQueries/CollectionFilterChips';
-import Footer from './Footer';
+import Footer, {getShopifyFilters} from './Footer';
 import styles from './styles';
 
 export function ReactComponent({ model }) {
@@ -38,7 +38,6 @@ export function ReactComponent({ model }) {
   const [sortOption, setSortOption] = useState('BEST_SELLING');
   const [sortReverse, setSortReverse] = useState(false);
   const [filterData, setFilterData] = useState({filters: [], unflattenedFilters: []});
-  const [selectedFilters, setSelectedFilters] = useState([]);
   const [appliedFilters, setAppliedFilters] = useState([]); // Track applied filters separately
   const [filteredProductsCount, setFilteredProductsCount] = useState(0);
   const [isLoadingFilteredCount, setIsLoadingFilteredCount] = useState(false);
@@ -135,22 +134,6 @@ export function ReactComponent({ model }) {
     });
   }
 
-  // Function to convert selected filters to Shopify filter format
-  function getShopifyFilters(filterIds, filterData) {
-    const filters = [];
-    for (let i = 0; i < filterData.filters.length; ++i) {
-      const filter = filterData.filters[i];
-      if (filterIds.indexOf(filter.id) >= 0) {
-        try {
-          filters.push(JSON.parse(filter.input));
-        } catch(err) {
-          console.error("Failed to parse filter input");
-        }
-      }
-    }
-    return filters;
-  }
-  
   // Function to fetch filtered products count
   async function fetchFilteredCount(collectionHandle, filters) {
     if (filters.length === 0) {
@@ -196,34 +179,30 @@ export function ReactComponent({ model }) {
   }
   
   // Function to apply filters
-  const applyFilters = useCallback((newSelectedFilters) => {
+  const applyFilters = useCallback((filterIds) => {
     // Hide the filter bottom sheet
     if (footerRef.current) {
       footerRef.current.hideFilterBottomSheet();
     }
     
-    // Update the selected filters state with the new filters from the Footer component
-    setSelectedFilters(newSelectedFilters);
-    
     // Set applied filters to the new selected filters
-    setAppliedFilters(newSelectedFilters);
+    setAppliedFilters(filterIds);
     
     // Reload products with selected filters
     setProducts([]);
     setCurrentCursor(null);
     
-    const shopifyFilters = getShopifyFilters(appliedFilters, filterData.filters);
-    
     // Fetch data with filters
-    fetchDataWithFilters(null, false, sortOption, sortReverse, shopifyFilters);
+    fetchDataWithFilters(collectionHandle, null, false, sortOption, sortReverse, filterIds, filterData);
     
+    const shopifyFilters = getShopifyFilters(filterIds, filterData);
     // If no filters are applied, refresh the total count
-    if (newSelectedFilters.length === 0) {
+    if (filterIds.length === 0) {
       fetchTotalProductsCount(collectionHandle);
     } else {
-      fetchFilteredProductsCount(collectionHandle, newSelectedFilters, filterData);
+      fetchFilteredProductsCount(collectionHandle, shopifyFilters);
     }
-  }, [collectionHandle]);
+  }, [collectionHandle, filterData, sortOption, sortReverse]);
   
   // Function to fetch data with filters
   function fetchDataWithFilters(
@@ -404,7 +383,7 @@ export function ReactComponent({ model }) {
       {/* Filter chips header */}
       <Header 
         filterData={filterData.filters}
-        selectedFilters={appliedFilters}
+        appliedFilters={appliedFilters}
         onFilterRemove={onFilterRemove}
         onFilterSelect={onFilterSelect}
         onClearAllFilters={onClearAllFilters}
@@ -443,11 +422,11 @@ export function ReactComponent({ model }) {
         handleSortOptionSelect={handleSortOptionSelect}
         sortOption={sortOption}
         sortReverse={sortReverse}
-        filterData={filterData.unflattenedFilters}
-        selectedFilters={selectedFilters}
+        filterData={filterData}
         applyFilters={applyFilters}
         totalProductsCount={totalProductsCount.count}
         isMaxTotalCount={totalProductsCount.isMaxCount}
+        appliedFilters={appliedFilters}
       />
       {/* Shade Selector Modal */}
       <ShadeSelector 
