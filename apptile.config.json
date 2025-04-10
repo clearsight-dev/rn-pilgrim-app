@@ -10,18 +10,20 @@
   "build_ios": true,
   "build_android": true,
   "ios": {
-    "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
-    "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
+    "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/12576d43-9d11-4ce7-9ee9-fcf58441ae74/icon.png",
+    "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/9298eef2-c502-456a-9f21-b7af06284b92/splash.png",
     "bundle_id": "com.discoverpilgrimindia",
+    "service_file_path": "6a1f4f33-744a-418c-947e-30247efdbe91/iosFirebaseServiceFile/fa412970-91e9-465f-81b6-8853553db266/iosFirebaseServiceFile.plist",
     "team_id": "8SQ493N52G",
     "app_name": "Pilgrim India",
     "version_number": 142,
     "version_semver": "11.0.15"
   },
   "android": {
-    "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png",
-    "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png",
+    "icon_path": "6a1f4f33-744a-418c-947e-30247efdbe91/icon/12576d43-9d11-4ce7-9ee9-fcf58441ae74/icon.png",
+    "splash_path": "6a1f4f33-744a-418c-947e-30247efdbe91/splash/9298eef2-c502-456a-9f21-b7af06284b92/splash.png",
     "bundle_id": "com.discoverpilgrim",
+    "service_file_path": "6a1f4f33-744a-418c-947e-30247efdbe91/androidFirebaseServiceFile/768f5b83-ac23-4cdf-a193-410cb4f55ef2/androidFirebaseServiceFile.json",
     "expected_output": "apk&aab",
     "app_name": "Pilgrim",
     "version_code": 4195005,
@@ -36,7 +38,8 @@
     "enableSourceMap": false,
     "enableCleverTap": false,
     "enableKlaviyo": false,
-    "enableMoEngage": false
+    "enableMoEngage": false,
+    "enableLively": false
   },
   "integrations": {
     "metaAds": {
@@ -59,26 +62,66 @@
   },
   "assets": [
     {
-      "fileName": "icon.png",
-      "assetClass": "icon",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/icon/a952be68-2eba-45ea-8d03-433412f23f2a/icon.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250214T112350Z&X-Amz-Expires=3600&X-Amz-Signature=79334fd73c7126c988d0d5fe88bcd813c77ede34db6cf3745719b1e24fdb5843&X-Amz-SignedHeaders=host&x-id=GetObject"
-    },
-    {
       "fileName": "splash.png",
       "assetClass": "splash",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/splash/cde49d21-a75d-4183-a450-d559fb0d316c/splash.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250214%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250214T112350Z&X-Amz-Expires=3600&X-Amz-Signature=a29168501c76b649a4df9d63a428feeea59540240e1b50f58c5bee1784acf5ad&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/splash/9298eef2-c502-456a-9f21-b7af06284b92/splash.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=3af1d26e0955d1327f7633aa33928da165527b43abd01235814f3b0aa2a27a5e&X-Amz-SignedHeaders=host&x-id=GetObject"
+    },
+    {
+      "fileName": "androidFirebaseServiceFile.json",
+      "assetClass": "androidFirebaseServiceFile",
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/androidFirebaseServiceFile/768f5b83-ac23-4cdf-a193-410cb4f55ef2/androidFirebaseServiceFile.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=0d9246004a4d287b19ccb6e2d4f00cf5e1a534613a3662c864085a3d91ee23b8&X-Amz-SignedHeaders=host&x-id=GetObject"
+    },
+    {
+      "fileName": "androidStoreFile.keystore",
+      "assetClass": "androidStoreFile",
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/androidStoreFile/170fc401-587c-431a-9b6b-b35442972aff/androidStoreFile.keystore?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=5385de2cef25ec0e32db3b08060e6b218dbea1c953f72cf9f67cad9a7bff763b&X-Amz-SignedHeaders=host&x-id=GetObject"
+    },
+    {
+      "fileName": "iosFirebaseServiceFile.plist",
+      "assetClass": "iosFirebaseServiceFile",
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/iosFirebaseServiceFile/fa412970-91e9-465f-81b6-8853553db266/iosFirebaseServiceFile.plist?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=7fb72543f11ea00352b651fade7e12a953532cef598950fcda00c07b71856919&X-Amz-SignedHeaders=host&x-id=GetObject"
+    },
+    {
+      "fileName": "icon.png",
+      "assetClass": "icon",
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/icon/12576d43-9d11-4ce7-9ee9-fcf58441ae74/icon.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=a4a4cc77c784bce80ce32e060f83d745ba6eb8b99cec140bfdcc7cbf2c5fe989&X-Amz-SignedHeaders=host&x-id=GetObject"
     }
   ],
-  "secrets": [],
-  "feature_flags": {
-    "ENABLE_MOENGAGE": true,
-    "ENABLE_APPSFLYER": true,
-    "ENABLE_FIREBASE_ANALYTICS": true,
-    "ENABLE_FBSDK": true,
-    "ENABLE_ONESIGNAL": false,
-    "ENABLE_SEGMENT_ANALYTICS": false,
-    "ENABLE_CLEVERTAP": false,
-    "ENABLE_KALVIYO": false
+  "secrets": [
+    {
+      "id": "82c0a096-9ae5-4278-a103-44dc931eb5ea",
+      "appId": "6a1f4f33-744a-418c-947e-30247efdbe91",
+      "secretClass": "keyPassword",
+      "deletedAt": null,
+      "createdAt": "2025-04-09T10:42:54.620Z",
+      "secret": "ZQfBH5XBNa+agTS2"
+    },
+    {
+      "id": "ba833aee-a495-48fa-8abd-86c5275b3b42",
+      "appId": "6a1f4f33-744a-418c-947e-30247efdbe91",
+      "secretClass": "storePassword",
+      "deletedAt": null,
+      "createdAt": "2025-04-09T10:42:54.617Z",
+      "secret": "ZQfBH5XBNa+agTS2"
+    },
+    {
+      "id": "cf0eb778-d203-4195-946f-b4f98df31ea5",
+      "appId": "6a1f4f33-744a-418c-947e-30247efdbe91",
+      "secretClass": "keyAlias",
+      "deletedAt": null,
+      "createdAt": "2025-04-09T10:42:54.621Z",
+      "secret": "discoverpilgrim"
+    }
+  ],
+  "feature_flags": {    
+  "ENABLE_MOENGAGE": true,
+  "ENABLE_APPSFLYER": true,
+  "ENABLE_FIREBASE_ANALYTICS": true,
+  "ENABLE_FBSDK": true,
+  "ENABLE_ONESIGNAL": false,
+  "ENABLE_SEGMENT_ANALYTICS": false,
+  "ENABLE_CLEVERTAP": false,
+  "ENABLE_KALVIYO": false
   },
   "SDK_PATH": "/Users/vadivazhagan/apptile-cli-home/ReactNativeTSProjeect",
   "APP_ID": "6a1f4f33-744a-418c-947e-30247efdbe91",
