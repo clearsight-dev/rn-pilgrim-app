@@ -86,7 +86,7 @@ async function addMoengage(
   const moengageIntegration = apptileConfig.integrations.moengage;
   infoPlist.MOENGAGE_APPID = moengageIntegration.appId;
   infoPlist.MOENGAGE_DATACENTER = moengageIntegration.datacenter;
-  infoPlist.MoEngageAppDelegateProxyEnabled = false;
+  infoPlist.MoEngageAppDelegateProxyEnabled = true;
   infoPlist.MoEngage = {
     ENABLE_LOGS: false,
     MOENGAGE_APP_ID: moengageIntegration.appId,

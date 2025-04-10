@@ -107,7 +107,7 @@
     "react-native-keyboard-aware-scroll-view": "0.9.5",
     "react-native-klaviyo": "github:clearsight-dev/react-native-klaviyo-apptile#2.1.0",
     "react-native-linear-gradient": "2.8.3",
-    "react-native-moengage": "10.1.0",
+    "react-native-moengage": "^11.2.0",
     "react-native-onesignal": "5.2.0",
     "react-native-otp-entry": "^1.8.4",
     "react-native-otp-verify": "^1.1.8",
