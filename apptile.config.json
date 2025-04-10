@@ -64,27 +64,27 @@
     {
       "fileName": "splash.png",
       "assetClass": "splash",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/splash/9298eef2-c502-456a-9f21-b7af06284b92/splash.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=3af1d26e0955d1327f7633aa33928da165527b43abd01235814f3b0aa2a27a5e&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/splash/9298eef2-c502-456a-9f21-b7af06284b92/splash.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T071913Z&X-Amz-Expires=3600&X-Amz-Signature=194338a9a3fbf09d2483db5e114ffa11b17ba310630ec0d162e635cf1a5cbc5f&X-Amz-SignedHeaders=host&x-id=GetObject"
     },
     {
       "fileName": "androidFirebaseServiceFile.json",
       "assetClass": "androidFirebaseServiceFile",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/androidFirebaseServiceFile/768f5b83-ac23-4cdf-a193-410cb4f55ef2/androidFirebaseServiceFile.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=0d9246004a4d287b19ccb6e2d4f00cf5e1a534613a3662c864085a3d91ee23b8&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/androidFirebaseServiceFile/768f5b83-ac23-4cdf-a193-410cb4f55ef2/androidFirebaseServiceFile.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T071913Z&X-Amz-Expires=3600&X-Amz-Signature=f2b57e019ed727f2d31f46ce93ae4d24ba77250d0067fb97f300ce0f15c3c211&X-Amz-SignedHeaders=host&x-id=GetObject"
     },
     {
       "fileName": "androidStoreFile.keystore",
       "assetClass": "androidStoreFile",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/androidStoreFile/170fc401-587c-431a-9b6b-b35442972aff/androidStoreFile.keystore?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=5385de2cef25ec0e32db3b08060e6b218dbea1c953f72cf9f67cad9a7bff763b&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/androidStoreFile/170fc401-587c-431a-9b6b-b35442972aff/androidStoreFile.keystore?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T071913Z&X-Amz-Expires=3600&X-Amz-Signature=1547866f7f16f45db9b33eaa3de2758498abcfc39d107289d2827d7bd1d947a6&X-Amz-SignedHeaders=host&x-id=GetObject"
     },
     {
       "fileName": "iosFirebaseServiceFile.plist",
       "assetClass": "iosFirebaseServiceFile",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/iosFirebaseServiceFile/fa412970-91e9-465f-81b6-8853553db266/iosFirebaseServiceFile.plist?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=7fb72543f11ea00352b651fade7e12a953532cef598950fcda00c07b71856919&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/iosFirebaseServiceFile/fa412970-91e9-465f-81b6-8853553db266/iosFirebaseServiceFile.plist?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T071913Z&X-Amz-Expires=3600&X-Amz-Signature=4bc4bbfc1df4a69ac2c0d310f7a170ee94d994acd5a05e57ee428dd1b88b600f&X-Amz-SignedHeaders=host&x-id=GetObject"
     },
     {
       "fileName": "icon.png",
       "assetClass": "icon",
-      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/icon/12576d43-9d11-4ce7-9ee9-fcf58441ae74/icon.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T063500Z&X-Amz-Expires=3600&X-Amz-Signature=a4a4cc77c784bce80ce32e060f83d745ba6eb8b99cec140bfdcc7cbf2c5fe989&X-Amz-SignedHeaders=host&x-id=GetObject"
+      "url": "https://prod-apptile-build-assets.s3.us-east-1.amazonaws.com/6a1f4f33-744a-418c-947e-30247efdbe91/icon/12576d43-9d11-4ce7-9ee9-fcf58441ae74/icon.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA2Q4O3KBMDCQNW4UR%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250410T071913Z&X-Amz-Expires=3600&X-Amz-Signature=b540df0373b4d3af6f1a0b90f8992fbbce9ca1c02fb5c7206320a38e700374f7&X-Amz-SignedHeaders=host&x-id=GetObject"
     }
   ],
   "secrets": [
@@ -113,17 +113,17 @@
       "secret": "discoverpilgrim"
     }
   ],
-  "feature_flags": {    
-  "ENABLE_MOENGAGE": true,
-  "ENABLE_APPSFLYER": true,
-  "ENABLE_FIREBASE_ANALYTICS": true,
-  "ENABLE_FBSDK": true,
-  "ENABLE_ONESIGNAL": false,
-  "ENABLE_SEGMENT_ANALYTICS": false,
-  "ENABLE_CLEVERTAP": false,
-  "ENABLE_KALVIYO": false
+  "feature_flags": {
+    "ENABLE_MOENGAGE": true,
+    "ENABLE_APPSFLYER": true,
+    "ENABLE_FIREBASE_ANALYTICS": true,
+    "ENABLE_FBSDK": true,
+    "ENABLE_ONESIGNAL": false,
+    "ENABLE_SEGMENT_ANALYTICS": false,
+    "ENABLE_CLEVERTAP": false,
+    "ENABLE_KALVIYO": false
   },
-  "SDK_PATH": "/Users/gauravgautam/apptile-cli-home/ReactNativeTSProjeect",
+  "SDK_PATH": "/Users/vadivazhagan/apptile-cli-home/ReactNativeTSProjeect",
   "APP_ID": "6a1f4f33-744a-418c-947e-30247efdbe91",
   "APPTILE_BACKEND_URL": "https://api.apptile.io",
   "APPCONFIG_SERVER_URL": "https://appconfigs.apptile.io"
