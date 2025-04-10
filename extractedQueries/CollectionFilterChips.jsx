@@ -3,6 +3,7 @@ import {
   View, 
   Text,
   StyleSheet,
+  TouchableOpacity,
   Pressable,
   ScrollView
 } from 'react-native';
@@ -14,9 +15,9 @@ import { Icon } from 'apptile-core';
  * @param {selectedFilters} param1 string[], array of filter ids
  * @returns 
  */
-function ChipCarouselFilters ({ 
+function CollectionFilterChips ({ 
   filterData, 
-  selectedFilters, 
+  appliedFilters, 
   onFilterRemove,
   onFilterSelect,
   onClearAllFilters
@@ -24,7 +25,7 @@ function ChipCarouselFilters ({
   const selectedOptions = [];
   const unselectedOptions = [];
   for (let i = 0; i < filterData.length; ++i) {
-    if (selectedFilters.indexOf(filterData[i].id) >= 0) {
+    if (appliedFilters.indexOf(filterData[i].id) >= 0) {
       selectedOptions.push(filterData[i]);
     } else {
       unselectedOptions.push(filterData[i]);
@@ -41,7 +42,7 @@ function ChipCarouselFilters ({
         <Pressable 
           style={({pressed}) => [
             styles.chip, 
-            (selectedFilters.length === 0) && styles.selectedChip,
+            (appliedFilters.length === 0) && styles.selectedChip,
             pressed && {opacity: 0.5}
           ]}
           onPress={onClearAllFilters}
@@ -123,4 +124,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChipCarouselFilters;
+export default CollectionFilterChips;

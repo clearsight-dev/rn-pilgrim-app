@@ -1,8 +1,65 @@
 import gql from 'graphql-tag';
-import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
+import { PRODUCT_CARD_INFO } from './commonGraphqlInfo';
 import { cheaplyGetShopifyQueryRunner } from './selectors';
-import {VARIANT_INFO} from './commonGraphqlInfo';
+import { VARIANT_INFO } from './commonGraphqlInfo';
 import { PRODUCT_QUERY } from './pdpquery';
+import { formatProduct } from './RelatedProductsCarousel';
+
+export async function getFilterAndProductsForCollection(
+  collectionHandle, 
+  filters = [], // these are filters applied before fetching products
+  sortKey = 'BEST_SELLING',
+  reverse = false,
+  cursor = null,
+  numProducts = 5,
+) {
+  const result = {
+    title: "",
+    products: [],
+    filters: [], // these are the entire set of filters that the ui can send back and are obtained 
+                 // from the collection query response, regardless of what filters were 
+                 // applied in the query
+    unflattenedFilters: [],
+    hasNextPage: false,
+    lastCursor: null
+  }; 
+
+  try {
+    const res = await fetchCollectionData(
+      collectionHandle,
+      numProducts,
+      cursor,
+      sortKey,
+      reverse,
+      filters
+    );
+
+    if (res?.data?.collection?.products?.edges) {
+      for (let i = 0; i < res.data.collection.products.edges.length; ++i) {
+        const edge = res.data.collection.products.edges[i];
+        
+        result.products.push(formatProduct(edge.node));
+      }
+    }
+
+    if (res?.data?.collection?.products?.filters) {
+      const nonPriceFilters = res.data.collection.products.filters.filter(it => it.id !== "filter.v.price");
+      result.unflattenedFilters = nonPriceFilters;
+      const applicableFilters = nonPriceFilters.flatMap(filterCategory => {
+        return filterCategory.values;
+      });
+      result.filters = applicableFilters;
+    }
+    result.hasNextPage = res?.data?.pagination?.hasNextPage ?? false;
+    result.lastCursor = res?.data?.pagination?.lastCursor ?? null;
+    result.title = res?.data?.collection?.title;
+  } catch (err) {
+    console.error("Failed to fetch data for chip carousel for the collection: ", collectionHandle);
+  } 
+
+  return result;
+}
+
 // Function to fetch collection data for the carousel component
 export async function fetchCollectionCarouselData(collectionHandle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();

@@ -4,14 +4,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   Animated
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
-import { fetchCollectionData } from '../../../../extractedQueries/collectionqueries';
 import RelatedProductsCarousel from '../../../../extractedQueries/RelatedProductsCarousel';
-import Header from './Header';
+import Header from '../../../../extractedQueries/CollectionFilterChips';
 
 function ChipCollectionCarousel({ 
   data,
@@ -115,7 +113,7 @@ function ChipCollectionCarousel({
       {/* Filter chips header */}
       <Header 
         filterData={filterData}
-        selectedFilters={selectedFilters}
+        appliedFilters={selectedFilters}
         onFilterRemove={filter => onFilterRemove(collectionHandle, filter, selectedFilters, filterData)}
         onFilterSelect={filter => onFilterSelect(collectionHandle, filter, selectedFilters, filterData)}
         onClearAllFilters={() => onFilterClear(collectionHandle, null, selectedFilters, filterData)}
