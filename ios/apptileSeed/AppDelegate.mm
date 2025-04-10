@@ -238,46 +238,4 @@
 #endif
   return [RCTLinkingManager application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
 }
-// Justing keep this things for reference have to remove
-////Remote notification Registration callback methods
-//- (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken {
-//  //Call only if MoEngageAppDelegateProxyEnabled is NO
-//  [[MoEngageSDKMessaging sharedInstance] setPushToken:deviceToken];
-//}
-// 
-//-(void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-//  //Call only if MoEngageAppDelegateProxyEnabled is NO
-//  [[MoEngageSDKMessaging sharedInstance]didFailToRegisterForPush];
-//}
-//
-//// UserNotifications Framework Callback
-//
-//- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-//     willPresentNotification:(UNNotification *)notification
-//       withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler{
-//         
-//         //This is to only to display Alert and enable notification sound
-//         completionHandler((UNNotificationPresentationOptionSound
-//                     | UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionBadge));
-//}
-//
-//// UserNotifications Framework Callback
-//- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-//didReceiveNotificationResponse:(UNNotificationResponse *)response
-//         withCompletionHandler:(void (^)())completionHandler{
-//    
-//           //Call only if MoEngageAppDelegateProxyEnabled is NO
-//           [[MoEngageSDKMessaging sharedInstance] userNotificationCenter:center didReceive:response];
-//           
-//           //Custom Handling of notification if Any
-//           completionHandler();
-//}
-//
-//- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
-//{
-//  completionHandler(UIBackgroundFetchResultNewData);
-//
-//  [[MoEngageSDKMessaging sharedInstance] didReceieveNotificationInApplication:application withInfo:userInfo];
-//}
-
 @end
