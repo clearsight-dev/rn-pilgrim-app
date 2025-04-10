@@ -172,7 +172,23 @@ android {
             exclude "**/libjsc.so"
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 }
+
+// "I'm not sure where androidx.browser is being used, but it's breaking the build, so I'm constraining it to the supported version for the current setup."
+configurations.configureEach {
+    resolutionStrategy {
+        force 'androidx.browser:browser:1.5.0'
+    }
+}
+
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
@@ -218,7 +234,9 @@ dependencies {
     }
 
     if(enable_moengage) {
-        implementation("com.moengage:rich-notification:5.0.1")
+        implementation(moengage.core)
+        implementation(moengage.richNotification)
+        implementation(moengage.inapp)
     }
 }
 
