@@ -15,7 +15,7 @@ import AutoScrollBubbles from './AutoScrollBubbles';
 import ScrollBubbles from './ScrollBubbles';
 
 // Reusable image carousel component with auto-scrolling and manual interaction
-export const Carousel = forwardRef(({ width, flatlistData, renderChildren }, ref) => {
+export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoScroll = false }, ref) => {
   const scrollView = useRef(null);
   const scrollBubblesRef = useRef();
   const currentIndexRef = useRef(0);
@@ -108,6 +108,10 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren }, ref
   
   // Clean up timer on unmount
   useEffect(() => {
+    if (!autoScroll) {
+      scrollBubblesRef.current.setCurrentIndex(0);
+    }
+
     return () => {
       if (inactivityTimerRef.current) {
         clearTimeout(inactivityTimerRef.current);
@@ -150,7 +154,7 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren }, ref
         }}
         renderItem={renderChildren}
         showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={true}
+        showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
       />
       <View
@@ -162,13 +166,7 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren }, ref
           left: 0.25 * width,
         }}
       >
-        {/* <ScrollBubbles 
-          ref={scrollBubblesRef}
-          numBubbles={flatlistData.length} 
-          currentIndex={currentIndexRef.current}
-          onBubblePress={handleBubblePress}
-        /> */}
-        {/* {userInteracted ? (
+        {(userInteracted || !autoScroll) ? (
           <ScrollBubbles 
             ref={scrollBubblesRef}
             numBubbles={flatlistData.length} 
@@ -181,7 +179,7 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren }, ref
             onIndexChange={handleAutoIndexChange}
             startIndex={currentIndexRef.current}
           />
-        )} */}
+        )}
       </View>
     </View>
   );
