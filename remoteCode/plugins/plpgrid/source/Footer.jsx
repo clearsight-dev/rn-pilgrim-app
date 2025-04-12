@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     bottom: 0, // Stick to the bottom
     left: 0,
     right: 0,
-    backgroundColor: colors.dark90, // Add background color to ensure it's not transparent
+    backgroundColor: colors.dark20, // Add background color to ensure it's not transparent
   },
   filterCountContainer: {
     backgroundColor: colors.dark5,
