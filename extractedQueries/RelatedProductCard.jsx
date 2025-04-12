@@ -12,6 +12,7 @@ import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 import {addLineItemToCart} from './selectors';
+import { colors, typography } from './theme';
 
 function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelectVariant}) {
   const {
@@ -94,7 +95,7 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
       {/* Promo Tag */}
       {productLabel2?.value && <ProductFlag
         label={productLabel2?.value}
-        color="#00726C"
+        color={colors.secondaryMain}
         style={styles.promoTagContainer}
         textStyle={styles.promoTagText}
         height={18}
@@ -110,7 +111,7 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
         />
         {(rating > 0) && (<View style={styles.ratingContainer}>
           <Text style={styles.ratingText}>{rating}</Text>
-          <Star color={'#00909E'} size={12} fillPercentage={1} />
+          <Star color={colors.secondaryMain} size={12} fillPercentage={1} />
         </View>)}
       </View> 
 
@@ -118,29 +119,31 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
       <View style={[styles.detailsContainer, cardVariant === "large" ? {alignItems: "center"} : {}]}>
         {
           isBestSeller ? (
-            <Text style={{color: '#F27B58', fontWeight: '600', fontSize: 11}}>
+            <Text style={typography.bestseller}>
               BESTSELLER
             </Text>
           ) : (
             <View style={{height: 11}}></View>
           )
         }
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={typography.heading14} numberOfLines={2}>
           {title}
         </Text>
-        <Text style={styles.subtitle}>{weightString}</Text>
+        <Text style={[styles.subtitle, typography.subHeading12]}>{weightString}</Text>
 
         {/* Price Section */}
         <View style={{flexGrow: 1, flexDirection: 'column', justifyContent: 'flex-end'}}>
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>₹{parseInt(price.amount).toLocaleString()}</Text>
+            <Text style={[typography.price, styles.price]}>
+              ₹{parseInt(price.amount).toLocaleString()}
+            </Text>
 
             {(compareAtPrice && discountPercentage > 0) && (
               <>
-                <Text style={styles.compareAtPrice}>
+                <Text style={[typography.slashedPrice, styles.compareAtPrice]}>
                   ₹{parseInt(compareAtPrice).toLocaleString()}
                 </Text>
-                <Text style={styles.discount}>{discountPercentage}% Off</Text>
+                <Text style={typography.savings}>{discountPercentage}% Off</Text>
               </>
             )}
           </View>
@@ -157,7 +160,7 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
 const styles = StyleSheet.create({
   container: {
     width: 184,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
     overflow: 'hidden',
     marginRight: 12,
   },
@@ -168,7 +171,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   promoTagText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 10,
     fontWeight: '600',
   },
@@ -178,7 +181,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#F3F3F3',
+    borderColor: colors.dark10,
   },
   image: {
     width: '100%',
@@ -196,13 +199,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 3,
     borderRadius: 24,
-    borderColor: '#F3F3F3',
+    borderColor: colors.dark10,
     backgroundColor: 'white',
   },
   ratingText: {
-    fontSize: 12,
-    color: '#1A1A1A',
-    fontWeight: '600',
+    fontSize: 11,
+    color: colors.dark70,
+    fontWeight: '500',
     marginRight: 4,
   },
   detailsContainer: {
@@ -214,16 +217,10 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '500',
-    lineHeight: 18,
-    color: '#333333',
     marginBottom: 4,
-    lineHeight: 18,
   },
   subtitle: {
-    fontSize: 12,
-    color: '#666666',
+    color: colors.dark60,
     marginBottom: 8,
   },
   priceContainer: {
@@ -233,21 +230,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   price: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#333333',
     marginRight: 4,
   },
   compareAtPrice: {
-    fontSize: 12,
-    color: '#999999',
-    textDecorationLine: 'line-through',
     marginRight: 4,
-  },
-  discount: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#00909E',
   },
   loadingOverlay: {
     position: 'absolute',

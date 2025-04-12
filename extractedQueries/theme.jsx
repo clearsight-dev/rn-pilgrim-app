@@ -1,6 +1,8 @@
 import {StyleSheet} from 'react-native';
 
 export const colors = {
+  white: '#ffffff',
+
   primary10: '#E6F7F9',
   primary20: '#CCEFF2',
   primary30: '#B3E7EC',
@@ -103,6 +105,7 @@ export const typography = StyleSheet.create({
     fontSize: 13,
     lineHeight: 13,
     letterSpacing: -0.4,
+    textDecorationLine: 'line-through',
     color: colors.dark50
   },
   savings: {

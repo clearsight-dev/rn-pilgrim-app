@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import RelatedProductsCarousel from '../../../../extractedQueries/RelatedProductsCarousel';
 import Header from '../../../../extractedQueries/CollectionFilterChips';
+import { colors, typography } from '../../../../extractedQueries/theme';
 
 function ChipCollectionCarousel({ 
   data,
@@ -104,9 +105,9 @@ function ChipCollectionCarousel({
     <View style={[styles.container, style]}>
       {/* Title and See All button */}
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>{displayTitle}</Text>
+        <Text style={typography.heading19}>{displayTitle}</Text>
         <TouchableOpacity onPress={handleSeeAllClick}>
-          <Text style={styles.seeAllButton}>See All</Text>
+          <Text style={[typography.heading14, styles.seeAllButton]}>See All</Text>
         </TouchableOpacity>
       </View>
       
@@ -162,7 +163,7 @@ function ChipCollectionCarousel({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     marginBottom: 16,
     minHeight: 500 
   },
@@ -174,19 +175,12 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   seeAllButton: {
-    fontSize: 14,
-    color: '#00909E',
-    fontWeight: '500',
+    color: colors.secondaryMain,
   },
   linearLoader: {
     height: 2,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.secondaryMain,
     marginHorizontal: 16,
     marginBottom: 16,
     justifyContent: 'center',
@@ -198,7 +192,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.dark90,
     marginTop: 8,
   },
   errorContainer: {
@@ -207,7 +201,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#d32f2f',
+    color: colors.accentBurgundy,
   },
   emptyContainer: {
     padding: 32,
@@ -215,7 +209,7 @@ const styles = StyleSheet.create({
   },
   noProductsText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.dark80,
   },
   carousel: {
     marginTop: 8,
