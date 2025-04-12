@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.bold,
     color: 'white',
     fontSize: 14,
+    lineHeight: 14,
     fontWeight: '600',
   },
   label: {

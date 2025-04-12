@@ -433,7 +433,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 22,
+    paddingVertical: Platform.select({
+      android: 5,
+      default: 22
+    }),
     marginHorizontal: 8,
   },
   buttonIcon: {
@@ -452,6 +455,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.medium,
+    lineHeight: 20,
     fontWeight: '500',
     color: colors.dark100,
   },
@@ -544,8 +548,8 @@ const styles = StyleSheet.create({
     color: colors.dark90,
   },
   selectedFilterValueText: {
-    fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
+    // fontFamily: FONT_FAMILY.bold,
+    // fontWeight: '600',
     color: colors.dark100,
   },
   filterActionBar: {
