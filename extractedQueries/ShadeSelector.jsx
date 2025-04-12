@@ -13,6 +13,7 @@ import { colorSwatches, imageSwatches } from './colorswatchinfo';
 import { fetchProductOptions } from './collectionqueries';
 import { addLineItemToCart } from './selectors';
 import PilgrimCartButton from './PilgrimCartButton';
+import { colors, gradients, typography } from './theme';
 
 export function normalizeOption (value) {
   const normalizedName = value?.toLowerCase()
@@ -108,7 +109,7 @@ function ShadeSelector({
           ) : (
             <View style={[
               styles.shadeTablet, 
-              { backgroundColor: '#CCCCCC' }
+              { backgroundColor: colors.dark20 }
             ]} />
           )}
           
@@ -118,12 +119,13 @@ function ShadeSelector({
               <Icon 
                 name="check" 
                 size={24} 
-                color="#FFFFFF" 
+                color={colors.white} 
               />
             </View>
           )}
         </View>
         <Text style={[
+          typography.subHeading12,
           styles.shadeName,
           (selectedVariant?.id === item.id) ? styles.selectedShadeName : {}
         ]}>{item.title}</Text>
@@ -155,7 +157,7 @@ function ShadeSelector({
               resizeMode="contain"
             />
             <View style={styles.productInfo}>
-              <Text style={styles.productTitle} numberOfLines={2}>
+              <Text style={[typography.subHeading15, styles.productTitle]} numberOfLines={2}>
                 {product.title}
               </Text>
               <Text style={styles.productPrice}>
@@ -225,18 +227,18 @@ const styles = StyleSheet.create({
   productTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.dark90,
     marginBottom: 8,
   },
   productPrice: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#333333',
+    color: colors.dark90,
     marginBottom: 4,
   },
   productWeight: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.dark60,
   },
   loadingContainer: {
     width: 180,
@@ -244,12 +246,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.dark10,
     borderRadius: 8,
   },
   divider: {
     height: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: colors.dark10,
     marginVertical: 16,
   },
   flatListContainer: {
@@ -293,25 +295,11 @@ const styles = StyleSheet.create({
   },
   shadeName: {
     fontSize: 12,
-    color: '#666666',
+    color: gradients.otherStroke.end,
     textAlign: 'center',
   },
-  addToCartButton: {
-    backgroundColor: '#FACA0C',
-    borderRadius: 8,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  addToCartText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333333',
-  },
   selectedShadeName: {
-    color: '#00AEBD',
+    color: colors.secondaryMain,
     fontWeight: '600'
   }
 });

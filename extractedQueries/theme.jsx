@@ -74,7 +74,7 @@ export const typography = StyleSheet.create({
     fontWeight: '600',
     fontSize: 20,
     lineHeight: 20,
-    letterSpacing: '-0.4%'
+    letterSpacing: -0.4
   },
   heading19: {
     fontFamily: 'SF Pro Text',
