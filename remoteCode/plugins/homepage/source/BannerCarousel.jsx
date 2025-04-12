@@ -33,12 +33,12 @@ export default function BannerCarousel({items, screenWidth, onNavigate}) {
                   position: 'absolute',
                   width: 150,
                   left: 40,
-                  top: 50,
+                  top: 25,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 34,
+                    fontSize: 30,
                     fontWeight: '600',
                     color: colors.dark100
                   }}
