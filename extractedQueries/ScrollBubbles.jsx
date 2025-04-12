@@ -108,7 +108,7 @@ const ScrollBubbles = forwardRef(function ScrollBubbles({
     )
   );
 
-  const unAnimatedWidth = 8 + (1 * 1);
+  const unAnimatedWidth = 7 + (1 * 1);
 
   let bubbles = [];
   if (currentIndex === lastIndex.current) {
@@ -130,12 +130,11 @@ const ScrollBubbles = forwardRef(function ScrollBubbles({
             style={{
               margin: 3,
               width, 
-              height: 10, 
+              height: 8, 
               borderRadius: 5,
               borderWidth: 1,
               borderColor: "#cccccccc", 
-              backgroundColor: "#ffffffcc",
-              borderWidth: 2,
+              backgroundColor: "#ffffff",
               // Add shadow for visibility on white backgrounds
             }}
           />
@@ -164,11 +163,11 @@ const ScrollBubbles = forwardRef(function ScrollBubbles({
             style={{
               margin: 3,
               width, 
-              height: 10, 
+              height: 8, 
               borderRadius: 5,
               borderWidth: 1,
               borderColor: "#cccccccc", 
-              backgroundColor: "#ffffffcc",
+              backgroundColor: "#ffffff",
               // Add shadow for visibility on white backgrounds
             }}
           />
