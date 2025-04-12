@@ -6,6 +6,7 @@ import RatingPill from '../../../../extractedQueries/RatingPill';
 import OfferCard from './OfferCard';
 import VariantCard from '../../../../extractedQueries/VariantCard';
 import { normalizeOption } from '../../../../extractedQueries/ShadeSelector';
+import { colors } from '../../../../extractedQueries/theme';
 
 // Enhanced variant selector component using the new VariantCard
 function InlineVariantSelector ({ 
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   bestsellerText: {
-    color: '#ff6b6b',
+    color: colors.accentCoral,
     fontWeight: 'bold',
     fontSize: 14,
   },

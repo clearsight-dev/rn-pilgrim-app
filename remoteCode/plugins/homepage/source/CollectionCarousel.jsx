@@ -12,7 +12,7 @@ import {useDispatch} from 'react-redux';
 import {navigateToScreen} from 'apptile-core';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import {Image} from '../../../../extractedQueries/ImageComponent';
-import { colors, typography } from '../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY, typography } from '../../../../extractedQueries/theme';
 
 // Subtitles for each collection
 const COLLECTION_SUBTITLES = {
@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: colors.secondaryMain,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
   cardsContainer: {

@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import {Image} from './ImageComponent';
 import Accordion from './Accordion';
-import { colors, typography } from './theme';
+import { colors, FONT_FAMILY, typography } from './theme';
 
 export function PilgrimCode() {
   const content = [
@@ -59,6 +59,7 @@ export function PilgrimCode() {
           source={{uri: item.urls[0]}}
         ></Image>
         <Text style={{
+            fontFamily: FONT_FAMILY.medium,
             textAlign: 'center', 
             fontSize: 11, 
             fontWeight: '500',

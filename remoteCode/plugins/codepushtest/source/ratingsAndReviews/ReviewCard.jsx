@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import {Image} from '../../../../../extractedQueries/ImageComponent';
 import RatingPill from '../../../../../extractedQueries/RatingPill';
 import moment from 'moment';
+import { colors, FONT_FAMILY } from '../../../../../extractedQueries/theme';
 
 const ReviewCard = ({ review }) => {
   const { title, body, rating, verified, created_at, name, pictures } = review;
@@ -78,11 +79,11 @@ const ReviewCard = ({ review }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
     borderRadius: 8,
     marginBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F3F3'
+    borderBottomColor: colors.dark10
   },
   header: {
     flexDirection: 'row',
@@ -94,22 +95,23 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 12,
-    color: '#767676',
+    color: colors.dark60,
     marginLeft: 9,
   },
   title: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: 'bold',
-    color: '#1A1A1A',
+    color: colors.dark100,
   },
   body: {
     fontSize: 14,
-    color: '#1A1A1A',
+    color: colors.dark100,
     marginBottom: 12,
     lineHeight: 20,
   },
   verifiedContainer: {
-    backgroundColor: '#E8F7F0',
+    backgroundColor: colors.dark10,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -118,12 +120,13 @@ const styles = StyleSheet.create({
   },
   verifiedText: {
     fontSize: 12,
-    color: '#00909E',
+    color: colors.secondaryMain,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
   name: {
     fontSize: 14,
-    color: '#767676',
+    color: colors.dark60,
     marginBottom: 12,
   },
   imagesContainer: {

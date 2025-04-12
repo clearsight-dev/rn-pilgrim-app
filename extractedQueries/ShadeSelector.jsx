@@ -13,7 +13,7 @@ import { colorSwatches, imageSwatches } from './colorswatchinfo';
 import { fetchProductOptions } from './collectionqueries';
 import { addLineItemToCart } from './selectors';
 import PilgrimCartButton from './PilgrimCartButton';
-import { colors, gradients, typography } from './theme';
+import { colors, FONT_FAMILY, gradients, typography } from './theme';
 
 export function normalizeOption (value) {
   const normalizedName = value?.toLowerCase()
@@ -225,12 +225,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   productTitle: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
     color: colors.dark90,
     marginBottom: 8,
   },
   productPrice: {
+    fontFamily: FONT_FAMILY.medium,
     fontSize: 18,
     fontWeight: '500',
     color: colors.dark90,
@@ -299,6 +301,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   selectedShadeName: {
+    fontFamily: FONT_FAMILY.bold,
     color: colors.secondaryMain,
     fontWeight: '600'
   }

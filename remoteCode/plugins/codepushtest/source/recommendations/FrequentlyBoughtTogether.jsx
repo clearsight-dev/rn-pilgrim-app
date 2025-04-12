@@ -1,6 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import ProductCard from './ProductCard';
+import { colors, FONT_FAMILY } from '../../../../../extractedQueries/theme';
 
 const FrequentlyBoughtTogether = ({ 
   title = "Frequently bought together",
@@ -70,19 +71,19 @@ const FrequentlyBoughtTogether = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
     marginHorizontal: 16,
     marginVertical: 8,
   },
   title: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#333333',
+    fontWeight: '600',
+    color: colors.dark90,
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.dark70,
     marginBottom: 16,
     lineHeight: 20,
   },
@@ -103,8 +104,9 @@ const styles = StyleSheet.create({
   },
   plusSign: {
     fontSize: 24,
-    fontWeight: '300',
-    color: '#666666',
+    fontFamily: FONT_FAMILY.regular,
+    fontWeight: '400',
+    color: colors.dark70,
   },
   priceSection: {
     flexDirection: 'row',
@@ -115,23 +117,24 @@ const styles = StyleSheet.create({
   },
   totalPriceLabel: {
     fontSize: 14,
-    color: '#333333',
+    color: colors.dark90,
   },
   totalPrice: {
-    fontWeight: '700',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     fontSize: 16,
   },
   savingsText: {
     fontSize: 12,
-    color: '#00909E',
+    color: colors.secondaryMain,
     marginTop: 4,
   },
   originalPrice: {
     textDecorationLine: 'line-through',
-    color: '#999999',
+    color: colors.dark60,
   },
   addToCartButton: {
-    backgroundColor: '#FFC700',
+    backgroundColor: colors.buttonBg,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 4,
@@ -139,8 +142,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   addToCartText: {
-    color: '#333333',
+    color: colors.dark90,
     fontSize: 14,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
   },
 });

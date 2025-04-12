@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import {Image} from '../../../../../extractedQueries/ImageComponent';
 import { ImageSkeleton } from './SkeletonLoaders';
+import { colors, FONT_FAMILY } from '../../../../../extractedQueries/theme';
 
 const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
 
@@ -54,12 +55,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     color: '#000',
   },
   seeAllButton: {
     fontSize: 14,
-    color: '#666',
+    color: colors.dark70,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
   photoWrapper: {

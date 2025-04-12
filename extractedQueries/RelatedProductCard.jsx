@@ -12,7 +12,7 @@ import {useDispatch} from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
 import {addLineItemToCart} from './selectors';
-import { colors, typography } from './theme';
+import { colors, FONT_FAMILY, typography } from './theme';
 
 function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelectVariant}) {
   const {
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   promoTagText: {
+    fontFamily: FONT_FAMILY.bold,
     color: colors.white,
     fontSize: 10,
     fontWeight: '600',
@@ -211,7 +212,8 @@ const styles = StyleSheet.create({
   detailsContainer: {
     flexGrow: 1,
     fontSize: 12,
-    color: '#767676',
+    color: colors.dark60,
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     padding: 12,
     paddingTop: 4,

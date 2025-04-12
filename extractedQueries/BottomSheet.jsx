@@ -12,6 +12,7 @@ import {
 import { Portal } from '@gorhom/portal';
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 import { useApptileWindowDims } from 'apptile-core';
+import { colors, FONT_FAMILY } from './theme';
 
 const BottomSheet = forwardRef(function ({ 
   title = 'Bottom Sheet',
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#DDDDDD',
+    backgroundColor: colors.dark20,
   },
   header: {
     flexDirection: 'row',
@@ -190,16 +191,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderBottomColor: colors.dark10,
   },
   title: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 18,
     fontWeight: '600',
-    color: '#000000',
+    color: colors.dark100,
   },
   closeButton: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.dark70,
   },
   contentContainer: {
     flex: 1,

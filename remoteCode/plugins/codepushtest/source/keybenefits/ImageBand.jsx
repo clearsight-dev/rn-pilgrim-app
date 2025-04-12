@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import { Image } from '../../../../../extractedQueries/ImageComponent';
-import { colors, typography } from '../../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY, typography } from '../../../../../extractedQueries/theme';
 
 export default function ImageBand() {
   const imageBand = [
@@ -48,7 +48,8 @@ export default function ImageBand() {
                   typography.family,
                   {
                     fontSize: 13,
-                    fontWeight: '800',
+                    fontFamily: FONT_FAMILY.bold,
+                    fontWeight: '600',
                     color: colors.dark100
                   }
                 ]}

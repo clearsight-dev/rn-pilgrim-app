@@ -14,7 +14,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from '../../../../../extractedQueries/BottomSheet';
 import Star from '../../../../../extractedQueries/Star';
 import { useApptileWindowDims } from 'apptile-core';
-import { colors, typography } from '../../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY, typography } from '../../../../../extractedQueries/theme';
 
 const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
   const [rating, setRating] = useState(0);
@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     color: colors.dark90,
     marginBottom: 8,
@@ -248,6 +249,7 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: colors.white,
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
   },

@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
-import { colors, typography } from './theme';
+import { colors, FONT_FAMILY, typography } from './theme';
 
 function PilgrimCartButton({
   buttonText,
@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
     zIndex: 2, // Ensure text is above the progress bar
   },
   buttonLargeText: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
     color: colors.dark100,

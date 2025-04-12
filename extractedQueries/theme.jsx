@@ -1,4 +1,22 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
+
+export const FONT_FAMILY = Platform.select({
+  android: {
+    regular: 'SFPro-Regular',
+    medium: 'SFProText-Medium',
+    bold: 'SFProText-Bold'
+  },
+  ios: {
+    regular: 'SFPro-Regular',
+    medium: 'SFProText-Medium',
+    bold: 'SFProText-Bold'
+  },
+  web: {
+    regular: 'SFPro-Regular',
+    medium: 'SFProText-Medium',
+    bold: 'SFProText-Bold' 
+  }
+});
 
 export const colors = {
   white: '#ffffff',
@@ -70,25 +88,25 @@ export const gradients = {
 
 export const typography = StyleSheet.create({
   family: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.regular,
     color: colors.dark100
   },
   heading20: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     fontSize: 20,
     lineHeight: 20,
     letterSpacing: -0.4
   },
   heading19: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     fontSize: 19,
     lineHeight: 19,
     color: colors.dark100
   },
   heading14: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     fontSize: 14,
     lineHeight: 19,
@@ -96,7 +114,7 @@ export const typography = StyleSheet.create({
     color: colors.dark100
   },
   price: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     fontSize: 18,
     lineHeight: 18,
@@ -104,7 +122,7 @@ export const typography = StyleSheet.create({
     color: colors.dark100
   },
   slashedPrice: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     fontSize: 13,
     lineHeight: 13,
@@ -113,7 +131,7 @@ export const typography = StyleSheet.create({
     color: colors.dark50
   },
   savings: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     fontSize: 13,
     lineHeight: 13,
@@ -121,21 +139,21 @@ export const typography = StyleSheet.create({
     color: colors.savingsText
   },
   subHeading15: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     fontSize: 15,
     lineHeight: 15,
     color: colors.dark100
   },
   subHeading14: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 14,
     color: colors.dark80
   },
   subHeading12: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     fontSize: 12,
     lineHeight: 16,
@@ -143,14 +161,14 @@ export const typography = StyleSheet.create({
     color: colors.dark100
   },
   body14: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 14,
     color: colors.dark80
   },
   bestseller: {
-    fontFamily: 'SF Pro Text',
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '600',
     fontSize: 11,
     lineHeight: 11,

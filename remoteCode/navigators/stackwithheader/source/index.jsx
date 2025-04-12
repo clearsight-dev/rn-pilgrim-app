@@ -23,6 +23,7 @@ import {
   datasourceTypeModelSel,
 } from 'apptile-core';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { colors, FONT_FAMILY } from '../../../../extractedQueries/theme';
 
 const StackNavigator = createStackNavigator();
 
@@ -367,12 +368,13 @@ const styles = StyleSheet.create({
   badgeText: {
     color: 'white',
     fontSize: 10,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.dark5,
     borderRadius: 8,
     paddingHorizontal: 12,
   },

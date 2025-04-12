@@ -17,7 +17,7 @@ import { formatProduct, formatProductsForCarousel } from '../../../../extractedQ
 import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
 import FAQComponent from './FAQComponent';
 import ImageBand from './keybenefits/ImageBand';
-import { colors } from '../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY } from '../../../../extractedQueries/theme';
 
 async function getVariants(product, setVariants, setSelectedVariant) {
   const res = await fetchProductOptions(product.handle, product.variantsCount);
@@ -357,7 +357,8 @@ const styles = StyleSheet.create({
   },
   sectionHeaderText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     color: colors.dark90,
   },
   dummySection: {

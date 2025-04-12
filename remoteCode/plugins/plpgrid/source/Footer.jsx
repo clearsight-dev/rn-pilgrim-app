@@ -13,7 +13,7 @@ import BottomSheet from '../../../../extractedQueries/BottomSheet';
 import RadioButton from '../../../../extractedQueries/RadioButton';
 import Checkbox from '../../../../extractedQueries/Checkbox';
 import { fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
-import { colors, typography } from '../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY, typography } from '../../../../extractedQueries/theme';
 
 export function getShopifyFilters(filterIds, filterData) {
   const filters = [];
@@ -439,16 +439,19 @@ const styles = StyleSheet.create({
   buttonIcon: {
     marginRight: 8,
     fontSize: 20,
-    fontWeight: '300',
+    fontFamily: FONT_FAMILY.regular,
+    fontWeight: '400',
     color: colors.dark100,
   },
   buttonSubtext: {
     fontSize: 12,
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     color: colors.dark70
   },
   buttonText: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     color: colors.dark100,
   },
@@ -474,6 +477,7 @@ const styles = StyleSheet.create({
     color: colors.dark90,
   },
   selectedSortOptionText: {
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     color: colors.dark100,
   },
@@ -512,10 +516,12 @@ const styles = StyleSheet.create({
   filterTabText: {
     fontSize: 14,
     color: colors.dark100,
-    fontWeight: '300'
+    fontFamily: FONT_FAMILY.regular,
+    fontWeight: '400'
   },
   activeFilterTabText: {
     color: colors.dark100,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
   filterValuesContainer: {
@@ -538,6 +544,7 @@ const styles = StyleSheet.create({
     color: colors.dark90,
   },
   selectedFilterValueText: {
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     color: colors.dark100,
   },
@@ -561,6 +568,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   filterCountText: {
+    fontFamily: FONT_FAMILY.medium,
     fontSize: 16,
     fontWeight: '500',
     color: colors.dark90,
@@ -578,6 +586,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   applyButtonText: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
     color: colors.dark100,

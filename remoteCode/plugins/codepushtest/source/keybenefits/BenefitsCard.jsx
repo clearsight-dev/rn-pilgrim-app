@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Icon } from 'apptile-core';
 import GradientBackground from '../../../../../extractedQueries/GradientBackground';
-import { colors, typography } from '../../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY, typography } from '../../../../../extractedQueries/theme';
 
 // Separate UI component that takes props
 export default function BenefitsCard({ title = "", benefits = [], style = {} }) {
@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
   title: {
     color: BORDER_COLOR,
     fontSize: 23,
-    fontWeight: "bold",
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: "600",
     letterSpacing: -0.08, // -0.4% of 20px
     paddingHorizontal: 4,
   },
@@ -108,12 +109,14 @@ const styles = StyleSheet.create({
   bulletPoint: {
     color: BORDER_COLOR,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     marginRight: 8,
     marginTop: 2,
   },
   benefitText: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
     color: colors.dark90,
     flex: 1,

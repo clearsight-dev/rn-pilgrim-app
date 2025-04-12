@@ -13,7 +13,7 @@ import { fetchProductOptions, fetchVariantBySelectedOptions } from './collection
 import VariantCard from './VariantCard';
 import {addLineItemToCart} from './selectors';
 import PilgrimCartButton from './PilgrimCartButton';
-import { colors, typography } from './theme';
+import { colors, FONT_FAMILY, typography } from './theme';
 
 function VariantSelector({ 
   bottomSheetRef, 
@@ -204,12 +204,14 @@ const styles = StyleSheet.create({
   },
   productTitle: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     color: colors.dark10,
     marginBottom: 8,
   },
   productPrice: {
     fontSize: 18,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     color: colors.dark10,
     marginBottom: 4,

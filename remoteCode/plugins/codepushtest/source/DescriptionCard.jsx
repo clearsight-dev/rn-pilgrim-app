@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { WebView } from 'react-native-webview';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';
 import { fetchProductDescriptionHtml } from '../../../../extractedQueries/pdpquery';
-import { colors, typography } from '../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY, typography } from '../../../../extractedQueries/theme';
 
 const DescriptionCard = ({ productData, loading }) => {
   const [activeTab, setActiveTab] = useState('description');
@@ -231,7 +231,8 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     marginBottom: 24,
   },
   tabContainer: {
@@ -252,6 +253,7 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: colors.secondaryMain,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
   activeTabIndicator: {
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 3,
-    backgroundColor: '#4EB0B5',
+    backgroundColor: colors.secondaryMain,
     borderRadius: 1.5,
   },
   contentContainer: {
@@ -272,7 +274,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     marginBottom: 16,
     lineHeight: 24,
   },

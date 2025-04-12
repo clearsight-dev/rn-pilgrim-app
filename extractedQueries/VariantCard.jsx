@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Defs, LinearGradient, Stop, Rect, Path } from 'react-native-svg';
 import GradientText from './GradientText';
+import { colors, FONT_FAMILY } from './theme';
 
 function DiscountBadge({ discount }) {
   // Badge dimensions
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderWidth: 1,
-    borderColor: '#00AEBD',
+    borderColor: colors.secondaryMain,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
     paddingVertical: 4,
@@ -164,7 +165,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   popularChoiceText: {
-    color: '#00AEBD',
+    color: colors.secondaryMain,
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -184,11 +186,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   variantCardSelected: {
-    borderColor: '#00AEBD',
+    borderColor: colors.secondaryMain,
     borderWidth: 1.5,
   },
   variantCardDefault: {
-    borderColor: '#D1D1D1',
+    borderColor: colors.dark20,
   },
   discountBadgeContainer: {
     position: 'absolute',
@@ -203,7 +205,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   discountBadgeText: {
-    fontWeight: "bold",
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: "600",
     fontSize: 12,
     color: 'white'
   },
@@ -217,12 +220,13 @@ const styles = StyleSheet.create({
   },
   sizeLabel: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: colors.dark100,
   },
   sizeValue: {
     fontSize: 14,
-    color: '#1A1A1A',
+    color: colors.dark100,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -231,12 +235,13 @@ const styles = StyleSheet.create({
   },
   currentPrice: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: colors.dark100,
   },
   originalPrice: {
     fontSize: 14,
-    color: '#A3A3A3',
+    color: colors.dark40,
     textDecorationLine: 'line-through',
   },
 });

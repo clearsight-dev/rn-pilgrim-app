@@ -2,6 +2,7 @@ import React from 'react';
 import {useApptileWindowDims} from 'apptile-core';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {Image} from '../../../../extractedQueries/ImageComponent';
+import { colors, FONT_FAMILY } from '../../../../extractedQueries/theme';
 
 const CollectionsGridSquare = ({collections = []}) => {
   const {width} = useApptileWindowDims();
@@ -54,13 +55,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     color: '#000',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 18,
-    color: '#333',
+    color: colors.dark90,
     marginBottom: 16,
   },
   gridContainer: {
@@ -88,12 +90,13 @@ const styles = StyleSheet.create({
     left: 10,
   },
   priceText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
   },
   categoryText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 12,
     marginTop: 4,
   },

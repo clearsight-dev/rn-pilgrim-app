@@ -6,7 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import {Icon} from 'apptile-core';
-import { colors } from './theme';
+import { colors, FONT_FAMILY } from './theme';
 
 export function Accordion({ title, children, initiallyExpanded = true }) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   titleText: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
     flex: 1,

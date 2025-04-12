@@ -2,7 +2,7 @@ import React from "react";
 import {Carousel} from '../../../../extractedQueries/ImageCarousel';
 import {View, Text, Pressable} from 'react-native';
 import {Image} from "../../../../extractedQueries/ImageComponent";
-import { colors, typography } from "../../../../extractedQueries/theme";
+import { colors, FONT_FAMILY, typography } from "../../../../extractedQueries/theme";
 
 export default function BannerCarousel({items, screenWidth, onNavigate}) {
   return (
@@ -39,6 +39,7 @@ export default function BannerCarousel({items, screenWidth, onNavigate}) {
                 <Text
                   style={{
                     fontSize: 30,
+                    fontFamily: FONT_FAMILY.bold,
                     fontWeight: '600',
                     color: colors.dark100
                   }}

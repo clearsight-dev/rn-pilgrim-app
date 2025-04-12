@@ -7,7 +7,7 @@ import WriteReviewBottomSheet from './WriteReviewBottomSheet';
 import PhotosBottomSheet from './PhotosBottomSheet';
 import ReviewCard from './ReviewCard';
 import { ReviewCardSkeleton } from './SkeletonLoaders';
-import { colors, typography } from '../../../../../extractedQueries/theme';
+import { colors, FONT_FAMILY, typography } from '../../../../../extractedQueries/theme';
 
 // Component for displaying consumer study results
 function ConsumerStudyResults ({ results = [] }) {
@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
   },
   percentageText: {
     fontSize: 13,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     color: colors.dark100,
     width: 40,
@@ -201,6 +202,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 15,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     color: colors.dark100,
     marginBottom: 16,
@@ -218,7 +220,8 @@ const styles = StyleSheet.create({
   },
   ratingValue: {
     fontSize: 30,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     marginRight: 8,
     color: colors.dark100,
   },
@@ -237,6 +240,7 @@ const styles = StyleSheet.create({
   writeReviewText: {
     color: colors.dark100,
     fontSize: 16,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
   reviewsSection: {
@@ -250,6 +254,7 @@ const styles = StyleSheet.create({
   },
   seeAllButton: {
     fontSize: 15,
+    fontFamily: FONT_FAMILY.medium,
     color: colors.secondaryMain,
     fontWeight: '500',
   },

@@ -8,7 +8,7 @@ import {
 import {Image} from './ImageComponent';
 import GradientBackground from './GradientBackground';
 import RadialGradientBackground from './RadialGradientBackground';
-import { colors, gradients } from './theme';
+import { colors, FONT_FAMILY, gradients } from './theme';
 
 // Link Item component
 const LinkItem = ({ title }) => {
@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   headerText: {
+    fontFamily: FONT_FAMILY.bold,
     color: colors.white,
     fontSize: 24,
     fontWeight: '600',
@@ -191,6 +192,7 @@ const styles = StyleSheet.create({
     maxWidth: 180
   },
   columnTitle: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
@@ -200,6 +202,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   linkText: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 14,
     color: colors.dark90,
     lineHeight: 22,
@@ -211,6 +214,7 @@ const styles = StyleSheet.create({
     marginRight: 11
   },
   socialMediaHeader: {
+    fontFamily: FONT_FAMILY.bold,
     paddingTop: 30,
     fontSize: 14,
     fontWeight: '600',
