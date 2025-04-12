@@ -2,6 +2,7 @@ import React from "react";
 import {Carousel} from '../../../../extractedQueries/ImageCarousel';
 import {View, Text, Pressable} from 'react-native';
 import {Image} from "../../../../extractedQueries/ImageComponent";
+import { colors, typography } from "../../../../extractedQueries/theme";
 
 export default function BannerCarousel({items, screenWidth, onNavigate}) {
   return (
@@ -30,23 +31,22 @@ export default function BannerCarousel({items, screenWidth, onNavigate}) {
               <View
                 style={{
                   position: 'absolute',
-                  width: 200,
-                  left: 10
+                  width: 150,
+                  left: 40,
+                  top: 50,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 44,
-                    fontWeight: '600'
+                    fontSize: 34,
+                    fontWeight: '600',
+                    color: colors.dark100
                   }}
                 >
                   {item.title}
                 </Text>
                 <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: '300'
-                  }}
+                  style={typography.subHeading14}
                 >
                   {item.subtitle}
                 </Text>
@@ -66,10 +66,14 @@ export default function BannerCarousel({items, screenWidth, onNavigate}) {
                     marginTop: 20,
                     paddingHorizontal: 10,
                     borderRadius: 8,
-                    width: 100,
+                    width: 120,
                   }}
                 >
-                  <Text>Shop now -&gt;</Text>
+                  <Text 
+                    style={[typography.subHeading15]}
+                  >
+                    Shop now -&gt;
+                  </Text>
                 </Pressable>
               </View>
             </View>

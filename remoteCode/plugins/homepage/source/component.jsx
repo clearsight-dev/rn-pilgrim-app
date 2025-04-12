@@ -26,6 +26,7 @@ import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
+// import {typography} from '../../../../extractedQueries/theme'
 
 async function fetchHomepageChipCarouselData() {
   console.log("Starting fetch for chipcarousels");
@@ -52,7 +53,7 @@ export function ReactComponent({ model }) {
   const dispatch = useDispatch();
   // Get collection handle and number of products from model props or use defaults
   const numberOfProducts = 5;
-  const { width: screenWidth } = useApptileWindowDims();
+  const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
   const quickCollectionsData = model.get('quickCollections') || [];
   const imageCarouselImages = model.get('imageCarouselImages') || [];
   const celebPicksData = model.get('celebPicksData') || [];
@@ -447,6 +448,29 @@ export function ReactComponent({ model }) {
 
   return (
     <>
+      {/* <View 
+        style={{
+          width: screenWidth, 
+          height: screenHeight,
+          flexDirection: 'column',
+          borderWidth: 2,
+          position: 'relative',
+          top: 50,
+          borderColor: 'red'
+        }}
+      >
+        <Text style={typography.heading20}>Heading-20</Text>
+        <Text style={typography.heading19}>Heading-19</Text>
+        <Text style={typography.heading14}>Heading-14</Text>
+        <Text style={typography.price}>695</Text>
+        <Text style={typography.slashedPrice}>895</Text>
+        <Text style={typography.savings}>20% Off</Text>
+        <Text style={typography.subHeading15}>Sub-Heading-15</Text>
+        <Text style={typography.subHeading14}>Sub-Heading-14</Text>
+        <Text style={typography.subHeading12}>Sub-Heading-12</Text>
+        <Text style={typography.body14}>body-14</Text>
+        <Text style={typography.bestseller}>BESTSELLER</Text>
+      </View> */}
       <SectionList
         style={styles.container}
         contentContainerStyle={styles.contentContainer}

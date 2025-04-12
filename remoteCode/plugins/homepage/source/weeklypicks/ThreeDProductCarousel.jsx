@@ -5,6 +5,7 @@ import GradientText from '../../../../../extractedQueries/GradientText';
 import GradientBackground from '../../../../../extractedQueries/GradientBackground';
 import Underline from '../../../../../extractedQueries/Underline';
 import RelatedProductCard from '../../../../../extractedQueries/RelatedProductCard';
+import { typography } from '../../../../../extractedQueries/theme';
 
 function ThreeDProductCarousel({ 
   products = [], 
@@ -54,7 +55,7 @@ function ThreeDProductCarousel({
           />
         </Svg>
         <GradientText
-          text="weekly picks"
+          text="Weekly Picks"
           fontSize={26}
           fontWeight="bold"
           width="100%"
@@ -65,7 +66,7 @@ function ThreeDProductCarousel({
 
       {/* Top Finds Section */}
       <View style={styles.topFindsContainer}>
-        <Text style={styles.topFindsText}>Top finds just for you</Text>
+        <Text style={[styles.topFindsText, typography.subHeading15]}>Top finds just for you</Text>
         <View style={styles.underlineContainer}>
           <Underline />
         </View>
@@ -185,14 +186,12 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   topFindsText: {
-    fontSize: 20,
-    color: '#333333',
     textAlign: 'center',
   },
   underlineContainer: {
     position: 'absolute',
     top: '100%',
-    left: '60%',
+    left: '50%',
     transform: [
       {
         scale: 0.5
