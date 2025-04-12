@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import {Image} from './ImageComponent';
 import Accordion from './Accordion';
+import { colors, typography } from './theme';
 
 export function PilgrimCode() {
   const content = [
@@ -57,7 +58,15 @@ export function PilgrimCode() {
           resizeMode='contain'
           source={{uri: item.urls[0]}}
         ></Image>
-        <Text style={{textAlign: 'center', fontSize: 11, fontWeight: '500'}}>{item.blurb}</Text>
+        <Text style={{
+            textAlign: 'center', 
+            fontSize: 11, 
+            fontWeight: '500',
+            color: colors.dark100
+          }}
+        >
+          {item.blurb}
+        </Text>
       </View>
     );
   }
@@ -75,7 +84,15 @@ export function PilgrimCode() {
       <View style={{
         flexDirection: 'column',
       }}>
-        <Text style={{fontSize: 14, fontWeight: '400', lineHeight: 20, marginBottom: 16}}>
+        <Text 
+          style={[
+            typography.subHeading14, 
+            {
+              lineHeight: 20, 
+              marginBottom: 16
+            }
+          ]}
+        >
           Pilgrim is "Clean Compatible". Not just free of harmful and toxic chemicals 
           but uses only those ingredients that either enhance the health of our hair 
           & skin or support the effectiveness of formulations.

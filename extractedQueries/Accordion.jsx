@@ -6,6 +6,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import {Icon} from 'apptile-core';
+import { colors } from './theme';
 
 export function Accordion({ title, children, initiallyExpanded = true }) {
   const [expanded, setExpanded] = useState(initiallyExpanded);
@@ -30,7 +31,7 @@ export function Accordion({ title, children, initiallyExpanded = true }) {
               style={{
                 marginRight: 8,
                 fontSize: 20,
-                color: '#1A1A1A'
+                color: colors.dark100
               }}
             />):
             (<Icon 
@@ -39,7 +40,7 @@ export function Accordion({ title, children, initiallyExpanded = true }) {
               style={{
                 marginRight: 8,
                 fontSize: 20,
-                color: '#1A1A1A'
+                color: colors.dark100
               }}
             />)
         }
@@ -69,6 +70,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     flex: 1,
+    color: colors.dark100
   },
   chevron: {
     fontSize: 12,
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   }
 });
 
