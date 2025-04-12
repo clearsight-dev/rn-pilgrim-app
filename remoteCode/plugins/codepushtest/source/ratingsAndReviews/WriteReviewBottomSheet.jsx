@@ -7,11 +7,13 @@ import {
   TouchableOpacity, 
   ActivityIndicator,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from '../../../../../extractedQueries/BottomSheet';
 import Star from '../../../../../extractedQueries/Star';
+import { useApptileWindowDims } from 'apptile-core';
 
 const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
   const [rating, setRating] = useState(0);
@@ -21,6 +23,7 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
   
   const titleInputRef = useRef(null);
   const reviewInputRef = useRef(null);
+  const {height: screenHeight} = useApptileWindowDims();
 
   const handleStarPress = (selectedRating) => {
     setRating(selectedRating);
@@ -115,6 +118,10 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
     );
   };
 
+  const sheetBgHeight = screenHeight * 0.3;
+  const tabHeaderHeight = 40; // from stackwithheader/source/index.jsx
+  const bottomSheetHeaderHeightApprox = 40;
+
   return (
     <BottomSheet 
       ref={ref}
@@ -122,8 +129,13 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
       sheetHeightFraction={0.7}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.content}>
+        <KeyboardAvoidingView 
+          keyboardVerticalOffset={sheetBgHeight + tabHeaderHeight + bottomSheetHeaderHeightApprox}
+          behavior={'height'}
+        >
+          <ScrollView
+            style={styles.content}
+          >
             {/* Rating Section */}
             <View style={styles.formRow}>
               <Text style={styles.label}>Rating</Text>
@@ -177,20 +189,16 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
                 <Text style={styles.submitButtonText}>Submit Review</Text>
               )}
             </TouchableOpacity>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </BottomSheet>
   );
 });
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
   content: {
-    padding: 16,
-    minHeight: 200,
+    paddingHorizontal: 16,
   },
   formRow: {
     marginBottom: 20,
