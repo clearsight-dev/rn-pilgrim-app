@@ -12,6 +12,7 @@ import {useDispatch} from 'react-redux';
 import {navigateToScreen} from 'apptile-core';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import {Image} from '../../../../extractedQueries/ImageComponent';
+import { colors, typography } from '../../../../extractedQueries/theme';
 
 // Subtitles for each collection
 const COLLECTION_SUBTITLES = {
@@ -62,7 +63,7 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color="#00909E" />
+        <ActivityIndicator size="large" color={colors.secondaryMain} />
         <Text style={styles.loadingText}>Loading collection...</Text>
       </View>
     );
@@ -85,21 +86,21 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
       {/* Collection Header */}
       <GradientBackground 
         gradientColors={[
-          { offset: "0%", color: "#FFFFFF", opacity: 0.5 },
-          { offset: "10%", color: "#E6F8FC", opacity: 1 },
-          { offset: "50%", color: "#E6F8FC", opacity: 1 },
-          { offset: "90%", color: "#E6F8FC", opacity: 0.5 },
-          { offset: "100%", color: "#FFFFFF", opacity: 0.5 }
+          { offset: "0%", color: colors.white, opacity: 0.5 },
+          { offset: "10%", color: colors.secondary10, opacity: 1 },
+          { offset: "50%", color: colors.secondary10, opacity: 1 },
+          { offset: "90%", color: colors.secondary10, opacity: 0.5 },
+          { offset: "100%", color: colors.white, opacity: 0.5 }
         ]}
         childrenContainerStyle={{paddingHorizontal: 16, }}
         style={styles.headerContainer}
       >
-        <Text style={styles.title}>{carouselData.title}</Text>
+        <Text style={[typography.heading20, styles.title]}>{carouselData.title}</Text>
         <View
           style={{
             alignSelf: 'flex-start',
           }}>
-          <Text style={[styles.subtitle]}>{carouselData.subtitle}</Text>
+          <Text style={[typography.subHeading14, styles.subtitle]}>{carouselData.subtitle}</Text>
           <Underline
             style={{
               width: 70,
@@ -135,7 +136,7 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
               onPress={() => setActiveTab(index)}>
               <Text
                 style={[
-                  styles.tabText,
+                  typography.subHeading14,
                   activeTab === index && styles.activeTabText,
                 ]}>
                 {tab}
@@ -170,7 +171,7 @@ export default function CollectionCarousel({collectionHandle, carouselData: rawD
                   resizeMode="cover"
                 />
                 <View style={styles.cardOverlay} />
-                <Text style={styles.cardTitle}>{category.title}</Text>
+                <Text style={[typography.heading20, styles.cardTitle]}>{category.title}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -193,14 +194,9 @@ const styles = StyleSheet.create({
     top: 22,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
     marginBottom: 16,
   },
   tabContainer: {
@@ -214,19 +210,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.dark10,
     backgroundColor: 'white',
   },
   activeTabButton: {
     backgroundColor: 'rgba(0, 174, 189, 0.04)',
-    borderColor: '#00909E',
-  },
-  tabText: {
-    fontSize: 14,
-    color: '#1A1A1A',
+    borderColor: colors.secondaryMain,
   },
   activeTabText: {
-    color: '#00909E',
+    color: colors.secondaryMain,
     fontWeight: '500',
   },
   cardsContainer: {
@@ -239,7 +231,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
     borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: '#ccc',
+    backgroundColor: colors.dark10,
   },
   cardImageContainer: {
     width: '100%',
@@ -252,9 +244,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   cardTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: colors.white,
     textAlign: 'center',
     padding: 8,
   },
@@ -267,7 +257,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 14,
-    color: '#666',
+    color: colors.dark60,
   },
   // Error state styles
   errorContainer: {
@@ -277,13 +267,13 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#ff3b30',
+    color: colors.accentBurgundy,
     textAlign: 'center',
   },
   // No data state styles
   noDataText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.dark80,
     textAlign: 'center',
     marginTop: 20,
   },
@@ -293,10 +283,10 @@ const styles = StyleSheet.create({
   },
   debugText: {
     fontSize: 10,
-    color: '#999',
+    color: colors.dark80,
   },
   debugData: {
     fontSize: 8,
-    color: '#999',
+    color: colors.dark80,
   },
 });
