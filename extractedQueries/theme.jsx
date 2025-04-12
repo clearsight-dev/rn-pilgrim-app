@@ -69,6 +69,10 @@ export const gradients = {
 };
 
 export const typography = StyleSheet.create({
+  family: {
+    fontFamily: 'SF Pro Text',
+    color: colors.dark100
+  },
   heading20: {
     fontFamily: 'SF Pro Text',
     fontWeight: '600',

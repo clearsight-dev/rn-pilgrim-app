@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Icon } from 'apptile-core';
 import GradientBackground from '../../../../../extractedQueries/GradientBackground';
+import { colors, typography } from '../../../../../extractedQueries/theme';
 
 // Separate UI component that takes props
 export default function BenefitsCard({ title = "", benefits = [], style = {} }) {
@@ -13,9 +14,9 @@ export default function BenefitsCard({ title = "", benefits = [], style = {} }) 
 
   // Custom gradient colors for the benefits card
   const gradientColors = [
-    { offset: "0%", color: "rgba(255, 255, 255, 1)", opacity: 0.5 },
-    { offset: "80%", color: "rgba(55, 238, 255, 1)", opacity: 0.2 },
-    { offset: "100%", color: "rgba(55, 238, 255, 1)", opacity: 0.2 }
+    { offset: "0%", color: colors.white, opacity: 0.5 },
+    { offset: "80%", color: colors.primary90, opacity: 0.2 },
+    { offset: "100%", color: colors.primary90, opacity: 0.2 }
   ];
 
   return (
@@ -33,7 +34,7 @@ export default function BenefitsCard({ title = "", benefits = [], style = {} }) 
         
         {/* Title container with the same width as the cutout */}
         <View style={[styles.titleContainer, { width: estimatedTitleWidth }]}>
-          <Text style={styles.title}>{titleText}</Text>
+          <Text style={[typography.family, styles.title]}>{titleText}</Text>
         </View>
         
         {/* Content container */}
@@ -50,7 +51,7 @@ export default function BenefitsCard({ title = "", benefits = [], style = {} }) 
                   color: BORDER_COLOR
                 }}
               />
-              <Text style={styles.benefitText}>{benefit.trim()}</Text>
+              <Text style={[typography.family, styles.benefitText]}>{benefit.trim()}</Text>
             </View>
           ))}
         </View>
@@ -59,7 +60,7 @@ export default function BenefitsCard({ title = "", benefits = [], style = {} }) 
   );
 };
 
-const BORDER_COLOR = '#00909E';
+const BORDER_COLOR = colors.secondaryMain;
 const BORDER_WIDTH = 1;
 const BORDER_RADIUS = 8;
 
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
   benefitText: {
     fontSize: 14,
     fontWeight: '400',
-    color: '#333333',
+    color: colors.dark90,
     flex: 1,
     lineHeight: 20,
   },

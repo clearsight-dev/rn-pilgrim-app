@@ -14,6 +14,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from '../../../../../extractedQueries/BottomSheet';
 import Star from '../../../../../extractedQueries/Star';
 import { useApptileWindowDims } from 'apptile-core';
+import { colors, typography } from '../../../../../extractedQueries/theme';
 
 const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
   const [rating, setRating] = useState(0);
@@ -138,13 +139,13 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
           >
             {/* Rating Section */}
             <View style={styles.formRow}>
-              <Text style={styles.label}>Rating</Text>
+              <Text style={[typography.family, styles.label]}>Rating</Text>
               {renderStars()}
             </View>
             
             {/* Title Section */}
             <View style={styles.formRow}>
-              <Text style={styles.label}>Title of review</Text>
+              <Text style={[typography.family, styles.label]}>Title of review</Text>
               <TextInput
                 ref={titleInputRef}
                 style={styles.titleInput}
@@ -156,7 +157,7 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
             
             {/* Review Text Section */}
             <View style={styles.formRow}>
-              <Text style={styles.label}>How was your experience?</Text>
+              <Text style={[typography.family, styles.label]}>How was your experience?</Text>
               <TextInput
                 ref={reviewInputRef}
                 style={styles.reviewInput}
@@ -171,7 +172,7 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
             
             {/* Error Message */}
             {errorMessage ? (
-              <Text style={styles.errorMessage}>{errorMessage}</Text>
+              <Text style={[typography.family, styles.errorMessage]}>{errorMessage}</Text>
             ) : null}
             
             {/* Submit Button */}
@@ -184,9 +185,9 @@ const WriteReviewBottomSheet = forwardRef(function ({ onSubmitReview }, ref) {
               disabled={!isFormValid || isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
+                <ActivityIndicator color={colors.white} size="small" />
               ) : (
-                <Text style={styles.submitButtonText}>Submit Review</Text>
+                <Text style={[typography.family, styles.submitButtonText]}>Submit Review</Text>
               )}
             </TouchableOpacity>
           </ScrollView>
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.dark90,
     marginBottom: 8,
   },
   starsContainer: {
@@ -219,23 +220,23 @@ const styles = StyleSheet.create({
   },
   titleInput: {
     borderWidth: 1,
-    borderColor: '#DDDDDD',
+    borderColor: colors.dark20,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   },
   reviewInput: {
     borderWidth: 1,
-    borderColor: '#DDDDDD',
+    borderColor: colors.dark20,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
     minHeight: 120,
   },
   submitButton: {
-    backgroundColor: '#00909E',
+    backgroundColor: colors.secondaryMain,
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -243,15 +244,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   disabledButton: {
-    backgroundColor: '#CCCCCC',
+    backgroundColor: colors.dark30,
   },
   submitButtonText: {
-    color: '#FFFFFF',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
   },
   errorMessage: {
-    color: '#D32F2F',
+    color: colors.accentBurgundy,
     fontSize: 14,
     marginBottom: 10,
     textAlign: 'center',

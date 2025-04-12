@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { WebView } from 'react-native-webview';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';
 import { fetchProductDescriptionHtml } from '../../../../extractedQueries/pdpquery';
+import { colors, typography } from '../../../../extractedQueries/theme';
 
 const DescriptionCard = ({ productData, loading }) => {
   const [activeTab, setActiveTab] = useState('description');
@@ -58,7 +59,7 @@ const DescriptionCard = ({ productData, loading }) => {
   if (loading || description.status != "loaded") {
     return (
       <View style={styles.container}>
-        <Text>Loading product details...</Text>
+        <Text style={typography.body14}>Loading product details...</Text>
       </View>
     );
   }
@@ -93,7 +94,7 @@ const DescriptionCard = ({ productData, loading }) => {
   
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Product Details</Text>
+      <Text style={[typography.family, styles.header]}>Product Details</Text>
       
       <View style={styles.tabContainer}>
         <TouchableOpacity
@@ -102,6 +103,7 @@ const DescriptionCard = ({ productData, loading }) => {
         >
           <Text 
             style={[
+              typography.family,
               styles.tabText, 
               activeTab === 'description' && styles.activeTabText
             ]}
@@ -117,6 +119,7 @@ const DescriptionCard = ({ productData, loading }) => {
         >
           <Text 
             style={[
+              typography.family,
               styles.tabText, 
               activeTab === 'howToUse' && styles.activeTabText
             ]}
@@ -130,12 +133,12 @@ const DescriptionCard = ({ productData, loading }) => {
       <View style={styles.contentContainer}>
         {activeTab === 'description' ? (
           <View>
-            <Text numberOfLines={6}>
+            <Text numberOfLines={6} style={typography.family}>
               {description.valueText}
             </Text>
             <TouchableOpacity onPress={openBottomSheet} style={styles.readMoreButton}>
-              <Text style={styles.readMoreText}>Read more </Text>
-              <Text style={styles.readMoreArrow}>›</Text>
+              <Text style={[typography.family, styles.readMoreText]}>Read more </Text>
+              <Text style={[typography.family, styles.readMoreArrow]}>›</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -172,7 +175,7 @@ const DescriptionCard = ({ productData, loading }) => {
                       body { 
                         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
                         padding: 16px;
-                        color: #333;
+                        color: ${colors.dark90};
                         line-height: 1.5;
                       }
                       img { max-width: 100%; height: auto; }
@@ -197,7 +200,7 @@ const DescriptionCard = ({ productData, loading }) => {
                         body { 
                           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
                           padding: 16px;
-                          color: #333;
+                          color: ${colors.dark90};
                           line-height: 1.5;
                         }
                         img { max-width: 100%; height: auto; }
@@ -221,7 +224,7 @@ const DescriptionCard = ({ productData, loading }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     padding: 16,
     width: '100%',
     minHeight: 100,
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#e1e1e1',
+    borderBottomColor: colors.dark20,
     marginBottom: 20,
   },
   tab: {
@@ -245,10 +248,10 @@ const styles = StyleSheet.create({
   activeTab: {},
   tabText: {
     fontSize: 16,
-    color: '#9e9e9e',
+    color: colors.dark50,
   },
   activeTabText: {
-    color: '#4EB0B5',
+    color: colors.secondaryMain,
     fontWeight: '500',
   },
   activeTabIndicator: {
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#333',
+    color: colors.dark90,
     marginBottom: 16,
   },
   readMoreButton: {
@@ -284,11 +287,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   readMoreText: {
-    color: '#4EB0B5',
+    color: colors.secondaryMain,
     fontSize: 16,
   },
   readMoreArrow: {
-    color: '#4EB0B5',
+    color: colors.secondaryMain,
     fontSize: 20,
   },
   howToUseContainer: {

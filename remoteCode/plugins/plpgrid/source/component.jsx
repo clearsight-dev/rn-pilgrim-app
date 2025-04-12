@@ -15,6 +15,7 @@ import VariantSelector from '../../../../extractedQueries/VariantSelector';
 import Header from '../../../../extractedQueries/CollectionFilterChips';
 import Footer, {getShopifyFilters} from './Footer';
 import styles from './styles';
+import { colors, typography } from '../../../../extractedQueries/theme';
 
 export function ReactComponent({ model }) {
   // const collectionHandle = model.get('collectionHandle') || '';
@@ -310,8 +311,8 @@ export function ReactComponent({ model }) {
     
     return (
       <View style={styles.footerContainer}>
-        <ActivityIndicator size="small" color="#007bff" />
-        <Text style={styles.loadingMoreText}>Loading more products...</Text>
+        <ActivityIndicator size="small" color={colors.secondaryMain} />
+        <Text style={[typography.family, styles.loadingMoreText]}>Loading more products...</Text>
       </View>
     );
   };
@@ -356,7 +357,7 @@ export function ReactComponent({ model }) {
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{collectionTitle}</Text>
+      <Text style={[typography.family, styles.title]}>{collectionTitle}</Text>
       
       <View style={styles.headerContainer}>
         {appliedFilters.length > 0 ? (
@@ -364,7 +365,7 @@ export function ReactComponent({ model }) {
           isLoadingFilteredCount ? (
             <ProductCountSkeleton />
           ) : (
-            <Text style={styles.productsCount}>
+            <Text style={[typography.family, styles.productsCount]}>
               {isMaxFilteredCount ? '90+ Products' : `${filteredProductsCount} Products`}
             </Text>
           )
@@ -373,7 +374,7 @@ export function ReactComponent({ model }) {
           isLoadingTotalCount ? (
             <ProductCountSkeleton />
           ) : (
-            <Text style={styles.productsCount}>
+            <Text style={[typography.family, styles.productsCount]}>
               {totalProductsCount.isMaxCount ? '90+ Products' : `${totalProductsCount.count} Products`}
             </Text>
           )
@@ -410,7 +411,7 @@ export function ReactComponent({ model }) {
           onEndReachedThreshold={1.5} // Trigger when 30% from the end
           ListFooterComponent={renderFooter}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No products found</Text>
+            <Text style={[typography.family, styles.emptyText]}>No products found</Text>
           }
         />
       )}

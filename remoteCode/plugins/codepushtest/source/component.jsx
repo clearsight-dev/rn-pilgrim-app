@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, SectionList, Platform, Text, View } from 'react-native';
 import { useApptileWindowDims } from 'apptile-core';
@@ -18,6 +17,7 @@ import { formatProduct, formatProductsForCarousel } from '../../../../extractedQ
 import { fetchProductOptions } from '../../../../extractedQueries/collectionqueries';
 import FAQComponent from './FAQComponent';
 import ImageBand from './keybenefits/ImageBand';
+import { colors } from '../../../../extractedQueries/theme';
 
 async function getVariants(product, setVariants, setSelectedVariant) {
   const res = await fetchProductOptions(product.handle, product.variantsCount);
@@ -343,32 +343,32 @@ export function ReactComponent({ model }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff'
+    backgroundColor: colors.white
   },
   contentContainer: {
     flexGrow: 1,
-    backgroundColor: '#ffffff'
+    backgroundColor: colors.white
   },
   sectionHeader: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colors.dark5,
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: colors.dark10,
   },
   sectionHeaderText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.dark90,
   },
   dummySection: {
     padding: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.dark5,
     marginVertical: 10,
     borderRadius: 8,
   },
   dummyText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.dark70,
     textAlign: 'center',
   }
 });

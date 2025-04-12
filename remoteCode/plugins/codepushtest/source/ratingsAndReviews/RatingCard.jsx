@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import {Icon} from 'apptile-core';
 import StarRating from './StarRating';
 import UserPhotos from './UserPhotos';
@@ -7,6 +7,7 @@ import WriteReviewBottomSheet from './WriteReviewBottomSheet';
 import PhotosBottomSheet from './PhotosBottomSheet';
 import ReviewCard from './ReviewCard';
 import { ReviewCardSkeleton } from './SkeletonLoaders';
+import { colors, typography } from '../../../../../extractedQueries/theme';
 
 // Component for displaying consumer study results
 function ConsumerStudyResults ({ results = [] }) {
@@ -28,15 +29,15 @@ function ConsumerStudyResults ({ results = [] }) {
   
   return (
     <View style={styles.consumerStudyContainer}>
-      <Text style={styles.sectionTitle}>Customer Insights</Text>
+      <Text style={[typography.family, styles.sectionTitle]}>Customer Insights</Text>
       
       {results.map((result, index) => {
         const { percentage, text } = parseResult(result);
         
         return (
           <View key={index} style={styles.insightRow}>
-            <Text style={styles.insightText}>{text}</Text>
-            <View style={styles.progressBarContainer}>
+            <Text style={[typography.family, styles.insightText]}>{text}</Text>
+            <View style={[typography.family, styles.progressBarContainer]}>
               <View 
                 style={[
                   styles.progressBar, 
@@ -44,7 +45,7 @@ function ConsumerStudyResults ({ results = [] }) {
                 ]} 
               />
             </View>
-            <Text style={styles.percentageText}>{percentage}%</Text>
+            <Text style={[typography.family, styles.percentageText]}>{percentage}%</Text>
           </View>
         );
       })}
@@ -79,14 +80,14 @@ function RatingCard ({
   return (
     <View style={styles.container}>
       {/* Section Title */}
-      <Text style={styles.sectionTitle}>ratings & reviews</Text>
+      <Text style={[typography.family, styles.sectionTitle]}>ratings & reviews</Text>
       
       {/* Rating Row */}
       <View style={styles.ratingRow}>
         <View style={styles.ratingContainer}>
           <View style={{flexDirection: "column", alignItems: "center", marginRight: 16}}>
-            <Text style={styles.ratingValue}>{rating.toFixed(1)}</Text>
-            <Text style={{fontSize: 14, fontWeight: 'bold', color: '#767676'}}>out of 5</Text>
+            <Text style={[typography.family, styles.ratingValue]}>{rating.toFixed(1)}</Text>
+            <Text style={[typography.family, {fontSize: 14, fontWeight: 'bold', color: colors.dark80}]}>out of 5</Text>
           </View>
           <StarRating rating={rating} ratingCount={ratingCount} size={28} />
         </View>
@@ -94,12 +95,15 @@ function RatingCard ({
       </View>
       
       {/* Write Review Button */}
-      <TouchableOpacity 
-        style={styles.writeReviewButton}
+      <Pressable 
+        style={({pressed}) => [
+          styles.writeReviewButton, 
+          pressed && {opacity: 0.5}
+        ]}
         onPress={handleWriteReviewPress}
       >
-        <Text style={styles.writeReviewText}>Write a review</Text>
-      </TouchableOpacity>
+        <Text style={[typography.family, styles.writeReviewText]}>Write a review</Text>
+      </Pressable>
       
       {/* Consumer Study Results */}
       <ConsumerStudyResults results={consumerStudyResults} />
@@ -115,7 +119,7 @@ function RatingCard ({
       {isLoading || reviews.length > 0 ? (
         <View style={styles.reviewsSection}>
           <View style={styles.reviewsHeader}>
-            <Text style={styles.sectionTitle}>Customer Reviews</Text>
+            <Text style={[typography.family, styles.sectionTitle]}>Customer Reviews</Text>
             
           </View>
           
@@ -137,7 +141,7 @@ function RatingCard ({
           <TouchableOpacity 
             onPress={handleSeeAllPhotosPress} 
             style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={styles.seeAllButton}>View all reviews</Text>
+            <Text style={[typography.family, styles.seeAllButton]}>View all reviews</Text>
             <Icon 
               iconType={'Entypo'} 
               name={'chevron-right'} 
@@ -158,7 +162,7 @@ function RatingCard ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
     paddingVertical: 16,
     paddingHorizontal: 16
   },
@@ -173,32 +177,32 @@ const styles = StyleSheet.create({
   insightText: {
     flex: 2,
     fontSize: 15,
-    color: '#2A2A2A',
+    color: colors.dark100,
   },
   progressBarContainer: {
     flex: 2,
     height: 6,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: colors.dark10,
     borderRadius: 4,
     marginHorizontal: 12,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#009FAD',
+    backgroundColor: colors.secondaryMain,
     borderRadius: 4,
   },
   percentageText: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#2A2A2A',
+    color: colors.dark100,
     width: 40,
     textAlign: 'right',
   },
   sectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: colors.dark100,
     marginBottom: 16,
     textTransform: 'capitalize',
   },
@@ -216,11 +220,11 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     marginRight: 8,
-    color: '#1A1A1A',
+    color: colors.dark100,
   },
   reviewCount: {
     fontSize: 16,
-    color: '#666666',
+    color: colors.dark50,
   },
   writeReviewButton: {
     paddingVertical: 14,
@@ -228,10 +232,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#1A1A1A'
+    borderColor: colors.dark100
   },
   writeReviewText: {
-    color: '#1A1A1A',
+    color: colors.dark100,
     fontSize: 16,
     fontWeight: '500',
   },
@@ -246,7 +250,7 @@ const styles = StyleSheet.create({
   },
   seeAllButton: {
     fontSize: 15,
-    color: '#00726C',
+    color: colors.secondaryMain,
     fontWeight: '500',
   },
 });

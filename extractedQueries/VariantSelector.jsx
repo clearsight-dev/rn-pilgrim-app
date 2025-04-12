@@ -13,6 +13,7 @@ import { fetchProductOptions, fetchVariantBySelectedOptions } from './collection
 import VariantCard from './VariantCard';
 import {addLineItemToCart} from './selectors';
 import PilgrimCartButton from './PilgrimCartButton';
+import { colors, typography } from './theme';
 
 function VariantSelector({ 
   bottomSheetRef, 
@@ -137,18 +138,18 @@ function VariantSelector({
               />
             )}
             <View style={styles.productInfo}>
-              <Text style={styles.productTitle} numberOfLines={2}>
+              <Text style={[typography.family, styles.productTitle]} numberOfLines={2}>
                 {product.title}
               </Text>
-              <Text style={styles.productPrice}>
+              <Text style={[typography.family, styles.productPrice]}>
                 ₹{parseInt(selectedVariant?.price?.amount || "0").toLocaleString()}
               </Text>
               {selectedVariant?.weight > 0 && (
-                <Text style={styles.productWeight}>
+                <Text style={[typography.family, styles.productWeight]}>
                   {selectedVariant.weight} {selectedVariant.weightUnit.toLowerCase()}
                 </Text>
               )}
-              <Text style={styles.productWeight}>
+              <Text style={[typography.family, styles.productWeight]}>
                 Variant: {selectedVariant?.title || selectedVariant?.name}
               </Text>
             </View>
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 16,
     borderWidth: 1,
-    borderColor: '#F3F3F3',
+    borderColor: colors.dark10,
   },
   productInfo: {
     flex: 1,
@@ -204,18 +205,18 @@ const styles = StyleSheet.create({
   productTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.dark10,
     marginBottom: 8,
   },
   productPrice: {
     fontSize: 18,
     fontWeight: '500',
-    color: '#333333',
+    color: colors.dark10,
     marginBottom: 4,
   },
   productWeight: {
     fontSize: 14,
-    color: '#666666',
+    color: colors.dark60,
   },
   loadingContainer: {
     width: 180,
@@ -223,12 +224,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.dark10,
     borderRadius: 8,
   },
   divider: {
     height: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: colors.dark50,
     marginVertical: 16,
   },
   flatListContainer: {
@@ -242,23 +243,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  addToCartButton: {
-    backgroundColor: '#FACA0C',
-    borderRadius: 8,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  addToCartButtonDisabled: {
-    backgroundColor: '#F0F0F0',
-  },
-  addToCartText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333333',
-  }
 });
 
 export default VariantSelector;
