@@ -11,26 +11,26 @@ import {
   useStartApptile,
   triggerCustomEventListener,
   registerForMoengageNotification,
+  urlBuffer
 } from 'apptile-core';
 import {Linking, NativeModules} from 'react-native';
 
 import UpdateModal from './components/UpdateModal';
 import AdminPage from './components/AdminPage';
 import {PilgrimContext} from './PilgrimContext';
-import { fillCaches } from './extractedQueries/homepageQueries';
+import {fillCaches} from './extractedQueries/homepageQueries';
 
 export type ScreenParams = {
   NocodeRoot: undefined;
-  NativeUtils: { appId: string };
-  AdminPage: { appId: string };
+  NativeUtils: {appId: string};
+  AdminPage: {appId: string};
 };
 
 const {RNApptile} = NativeModules;
 
 // Import the generated code. The folder analytics is generated when you run the app.
-import { init as initAnalytics } from './analytics';
+import {init as initAnalytics} from './analytics';
 registerForMoengageNotification();
-
 const Stack = createNativeStackNavigator<ScreenParams>();
 
 const getAppFlyerDeepLink = (uri: string) => {
@@ -43,26 +43,28 @@ const getAppFlyerDeepLink = (uri: string) => {
     const parsedUriParams = queryString.parse(decodedUriParams);
     console.log('[DEEPLINK] Appsflyer decoded URI:', parsedUriParams);
 
-    let dpURL = _.get(parsedUriParams, 'af_dp');
+    let dpURL = _.get(parsedUriParams, 'af_dp') as string;
     if (_.isEmpty(dpURL)) {
       return;
     }
 
-    const dpValue = _.get(parsedUriParams, 'deep_link_value');
+    const dpValue = _.get(parsedUriParams, 'deep_link_value') as string;
     if (!_.isEmpty(dpValue)) {
       dpURL = dpURL + dpValue;
     }
 
     console.log('[DEEPLINK] Parsed AppFlyer InitialDeep Link: ', dpURL);
     return dpURL;
-  } catch (error) {
+  } catch (error) { 
     console.error('[DEEPLINK] Error parsing AppFlyer deep link:', error);
   }
 };
 function App(): React.JSX.Element {
-  const [pilgrimGlobals, setPilgrimGlobals] = useState({homePageScrolledDown: false});
+  const [pilgrimGlobals, setPilgrimGlobals] = useState({
+    homePageScrolledDown: false,
+  });
   const status = useStartApptile(initAnalytics);
-  
+
   React.useEffect(() => {
     (async () => {
       if (status.modelReady) {
@@ -71,11 +73,7 @@ function App(): React.JSX.Element {
         try {
           fillCaches();
         } catch (error) {
-          console.error("Failed to revalidate caches");
-        }
-
-        if (_.isEmpty(url)) {
-          return;
+          console.error('Failed to revalidate caches');
         }
 
         if (!_.isEmpty(url) && url?.includes('af')) {
@@ -85,16 +83,26 @@ function App(): React.JSX.Element {
           }
         }
 
+        // When the app opens with an initialUrl and the deep link buffer also has URLs,
+        // prioritize the most recently added URLs in the deep link buffer.
+        if(urlBuffer.urls.length > 0){
+          url = urlBuffer.pop()
+          urlBuffer.clear()
+        }
+
+        if (_.isEmpty(url)) {
+          return;
+        }
+
         setTimeout(async () => {
           if (url) {
             triggerCustomEventListener('deeplink_request', url);
-            // For pages other than homepage we dismiss here 
+            // For pages other than homepage we dismiss here
             // Home dismisses the splash when first component is rendered
             RNApptile.notifyJSReady();
           } else {
-            console.error("url was not defined for deeplink");
+            console.error('url was not defined for deeplink');
           }
- 
         }, 100);
       }
     })();
@@ -105,31 +113,29 @@ function App(): React.JSX.Element {
       ref={apptileNavigationRef}
       theme={{
         ...DefaultTheme,
-        colors: status.theme
+        colors: status.theme,
       }}
-      linking={status.linking}
-      onReady={() => {
-        console.log("Navigators are ready")
-        // RNApptile.notifyJSReady();
-      }}
-    >
+      linking={status.linking}>
       <Stack.Navigator
         screenOptions={{
-          animation: 'none'
-        }}
-      >
-        <Stack.Screen name="NocodeRoot" component={ApptileAppRoot} options={{ headerShown: false }} />
+          animation: 'none',
+        }}>
+        <Stack.Screen
+          name="NocodeRoot"
+          component={ApptileAppRoot}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="NativeUtils"
           component={UpdateModal}
-          options={{ headerShown: true }}
-          initialParams={{ appId: status.appId }}
+          options={{headerShown: true}}
+          initialParams={{appId: status.appId}}
         />
         <Stack.Screen
           name="AdminPage"
           component={AdminPage}
-          options={{ headerShown: true }}
-          initialParams={{ appId: status.appId }}
+          options={{headerShown: true}}
+          initialParams={{appId: status.appId}}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -139,12 +145,13 @@ function App(): React.JSX.Element {
   return (
     <PilgrimContext.Provider value={{pilgrimGlobals, setPilgrimGlobals}}>
       <ApptileWrapper
-        noNavigatePaths={["NativeUtils", "AdminPage"]}
-        onNavigationEvent={(ev) => {
-          console.log("handle navigation event", ev)
-          apptileNavigationRef.current.navigate(ev.screenName, { appId: status.appId });
-        }}
-      >
+        noNavigatePaths={['NativeUtils', 'AdminPage']}
+        onNavigationEvent={ev => {
+          console.log('handle navigation event', ev);
+          apptileNavigationRef.current.navigate(ev.screenName, {
+            appId: status.appId,
+          });
+        }}>
         {body}
         {/* {(!status.modelReady) && <JSSplash/>} */}
       </ApptileWrapper>
