@@ -50,7 +50,7 @@ function CouponTicket({ code, isAutoApplied = false, onCopy }) {
               Z
             `}
           fill="none"
-          stroke="#00AEBD"
+          stroke={colors.primaryMain}
           strokeWidth="1"
           strokeDasharray="1 2"
         />
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   offerCardHeader: {
     height: 33,
-    backgroundColor: colors.secondaryMain,
+    backgroundColor: colors.primaryMain,
     paddingHorizontal: 8,
     paddingVertical: 8,
     justifyContent: 'center',
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   offerCardBody: {
-    backgroundColor: colors.dark10,
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.dark10,
     padding: 8,

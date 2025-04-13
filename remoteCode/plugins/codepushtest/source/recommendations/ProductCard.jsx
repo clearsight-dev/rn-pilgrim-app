@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
     borderColor: colors.dark10,
-    backgroundColor: colors.dark20,
+    backgroundColor: colors.dark10,
     borderRadius: 8,
     overflow: 'hidden',
     flexGrow: 1,

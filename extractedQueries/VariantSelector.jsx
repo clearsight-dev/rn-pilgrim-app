@@ -206,14 +206,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
-    color: colors.dark10,
+    color: colors.dark100,
     marginBottom: 8,
   },
   productPrice: {
     fontSize: 18,
     fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
-    color: colors.dark10,
+    color: colors.dark100,
     marginBottom: 4,
   },
   productWeight: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: colors.dark50,
+    backgroundColor: colors.dark10,
     marginVertical: 16,
   },
   flatListContainer: {

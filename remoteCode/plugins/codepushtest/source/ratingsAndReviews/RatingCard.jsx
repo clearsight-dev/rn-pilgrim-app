@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: colors.secondaryMain,
+    backgroundColor: colors.primaryMain,
     borderRadius: 4,
   },
   percentageText: {

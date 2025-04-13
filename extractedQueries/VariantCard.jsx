@@ -35,7 +35,7 @@ function DiscountBadge({ discount }) {
       <Svg style={{position: 'absolute'}} width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
         <Path
           d={createJaggedPath()}
-          fill="#D64545"
+          fill={colors.accentBurgundy}
         />
       </Svg>
       <Text
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderWidth: 1,
-    borderColor: colors.secondaryMain,
+    borderColor: colors.primaryMain,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
     paddingVertical: 4,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   popularChoiceText: {
-    color: colors.secondaryMain,
+    color: colors.primaryMain,
     fontFamily: FONT_FAMILY.bold,
     fontSize: 12,
     fontWeight: '600',
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   variantCardSelected: {
-    borderColor: colors.secondaryMain,
+    borderColor: colors.primaryMain,
     borderWidth: 1.5,
   },
   variantCardDefault: {

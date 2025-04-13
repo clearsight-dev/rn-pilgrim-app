@@ -60,7 +60,7 @@ export default function BenefitsCard({ title = "", benefits = [], style = {} }) 
   );
 };
 
-const BORDER_COLOR = colors.secondaryMain;
+const BORDER_COLOR = colors.primaryMain;
 const BORDER_WIDTH = 1;
 const BORDER_RADIUS = 8;
 

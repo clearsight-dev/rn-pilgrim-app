@@ -138,10 +138,10 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
               ₹{parseInt(price.amount).toLocaleString()}
             </Text>
 
-            {(compareAtPrice && discountPercentage > 0) && (
+            {(compareAtPrice?.amount && discountPercentage > 0) && (
               <>
                 <Text style={[typography.slashedPrice, styles.compareAtPrice]}>
-                  ₹{parseInt(compareAtPrice).toLocaleString()}
+                  ₹{parseInt(compareAtPrice?.amount).toLocaleString()}
                 </Text>
                 <Text style={typography.savings}>{discountPercentage}% Off</Text>
               </>
