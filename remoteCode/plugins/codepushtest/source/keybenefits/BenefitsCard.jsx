@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Icon } from 'apptile-core';
 import GradientBackground from '../../../../../extractedQueries/GradientBackground';
 import { colors, FONT_FAMILY, typography } from '../../../../../extractedQueries/theme';
@@ -10,7 +10,11 @@ export default function BenefitsCard({ title = "", benefits = [], style = {} }) 
   const titleText = title;
   
   // Estimated title width for the cutout (this is an approximation)
-  const estimatedTitleWidth = titleText.length * 10 + 20; // 10px per character + 20px padding
+  const estimatedCharacterWidth = Platform.select({
+    ios: 10,
+    default: 12
+  })
+  const estimatedTitleWidth = titleText.length * estimatedCharacterWidth + 20; // 10px per character + 20px padding
 
   // Custom gradient colors for the benefits card
   const gradientColors = [

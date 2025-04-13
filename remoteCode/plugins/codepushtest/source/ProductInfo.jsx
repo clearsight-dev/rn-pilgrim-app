@@ -131,7 +131,7 @@ function ProductInfo({
       
       {/* Rating - Using parsed JSON value */}
       <View style={styles.ratingContainer}>
-        <RatingPill rating={product?.rating} size={16} backgroundColor="#25a69a" />
+        <RatingPill rating={product?.rating} size={16} backgroundColor={colors.primaryDark} />
         <View style={styles.reviewCount}>
           <Text style={{marginRight: 5}}>
             {product?.reviews?.value} 

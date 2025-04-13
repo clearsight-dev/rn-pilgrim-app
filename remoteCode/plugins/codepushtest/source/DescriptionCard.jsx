@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     color: colors.dark50,
   },
   activeTabText: {
-    color: colors.secondaryMain,
+    color: colors.primaryMain,
     fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 3,
-    backgroundColor: colors.secondaryMain,
+    backgroundColor: colors.primaryMain,
     borderRadius: 1.5,
   },
   contentContainer: {
