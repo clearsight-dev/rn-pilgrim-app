@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { colors, FONT_FAMILY } from '../../../../extractedQueries/theme';
 
 // Lightning icon SVG component
 const LightningIcon = () => (
@@ -75,14 +76,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 32,
     borderWidth: 1,
-    borderColor: '#A90A42',
+    borderColor: colors.accentBurgundy,
     paddingVertical: 4,
     paddingHorizontal: 6,
     gap: 2,
   },
   timerText: {
-    color: '#A90A42',
+    color: colors.accentBurgundy,
     fontSize: 12,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     letterSpacing: -0.6,
   }

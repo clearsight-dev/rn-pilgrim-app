@@ -1,5 +1,6 @@
 import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { colors, FONT_FAMILY } from './theme';
 
 const Checkbox = forwardRef(({ 
   label, 
@@ -105,27 +106,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkboxSelected: {
-    backgroundColor: '#00909E',
+    backgroundColor: colors.secondaryMain,
     borderWidth: 1.82,
-    borderColor: '#00909E',
+    borderColor: colors.secondaryMain,
   },
   checkboxUnselected: {
-    backgroundColor: '#F3F3F3',
+    backgroundColor: colors.dark10,
     borderWidth: 1.82,
-    borderColor: '#D1D1D1',
+    borderColor: colors.dark20,
   },
   checkboxDisabled: {
     opacity: 0.5,
   },
   checkmark: {
+    fontFamily: FONT_FAMILY.bold,
     color: 'white',
     fontSize: 14,
-    fontWeight: 'bold',
+    lineHeight: 14,
+    fontWeight: '600',
   },
   label: {
     marginLeft: 8,
     fontSize: 16,
-    color: '#333',
+    color: colors.dark90,
     flex: 1,
   },
   labelLeft: {
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   labelDisabled: {
-    color: '#999',
+    color: colors.dark50,
   },
   spacer: {
     flex: 1,

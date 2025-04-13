@@ -4,10 +4,11 @@ import {
   Text,
   Alert
 } from 'react-native';
-import RelatedProductsCarousel, {formatProductsForCarousel} from '../../../../../extractedQueries/RelatedProductsCarousel';
+import RelatedProductsCarousel from '../../../../../extractedQueries/RelatedProductsCarousel';
 import ShadeSelector from '../../../../../extractedQueries/ShadeSelector';
 import FrequentlyBoughtTogether from './FrequentlyBoughtTogether';
 import VariantSelector from '../../../../../extractedQueries/VariantSelector';
+import { typography } from '../../../../../extractedQueries/theme';
 
 function RecommendationsRoot({ 
   loading, 
@@ -35,7 +36,7 @@ function RecommendationsRoot({
   if (loading) {
     return (
       <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Loading recommendations...</Text>
+        <Text style={[typography.body14]}>Loading recommendations...</Text>
       </View>
     );
   }
@@ -44,7 +45,7 @@ function RecommendationsRoot({
   if (error) {
     return (
       <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Error loading recommendations: {error}</Text>
+        <Text style={[typography.body14]}>Error loading recommendations: {error}</Text>
       </View>
     );
   }

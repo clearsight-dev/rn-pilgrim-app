@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Star from './Star';
+import { FONT_FAMILY } from './theme';
 
 const RatingPill = ({ rating, size = 16, backgroundColor = '#00909E', textColor = '#FFFFFF' }) => {
   return (
@@ -22,6 +23,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingText: {
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     marginLeft: 4,
   },

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {View, StyleSheet, ActivityIndicator, Text} from 'react-native';
+import React from 'react';
+import {View, StyleSheet} from 'react-native';
 import CollectionCarouselComponent from './CollectionCarousel';
-import {fetchCollectionCarouselData} from '../../../../extractedQueries/collectionqueries';
 
 /**
  * MultiCollectionCarousel component that displays multiple collection carousels

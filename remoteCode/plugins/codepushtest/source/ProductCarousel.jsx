@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import ProductFlag from '../../../../extractedQueries/ProductFlag';
 import ImageCarousel from '../../../../extractedQueries/ImageCarousel';
+import { FONT_FAMILY } from '../../../../extractedQueries/theme';
 
 // Main ProductCarousel component
 export default function ProductCarousel({ images, screenWidth, productLabel }) {
@@ -137,7 +138,8 @@ const styles = StyleSheet.create({
   },
   labelText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     fontSize: 12
   },
 });

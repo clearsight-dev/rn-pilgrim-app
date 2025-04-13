@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-nativ
 import {Image} from '../../../../../extractedQueries/ImageComponent';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import { useDispatch } from 'react-redux';
+import { colors, FONT_FAMILY } from '../../../../../extractedQueries/theme';
 
 function ProductCard({ product, style, isPressable = false }) {
   // Extract product details
@@ -68,15 +69,15 @@ function ProductCard({ product, style, isPressable = false }) {
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#F3F3F3CC',
+    borderColor: colors.dark10,
+    backgroundColor: colors.dark10,
     borderRadius: 8,
     overflow: 'hidden',
     flexGrow: 1,
     alignSelf: "stretch",
     padding: 8,
     elevation: 1,
-    shadowColor: '#666666',
+    shadowColor: colors.dark70,
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.2,
     shadowRadius: 2
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     elevation: 1,
-    shadowColor: '#666666',
+    shadowColor: colors.dark70,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 2
@@ -104,13 +105,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.dark90,
     marginBottom: 4,
   },
   label: {
     fontSize: 12,
-    color: '#666666',
+    color: colors.dark70,
     marginBottom: 8,
   },
   priceContainer: {
@@ -120,20 +122,22 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#333333',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
+    color: colors.dark90,
     marginRight: 4,
   },
   compareAtPrice: {
     fontSize: 12,
-    color: '#999999',
+    color: colors.dark20,
     textDecorationLine: 'line-through',
     marginRight: 4,
   },
   discount: {
     fontSize: 12,
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
-    color: '#00909E',
+    color: colors.secondaryMain,
   },
 });
 

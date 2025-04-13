@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { 
   View, 
   Text, 
-  TouchableOpacity, 
+  Pressable, 
   StyleSheet
 } from 'react-native';
 import {Icon} from 'apptile-core';
 import Accordion from '../../../../extractedQueries/Accordion';
+import { colors, FONT_FAMILY, typography } from '../../../../extractedQueries/theme';
 
 // FAQ Item component with accordion functionality
 const FAQItem = ({ question, answer }) => {
@@ -14,11 +15,14 @@ const FAQItem = ({ question, answer }) => {
 
   return (
     <View style={styles.faqItemContainer}>
-      <TouchableOpacity 
-        style={styles.questionContainer} 
+      <Pressable 
+        style={({pressed}) => [
+          styles.questionContainer,
+          pressed && {opacity: 0.5} 
+        ]} 
         onPress={() => setExpanded(!expanded)}
       >
-        <Text style={styles.questionText}>{question}</Text>
+        <Text style={[typography.subHeading14, styles.questionText]}>{question}</Text>
         {
           expanded ? 
             (<Icon 
@@ -27,7 +31,7 @@ const FAQItem = ({ question, answer }) => {
               style={{
                 marginRight: 8,
                 fontSize: 18,
-                color: '#1A1A1A'
+                color: colors.dark100
               }}
             />):
             (<Icon 
@@ -36,11 +40,11 @@ const FAQItem = ({ question, answer }) => {
               style={{
                 marginRight: 8,
                 fontSize: 18,
-                color: '#1A1A1A'
+                color: colors.dark100
               }}
             />)
         }
-      </TouchableOpacity>
+      </Pressable>
       
       {expanded && (
         <View style={styles.answerContainer}>
@@ -81,7 +85,7 @@ const styles = StyleSheet.create({
   faqItemContainer: {
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.dark10,
     borderRadius: 8,
     overflow: 'hidden',
   },
@@ -93,6 +97,7 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     flex: 1,
   },
@@ -102,12 +107,12 @@ const styles = StyleSheet.create({
   },
   answerContainer: {
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   },
   answerText: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#333333',
+    color: colors.dark100,
   }
 });
 

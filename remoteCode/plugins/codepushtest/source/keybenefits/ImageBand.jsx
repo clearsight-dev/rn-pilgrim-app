@@ -1,6 +1,7 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import { Image } from '../../../../../extractedQueries/ImageComponent';
+import { colors, FONT_FAMILY, typography } from '../../../../../extractedQueries/theme';
 
 export default function ImageBand() {
   const imageBand = [
@@ -43,14 +44,19 @@ export default function ImageBand() {
             ></Image>
             <View style={{flexDirection: 'column'}}>
               <Text
-                style={{
-                  fontSize: 13,
-                  fontWeight: '800'
-                }}
+                style={[
+                  typography.family,
+                  {
+                    fontSize: 13,
+                    fontFamily: FONT_FAMILY.bold,
+                    fontWeight: '600',
+                    color: colors.dark100
+                  }
+                ]}
               >
                 {item.heading}
               </Text>
-              <Text>{item.subtitle}</Text>
+              <Text style={[typography.body14]}>{item.subtitle}</Text>
             </View>
           </View>
         );

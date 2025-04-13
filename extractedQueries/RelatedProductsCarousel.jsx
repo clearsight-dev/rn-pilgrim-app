@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
 import RelatedProductCard from './RelatedProductCard';
+import { typography } from './theme';
 
 export function formatProduct(product) {
   const firstVariant = product.variants?.edges?.[0]?.node;
@@ -136,7 +137,7 @@ function RelatedProductsCarousel({
   return (
     <View style={[styles.container, style]}>
       {/* Title */}
-      {title && <Text style={styles.title}>{title}</Text>}
+      {title && <Text style={[styles.title, typography.heading19]}>{title}</Text>}
 
       {/* Horizontal Scrollable List */}
       <FlatList
@@ -176,9 +177,6 @@ const styles = StyleSheet.create({
     borderColor: '#F0F0F0',
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333333',
     marginBottom: 16,
     paddingHorizontal: 16,
   },

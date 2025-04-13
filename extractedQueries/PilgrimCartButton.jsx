@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
+import { colors, FONT_FAMILY, typography } from './theme';
 
 function PilgrimCartButton({
   buttonText,
@@ -183,6 +184,7 @@ function PilgrimCartButton({
         {/* Button text */}
         <Text 
           style={[
+            typography.heading14,
             styles.buttonText, 
             (variant === "large") && styles.buttonLargeText,
             textStyle
@@ -194,7 +196,7 @@ function PilgrimCartButton({
         {/* Activity indicator in top right corner */}
         {isLoading && showActivityIndicator && (
           <View style={styles.activityIndicatorContainer}>
-            <ActivityIndicator size="small" color="#333333" />
+            <ActivityIndicator size="small" color={colors.secondaryMain} />
           </View>
         )}
       </Pressable>
@@ -208,7 +210,8 @@ const styles = StyleSheet.create({
   },
   button: {
     height: 33,
-    backgroundColor: '#FACA0C',
+    backgroundColor: colors.buttonBg,
+    color: colors.dark100,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -224,14 +227,13 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }], // Slight scale down for pressed effect
   },
   buttonText: {
-    fontSize: 14,
-    fontWeight: '500',
     zIndex: 2, // Ensure text is above the progress bar
   },
   buttonLargeText: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.dark100,
   },
   progressBar: {
     position: 'absolute',
@@ -248,7 +250,7 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   buttonDisabled: {
-    backgroundColor: '#F0F0F0'
+    backgroundColor: colors.dark20
   }
 });
 

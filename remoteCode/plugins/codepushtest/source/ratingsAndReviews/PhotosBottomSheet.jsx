@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import BottomSheet from '../../../../../extractedQueries/BottomSheet';
 import ReviewCard from './ReviewCard';
+import { colors, typography } from '../../../../../extractedQueries/theme';
 
 const PhotosBottomSheet = forwardRef(function ({ reviews = [] }, ref) {
   const renderContent = () => {
@@ -18,7 +19,7 @@ const PhotosBottomSheet = forwardRef(function ({ reviews = [] }, ref) {
     } else {
       return (
         <View style={styles.content}>
-          <Text style={styles.placeholderText}>
+          <Text style={[typography.family, styles.placeholderText]}>
             No reviews available
           </Text>
         </View>
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 16,
-    color: '#999999',
+    color: colors.dark50,
     textAlign: 'center',
     marginTop: 40,
   },

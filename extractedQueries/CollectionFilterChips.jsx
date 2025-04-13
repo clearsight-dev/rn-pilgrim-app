@@ -8,6 +8,7 @@ import {
   ScrollView
 } from 'react-native';
 import { Icon } from 'apptile-core';
+import { colors } from './theme';
 
 /**
  * 
@@ -47,7 +48,10 @@ function CollectionFilterChips ({
           ]}
           onPress={onClearAllFilters}
         >
-          <Text style={styles.chipText}>All</Text>
+          <Text style={[
+            styles.chipText,
+            (appliedFilters.length === 0) && colors.primaryDark,
+          ]}>All</Text>
         </Pressable>
         
         {/* Selected filter chips (shown first) */}
@@ -103,23 +107,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 4,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#F5F5F5',
+    borderColor: colors.dark20,
   },
   selectedChip: {
-    borderColor: '#00909E',
+    borderColor: colors.primaryDark,
     backgroundColor: 'rgba(0, 144, 158, 0.04)', // 4% opacity
   },
   chipText: {
     fontSize: 14,
-    color: '#333',
+    color: colors.dark100,
   },
   selectedChipText: {
-    color: '#00909E',
+    color: colors.primaryDark,
   },
   closeIcon: {
     fontSize: 16,
-    color: '#00909E',
+    color: colors.primaryDark,
     marginLeft: 8,
   },
 });

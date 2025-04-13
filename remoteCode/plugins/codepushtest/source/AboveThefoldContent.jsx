@@ -4,6 +4,7 @@ import {Carousel} from '../../../../extractedQueries/ImageCarousel';
 import { Image } from '../../../../extractedQueries/ImageComponent';
 import ProductInfo from './ProductInfo';
 import AboveThefoldSkeleton from './AboveThefoldSkeleton';
+import { colors, typography } from '../../../../extractedQueries/theme';
 
 function AboveThefoldContent({ 
   loading, 
@@ -46,7 +47,7 @@ function AboveThefoldContent({
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Error: {error}</Text>
+        <Text style={[typography.family, styles.errorText]}>Error: {error}</Text>
       </View>
     );
   } 
@@ -91,12 +92,12 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     padding: 16,
-    backgroundColor: '#ffebee',
+    backgroundColor: colors.dark5,
     borderRadius: 8,
     margin: 16,
   },
   errorText: {
-    color: '#d32f2f',
+    color: colors.accentBurgundy,
     fontSize: 16,
   }
 });

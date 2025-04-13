@@ -8,6 +8,7 @@ import {
 import {Image} from './ImageComponent';
 import GradientBackground from './GradientBackground';
 import RadialGradientBackground from './RadialGradientBackground';
+import { colors, FONT_FAMILY, gradients } from './theme';
 
 // Link Item component
 const LinkItem = ({ title }) => {
@@ -69,8 +70,8 @@ export function ExternalLinks() {
         <GradientBackground 
           style={styles.header}
           gradientColors={[
-            { offset: "0%", color: "#007F89" },
-            { offset: "100%", color: "#00AEBD" }
+            { offset: "0%", color: colors.secondaryMain },
+            { offset: "100%", color: gradients.alphaPrimary10.end.color }
           ]}
           gradientDirection="vertical"
           borderRadius={4}
@@ -81,8 +82,8 @@ export function ExternalLinks() {
       
       <RadialGradientBackground 
         gradientColors={[
-          { offset: "0%", color: "#009FAD1A", opacity: 0.3 },
-          { offset: "100%", color: "#FFFFFF", opacity: 0.2 }
+          { offset: "0%", color: colors.primaryMain, opacity: 0.3 },
+          { offset: "100%", color: colors.white, opacity: 0.2 }
         ]}
         gradientCenter={{ x: '50%', y: '50%' }}
         gradientRadius="70%"
@@ -165,7 +166,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   headerText: {
-    color: '#FFFFFF',
+    fontFamily: FONT_FAMILY.bold,
+    color: colors.white,
     fontSize: 24,
     fontWeight: '600',
     textAlign: 'center',
@@ -190,17 +192,19 @@ const styles = StyleSheet.create({
     maxWidth: 180
   },
   columnTitle: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
-    color: '#333333',
+    color: colors.dark90,
   },
   linkItem: {
     marginBottom: 8,
   },
   linkText: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 14,
-    color: '#333333',
+    color: colors.dark90,
     lineHeight: 22,
   },
   socialMediaImage: {
@@ -210,10 +214,11 @@ const styles = StyleSheet.create({
     marginRight: 11
   },
   socialMediaHeader: {
+    fontFamily: FONT_FAMILY.bold,
     paddingTop: 30,
     fontSize: 14,
     fontWeight: '600',
-    color: '#01838E'
+    color: colors.secondaryMain
   }
 });
 

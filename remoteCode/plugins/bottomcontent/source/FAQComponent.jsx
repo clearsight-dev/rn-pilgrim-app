@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import {Icon} from 'apptile-core';
 import Accordion from '../../../../extractedQueries/Accordion';
+import { colors, FONT_FAMILY } from '../../../../extractedQueries/theme';
 
 // FAQ Item component with accordion functionality
 const FAQItem = ({ question, answer }) => {
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
   faqItemContainer: {
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.dark10,
     borderRadius: 8,
     overflow: 'hidden',
   },
@@ -111,6 +112,7 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
     flex: 1,
   },
@@ -120,12 +122,12 @@ const styles = StyleSheet.create({
   },
   answerContainer: {
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.white,
   },
   answerText: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#333333',
+    color: colors.dark90,
   }
 });
 

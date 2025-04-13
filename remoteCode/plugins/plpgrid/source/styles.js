@@ -1,14 +1,16 @@
 import { StyleSheet } from 'react-native';
+import { colors, FONT_FAMILY } from '../../../../extractedQueries/theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     marginBottom: 8,
   },
   headerContainer: {
@@ -19,7 +21,7 @@ export const styles = StyleSheet.create({
   },
   productsCount: {
     fontSize: 16,
-    color: '#666',
+    color: colors.dark70,
   },
   loadingContainer: {
     flex: 1,
@@ -58,7 +60,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     marginTop: 32,
-    color: '#666',
+    color: colors.dark70,
   },
   filterValueItem: {
     flexDirection: 'row',
@@ -66,22 +68,23 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colors.dark20,
   },
   selectedFilterValue: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colors.dark5,
   },
   filterValueText: {
     fontSize: 16,
-    color: '#333',
+    color: colors.dark10,
   },
   selectedFilterValueText: {
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
     color: '#000',
   },
   checkIcon: {
     fontSize: 20,
-    color: '#007bff',
+    color: colors.secondaryMain,
   },
 });
 

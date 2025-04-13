@@ -13,6 +13,7 @@ import BottomSheet from '../../../../extractedQueries/BottomSheet';
 import RadioButton from '../../../../extractedQueries/RadioButton';
 import Checkbox from '../../../../extractedQueries/Checkbox';
 import { fetchFilteredProductsCount } from '../../../../extractedQueries/collectionqueries';
+import { colors, FONT_FAMILY, typography } from '../../../../extractedQueries/theme';
 
 export function getShopifyFilters(filterIds, filterData) {
   const filters = [];
@@ -196,10 +197,10 @@ const Footer = React.forwardRef(({
         style={[styles.filterTab, isActive && styles.activeFilterTab]}
         onPress={() => setActiveFilterTab(index)}
       >
-        <Text style={[styles.filterTabText, isActive && styles.activeFilterTabText]}>
+        <Text style={[typography.family, styles.filterTabText, isActive && styles.activeFilterTabText]}>
           {filter.label}
         </Text>
-        {numSelected > 0 && <Text style={[styles.filterTabText, {color: "#009FAD"}]}>{numSelected}</Text>}
+        {numSelected > 0 && <Text style={[styles.filterTabText, {color: colors.secondaryMain}]}>{numSelected}</Text>}
       </Pressable>
     );
   };
@@ -298,8 +299,8 @@ const Footer = React.forwardRef(({
             style={styles.buttonIcon}
           />
           <View style={{flexDirection: 'column'}}>
-            <Text style={styles.buttonText}>Sort By</Text>
-            {currentSortLabel && <Text style={styles.buttonSubtext}>{currentSortLabel.label}</Text>}
+            <Text style={[typography.family, styles.buttonText]}>Sort By</Text>
+            {currentSortLabel && <Text style={[typography.family, styles.buttonSubtext]}>{currentSortLabel.label}</Text>}
           </View>
         </Pressable>
 
@@ -318,8 +319,8 @@ const Footer = React.forwardRef(({
             style={styles.buttonIcon}
           />
           <View style={{flexDirection: 'column'}}>
-            <Text style={styles.buttonText}>Filter</Text>
-            <Text style={styles.buttonSubtext}>{numFiltersText}</Text>
+            <Text style={[typography.family, styles.buttonText]}>Filter</Text>
+            <Text style={[typography.family, styles.buttonSubtext]}>{numFiltersText}</Text>
           </View>
         </Pressable>
       </View>
@@ -356,9 +357,9 @@ const Footer = React.forwardRef(({
           <View style={styles.filterActionBar}>
             <View style={styles.filterCountContainer}>
               {isLoadingFilteredCount ? (
-                <ActivityIndicator size="small" color="#007bff" />
+                <ActivityIndicator size="small" color={colors.secondaryMain} />
               ) : (
-                <Text style={styles.filterCountText}>
+                <Text style={[typography.family, styles.filterCountText]}>
                   {editableCopyOfSelectedFilters.length > 0 && filteredProductsCount.state === 'loaded' ? (
                     isMaxFilteredCount ? 
                     `${maxFilteredCount}+ Products` : 
@@ -380,7 +381,7 @@ const Footer = React.forwardRef(({
                 ]}
                 onPress={handleApplyFilters}
               >
-                <Text style={styles.applyButtonText}>
+                <Text style={[typography.family, styles.applyButtonText]}>
                   Apply
                 </Text>
               </Pressable>
@@ -417,9 +418,9 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: colors.dark10,
     paddingHorizontal: 16,
   },
   bottomButtonsSeparator: {
@@ -432,24 +433,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 22,
+    paddingVertical: Platform.select({
+      android: 5,
+      default: 22
+    }),
     marginHorizontal: 8,
   },
   buttonIcon: {
     marginRight: 8,
     fontSize: 20,
-    fontWeight: '300',
-    color: '#1A1A1A',
+    fontFamily: FONT_FAMILY.regular,
+    fontWeight: '400',
+    color: colors.dark100,
   },
   buttonSubtext: {
     fontSize: 12,
+    fontFamily: FONT_FAMILY.regular,
     fontWeight: '400',
-    color: '#646464'
+    color: colors.dark70
   },
   buttonText: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.medium,
+    lineHeight: 20,
     fontWeight: '500',
-    color: '#1A1A1A',
+    color: colors.dark100,
   },
   // Bottom sheet content styles
   bottomSheetContent: {
@@ -463,22 +471,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colors.dark10,
   },
   selectedSortOption: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colors.dark10,
   },
   sortOptionText: {
     fontSize: 16,
-    color: '#333',
+    color: colors.dark90,
   },
   selectedSortOptionText: {
+    fontFamily: FONT_FAMILY.bold,
     fontWeight: '600',
-    color: '#000',
+    color: colors.dark100,
   },
   checkIcon: {
     fontSize: 20,
-    color: '#007bff',
+    color: colors.secondaryMain,
   },
   // Filter bottom sheet styles
   filterBottomSheetContent: {
@@ -495,13 +504,13 @@ const styles = StyleSheet.create({
   filterTabsContainer: {
     width: '40%',
     borderBottomWidth: 1,
-    backgroundColor: '#F5F5F5',
-    borderBottomColor: '#eee',
+    backgroundColor: colors.dark10,
+    borderBottomColor: colors.dark30,
   },
   filterTab: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: colors.dark10,
     justifyContent: "space-between",
     flexDirection: "row"
   },
@@ -510,11 +519,13 @@ const styles = StyleSheet.create({
   },
   filterTabText: {
     fontSize: 14,
-    color: '#0a0a0a',
-    fontWeight: '300'
+    color: colors.dark100,
+    fontFamily: FONT_FAMILY.regular,
+    fontWeight: '400'
   },
   activeFilterTabText: {
-    color: '#0a0a0a',
+    color: colors.dark100,
+    fontFamily: FONT_FAMILY.medium,
     fontWeight: '500',
   },
   filterValuesContainer: {
@@ -527,44 +538,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: colors.dark10,
   },
   selectedFilterValue: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colors.dark10,
   },
   filterValueText: {
     fontSize: 16,
-    color: '#333',
+    color: colors.dark90,
   },
   selectedFilterValueText: {
-    fontWeight: '600',
-    color: '#000',
+    // fontFamily: FONT_FAMILY.bold,
+    // fontWeight: '600',
+    color: colors.dark100,
   },
   filterActionBar: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: colors.dark20,
     position: 'absolute', // Position it absolutely
     bottom: 0, // Stick to the bottom
     left: 0,
     right: 0,
-    backgroundColor: '#fff', // Add background color to ensure it's not transparent
+    backgroundColor: colors.dark20, // Add background color to ensure it's not transparent
   },
   filterCountContainer: {
+    backgroundColor: colors.dark5,
     height: 60,
     width: '50%',
     justifyContent: 'center',
     alignItems: 'center'
   },
   filterCountText: {
+    fontFamily: FONT_FAMILY.medium,
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: colors.dark90,
   },
   filterButtonsContainer: {
-    backgroundColor: '#FACA0C',
+    backgroundColor: colors.buttonBg,
     height: 60,
     width: '50%',
     flexDirection: 'row',
@@ -576,15 +590,16 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   applyButtonText: {
+    fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
     fontWeight: '600',
-    color: '#0a0a0a',
+    color: colors.dark100,
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: colors.dark30,
   },
   disabledButtonText: {
-    color: '#888',
+    color: colors.dark60,
   },
 });
 

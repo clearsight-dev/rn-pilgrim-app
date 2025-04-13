@@ -6,6 +6,7 @@ import RatingPill from '../../../../extractedQueries/RatingPill';
 import OfferCard from './OfferCard';
 import VariantCard from '../../../../extractedQueries/VariantCard';
 import { normalizeOption } from '../../../../extractedQueries/ShadeSelector';
+import { colors } from '../../../../extractedQueries/theme';
 
 // Enhanced variant selector component using the new VariantCard
 function InlineVariantSelector ({ 
@@ -130,7 +131,7 @@ function ProductInfo({
       
       {/* Rating - Using parsed JSON value */}
       <View style={styles.ratingContainer}>
-        <RatingPill rating={product?.rating} size={16} backgroundColor="#25a69a" />
+        <RatingPill rating={product?.rating} size={16} backgroundColor={colors.primaryDark} />
         <View style={styles.reviewCount}>
           <Text style={{marginRight: 5}}>
             {product?.reviews?.value} 
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   bestsellerText: {
-    color: '#ff6b6b',
+    color: colors.accentCoral,
     fontWeight: 'bold',
     fontSize: 14,
   },

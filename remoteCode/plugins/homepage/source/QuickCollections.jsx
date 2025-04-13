@@ -3,13 +3,13 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  TouchableOpacity, 
-  NativeModules
+  Pressable, 
 } from 'react-native';
 import {Image} from '../../../../extractedQueries/ImageComponent';
 import { useDispatch } from 'react-redux';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
+import { typography } from '../../../../extractedQueries/theme';
 
 const QuickCollections = ({ 
   collections = []
@@ -31,11 +31,12 @@ const QuickCollections = ({
       {/* Grid */}
       <View style={styles.gridContainer}>
         {collections.map((item, index) => (
-          <TouchableOpacity
+          <Pressable
             key={item.collection + index}
-            style={[
+            style={({pressed}) => [
               styles.gridItem,
-              { width: itemWidth, height: itemHeight }
+              { width: itemWidth, height: itemHeight },
+              pressed && {opacity: 0.5}
             ]}
             onPress={() => handleCollectionPress(item.collection)}
           >
@@ -59,9 +60,9 @@ const QuickCollections = ({
             
             {/* Title */}
             <View style={styles.itemTitleContainer}>
-              <Text style={styles.itemTitle}>{item.title}</Text>
+              <Text style={[typography.subHeading12, styles.itemTitle]}>{item.title}</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </View>
@@ -109,8 +110,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: {
-    color: '#1a1a1a',
-    fontSize: 12,
     textAlign: 'center',
   },
 });

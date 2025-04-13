@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Rect, Path, Circle } from 'react-native-svg';
+import { colors, FONT_FAMILY } from '../../../../extractedQueries/theme';
 // Fixed Ticket-shaped coupon component with SVG
 function CouponTicket({ code, isAutoApplied = false, onCopy }) {
   const ticketWidth = 128;
@@ -49,7 +50,7 @@ function CouponTicket({ code, isAutoApplied = false, onCopy }) {
               Z
             `}
           fill="none"
-          stroke="#00AEBD"
+          stroke={colors.primaryMain}
           strokeWidth="1"
           strokeDasharray="1 2"
         />
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   },
   offerCardHeader: {
     height: 33,
-    backgroundColor: '#00AEBD',
+    backgroundColor: colors.primaryMain,
     paddingHorizontal: 8,
     paddingVertical: 8,
     justifyContent: 'center',
@@ -126,13 +127,14 @@ const styles = StyleSheet.create({
   },
   offerCardHeaderText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     fontSize: 13,
   },
   offerCardBody: {
-    backgroundColor: '#FCFCFC',
+    backgroundColor: colors.white,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.dark10,
     padding: 8,
     flex: 1,
     justifyContent: 'space-between',
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
   },
   offerCardDescription: {
     fontSize: 12,
-    color: '#454545',
+    color: colors.dark80,
     marginBottom: 6,
     lineHeight: 16,
   },
@@ -172,7 +174,8 @@ const styles = StyleSheet.create({
   },
   couponCodeText: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
     color: 'rgba(69, 69, 69, 0.8)',
   },
   copyButton: {
@@ -180,7 +183,8 @@ const styles = StyleSheet.create({
   },
   copyButtonText: {
     fontSize: 12,
-    color: '#00AEBD',
-    fontWeight: 'bold',
+    color: colors.secondaryMain,
+    fontFamily: FONT_FAMILY.bold,
+    fontWeight: '600',
   }
 });
