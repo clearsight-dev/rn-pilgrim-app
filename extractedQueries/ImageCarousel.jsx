@@ -109,7 +109,9 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoS
   // Clean up timer on unmount
   useEffect(() => {
     if (!autoScroll) {
-      scrollBubblesRef.current.setCurrentIndex(0);
+      if (scrollBubblesRef.current) {
+        scrollBubblesRef.current.setCurrentIndex(0);
+      }
     }
 
     return () => {

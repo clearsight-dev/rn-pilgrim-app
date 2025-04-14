@@ -6,7 +6,8 @@ import {
   Pressable,
   ScrollView,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform
 } from 'react-native';
 import { Icon } from 'apptile-core';
 import BottomSheet from '../../../../extractedQueries/BottomSheet';

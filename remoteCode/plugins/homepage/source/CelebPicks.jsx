@@ -65,7 +65,7 @@ const CelebPicks = ({celebs = []}) => {
                   },
                 ]}>
                 <Image
-                  source={{uri: celeb.urls[0]}}
+                  source={{uri: celeb.image.value}}
                   style={styles.celebImage}
                   resizeMode="cover"
                 />

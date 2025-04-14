@@ -12,7 +12,7 @@ export default function BannerCarousel({items, screenWidth, onNavigate}) {
           (it, i) => ({
             id: i,
             ...it,
-            url: it.urls[0],
+            url: it.image?.value,
           })
         )}
         width={screenWidth}

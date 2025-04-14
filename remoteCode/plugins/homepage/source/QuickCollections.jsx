@@ -52,7 +52,7 @@ const QuickCollections = ({
             >
               {/* Background Image */}
               <Image
-                source={{ uri: item.urls[0] }}
+                source={{ uri: item.image.value }}
                 style={styles.itemImage}
                 resizeMode="cover"
               />

@@ -535,8 +535,8 @@ export const WidgetEditors = {
           type: 'array',
           items: {
             type: 'object',
-            fields: {
-              urls: { type: 'image' },
+            properties: {
+              image: { type: 'image' },
               title: { type: 'string' },
               collection: { type: 'collection', dataFormat: 'handle' }
             }
@@ -553,8 +553,8 @@ export const WidgetEditors = {
           type: 'array',
           items: {
             type: 'object',
-            fields: {
-              urls: { type: 'image' },
+            properties: {
+              image: { type: 'image' },
               title: { type: 'string' },
               subtitle: { type: 'string' },
               collection: { type: 'collection', dataFormat: 'handle' },
@@ -573,9 +573,9 @@ export const WidgetEditors = {
           type: 'array',
           items: {
             type: 'object',
-            fields: {
+            properties: {
               title: { type: 'string' },
-              urls: { type: 'image' },
+              image: { type: 'image' },
             }
           }
         }

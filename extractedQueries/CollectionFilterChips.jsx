@@ -50,7 +50,7 @@ function CollectionFilterChips ({
         >
           <Text style={[
             styles.chipText,
-            (appliedFilters.length === 0) && colors.primaryDark,
+            (appliedFilters.length === 0) && {color: colors.primaryDark},
           ]}>All</Text>
         </Pressable>
         
