@@ -149,4 +149,6 @@ struct ManifestResponse: Codable {
     let deletedAt: String?
     let url: String
     let artefacts: [CodeArtefact]
+    let latestBuildNumberIos: Int?
+    let appStorePermanentLink: String?
 }

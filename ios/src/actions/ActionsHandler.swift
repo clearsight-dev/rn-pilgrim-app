@@ -7,6 +7,7 @@
 
 import Foundation
 import React
+import UIKit
 
 @objc(Actions)
 class Actions: NSObject {
@@ -16,7 +17,7 @@ class Actions: NSObject {
     // MARK: - Startup Process Entry Point
 
     @objc static func startApptileAppProcess(
-        _ completion: @escaping @convention(block) (Bool) -> Void
+        _ completion: @escaping @convention(block) (Bool, String?) -> Void
     ) {
         Task(priority: .background) {
             
@@ -29,7 +30,7 @@ class Actions: NSObject {
             guard let apptileUpdateEndpoint = Bundle.main.object(forInfoDictionaryKey: "APPTILE_UPDATE_ENDPOINT") as? String
                     else {
               Logger.error("APPTILE_UPDATE_ENDPOINT is missing or empty in Info.plist")
-              completion(false)
+              completion(false, nil)
               return
             }
                   
@@ -39,7 +40,7 @@ class Actions: NSObject {
                   !appId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             else {
                 Logger.error("APP_ID is missing or empty in Info.plist")
-                completion(false)
+                completion(false, nil)
                 return
             }
 
@@ -48,14 +49,14 @@ class Actions: NSObject {
             if !isTrackerFilePresent() {
                 guard copyInitialAssets() else {
                     Logger.error("Failed to copy initial assets.")
-                    completion(false)
+                    completion(false, nil)
                     return
                 }
             }
 
-            let updateStatus = await performOTAUpdate(appId: appId)
+            let otaResult = await performOTAUpdate(appId: appId)
             DispatchQueue.main.async {
-                completion(updateStatus)
+                completion(otaResult.0, otaResult.1)
             }
         }
     }
@@ -79,15 +80,16 @@ class Actions: NSObject {
 
     // MARK: OTA Handlers
 
-    private static func performOTAUpdate(appId: String) async -> Bool {
+    // Returns (updateRequired: Bool, appStoreUrl: String?)
+    private static func performOTAUpdate(appId: String) async -> (Bool, String?) {
         guard let manifest = await fetchManifest(appId: appId) else {
             Logger.error("Failed to fetch manifest.")
-            return false
+            return (false, nil) // No update needed, no URL
         }
 
         guard let trackerData = readTrackerFile() else {
             Logger.error("Failed to read tracker file.")
-            return false
+            return (false, nil) // No update needed, no URL
         }
       
         Logger.info("Current Local tracker data ✅ : \(trackerData)")
@@ -122,7 +124,27 @@ class Actions: NSObject {
         }
     }
 
-    private static func handleUpdateIfNeeded(manifest: ManifestResponse, trackerData: [String: Any], appId: String) async -> Bool {
+    // Returns (updateRequired: Bool, appStoreUrl: String?)
+    private static func handleUpdateIfNeeded(manifest: ManifestResponse, trackerData: [String: Any], appId: String) async -> (Bool, String?) {
+
+        // --- Build Number Check --- 
+        if let latestBuildNumber = manifest.latestBuildNumberIos,
+           let currentBuildNumberString = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
+           let currentBuildNumber = Int(currentBuildNumberString) {
+            
+            Logger.info("Build Check: Current=\(currentBuildNumber), Latest=\(latestBuildNumber)")
+            if currentBuildNumber < latestBuildNumber {
+                Logger.warn("Mandatory app update required based on build number.")
+                // Update required based on build number, return true and the App Store URL
+                return (true, manifest.appStorePermanentLink)
+            }
+        } else {
+            Logger.warn("Could not perform build number check. Missing latestBuildNumberIos in manifest or CFBundleVersion in Info.plist.")
+            // Proceed without build check if data is missing, but log it.
+        }
+        // --- End Build Number Check --- 
+
+        // Proceed with bundle/commit checks ONLY if build number check passed or wasn't possible
         let localCommitId = (trackerData["publishedCommitId"] as? NSNumber)?.int64Value
         let localBundleId = (trackerData["iosBundleId"] as? NSNumber)?.int64Value
 
@@ -155,7 +177,10 @@ class Actions: NSObject {
 //            }
 //        }
 
-        return updateResults.allSatisfy { $0 }
+        // If we reach here, it means the build number check passed (or wasn't possible).
+        // Bundle/commit updates were performed if necessary, but these don't require stopping the app launch.
+        // Always return false for the mandatory update flag, and nil for the URL.
+        return (false, nil)
     }
 
     static func updateAppConfig(appId: String, latestCommitId: Int64) async -> Bool {
@@ -325,6 +350,65 @@ class Actions: NSObject {
         } else {
             Logger.error("❌ Rollback Failed")
             return false
+        }
+    }
+
+    // Update Alert Display
+    @objc static func showUpdateRequiredAlertWithUrl(_ urlString: String?) {
+        // Ensure UI updates happen on the main thread
+        DispatchQueue.main.async {
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let rootViewController = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+                Logger.error("Could not find root view controller to present update alert.")
+                return
+            }
+            
+            let title = "Update Required"
+            let message = "An app update is available. Please update your app to continue using it with the best experience."
+            
+            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            
+            // Determine the URL to open
+            var finalUrlString = urlString
+            if finalUrlString == nil || finalUrlString!.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Logger.warn("App Store URL missing in manifest for update alert. Using fallback.")
+                finalUrlString = "https://apps.apple.com/" // General App Store link as fallback
+            }
+            
+            // Create the 'Update' action
+            let updateAction = UIAlertAction(title: "Update", style: .default) { _ in
+                guard let finalUrl = URL(string: finalUrlString!) else {
+                    Logger.error("Invalid App Store URL string: \(finalUrlString ?? "nil")")
+                    return
+                }
+                
+                Logger.info("Attempting to open App Store URL: \(finalUrl.absoluteString)")
+                
+                // Check if the URL can be opened before attempting
+                if UIApplication.shared.canOpenURL(finalUrl) {
+                    // Use the modern open method
+                    UIApplication.shared.open(finalUrl, options: [:]) { success in
+                        if success {
+                            Logger.info("Successfully initiated opening App Store URL.")
+                            // Exit only after confirming the open call was initiated (or failed)
+                             exit(0) // Force exit as the update is mandatory
+                        } else {
+                            Logger.error("Failed to initiate opening App Store URL.")
+                             exit(0) // Exit even if opening failed, as update is mandatory
+                        }
+                    }
+                } else {
+                     Logger.error("System determined it cannot open the App Store URL: \(finalUrl.absoluteString)")
+                     exit(0) // Exit if URL cannot be opened
+                }
+                // Note: The exit(0) calls will terminate the app immediately after the open operation is *initiated* or fails.
+                // The completion handler for open runs asynchronously, but the exit might happen before the App Store fully transitions.
+            }
+            
+            alertController.addAction(updateAction)
+            
+            // Present the alert. Since there's no 'Cancel' action, it's effectively non-dismissible until the 'Update' action is taken.
+            rootViewController.present(alertController, animated: true, completion: nil)
         }
     }
 }
