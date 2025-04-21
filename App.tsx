@@ -91,6 +91,10 @@ function App(): React.JSX.Element {
         }
 
         if (_.isEmpty(url)) {
+          // Dismissing splash screen for home page
+          setTimeout(() => {
+            RNApptile.notifyJSReady();
+          }, 50)
           return;
         }
 

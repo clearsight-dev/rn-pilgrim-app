@@ -345,7 +345,7 @@ async function main() {
       await downloadFile(appConfigUrl, appConfigPath);
       console.log('appConfig downloaded');
       const bundleTrackerPath = path.resolve(__dirname, 'ios/localBundleTracker.json');
-      await writeFile(bundleTrackerPath, `{"publishedCommitId": ${publishedCommit}, "iosBundleId": ${iosBundle?.id ?? "null"}}`)
+      await writeFile(bundleTrackerPath, `{"publishedCommitId": ${publishedCommit}, "iosBundleId": ${"null"}}`)
       console.log('bundleTrackerPath updated: ', bundleTrackerPath);
     } else {
       console.error("Published appconfig not found! Stopping build.")
