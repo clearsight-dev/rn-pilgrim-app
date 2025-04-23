@@ -53,86 +53,90 @@ function isOnHome(state) {
 };
 
 const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbutton}, ref) => {
-  const locals = useRef({
-    isSearchbarVisible: true,
-    searchbarAnimation: null
-  });
-  const searchBarTranslation = useRef(new Animated.Value(0));
-  const textInputRef = useRef(null); 
+  // const locals = useRef({
+  //   isSearchbarVisible: true,
+  //   searchbarAnimation: null
+  // });
+  // const searchBarTranslation = useRef(new Animated.Value(0));
+  // const textInputRef = useRef(null); 
 
-  useImperativeHandle(ref, () => {
-    return {
-      showSearchbarAnimated: () => {
-        if (!locals.current.isSearchbarVisible) {
-          locals.current.isSearchbarVisible = true;
-          console.log("Show animation");
-          if (locals.current.searchbarAnimation) {
-            locals.current.searchbarAnimation.stop();
-          }
+  // useImperativeHandle(ref, () => {
+  //   return {
+  //     showSearchbarAnimated: () => {
+  //       if (!locals.current.isSearchbarVisible) {
+  //         locals.current.isSearchbarVisible = true;
+  //         console.log("Show animation");
+  //         if (locals.current.searchbarAnimation) {
+  //           locals.current.searchbarAnimation.stop();
+  //         }
 
-          searchBarTranslation.current.setValue(-50);
-          locals.current.isSearchbarVisible = Animated.timing(searchBarTranslation.current, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true
-          }).start((finished) => {
-            if (finished) {
-              console.log("show animation finished for searchbar");
-              locals.current.searchbarAnimation = null;
-            }
-          });
-        } else {
-          console.log("searchbar is alredy visible");
-        }
-      },
-      hideSearchbarAnimated: () => {
-        if (locals.current.isSearchbarVisible) {
-          locals.current.isSearchbarVisible = false;
-          console.log("Hide animation");
-          if (locals.current.searchbarAnimation) {
-            locals.current.searchbarAnimation.stop();
-          }
+  //         searchBarTranslation.current.setValue(-50);
+  //         locals.current.isSearchbarVisible = Animated.timing(searchBarTranslation.current, {
+  //           toValue: 0,
+  //           duration: 300,
+  //           useNativeDriver: true
+  //         }).start((finished) => {
+  //           if (finished) {
+  //             console.log("show animation finished for searchbar");
+  //             locals.current.searchbarAnimation = null;
+  //           }
+  //         });
+  //       } else {
+  //         console.log("searchbar is alredy visible");
+  //       }
+  //     },
+  //     hideSearchbarAnimated: () => {
+  //       if (locals.current.isSearchbarVisible) {
+  //         locals.current.isSearchbarVisible = false;
+  //         console.log("Hide animation");
+  //         if (locals.current.searchbarAnimation) {
+  //           locals.current.searchbarAnimation.stop();
+  //         }
 
-          searchBarTranslation.current.setValue(0);
-          locals.current.isSearchbarVisible = Animated.timing(searchBarTranslation.current, {
-            toValue: -50,
-            duration: 300,
-            useNativeDriver: true
-          }).start((finished) => {
-            if (finished) {
-              console.log("hide animation finished for searchbar");
-              locals.current.searchbarAnimation = null;
-            }
-          });
-        } else {
-          console.log("searchbar is already hidden");
-        }
-      },
-      showSearchbar: () => {
-        if (!locals.current.isSearchbarVisible) {
-          locals.current.isSearchbarVisible = true;
-          searchBarTranslation.current.setValue(0);
-        } else {
-          console.warn("Searchbar is already visible!");
-        }
-      },
-      hideSearchbar: () => {
-        if (locals.current.isSearchbarVisible) {
-          locals.current.isSearchbarVisible = false;
-          searchBarTranslation.current.setValue(-50);
-        } else {
-          console.warn("Searchbar is already hidden!");
-        }
-      },
-      isSearchbarVisible: () => {
-        return locals.current.isSearchbarVisible;
-      }
-    }
-  }, [searchBarTranslation, locals.current]);
+  //         searchBarTranslation.current.setValue(0);
+  //         locals.current.isSearchbarVisible = Animated.timing(searchBarTranslation.current, {
+  //           toValue: -50,
+  //           duration: 300,
+  //           useNativeDriver: true
+  //         }).start((finished) => {
+  //           if (finished) {
+  //             console.log("hide animation finished for searchbar");
+  //             locals.current.searchbarAnimation = null;
+  //           }
+  //         });
+  //       } else {
+  //         console.log("searchbar is already hidden");
+  //       }
+  //     },
+  //     showSearchbar: () => {
+  //       if (!locals.current.isSearchbarVisible) {
+  //         locals.current.isSearchbarVisible = true;
+  //         searchBarTranslation.current.setValue(0);
+  //       } else {
+  //         console.warn("Searchbar is already visible!");
+  //       }
+  //     },
+  //     hideSearchbar: () => {
+  //       if (locals.current.isSearchbarVisible) {
+  //         locals.current.isSearchbarVisible = false;
+  //         searchBarTranslation.current.setValue(-50);
+  //       } else {
+  //         console.warn("Searchbar is already hidden!");
+  //       }
+  //     },
+  //     isSearchbarVisible: () => {
+  //       return locals.current.isSearchbarVisible;
+  //     }
+  //   }
+  // }, [searchBarTranslation, locals.current]);
 
   const FIRST_ROW_HEIGHT = 40;
 
   const handleHeaderLeft = () => {
+    if (!showBackbutton) {
+      navigation.navigate('Search')
+      return
+    }
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
@@ -172,7 +176,7 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
           style={styles.iconContainer}
           onPress={handleHeaderLeft}
         >
-          <Icon iconType="MaterialIcons" name={showBackbutton ? "keyboard-backspace" : "menu"} size={24} color="#333" />
+          <Icon iconType="MaterialIcons" name={showBackbutton ? "keyboard-backspace" : "search"} size={24} color="#333" />
         </TouchableOpacity>
         <View style={styles.logoContainer}>
           <Image 
@@ -184,9 +188,9 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
           />
         </View>
         <View style={styles.rightIcons}>
-          <Pressable style={styles.iconContainer}>
+          {/* <Pressable style={styles.iconContainer}>
             <Icon iconType="MaterialIcons" name="local-shipping" size={24} color="#333" />
-          </Pressable>
+          </Pressable> */}
           
           <Pressable 
             style={styles.iconContainer}
@@ -205,7 +209,7 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
           </Pressable>
         </View>
       </View>
-      <Animated.View 
+      {/* <Animated.View 
         style={{
           paddingHorizontal: 16,
           backgroundColor: "#fff",
@@ -236,7 +240,7 @@ const CustomHeader = forwardRef(({navigation, topInset, numCartItems, showBackbu
             </Pressable>
           )} 
         </View>
-      </Animated.View>
+      </Animated.View> */}
     </View>
   );
 })

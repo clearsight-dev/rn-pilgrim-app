@@ -57,7 +57,6 @@ export async function fillCaches() {
     'hair-care', 
     'pore-care', 
     'makeup',
-
     'face-care', 
     'night-care', 
     'hydration',

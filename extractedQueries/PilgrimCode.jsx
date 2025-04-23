@@ -1,12 +1,13 @@
 import React from 'react';
-import { 
-  View, 
+import {
+  View,
   Text,
   StyleSheet
 } from 'react-native';
-import {Image} from './ImageComponent';
+import { Image } from './ImageComponent';
 import Accordion from './Accordion';
 import { colors, FONT_FAMILY, typography } from './theme';
+import GradientText from './GradientText';
 
 export function PilgrimCode() {
   const content = [
@@ -40,7 +41,7 @@ export function PilgrimCode() {
   const createLabelledItem = (i) => {
     const item = content[i];
     return (
-      <View 
+      <View
         key={i + ':' + item.urls[0]}
         style={{
           width: 90,
@@ -53,18 +54,18 @@ export function PilgrimCode() {
           style={{
             height: 59,
             aspectRatio: 1,
-            marginBottom: 10 
+            marginBottom: 10
           }}
           resizeMode='contain'
-          source={{uri: item.urls[0]}}
+          source={{ uri: item.urls[0] }}
         ></Image>
         <Text style={{
-            fontFamily: FONT_FAMILY.medium,
-            textAlign: 'center', 
-            fontSize: 11, 
-            fontWeight: '500',
-            color: colors.dark100
-          }}
+          fontFamily: FONT_FAMILY.medium,
+          textAlign: 'center',
+          fontSize: 11,
+          fontWeight: '500',
+          color: colors.dark100
+        }}
         >
           {item.blurb}
         </Text>
@@ -72,32 +73,31 @@ export function PilgrimCode() {
     );
   }
 
-  for (let i = 0; i < content.length/2; i++) {
+  for (let i = 0; i < content.length / 2; i++) {
     firstRow.push(createLabelledItem(i));
   }
 
-  for (let i = Math.ceil(content.length/2); i < content.length; i++) {
+  for (let i = Math.ceil(content.length / 2); i < content.length; i++) {
     secondRow.push(createLabelledItem(i));
   }
 
   return (
-    <Accordion title="The Pilgrim code">
       <View style={{
         flexDirection: 'column',
+        paddingVertical: 24
       }}>
-        <Text 
-          style={[
-            typography.subHeading14, 
-            {
-              lineHeight: 20, 
-              marginBottom: 16
-            }
+        <GradientText
+          text="The Pilgrim Code"
+          fontSize={22}
+          width="100%"
+          height={32}
+          gradientColors={[
+            { offset: '0%', color: '#009FAD' },
+            { offset: '33%', color: '#00707A' },
+            { offset: '66%', color: '#009FAD' },
+            { offset: '100%', color: '#00707A' },
           ]}
-        >
-          Pilgrim is "Clean Compatible". Not just free of harmful and toxic chemicals 
-          but uses only those ingredients that either enhance the health of our hair 
-          & skin or support the effectiveness of formulations.
-        </Text>
+        />
         <View style={styles.imageRow}>
           {firstRow}
         </View>
@@ -105,7 +105,6 @@ export function PilgrimCode() {
           {secondRow}
         </View>
       </View>
-    </Accordion>
   );
 }
 

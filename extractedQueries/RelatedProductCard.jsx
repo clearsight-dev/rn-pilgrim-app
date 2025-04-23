@@ -110,7 +110,7 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
           resizeMode="contain"
         />
         {(rating > 0) && (<View style={styles.ratingContainer}>
-          <Text style={styles.ratingText}>{rating}</Text>
+          <Text style={[typography.subHeading14, styles.ratingText]}>{rating}</Text>
           <Star color={colors.secondaryMain} size={12} fillPercentage={1} />
         </View>)}
       </View> 
@@ -119,7 +119,7 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
       <View style={[styles.detailsContainer, cardVariant === "large" ? {alignItems: "center"} : {}]}>
         {
           isBestSeller ? (
-            <Text style={typography.bestseller}>
+            <Text style={[typography.body14, typography.bestseller]}>
               BESTSELLER
             </Text>
           ) : (
@@ -206,7 +206,6 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 11,
     color: colors.dark70,
-    fontWeight: '500',
     marginRight: 4,
   },
   detailsContainer: {

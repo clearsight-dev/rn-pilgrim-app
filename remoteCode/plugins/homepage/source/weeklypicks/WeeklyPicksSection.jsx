@@ -15,6 +15,7 @@ import { formatProductsForCarousel } from '../../../../../extractedQueries/Relat
  * @param {number} props.cardSpacing - Spacing between cards in pixels
  */
 function WeeklyPicksSection ({ 
+  config = {},
   products = [],
   loading = false,
   error = null,
@@ -38,6 +39,8 @@ function WeeklyPicksSection ({
   return (
     <View style={{width}}>
       <ThreeDProductCarousel
+        title={config.title}
+        subtitle={config.subtitle}
         products={products}
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}

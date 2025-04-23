@@ -81,7 +81,7 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoS
       
       // Update the ScrollBubbles component via imperative handle
       if (scrollBubblesRef.current) {
-        scrollBubblesRef.current.setCurrentIndex(index);
+        scrollBubblesRef.current?.setCurrentIndex(index);
       }
       
       // Only set userInteracted if it's not already true
@@ -139,7 +139,7 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoS
         }}
         horizontal={true}
         pagingEnabled={true}
-        keyExtractor={(item, i) => item.id + item.url + i}
+        keyExtractor={(item, i) => i}
         getItemLayout={getItemLayout}
         initialNumToRender={3}
         onScrollToIndexFailed={(info) => {

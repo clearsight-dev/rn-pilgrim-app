@@ -1,68 +1,64 @@
-import React, { memo, useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated
-} from 'react-native';
-import { useDispatch } from 'react-redux';
-import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
+import React, {memo, useEffect, useRef} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
+import {useDispatch} from 'react-redux';
+import {navigateToScreen, useApptileWindowDims} from 'apptile-core';
 import RelatedProductsCarousel from '../../../../extractedQueries/RelatedProductsCarousel';
 import Header from '../../../../extractedQueries/CollectionFilterChips';
-import { colors, typography } from '../../../../extractedQueries/theme';
+import {colors, typography} from '../../../../extractedQueries/theme';
 
-function ChipCollectionCarousel({ 
+function ChipCollectionCarousel({
+  config = {},
   data,
-  collectionHandle = 'bestsellers',
-  title,
   style,
   onSelectShade,
   onSelectVariant,
   onFilterSelect,
   onFilterRemove,
-  onFilterClear
+  onFilterClear,
 }) {
+  const {collection: collectionHandle, title} = config;
+
   // Get window dimensions
-  const { width: screenWidth } = useApptileWindowDims();
-  
+  const {width: screenWidth} = useApptileWindowDims();
+
   // Animation for loading indicator
   const loadingAnimation = useRef(new Animated.Value(-100)).current;
   const animationRef = useRef(null);
   const dispatch = useDispatch();
   const products = data.products;
-  let loading = false; 
-  if (data.status === "loading") {
+  let loading = false;
+  if (data.status === 'loading') {
     loading = true;
   }
   const error = data.error;
   const filterData = data.filters;
   const selectedFilters = data.selectedFilters;
 
-
   // Handle "See All" button click
   const handleSeeAllClick = () => {
-    dispatch(navigateToScreen('Collection', { collectionHandle }));
+    dispatch(navigateToScreen('Collection', {collectionHandle}));
   };
-  
+
   // Display title with capitalized first letter and spaces instead of hyphens
-  const displayTitle = title || (collectionHandle.charAt(0).toUpperCase() + 
-                               collectionHandle.slice(1).replace(/-/g, ' '));
-  
+  const displayTitle =
+    title ||
+    collectionHandle.charAt(0).toUpperCase() +
+      collectionHandle.slice(1).replace(/-/g, ' ');
+
   // Animation effect
   useEffect(() => {
     // Function to run the animation
     const runAnimation = () => {
       // Reset animation to start position
       loadingAnimation.setValue(-screenWidth);
-      
+
       // Start the animation
       animationRef.current = Animated.timing(loadingAnimation, {
         toValue: 0,
         duration: 1000, // Duration for the animation to complete
-        useNativeDriver: true
+        useNativeDriver: true,
       });
-      
+
       // Start animation and set up the loop with pause
       animationRef.current.start(({finished}) => {
         // When animation completes, wait 500ms before restarting
@@ -73,7 +69,7 @@ function ChipCollectionCarousel({
           setTimeout(() => {
             if (loading) {
               runAnimation();
-            } 
+            }
           }, 500);
         }
       });
@@ -105,47 +101,57 @@ function ChipCollectionCarousel({
     <View style={[styles.container, style]}>
       {/* Title and See All button */}
       <View style={styles.titleContainer}>
-        <Text style={typography.heading19}>{displayTitle}</Text>
+        <Text style={[typography.heading19]}>{displayTitle}</Text>
         <TouchableOpacity onPress={handleSeeAllClick}>
-          <Text style={[typography.heading14, styles.seeAllButton]}>See All</Text>
+          <Text style={[typography.heading14, styles.seeAllButton]}>
+            See All
+          </Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Filter chips header */}
-      <Header 
+      <Header
         filterData={filterData}
         appliedFilters={selectedFilters}
-        onFilterRemove={filter => onFilterRemove(collectionHandle, filter, selectedFilters, filterData)}
-        onFilterSelect={filter => onFilterSelect(collectionHandle, filter, selectedFilters, filterData)}
-        onClearAllFilters={() => onFilterClear(collectionHandle, null, selectedFilters, filterData)}
+        onFilterRemove={filter =>
+          onFilterRemove(collectionHandle, filter, selectedFilters, filterData)
+        }
+        onFilterSelect={filter =>
+          onFilterSelect(collectionHandle, filter, selectedFilters, filterData)
+        }
+        onClearAllFilters={() =>
+          onFilterClear(collectionHandle, null, selectedFilters, filterData)
+        }
       />
-      
+
       {/* Cards */}
-      { error ? (
+      {error ? (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Error: {error}</Text>
+          <Text style={[typography.body14, styles.errorText]}>Error: {error}</Text>
         </View>
       ) : products.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.noProductsText}>No products found</Text>
+          <Text style={[typography.body14, styles.noProductsText]}>No products found</Text>
         </View>
       ) : (
         <>
-          { (
-            <View style={{height: 2, width: "100%", overflow: 'hidden'}}>
-              <Animated.View 
+          {
+            <View style={{height: 2, width: '100%', overflow: 'hidden'}}>
+              <Animated.View
                 style={{
-                  height: 2, 
-                  backgroundColor: "#00909E", 
+                  height: 2,
+                  backgroundColor: '#00909E',
                   width: screenWidth, // Width of the moving line
-                  transform: [{
-                    translateX: loadingAnimation
-                  }]
+                  transform: [
+                    {
+                      translateX: loadingAnimation,
+                    },
+                  ],
                 }}
               />
             </View>
-          )}
-          <RelatedProductsCarousel 
+          }
+          <RelatedProductsCarousel
             title="" // We're already showing the title above
             products={products}
             // initialProductsToLoad={5}
@@ -157,22 +163,17 @@ function ChipCollectionCarousel({
       )}
     </View>
   );
-
-  
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.white,
-    marginBottom: 16,
-    minHeight: 500 
+    marginBottom: 20,
   },
   titleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 16,
     paddingBottom: 8,
   },
   seeAllButton: {
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
   },
   carousel: {
     marginTop: 8,
-  }
+  },
 });
 
 export default memo(ChipCollectionCarousel);

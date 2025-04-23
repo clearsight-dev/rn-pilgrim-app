@@ -232,7 +232,6 @@ const styles = StyleSheet.create({
   buttonLargeText: {
     fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
-    fontWeight: '600',
     color: colors.dark100,
   },
   progressBar: {

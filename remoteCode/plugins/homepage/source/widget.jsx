@@ -4,6 +4,7 @@ import {ReactComponent, WidgetConfig, WidgetEditors, PropertySettings} from './c
 const pluginListing = {
   labelPrefix: 'homepage',
   type: 'widget',
+  isSDKwidget: true,
   name: 'homepage',
   description: 'Basic plugin created from template',
   layout: {

@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const GET_METAOBJECT = gql`
-  fragment referenceObj on MetafieldReference {
+  fragment referenceSCObj on MetafieldReference {
     ... on Collection {
       description
       descriptionHtml
@@ -83,8 +83,8 @@ export const GET_METAOBJECT = gql`
     }
   }
 
-  fragment referenceWithMetaobject on MetafieldReference {
-    ...referenceObj
+  fragment referenceSCWithMetaobject on MetafieldReference {
+    ...referenceSCObj
     ... on Metaobject {
       id
       type
@@ -93,12 +93,12 @@ export const GET_METAOBJECT = gql`
         type
         value
         reference {
-          ...referenceObj
+          ...referenceSCObj
           __typename
         }
         references(first: 250) {
           nodes {
-            ...referenceObj
+            ...referenceSCObj
             __typename
           }
           __typename
@@ -120,13 +120,13 @@ export const GET_METAOBJECT = gql`
           value
           references(first: 250) {
             nodes {
-              ...referenceWithMetaobject
+              ...referenceSCWithMetaobject
               __typename
             }
             __typename
           }
           reference {
-            ...referenceWithMetaobject
+            ...referenceSCWithMetaobject
             __typename
           }
           __typename

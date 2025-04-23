@@ -93,21 +93,18 @@ export const typography = StyleSheet.create({
   },
   heading20: {
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     fontSize: 20,
     lineHeight: 20,
     letterSpacing: -0.4
   },
   heading19: {
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     fontSize: 19,
     lineHeight: 19,
     color: colors.dark100
   },
   heading14: {
     fontFamily: FONT_FAMILY.medium,
-    fontWeight: '500',
     fontSize: 14,
     lineHeight: 19,
     letterSpacing: -0.4,
@@ -115,7 +112,6 @@ export const typography = StyleSheet.create({
   },
   price: {
     fontFamily: FONT_FAMILY.medium,
-    fontWeight: '500',
     fontSize: 18,
     lineHeight: 18,
     letterSpacing: -0.4,
@@ -123,7 +119,6 @@ export const typography = StyleSheet.create({
   },
   slashedPrice: {
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     fontSize: 13,
     lineHeight: 13,
     letterSpacing: -0.4,
@@ -132,7 +127,6 @@ export const typography = StyleSheet.create({
   },
   savings: {
     fontFamily: FONT_FAMILY.medium,
-    fontWeight: '500',
     fontSize: 13,
     lineHeight: 13,
     letterSpacing: -0.4,
@@ -140,21 +134,18 @@ export const typography = StyleSheet.create({
   },
   subHeading15: {
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     fontSize: 15,
     lineHeight: 15,
     color: colors.dark100
   },
   subHeading14: {
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     fontSize: 14,
     lineHeight: 14,
     color: colors.dark80
   },
   subHeading12: {
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     fontSize: 12,
     lineHeight: 16,
     letterSpacing: -0.4,
@@ -162,17 +153,15 @@ export const typography = StyleSheet.create({
   },
   body14: {
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     fontSize: 14,
     lineHeight: 14,
     color: colors.dark80
   },
   bestseller: {
-    fontFamily: FONT_FAMILY.regular,
-    fontWeight: '600',
     fontSize: 11,
     lineHeight: 11,
     letterSpacing: 0.4,
-    color: colors.accentCoral
+    color: colors.accentCoral,
+    marginBottom: 2
   }
 });

@@ -1,27 +1,27 @@
 import React from 'react';
-import { 
-  View, 
+import {
+  View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Pressable,
-  ScrollView
+  ScrollView,
 } from 'react-native';
-import { Icon } from 'apptile-core';
-import { colors } from './theme';
+import {Icon} from 'apptile-core';
+import {colors, typography} from './theme';
 
 /**
- * 
+ *
  * @param {filterData} param0 Array<{id: string, label: "Display text", value: "object that goes in the filters array"}>
  * @param {selectedFilters} param1 string[], array of filter ids
- * @returns 
+ * @returns
  */
-function CollectionFilterChips ({ 
-  filterData, 
-  appliedFilters, 
+function CollectionFilterChips({
+  filterData,
+  appliedFilters,
   onFilterRemove,
   onFilterSelect,
-  onClearAllFilters
+  onClearAllFilters,
 }) {
   const selectedOptions = [];
   const unselectedOptions = [];
@@ -34,67 +34,72 @@ function CollectionFilterChips ({
   }
   return (
     <View style={styles.container}>
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+        contentContainerStyle={styles.scrollContent}>
         {/* "All" chip that shows when no filters are selected */}
-        <Pressable 
+        <Pressable
           style={({pressed}) => [
-            styles.chip, 
-            (appliedFilters.length === 0) && styles.selectedChip,
-            pressed && {opacity: 0.5}
+            styles.chip,
+            appliedFilters.length === 0 && styles.selectedChip,
+            pressed && {opacity: 0.5},
           ]}
-          onPress={onClearAllFilters}
-        >
-          <Text style={[
-            styles.chipText,
-            (appliedFilters.length === 0) && {color: colors.primaryDark},
-          ]}>All</Text>
+          onPress={onClearAllFilters}>
+          <Text
+            style={[
+              typography.body14,
+              styles.chipText,
+              appliedFilters.length === 0 && {color: colors.primaryDark},
+            ]}>
+            All
+          </Text>
         </Pressable>
-        
+
         {/* Selected filter chips (shown first) */}
         {selectedOptions.map(chip => (
-          <Pressable 
-            key={chip.id} 
+          <Pressable
+            key={chip.id}
             style={({pressed}) => [
-              styles.chip, 
+              styles.chip,
               styles.selectedChip,
-              pressed && {opacity: 0.5}
+              pressed && {opacity: 0.5},
             ]}
-            onPress={() => onFilterRemove(chip.id)}
-          >
-            <Text style={[styles.chipText, styles.selectedChipText]}>{chip.label}</Text>
-            <Icon 
-              iconType={'Material Icon'} 
-              name={'close'} 
+            onPress={() => onFilterRemove(chip.id)}>
+            <Text
+              style={[
+                typography.body14,
+                styles.chipText,
+                styles.selectedChipText,
+              ]}>
+              {chip.label}
+            </Text>
+            <Icon
+              iconType={'Material Icon'}
+              name={'close'}
               style={styles.closeIcon}
             />
           </Pressable>
         ))}
-        
+
         {/* Unselected filter options */}
         {unselectedOptions.map(option => (
-          <Pressable 
-            key={option.id} 
-            style={({pressed}) => [
-              styles.chip,
-              pressed && {opacity: 0.5}
-            ]}
-            onPress={() => onFilterSelect(option.id)}
-          >
-            <Text style={styles.chipText}>{option.label}</Text>
+          <Pressable
+            key={option.id}
+            style={({pressed}) => [styles.chip, pressed && {opacity: 0.5}]}
+            onPress={() => onFilterSelect(option.id)}>
+            <Text style={[typography.body14, styles.chipText]}>
+              {option.label}
+            </Text>
           </Pressable>
         ))}
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
   scrollContent: {
     paddingVertical: 8,
     paddingHorizontal: 4,
@@ -114,7 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 144, 158, 0.04)', // 4% opacity
   },
   chipText: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.dark100,
   },
   selectedChipText: {

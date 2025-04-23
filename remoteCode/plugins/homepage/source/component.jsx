@@ -1,118 +1,240 @@
-import React, { useEffect, useContext, useCallback, useRef, useState } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  Text, 
-  Image, 
-  TouchableOpacity, 
-  NativeModules, 
+import _, {min, set} from 'lodash';
+import React, {
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  TouchableOpacity,
+  NativeModules,
   SectionList,
-  Platform 
+  Platform,
 } from 'react-native';
-import { 
-  navigateToScreen, 
-  useApptileWindowDims 
-} from 'apptile-core';
-import { useDispatch } from 'react-redux';
-import { fetchCollectionCarouselData, getFilterAndProductsForCollection } from '../../../../extractedQueries/collectionqueries';
+import {navigateToScreen, useApptileWindowDims} from 'apptile-core';
+import {useDispatch} from 'react-redux';
+import {
+  fetchCollectionCarouselData,
+  getFilterAndProductsForCollection,
+} from '../../../../extractedQueries/collectionqueries';
 import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
-import BannerCarousel from './BannerCarousel';
+import {MetafieldBannerCarousel, BannerCarousel} from './BannerCarousel';
 // import {PilgrimContext} from '../../../../PilgrimContext';
 import WeeklyPicksSection from './weeklypicks/WeeklyPicksSection';
 import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
+
+import {dummy} from './dummySections';
+
+import {fetchPageData} from '../../../../queries/pageQuery';
 // import {typography} from '../../../../extractedQueries/theme'
 
-async function fetchHomepageChipCarouselData() {
-  console.log("Starting fetch for chipcarousels");
-  const bestsellersP = getFilterAndProductsForCollection("bestsellers");
-  const makeupP = getFilterAndProductsForCollection("makeup");
-  const newLaunchP = getFilterAndProductsForCollection("new-launch");
-  return Promise.all([bestsellersP, makeupP, newLaunchP]);
+const extractCollectionsFromSections = (sections, sectionToPick) => {
+  const collections = new Set();
+
+  // Default collections to always fetch
+  collections.add('bestsellers');
+  collections.add('makeup');
+  collections.add('new-launch');
+
+  // Add collections from section configs
+  sections.forEach(section => {
+    if (sectionToPick.includes(section.type) && section.config?.collection) {
+      collections.add(section.config.collection);
+    }
+  });
+
+  return Array.from(collections);
+};
+
+async function fetchHomepageCollectionsData(collections) {
+  console.log('Starting fetch for collections:', collections);
+
+  // Create an array of promises for all collections
+  const collectionPromises = collections.map(collection =>
+    getFilterAndProductsForCollection(collection),
+  );
+
+  // Return results as an object with collection handles as keys
+  const results = await Promise.all(collectionPromises);
+  return collections.reduce((acc, collection, index) => {
+    acc[collection] = results[index];
+    return acc;
+  }, {});
 }
 
-async function fetchMultiCollectionCarouselData() {
-  console.log("Starting fetch for multicollection carousel");
-  const poreCareP = fetchCollectionCarouselData("pore-care");
-  const hairCareP = fetchCollectionCarouselData("pore-care");
-  const makeupP = fetchCollectionCarouselData("pore-care");
-  return Promise.all([poreCareP, hairCareP, makeupP]);
+/**
+ * Transforms the page data to extract specific metafields and their references
+ *
+ * @param {Object} pageData - The raw page data received from the GraphQL query
+ * @returns {Object} - The transformed data with extracted metafields and references
+ */
+export function transformPageData(pageData) {
+  if (!pageData?.data?.page) {
+    return {
+      pageInfo: {},
+      metafields: {},
+      bannerContents: [],
+    };
+  }
+
+  const page = pageData.data.page;
+  const metafields = page.metafields || [];
+
+  // Extract banner contents from metafields
+  const bannerContentsMetafield = _.find(
+    metafields,
+    o => ['banner_contents'].includes(o?.key) && o?.namespace === 'custom',
+  );
+
+  const bannerContents = _.get(bannerContentsMetafield, 'references.nodes', []);
+
+  // Extract other individual metafields for easy access
+  const metafieldValues = {};
+  metafields.forEach(metafield => {
+    if (metafield.namespace === 'custom') {
+      metafieldValues[metafield.key] = metafield.value;
+    }
+  });
+
+  return {
+    pageInfo: {
+      id: page.id,
+      handle: page.handle,
+      title: page.title,
+    },
+    metafields: metafieldValues,
+    bannerContents: bannerContents,
+  };
 }
 
-export function ReactComponent({ model }) {
-  // const {pilgrimGlobals, setPilgrimGlobals} = useContext(PilgrimContext);
-  // const prevScrollY = useRef(0);
+/**
+ * Extracts essential banner navigation data from transformed page data
+ *
+ * @param {Object} transformedData - Data returned from transformPageData function
+ * @returns {Array} - Array of banner navigation arrays in format [imageUrl, isNavigatable, navigateToScreen, navigateToScreenParam]
+ */
+export function extractBannerNavigation(transformedData) {
+  // Extract banner contents from the transformed data
+  const bannerContents = _.get(transformedData, 'bannerContents', []);
+
+  // Map each banner to the required format
+  return bannerContents.map(banner => {
+    const fields = banner.fields || [];
+
+    // Get image URL
+    const imageUrl = _.get(
+      _.find(fields, o => ['image'].includes(o?.key)) || {},
+      ['reference', 'image', 'url'],
+      '',
+    );
+
+    // Get navigation type
+    const navigateTo = _.get(
+      _.find(fields, o => ['navigate_to'].includes(o?.key)) || {},
+      ['value'],
+      '',
+    );
+
+    // Check if navigatable
+    const isNavigatable = !_.isEmpty(navigateTo);
+
+    // Determine navigation screen and params based on navigation type
+    let navigateToScreenParam = {};
+
+    if (navigateTo === 'Collection') {
+      const collectionHandle = _.get(
+        _.find(fields, o => ['navigate_to_collection'].includes(o?.key)) || {},
+        ['reference', 'handle'],
+        '',
+      );
+      navigateToScreenParam = {collectionHandle};
+    } else if (navigateTo === 'Product') {
+      const productHandle = _.get(
+        _.find(fields, o => ['navigate_to_product'].includes(o?.key)) || {},
+        ['reference', 'handle'],
+        '',
+      );
+      navigateToScreenParam = {productHandle};
+    }
+
+    // Return array in the requested format
+    return {
+      imageUrl,
+      isNavigatable,
+      navigateToScreen: navigateTo,
+      navigateToScreenParam,
+    };
+  });
+}
+
+const numberOfProducts = 5;
+
+export function ReactComponent({model}) {
   const shadeBottomSheetRef = useRef(null);
   const variantBottomSheetRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [metafieldCarousalData, setMetafieldCarousalData] = useState([]);
   const dispatch = useDispatch();
+
   // Get collection handle and number of products from model props or use defaults
-  const numberOfProducts = 5;
-  const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
-  const quickCollectionsData = model.get('quickCollections') || [];
-  const imageCarouselImages = model.get('imageCarouselImages') || [];
+
+  const {width: screenWidth, height: screenHeight} = useApptileWindowDims();
+  // let sections = model.get('widgetList') || [];
+  const [sections, setSections] = React.useState([]);
   const celebPicksData = model.get('celebPicksData') || [];
   const [chipCollectionData, setChipCollectionData] = useState({
     bestsellers: {
-      status: "notstarted",
+      status: 'notstarted',
       products: [],
       filters: [],
       selectedFilters: [],
-      error: ""
+      error: '',
     },
     makeup: {
-      loading: "notstarted",
+      loading: 'notstarted',
       products: [],
       filters: [],
       selectedFilters: [],
-      error: ""
+      error: '',
     },
-    "new-launch": {
-      loading: "notstarted",
+    'new-launch': {
+      loading: 'notstarted',
       products: [],
       filters: [],
       selectedFilters: [],
-      error: ""
-    }
+      error: '',
+    },
   });
-  const [multiCollectionCarouselData, setMultiCollectionCarouselData] = useState({
-    'pore-care': {
-      status: "notstarted",
-      data: {},
-      error: ""
-    },
-    'hair-care': {
-      status: "notstarted",
-      data: {},
-      error: ""
-    },
-    makeup: {
-      status: "notstarted",
-      data: {},
-      error: ""
-    }
-  })
 
-  
   // Gets filter id to add to the set of selectedFilters which is an array of filterId's
   // that are already selected and adds the new filter object using allFilters
   // Everything is passed in as arguments instead of dependencies in usecallback
   // to avoid unnecessary re-renders of the children
-  async function getFilteredDataForCollection(collectionHandle, newSelectedFilters, allFilters) {
+  async function getFilteredDataForCollection(
+    collectionHandle,
+    newSelectedFilters,
+    allFilters,
+  ) {
     setChipCollectionData(prev => {
       return {
         ...prev,
         [collectionHandle]: {
           ...prev[collectionHandle],
-          status: "loading",
-          selectedFilters: newSelectedFilters
-        }
-      }
+          status: 'loading',
+          selectedFilters: newSelectedFilters,
+        },
+      };
     });
 
     try {
@@ -125,381 +247,303 @@ export function ReactComponent({ model }) {
         const filterToSend = filtersById.get(filterId);
         return JSON.parse(filterToSend.input);
       });
-      
-      const res = await getFilterAndProductsForCollection(collectionHandle, filters); 
+
+      const res = await getFilterAndProductsForCollection(
+        collectionHandle,
+        filters,
+      );
       setChipCollectionData(prev => {
         return {
           ...prev,
           [collectionHandle]: {
             ...prev[collectionHandle],
-            status: "loaded",
+            status: 'loaded',
             products: res.products,
-          }
-        }
+          },
+        };
       });
     } catch (err) {
-      console.error("Failed to fetch data for the applied filters: ", collectionHandle, err);
+      console.error(
+        'Failed to fetch data for the applied filters: ',
+        collectionHandle,
+        err,
+      );
       setChipCollectionData(prev => {
         return {
           ...prev,
           [collectionHandle]: {
             ...prev[collectionHandle],
-            status: "error",
+            status: 'error',
             products,
-          }
-        }
+          },
+        };
       });
     }
   }
 
-  const onFilterSelect = useCallback((collectionHandle, filter, selectedFilters, allFilters) => {
-    const newSelectedFilters = selectedFilters.concat(filter);
-    getFilteredDataForCollection(collectionHandle, newSelectedFilters, allFilters);
-  }, []);
+  const onFilterSelect = useCallback(
+    (collectionHandle, filter, selectedFilters, allFilters) => {
+      const newSelectedFilters = selectedFilters.concat(filter);
+      getFilteredDataForCollection(
+        collectionHandle,
+        newSelectedFilters,
+        allFilters,
+      );
+    },
+    [],
+  );
 
-  const onFilterRemove = useCallback((collectionHandle, filter, selectedFilters, allFilters) => {
-    const newSelectedFilters = selectedFilters.filter(id => id !== filter);
-    getFilteredDataForCollection(collectionHandle, newSelectedFilters, allFilters);
-  }, []);
+  const onFilterRemove = useCallback(
+    (collectionHandle, filter, selectedFilters, allFilters) => {
+      const newSelectedFilters = selectedFilters.filter(id => id !== filter);
+      getFilteredDataForCollection(
+        collectionHandle,
+        newSelectedFilters,
+        allFilters,
+      );
+    },
+    [],
+  );
 
-  const onClearAllFilters = useCallback((collectionHandle, filter, selectedFilters, allFilters) => {
-    getFilteredDataForCollection(collectionHandle, [], allFilters);
-  }, []);
+  const onClearAllFilters = useCallback(
+    (collectionHandle, filter, selectedFilters, allFilters) => {
+      getFilteredDataForCollection(collectionHandle, [], allFilters);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
-      console.log("[AGENT] Dismissing splash");
+      console.log('[AGENT] Dismissing splash');
       setTimeout(() => {
-        const { RNApptile } = NativeModules;
+        const {RNApptile} = NativeModules;
         RNApptile.notifyJSReady();
       }, 50);
     }
 
-    fetchMultiCollectionCarouselData()
-      .then(([poreCare, hairCare, makeup]) => {
-        console.log("Finish loading data for multicollection carousel");
-        setMultiCollectionCarouselData({
-          'pore-care': {
-            status: "loaded",
-            data: poreCare,
-            error: ""
-          },
-          'hair-care': {
-            status: "loaded",
-            data: hairCare,
-            error: ""
-          },
-          makeup: {
-            status: "loaded",
-            data: makeup,
-            error: ""
-          }
-        });
-      })
-      .catch(err => {
-        const errorMessage = "Error: " + err.toString();
-        setMultiCollectionCarouselData(prev => {
-          return {
-            'pore-care': {
-              ...prev.poreCare,
-              status: "error",
-              error: errorMessage
-            },
-            'hair-care': {
-              ...prev.hairCare,
-              status: "error",
-              error: errorMessage
-            },
-            makeup: {
-              ...prev.makeup,
-              status: "error",
-              error: errorMessage
-            }
+    const collectionsToFetch = extractCollectionsFromSections(sections, [
+      'highlighted-collections',
+      'chip-collections',
+    ]);
+
+    fetchHomepageCollectionsData(collectionsToFetch)
+      .then(collectionsData => {
+        console.log('Finishing carousel data fetch for collections');
+
+        // Convert the results to the format expected by chipCollectionData
+        const formattedData = {};
+        Object.entries(collectionsData).forEach(([collection, data]) => {
+          formattedData[collection] = {
+            status: 'loaded',
+            products: data.products,
+            filters: data.filters,
+            selectedFilters: [],
+            error: '',
           };
         });
-      })
 
-    fetchHomepageChipCarouselData()
-      .then(([bestsellers, makeup, newLaunch]) => {
-        console.log("Finishing carousel data fetch for chipcarousels");
-        setChipCollectionData({
-          bestsellers: {
-            status: "loaded",
-            products: bestsellers.products,
-            filters: bestsellers.filters,
-            selectedFilters: [],
-            error: ""
-          }, 
-          makeup: {
-            status: "loaded",
-            products: makeup.products,
-            filters: makeup.filters,
-            selectedFilters: [],
-            error: ""
-          },
-          "new-launch": {
-            status: "loaded",
-            products: newLaunch.products,
-            filters: newLaunch.filters,
-            selectedFilters: [],
-            error: ""
-          },
-        });
+        setChipCollectionData(formattedData);
       })
       .catch(err => {
-        console.error("Failed to fetch data for homepage", err);
-        const errorMessage = "Error: " + err.toString();
-        setChipCollectionData(prev => {
-          return {
-            bestsellers: {
-              ...prev.bestsellers,
-              status: "error",
-              error: errorMessage
-            }, 
-            makeup: {
-              ...prev.makeup,
-              status: "error",
-              error: errorMessage
-            },
-            "new-launch": {
-              ...prev["new-launch"],
-              status: "error",
-              error: errorMessage
-            }
-          }
-        })
-      })
-  }, []);
+        console.error('Failed to fetch data for homepage', err);
+        const errorMessage = 'Error: ' + err.toString();
 
-  const onSelectShade = (product) => {
+        // Create an error state for each collection
+        const errorData = {};
+        collectionsToFetch.forEach(collection => {
+          errorData[collection] = {
+            status: 'error',
+            products: [],
+            filters: [],
+            selectedFilters: [],
+            error: errorMessage,
+          };
+        });
+
+        setChipCollectionData(errorData);
+      });
+
+    const pageParams = {
+      handle: 'app-homepage',
+      pageMetafields: [
+        {
+          key: 'app_top_banner_content',
+          namespace: 'custom',
+        },
+        {
+          key: 'app_banner_heading',
+          namespace: 'custom',
+        },
+        {
+          key: 'banner_contents',
+          namespace: 'custom',
+        },
+      ],
+    };
+
+    fetchPageData(pageParams.handle, pageParams.pageMetafields)
+      .then(data => {
+        setMetafieldCarousalData(
+          extractBannerNavigation(transformPageData(data)),
+        );
+      })
+      .catch(err => {
+        console.error('Page data [Marker error]', err);
+      });
+  }, [sections]);
+
+  const onSelectShade = useCallback(product => {
     setSelectedProduct(product);
     shadeBottomSheetRef.current?.show();
-  };
-  
+  },[]);
+
   // Handle Choose Variant button click
-  const onSelectVariant = (product) => {
+  const onSelectVariant = useCallback(product => {
     setSelectedProduct(product);
     variantBottomSheetRef.current?.show();
-  };
-  // const shopifyDSModel = useSelector(state => datasourceTypeModelSel(state, 'shopifyV_22_10'));
-
-  // useEffect(() => {
-  //   if (quickCollectionsData.length > 0) {
-  //     setTimeout(() => {
-  //       // const queryRunner = shopifyDSModel?.get('queryRunner');
-  //       for (let i = 0; i < quickCollectionsData.length; ++i) {
-  //         fetchCollectionData(quickCollectionsData[i].collection, 12);
-  //       }
-  //     }, 2000);
-  //   }
-  // }, [quickCollectionsData])
+  },[]);
 
   // Define sections for SectionList
-  const sections = [
-    {
-      title: "Quick Collections",
-      type: 'quick-collections',
-      key: 'quick-collections',
-      data: [{}]
-    },
-    // {
-    //   title: "Banner Carousel",
-    //   type: 'banner-carousel',
-    //   key: 'banner-carousel',
-    //   data: [{}]
-    // },
-    // {
-    //   title: "Weekly Picks",
-    //   type: 'weekly-picks',
-    //   key: 'weekly-picks',
-    //   data: [{}]
-    // },
-    {
-      title: "Bestsellers",
-      type: 'bestsellers',
-      key: 'bestsellers',
-      data: [{}]
-    },
-    {
-      title: "Celeb Picks",
-      type: 'celeb-picks',
-      key: 'celeb-picks',
-      data: [{}]
-    },
-    {
-      title: "Multi Collection",
-      type: 'multi-collection',
-      key: 'multi-collection',
-      data: [{}]
-    },
-    {
-      title: "Makeup",
-      type: 'makeup',
-      key: 'makeup',
-      data: [{}]
-    },
-    {
-      title: "New Launch",
-      type: 'new-launch',
-      key: 'new-launch',
-      data: [{}]
-    },
-    {
-      title: "Pilgrim Code",
-      type: 'pilgrim-code',
-      key: 'pilgrim-code',
-      data: [{}]
-    },
-    {
-      title: "External links",
-      type: 'external-links',
-      key: 'external-links',
-      data: [{}]
+  // Memoize sections data to prevent unnecessary re-renders
+  const sectionLoadedRef = useRef(false);
+  React.useEffect(() => {
+    if (!sectionLoadedRef.current) {
+      sectionLoadedRef.current = true;
+      setSections(dummy);
     }
-  ];
+  }, []);
 
   // Render section headers (currently not displaying any headers)
-  const renderSectionHeader = ({ section }) => null;
+  const renderSectionHeader = ({section}) => null;
 
-  // Render each section based on its type
-  const renderItem = ({ item, section }) => {
-    switch (section.type) {
-      case 'quick-collections':
-        return (
-          <>
-            <QuickCollections
-              collections={quickCollectionsData}
-            />
-            <BannerCarousel 
-              items={imageCarouselImages}
+  // Memoize render function to prevent unnecessary re-renders
+  const renderItem = useCallback(
+    ({item, section}) => {
+      switch (section.type) {
+        case 'metafield-carousel':
+          return (
+            <MetafieldBannerCarousel
+              items={metafieldCarousalData}
               screenWidth={screenWidth}
-              onNavigate={(screen, params) => dispatch(navigateToScreen(screen, params))}
+              onNavigate={(screen, params) =>
+                dispatch(navigateToScreen(screen, params))
+              }
             />
+          );
+        case 'banner-carousel':
+          return (
+            <BannerCarousel
+              config={section.config}
+              screenWidth={screenWidth}
+              onNavigate={(screen, params) =>
+                dispatch(navigateToScreen(screen, params))
+              }
+            />
+          );
+        case 'quick-collections':
+          return (
+            <QuickCollections
+              config={section.config}
+            />
+          );
+        case 'highlighted-collections':
+          // Get collection from config
+          const collectionHandle = section.config?.collection;
+
+          // Check if collection data exists, otherwise show loading or error
+          const collectionData = chipCollectionData[collectionHandle] || {
+            status: 'notstarted',
+            products: [],
+            error: '',
+          };
+
+          return (
             <WeeklyPicksSection
-              products={chipCollectionData["new-launch"].products}
-              loading={chipCollectionData["new-launch"].status !== "loaded"}
-              error={chipCollectionData["new-launch"].error}
+              config={section.config}
+              products={collectionData.products}
+              loading={collectionData.status !== 'loaded'}
+              error={collectionData.error}
               onSelectShade={onSelectShade}
               onSelectVariant={onSelectVariant}
             />
-          </>
-        );
-      case 'bestsellers':
-        return (
-          <ChipCollectionCarousel
-            collectionHandle={'bestsellers'}
-            numberOfProducts={numberOfProducts}
-            data={chipCollectionData.bestsellers}
-            onSelectShade={onSelectShade}
-            onSelectVariant={onSelectVariant}
-            onFilterSelect={onFilterSelect}
-            onFilterRemove={onFilterRemove}
-            onFilterClear={onClearAllFilters}
-          />
-        );
-      case 'celeb-picks':
-        return (
-          <CelebPicks celebs={celebPicksData} />
-        );
-      case 'multi-collection':
-        return (
-          <MultiCollectionCarousel 
-            collectionsData={multiCollectionCarouselData}
-          />
-        );
-      case 'makeup':
-        return (
-          <ChipCollectionCarousel
-            collectionHandle={'makeup'}
-            numberOfProducts={numberOfProducts}
-            data={chipCollectionData.makeup}
-            onSelectShade={onSelectShade}
-            onSelectVariant={onSelectVariant}
-            onFilterSelect={onFilterSelect}
-            onFilterRemove={onFilterRemove}
-            onFilterClear={onClearAllFilters}
-          />
-        );
-      case 'new-launch':
-        return (
-          <ChipCollectionCarousel
-            collectionHandle={'new-launch'}
-            numberOfProducts={numberOfProducts}
-            data={chipCollectionData["new-launch"]}
-            onSelectShade={onSelectShade}
-            onSelectVariant={onSelectVariant}
-            onFilterSelect={onFilterSelect}
-            onFilterRemove={onFilterRemove}
-            onFilterClear={onClearAllFilters}
-          />
-        );
-      case 'pilgrim-code':
-        return (
-          <PilgrimCode />
-        );
-      case 'external-links':
-        return (
-          <ExternalLinks />
-        );
-      default:
-        return null;
-    }
-  };
+          );
+        case 'chip-collections':
+          // Get collection from config
+          const handle = section.config?.collection;
+
+          // Check if collection data exists, otherwise show loading or error
+          const data = chipCollectionData[handle] || {
+            status: 'notstarted',
+            products: [],
+            filters: [],
+            selectedFilters: [],
+            error: '',
+          };
+
+          return (
+            <ChipCollectionCarousel
+              config={section.config}
+              numberOfProducts={numberOfProducts}
+              data={data}
+              onSelectShade={onSelectShade}
+              onSelectVariant={onSelectVariant}
+              onFilterSelect={onFilterSelect}
+              onFilterRemove={onFilterRemove}
+              onFilterClear={onClearAllFilters}
+            />
+          );
+        case 'celeb-picks':
+          return <CelebPicks config={section.config} />;
+        case 'pilgrim-code':
+          return <PilgrimCode />;
+        default:
+          return null;
+      }
+    },
+    [
+      metafieldCarousalData,
+      screenWidth,
+      dispatch,
+      chipCollectionData,
+      onSelectShade,
+      onSelectVariant,
+      onFilterSelect,
+      onFilterRemove,
+      onClearAllFilters,
+    ],
+  );
 
   return (
     <>
-      {/* <View 
-        style={{
-          width: screenWidth, 
-          height: screenHeight,
-          flexDirection: 'column',
-          borderWidth: 2,
-          position: 'relative',
-          top: 50,
-          borderColor: 'red'
-        }}
-      >
-        <Text style={typography.heading20}>Heading-20</Text>
-        <Text style={typography.heading19}>Heading-19</Text>
-        <Text style={typography.heading14}>Heading-14</Text>
-        <Text style={typography.price}>695</Text>
-        <Text style={typography.slashedPrice}>895</Text>
-        <Text style={typography.savings}>20% Off</Text>
-        <Text style={typography.subHeading15}>Sub-Heading-15</Text>
-        <Text style={typography.subHeading14}>Sub-Heading-14</Text>
-        <Text style={typography.subHeading12}>Sub-Heading-12</Text>
-        <Text style={typography.body14}>body-14</Text>
-        <Text style={typography.bestseller}>BESTSELLER</Text>
-      </View> */}
       <SectionList
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         sections={sections}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        keyExtractor={(item, index) => index.toString()}
         stickySectionHeadersEnabled={false}
         showsVerticalScrollIndicator={true}
         // onScroll={handleScroll}
-        scrollEventThrottle={50}
-        initialNumToRender={3}
-        maxToRenderPerBatch={3}
-        windowSize={3}
+        scrollEventThrottle={16}
+        initialNumToRender={2}
+        maxToRenderPerBatch={2}
+        windowSize={5}
         removeClippedSubviews={Platform.OS !== 'web'}
+        updateCellsBatchingPeriod={50}
       />
 
       {/* Shade Selector Modal */}
-      <ShadeSelector 
+      <ShadeSelector
         bottomSheetRef={shadeBottomSheetRef}
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
       />
-      
+
       {/* Variant Selector Modal */}
-      <VariantSelector 
+      <VariantSelector
         bottomSheetRef={variantBottomSheetRef}
         product={selectedProduct}
-        optionName={"Size"}
+        optionName={'Size'}
         onClose={() => setSelectedProduct(null)}
       />
     </>
@@ -513,15 +557,15 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexGrow: 1,
-    backgroundColor: '#fff'
-  }
+    backgroundColor: '#fff',
+  },
 });
 
 export const WidgetConfig = {
   quickCollections: [],
   numberOfProducts: '',
   imageCarouselImages: [],
-  celebPicksData: []
+  celebPicksData: [],
 };
 
 export const WidgetEditors = {
@@ -536,13 +580,13 @@ export const WidgetEditors = {
           items: {
             type: 'object',
             properties: {
-              image: { type: 'image' },
-              title: { type: 'string' },
-              collection: { type: 'collection', dataFormat: 'handle' }
-            }
-          }
-        }
-      }
+              image: {type: 'image'},
+              title: {type: 'string'},
+              collection: {type: 'collection', dataFormat: 'handle'},
+            },
+          },
+        },
+      },
     },
     {
       type: 'customData',
@@ -554,15 +598,15 @@ export const WidgetEditors = {
           items: {
             type: 'object',
             properties: {
-              image: { type: 'image' },
-              title: { type: 'string' },
-              subtitle: { type: 'string' },
-              collection: { type: 'collection', dataFormat: 'handle' },
-              product: { type: 'product', dataFormat: 'handle' }
-            }
-          }
-        }
-      }
+              image: {type: 'image'},
+              title: {type: 'string'},
+              subtitle: {type: 'string'},
+              collection: {type: 'collection', dataFormat: 'handle'},
+              product: {type: 'product', dataFormat: 'handle'},
+            },
+          },
+        },
+      },
     },
     {
       type: 'customData',
@@ -574,13 +618,52 @@ export const WidgetEditors = {
           items: {
             type: 'object',
             properties: {
-              title: { type: 'string' },
-              image: { type: 'image' },
-            }
-          }
-        }
-      }
-    }
+              title: {type: 'string'},
+              image: {type: 'image'},
+            },
+          },
+        },
+      },
+    },
+    {
+      type: 'customData',
+      name: 'widgetList',
+      props: {
+        label: 'Widget List',
+        schema: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              title: {type: 'string'},
+              type: {
+                type: 'string',
+                enum: [
+                  'metafield-carousel',
+                  'weekly-picks',
+                  'quick-collections',
+                  'makeup',
+                  'new-launch',
+                  'bestsellers',
+                  'celeb-picks',
+                  'pilgrim-code',
+                ],
+              },
+              key: {type: 'string'},
+              data: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    title: {type: 'string'},
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   ],
 };
 
@@ -590,6 +673,6 @@ export const WrapperTileConfig = {
   name: 'Product Collection Widget',
   defaultProps: {
     collectionHandle: 'bestsellers',
-    numberOfProducts: 5
+    numberOfProducts: 5,
   },
 };
