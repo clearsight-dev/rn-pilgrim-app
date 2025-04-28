@@ -9,7 +9,7 @@ export const dummy = [
     config: {
       title: 'Weekly Picks',
       subtitle: 'Shop the best of the week',
-      collection: 'bestsellers',
+      collection: 'weekly-picks',
     },
   },
   {
