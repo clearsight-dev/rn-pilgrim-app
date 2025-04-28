@@ -34,7 +34,7 @@ import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
 
-import {dummy} from './dummySections';
+import {dummy as sections} from './dummySections';
 
 import {fetchPageData} from '../../../../queries/pageQuery';
 // import {typography} from '../../../../extractedQueries/theme'
@@ -191,7 +191,8 @@ export function ReactComponent({model}) {
 
   const {width: screenWidth, height: screenHeight} = useApptileWindowDims();
   // let sections = model.get('widgetList') || [];
-  const [sections, setSections] = React.useState([]);
+
+  // const [sections, setSections] = React.useState([]);
   const celebPicksData = model.get('celebPicksData') || [];
   const [chipCollectionData, setChipCollectionData] = useState({
     bestsellers: {
@@ -405,13 +406,14 @@ export function ReactComponent({model}) {
 
   // Define sections for SectionList
   // Memoize sections data to prevent unnecessary re-renders
-  const sectionLoadedRef = useRef(false);
-  React.useEffect(() => {
-    if (!sectionLoadedRef.current) {
-      sectionLoadedRef.current = true;
-      setSections(dummy);
-    }
-  }, []);
+  // const sectionLoadedRef = useRef(false);
+  // React.useEffect(() => {
+  //   if (!sectionLoadedRef.current) {
+  //     sectionLoadedRef.current = true;
+  //     console.log('Setting sections for the first time');
+  //     setSections(widgetList);
+  //   }
+  // }, [widgetList]);
 
   // Render section headers (currently not displaying any headers)
   const renderSectionHeader = ({section}) => null;
@@ -625,45 +627,52 @@ export const WidgetEditors = {
         },
       },
     },
+    // {
+    //   type: 'customData',
+    //   name: 'widgetList',
+    //   props: {
+    //     label: 'Widget List',
+    //     schema: {
+    //       type: 'array',
+    //       items: {
+    //         type: 'object',
+    //         properties: {
+    //           title: {type: 'string'},
+    //           type: {
+    //             type: 'string',
+    //             enum: [
+    //               'metafield-carousel',
+    //               'weekly-picks',
+    //               'quick-collections',
+    //               'makeup',
+    //               'new-launch',
+    //               'bestsellers',
+    //               'celeb-picks',
+    //               'pilgrim-code',
+    //             ],
+    //           },
+    //           key: {type: 'string'},
+    //           data: {
+    //             type: 'array',
+    //             items: {
+    //               type: 'object',
+    //               properties: {
+    //                 title: {type: 'string'},
+    //               },
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
     {
-      type: 'customData',
+      type: 'codeInput',
       name: 'widgetList',
       props: {
         label: 'Widget List',
-        schema: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              title: {type: 'string'},
-              type: {
-                type: 'string',
-                enum: [
-                  'metafield-carousel',
-                  'weekly-picks',
-                  'quick-collections',
-                  'makeup',
-                  'new-launch',
-                  'bestsellers',
-                  'celeb-picks',
-                  'pilgrim-code',
-                ],
-              },
-              key: {type: 'string'},
-              data: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    title: {type: 'string'},
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
+      }
+    }
   ],
 };
 

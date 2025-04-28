@@ -44,18 +44,20 @@ import { colors, FONT_FAMILY, typography } from "../../../../extractedQueries/th
  * }
  */
 export function BannerCarousel({ config, screenWidth, onNavigate }) {
-  const { items, title, styles } = config;
-  const { aspectRatio} = styles || {};
+  const { items, title, styles, layout } = config;
+  const { aspectRatio, itemWidth, margin} = styles || {};
+  const { enableScrollBubbles} = layout || {}
 
   return (
     <View style={{ position: 'relative', marginBottom: 20 }}>
-      {title && <Text style={{marginBottom: 12, ...typography.heading19}}>{title}</Text>}
+      {title && <Text style={{marginBottom: 12, ...typography.heading19, paddingHorizontal: 16}}>{title}</Text>}
       <Carousel
         flatlistData={items.map((it, i) => ({
           id: i,
           ...it,
           url: it.image?.value,
         }))}
+        scrollBubbleEnabled={enableScrollBubbles}
         width={screenWidth}
         renderChildren={({ item }) => {
           return (
@@ -73,8 +75,9 @@ export function BannerCarousel({ config, screenWidth, onNavigate }) {
                 source={{ uri: item.url || item.urls[Math.floor(item.urls.length / 2)] }}
                 resizeMode="contain"
                 style={{
-                  width: screenWidth,
+                  width: itemWidth || screenWidth,
                   aspectRatio: aspectRatio,
+                  margin: margin || 0
                 }}
               />
             </Pressable>
