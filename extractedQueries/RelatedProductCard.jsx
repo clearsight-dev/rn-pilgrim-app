@@ -135,13 +135,13 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
         <View style={{flexGrow: 1, flexDirection: 'column', justifyContent: 'flex-end'}}>
           <View style={styles.priceContainer}>
             <Text style={[typography.price, styles.price]}>
-              ₹{parseInt(price.amount).toLocaleString()}
+              ₹{price.amount}
             </Text>
 
             {(compareAtPrice?.amount && discountPercentage > 0) && (
               <>
                 <Text style={[typography.slashedPrice, styles.compareAtPrice]}>
-                  ₹{parseInt(compareAtPrice?.amount).toLocaleString()}
+                  ₹{compareAtPrice?.amount}
                 </Text>
                 <Text style={typography.savings}>{discountPercentage}% Off</Text>
               </>
