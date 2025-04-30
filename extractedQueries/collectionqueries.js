@@ -8,7 +8,7 @@ import { formatProduct } from './RelatedProductsCarousel';
 export async function getFilterAndProductsForCollection(
   collectionHandle, 
   filters = [], // these are filters applied before fetching products
-  sortKey = 'BEST_SELLING',
+  sortKey = 'COLLECTION_DEFAULT',
   reverse = false,
   cursor = null,
   numProducts = 5,
@@ -232,7 +232,7 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
 `;
 
 // Function to fetch collection data using the GraphQL query with pagination support
-export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = [], revalidateCaches = false) {
+export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'COLLECTION_DEFAULT', reverse = false, filters = [], revalidateCaches = false) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");

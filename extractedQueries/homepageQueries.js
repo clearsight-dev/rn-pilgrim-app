@@ -41,7 +41,7 @@ async function revalidateCollection(handle) {
     handle,  
     12, // numitems
     null, // cursor
-    'BEST_SELLING', // sortkey
+    'COLLECTION_DEFAULT', // sortkey
     false, // reverse
     [], // filters
     true // useNetworkOnly
