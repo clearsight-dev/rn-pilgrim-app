@@ -50,11 +50,6 @@ function RelatedProductCard({
     weightString = `${weight}${weightUnit.toString().toLowerCase()}`;
   }
 
-  let isBestSeller = false;
-  if (productLabel1?.value?.toString().toLowerCase().includes('bestseller')) {
-    isBestSeller = true;
-  }
-
   const dispatch = useDispatch();
 
   // Find the first non-color option for variant selection
@@ -96,6 +91,7 @@ function RelatedProductCard({
     }
   };
 
+
   return (
     <Pressable
       style={({pressed}) => [
@@ -112,9 +108,8 @@ function RelatedProductCard({
           label={productLabel2?.value}
           color={colors.secondaryMain}
           style={styles.promoTagContainer}
-          textStyle={styles.promoTagText}
-          height={18}
-          width={95}
+          height={20}
+          width={80}
         />
       )}
 
@@ -141,26 +136,26 @@ function RelatedProductCard({
           styles.detailsContainer,
           cardVariant === 'large' ? {alignItems: 'center'} : {},
         ]}>
-        {isBestSeller ? (
+        {productLabel1?.value ? (
           <Text style={[typography.body14, typography.bestseller]}>
-            BESTSELLER
+            {productLabel1?.value?.toUpperCase()}
           </Text>
         ) : (
           <View style={{height: 11}}></View>
         )}
         <Text
-          style={[typography.heading14, {marginBottom: 2}, headingStyles]}
+          style={[typography.heading14, {marginBottom: 2}, headingStyles , {fontFamily: FONT_FAMILY.bold}]}
           numberOfLines={2}>
           {title}
         </Text>
         {benefitText && (
-          <Text style={[styles.subtitle, typography.subHeading12]}>
+          <Text style={[styles.subtitle, typography.subHeading12 , {color:"#767676"}]}>
             {benefitText}
           </Text>
         )}
         
         {variantText && (
-          <Text style={[styles.subtitle, typography.subHeading12]}>
+          <Text style={[styles.subtitle, typography.subHeading12, {color: "#767676"}]}>
             {variantText}
           </Text>
         )}
@@ -172,17 +167,17 @@ function RelatedProductCard({
             flexDirection: 'column',
             justifyContent: 'flex-end',
           }}>
-          <View style={styles.priceContainer}>
+          <View style={[styles.priceContainer]}>
             <Text style={[typography.price, styles.price]}>
               ₹{parseInt(price.amount)}
             </Text>
 
             {compareAtPrice?.amount && discountPercentage > 0 && (
               <>
-                <Text style={[typography.slashedPrice, styles.compareAtPrice]}>
+                <Text style={[typography.slashedPrice, styles.compareAtPrice, {fontSize: 11}]}>
                   ₹{parseInt(compareAtPrice?.amount)}
                 </Text>
-                <Text style={typography.savings}>
+                <Text style={[typography.savings, {fontSize: 11}]}>
                   {discountPercentage}% Off
                 </Text>
               </>
@@ -212,7 +207,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.bold,
     color: colors.white,
     fontSize: 10,
-    fontWeight: '600',
   },
   imageContainer: {
     width: '100%',
@@ -251,7 +245,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.dark60,
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     padding: 12,
     paddingTop: 4,
   },
@@ -264,7 +257,8 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     flexWrap: 'wrap',
     marginTop: 4,
   },

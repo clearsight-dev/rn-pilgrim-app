@@ -2,9 +2,9 @@ import { connectWidget } from 'apptile-core';
 import {ReactComponent, WidgetConfig, WidgetEditors, PropertySettings} from './component'
 
 const pluginListing = {
-  labelPrefix: 'codepushtest',
+  labelPrefix: 'pdppage',
   type: 'widget',
-  name: 'codepushtest',
+  name: 'pdppage',
   description: 'Basic plugin created from template',
   layout: {
     width: 50,
@@ -13,11 +13,11 @@ const pluginListing = {
   section: 'SDK',
   icon: 'badge',
   manifest: {
-    directoryName: 'codepushtest',
+    directoryName: 'pdppage',
   }
 };
 
-export default connectWidget('codepushtest', 
+export default connectWidget('pdppage', 
   ReactComponent, 
   WidgetConfig, 
   null, 

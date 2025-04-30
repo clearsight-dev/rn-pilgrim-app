@@ -81,7 +81,6 @@ export function ReactComponent({ model }) {
 
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
 
-  console.log("Rendering pdp");
   useEffect(() => {
     // When this function runs react's render cycle for the entire
     // PDP page will get kicked off. So its isolated and called differently 
@@ -295,10 +294,6 @@ export function ReactComponent({ model }) {
         return (
           <FAQComponent product={productData?.productByHandle} />
         );
-      case 'external-links':
-        return (
-          <ExternalLinks />
-        )
       default:
         return null;
     }
@@ -343,7 +338,8 @@ export function ReactComponent({ model }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white
+    backgroundColor: colors.white,
+    marginTop: 70
   },
   contentContainer: {
     flexGrow: 1,

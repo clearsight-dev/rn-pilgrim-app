@@ -97,7 +97,9 @@ const BottomSheet = forwardRef(function ({
           height: containerHeight ,
           position: 'absolute', 
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          top: -(StatusBar.currentHeight || 0)
+          bottom: 0,
+          left: 0,
+          right: 0
         }}
       >
         {/* Overlay area with tap to close the sheet */}
