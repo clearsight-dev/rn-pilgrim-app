@@ -396,13 +396,13 @@ export function ReactComponent({model}) {
   const onSelectShade = useCallback(product => {
     setSelectedProduct(product);
     shadeBottomSheetRef.current?.show();
-  },[]);
+  }, []);
 
   // Handle Choose Variant button click
   const onSelectVariant = useCallback(product => {
     setSelectedProduct(product);
     variantBottomSheetRef.current?.show();
-  },[]);
+  }, []);
 
   // Define sections for SectionList
   // Memoize sections data to prevent unnecessary re-renders
@@ -443,11 +443,7 @@ export function ReactComponent({model}) {
             />
           );
         case 'quick-collections':
-          return (
-            <QuickCollections
-              config={section.config}
-            />
-          );
+          return <QuickCollections config={section.config} />;
         case 'highlighted-collections':
           // Get collection from config
           const collectionHandle = section.config?.collection;
@@ -572,100 +568,6 @@ export const WidgetConfig = {
 
 export const WidgetEditors = {
   basic: [
-    {
-      type: 'customData',
-      name: 'quickCollections',
-      props: {
-        label: 'Quick collections',
-        schema: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              image: {type: 'image'},
-              title: {type: 'string'},
-              collection: {type: 'collection', dataFormat: 'handle'},
-            },
-          },
-        },
-      },
-    },
-    {
-      type: 'customData',
-      name: 'imageCarouselImages',
-      props: {
-        label: 'Image carousel images',
-        schema: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              image: {type: 'image'},
-              title: {type: 'string'},
-              subtitle: {type: 'string'},
-              collection: {type: 'collection', dataFormat: 'handle'},
-              product: {type: 'product', dataFormat: 'handle'},
-            },
-          },
-        },
-      },
-    },
-    {
-      type: 'customData',
-      name: 'celebPicksData',
-      props: {
-        label: 'Celeb picks',
-        schema: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              title: {type: 'string'},
-              image: {type: 'image'},
-            },
-          },
-        },
-      },
-    },
-    // {
-    //   type: 'customData',
-    //   name: 'widgetList',
-    //   props: {
-    //     label: 'Widget List',
-    //     schema: {
-    //       type: 'array',
-    //       items: {
-    //         type: 'object',
-    //         properties: {
-    //           title: {type: 'string'},
-    //           type: {
-    //             type: 'string',
-    //             enum: [
-    //               'metafield-carousel',
-    //               'weekly-picks',
-    //               'quick-collections',
-    //               'makeup',
-    //               'new-launch',
-    //               'bestsellers',
-    //               'celeb-picks',
-    //               'pilgrim-code',
-    //             ],
-    //           },
-    //           key: {type: 'string'},
-    //           data: {
-    //             type: 'array',
-    //             items: {
-    //               type: 'object',
-    //               properties: {
-    //                 title: {type: 'string'},
-    //               },
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // },
     {
       type: 'codeInput',
       name: 'widgetList',

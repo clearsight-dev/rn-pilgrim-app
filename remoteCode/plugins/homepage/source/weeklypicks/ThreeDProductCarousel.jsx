@@ -157,6 +157,7 @@ function ThreeDProductCarousel({
                     onSelectShade={onSelectShade}
                     onSelectVariant={onSelectVariant}
                     style={styles.productCard}
+                    headingStyles={styles.headingStyles}
                   />
                 )}
               </Animated.View>
@@ -213,6 +214,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: 8
   },
+  headingStyles: {
+    textAlign: 'center',
+  }
 });
 
 export default ThreeDProductCarousel;
