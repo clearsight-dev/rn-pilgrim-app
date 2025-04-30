@@ -9,23 +9,35 @@ const Star = ({ fillPercentage = 0, size = 16, color = '#FFB800' }) => {
   const starPath = "M50 5 L61 35 L95 38 L67 58 L75 91 L50 72 L25 91 L33 58 L5 38 L39 35 Z";
   const width = size;
   const height = size;
+  
+  // Use a unique clipPath ID for each star instance to avoid conflicts
+  const clipId = `clip-${Math.random().toString(36).substr(2, 9)}`;
 
   return (
-    <>
-      <Svg width={width} height={height} viewBox="0 0 100 100">
-        <Defs>
-          {/* Clip Path for Partial Fill */}
-          <ClipPath id="clip">
-            <Rect x="0" y="0" width={normalizedFill} height={100} />
-          </ClipPath>
-        </Defs>
-        {/* Outline */}
-        <Path d={starPath} fill="none" stroke={color} strokeWidth={5} />
-        {/* Filled Portion */}
-        <Path d={starPath} fill={color} clipPath="url(#clip)" />
-      </Svg>
-    </>
+    <Svg width={width} height={height} viewBox="0 0 100 100">
+      <Defs>
+        {/* Clip Path for Partial Fill - with unique ID */}
+        <ClipPath id={clipId}>
+          <Rect x="0" y="0" width={normalizedFill} height="100" />
+        </ClipPath>
+      </Defs>
+      
+      {/* Background/Empty star - always render this first */}
+      <Path 
+        d={starPath} 
+        fill="none" 
+        stroke={color} 
+        strokeWidth={5} 
+      />
+      
+      {/* Filled Portion with correct clip path reference */}
+      <Path 
+        d={starPath} 
+        fill={color} 
+        clipPath={`url(#${clipId})`} 
+      />
+    </Svg>
   );
 };
 
-export default Star;
+export default React.memo(Star);

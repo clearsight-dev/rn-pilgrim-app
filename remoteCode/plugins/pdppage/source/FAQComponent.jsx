@@ -66,8 +66,8 @@ export function FAQComponent({ product }) {
   }
 
   return (
-    <View style={{ marginBottom: 100 }}>
-      <Text style={[{paddingHorizontal: 16, marginBottom: 16, fontFamily:FONT_FAMILY.bold, fontSize: 16}]}>FAQs</Text>
+    <View style={{ marginBottom: 100, paddingHorizontal: 16 }}>
+      <Text style={[{marginBottom: 16, fontFamily:FONT_FAMILY.bold, fontSize: 16, color: "#1A1A1A"}]}>FAQs</Text>
       <View style={styles.faqList}>
         {product.questions.slice(0, numQuestions).map((question, index) => (
           <FAQItem

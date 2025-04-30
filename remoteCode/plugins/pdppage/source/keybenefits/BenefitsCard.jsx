@@ -40,24 +40,9 @@ export default function BenefitsCard({
         gradientDirection="vertical"
         borderRadius={BORDER_RADIUS}
       >
-        {titleText && (
-          <>
-            {/* Title cutout (white background to hide the border) */}
-            <View
-              style={[styles.titleCutout, { width: estimatedTitleWidth }]}
-            />
-
-            {/* Title container with the same width as the cutout */}
-            <View
-              style={[styles.titleContainer, { width: estimatedTitleWidth }]}
-            >
-              <Text style={[typography.family, styles.title]}>{titleText}</Text>
-            </View>
-          </>
-        )}
-
         {/* Content container */}
         <View style={styles.contentContainer}>
+        {titleText && <Text style={[typography.family, styles.title]}>{titleText}</Text>}
           {/* Benefits list */}
           {benefits.map((benefit, index) => (
             <View key={index} style={styles.benefitRow}>
@@ -87,7 +72,7 @@ const BORDER_RADIUS = 8;
 
 const styles = StyleSheet.create({
   outerContainer: {
-    padding: 16,
+    paddingHorizontal: 16,
     width: "100%",
   },
   container: {
@@ -104,20 +89,18 @@ const styles = StyleSheet.create({
     left: 16, // Align with left padding
   },
   titleContainer: {
-    position: "absolute",
-    top: -19, // Position to overlap the border
     alignItems: "center", // Center the text horizontally
     backgroundColor: "transparent",
   },
   title: {
     color: "#00909E",
-    fontSize: 23,
+    fontSize: 19,
     fontFamily: FONT_FAMILY.bold,
     letterSpacing: -0.08, // -0.4% of 20px
     paddingHorizontal: 4,
+    marginBottom: 12
   },
   contentContainer: {
-    marginTop: 20, // Space from title to content
     padding: 16,
   },
   benefitRow: {

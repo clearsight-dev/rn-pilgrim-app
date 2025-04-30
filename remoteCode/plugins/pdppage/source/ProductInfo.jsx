@@ -285,7 +285,6 @@ const styles = StyleSheet.create({
   },
   // Offers section styles
   offersSection: {
-
   },
   offersSectionTitle: {
     fontSize: 19,
