@@ -48,11 +48,11 @@ const FrequentlyBoughtTogether = ({
       {/* Price and Add to Cart Section */}
       <View style={styles.priceSection}>
         <View>
-          <Text style={styles.totalPriceLabel}>Total Price: <Text style={styles.totalPrice}>₹{Math.round(totalDiscountedPrice).toLocaleString()}</Text></Text>
+          <Text style={styles.totalPriceLabel}>Total Price: <Text style={styles.totalPrice}>₹{Math.round(totalDiscountedPrice)}</Text></Text>
           {totalSavings > 0 && (
             <Text style={styles.savingsText}>
-              <Text style={styles.originalPrice}>₹{Math.round(totalOriginalPrice).toLocaleString()}</Text>
-              {' '}Save ₹{Math.round(totalSavings).toLocaleString()}
+              <Text style={styles.originalPrice}>₹{Math.round(totalOriginalPrice)}</Text>
+              {' '}Save ₹{Math.round(totalSavings)}
             </Text>
           )}
         </View>
@@ -77,13 +77,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontFamily: FONT_FAMILY.bold,
     color: colors.dark90,
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
     color: colors.dark70,
+    fontFamily: FONT_FAMILY.regular,
     marginBottom: 16,
     lineHeight: 20,
   },
@@ -104,9 +105,7 @@ const styles = StyleSheet.create({
   },
   plusSign: {
     fontSize: 24,
-    fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
-    color: colors.dark70,
+    fontFamily: FONT_FAMILY.regular,  
   },
   priceSection: {
     flexDirection: 'row',
@@ -116,6 +115,7 @@ const styles = StyleSheet.create({
     paddingTop: 16
   },
   totalPriceLabel: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 14,
     color: colors.dark90,
   },
@@ -125,11 +125,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   savingsText: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 12,
     color: colors.secondaryMain,
     marginTop: 4,
   },
   originalPrice: {
+    fontFamily: FONT_FAMILY.regular,
     textDecorationLine: 'line-through',
     color: colors.dark60,
   },
@@ -145,7 +147,6 @@ const styles = StyleSheet.create({
     color: colors.dark90,
     fontSize: 14,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
   },
 });
 

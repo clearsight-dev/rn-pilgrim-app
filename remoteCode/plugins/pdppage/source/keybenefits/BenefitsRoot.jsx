@@ -25,7 +25,7 @@ function BenefitsRoot({
   if (error) {
     return (
       <View style={{ backgroundColor, paddingVertical: 20 }}>
-        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
+        <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
           <GradientText
             text="Key Benefits"
             fontSize={32}

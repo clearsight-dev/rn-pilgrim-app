@@ -56,8 +56,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
-    color: '#000',
+    color: '#1A1A1A',
   },
   seeAllButton: {
     fontSize: 14,

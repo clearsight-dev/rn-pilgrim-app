@@ -133,7 +133,7 @@ const DescriptionCard = ({ productData, loading }) => {
       <View style={styles.contentContainer}>
         {activeTab === 'description' ? (
           <View>
-            <Text numberOfLines={6} style={typography.family}>
+            <Text numberOfLines={6} style={[typography.family, {fontSize: 14, color: '#1A1A1A', lineHeight: 14 * 1.25}]}>
               {description.valueText}
             </Text>
             <TouchableOpacity onPress={openBottomSheet} style={styles.readMoreButton}>
@@ -230,10 +230,9 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   header: {
-    fontSize: 24,
+    fontSize: 19,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -254,7 +253,6 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: colors.primaryMain,
     fontFamily: FONT_FAMILY.medium,
-    fontWeight: '500',
   },
   activeTabIndicator: {
     position: 'absolute',
@@ -266,7 +264,6 @@ const styles = StyleSheet.create({
     borderRadius: 1.5,
   },
   contentContainer: {
-    paddingVertical: 12,
   },
   suitableFor: {
     fontSize: 15,
@@ -275,7 +272,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     marginBottom: 16,
     lineHeight: 24,
   },

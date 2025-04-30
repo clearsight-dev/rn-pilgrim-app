@@ -75,7 +75,7 @@ function InlineVariantSelector({
   return (
     <View style={styles.variantSelectorContainer}>
       {selectedVariant?.title && (
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
           <Text style={[styles.variantTitle, {fontFamily: FONT_FAMILY.regular}]}>{optionName}: </Text>
           <Text style={styles.variantTitle}>
             {selectedVariant.title}

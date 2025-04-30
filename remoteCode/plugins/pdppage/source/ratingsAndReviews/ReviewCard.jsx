@@ -101,11 +101,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: 'bold',
     color: colors.dark100,
   },
   body: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.regular,
     color: colors.dark100,
     marginBottom: 12,
     lineHeight: 20,
@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.regular,
     color: colors.dark60,
     marginBottom: 12,
   },

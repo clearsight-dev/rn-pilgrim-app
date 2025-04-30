@@ -52,11 +52,11 @@ function ProductCard({ product, style, isPressable = false }) {
         
         {/* Price Section */}
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>₹{parseInt(price).toLocaleString()}</Text>
+          <Text style={styles.price}>₹{parseInt(price)}</Text>
           
           {(compareAtPrice && discountPercentage > 0) && (
             <>
-              <Text style={styles.compareAtPrice}>₹{parseInt(compareAtPrice).toLocaleString()}</Text>
+              <Text style={styles.compareAtPrice}>₹{parseInt(compareAtPrice)}</Text>
               <Text style={styles.discount}>{discountPercentage}% Off</Text>
             </>
           )}
@@ -69,18 +69,12 @@ function ProductCard({ product, style, isPressable = false }) {
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    borderColor: colors.dark10,
-    backgroundColor: colors.dark10,
+    borderColor: '#00000020',
     borderRadius: 8,
     overflow: 'hidden',
     flexGrow: 1,
     alignSelf: "stretch",
     padding: 8,
-    elevation: 1,
-    shadowColor: colors.dark70,
-    shadowOffset: {width: 0, height: 0},
-    shadowOpacity: 0.2,
-    shadowRadius: 2
   },
   imageContainer: {
     width: '100%',
@@ -106,11 +100,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     color: colors.dark90,
     marginBottom: 4,
   },
   label: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 12,
     color: colors.dark70,
     marginBottom: 8,
@@ -123,11 +117,11 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     color: colors.dark90,
     marginRight: 4,
   },
   compareAtPrice: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 12,
     color: colors.dark20,
     textDecorationLine: 'line-through',
@@ -136,7 +130,6 @@ const styles = StyleSheet.create({
   discount: {
     fontSize: 12,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     color: colors.secondaryMain,
   },
 });

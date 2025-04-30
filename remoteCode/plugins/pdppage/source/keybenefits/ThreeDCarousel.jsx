@@ -110,7 +110,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 30,
   },
   slideContainer: {
     alignItems: 'center',

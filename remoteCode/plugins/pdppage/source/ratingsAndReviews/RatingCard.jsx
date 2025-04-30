@@ -86,8 +86,8 @@ function RatingCard ({
       <View style={styles.ratingRow}>
         <View style={styles.ratingContainer}>
           <View style={{flexDirection: "column", alignItems: "center", marginRight: 16}}>
-            <Text style={[typography.family, styles.ratingValue]}>{rating.toFixed(1)}</Text>
-            <Text style={[typography.family, {fontSize: 14, fontWeight: 'bold', color: colors.dark80}]}>out of 5</Text>
+            <Text style={[{fontFamily: FONT_FAMILY.bold}, styles.ratingValue]}>{rating.toFixed(1)}</Text>
+            <Text style={[{fontFamily: FONT_FAMILY.bold}, {fontSize: 14, color: colors.dark80}]}>out of 5</Text>
           </View>
           <StarRating rating={rating} ratingCount={ratingCount} size={28} />
         </View>
@@ -195,17 +195,15 @@ const styles = StyleSheet.create({
   percentageText: {
     fontSize: 13,
     fontFamily: FONT_FAMILY.medium,
-    fontWeight: '500',
     color: colors.dark100,
     width: 40,
     textAlign: 'right',
   },
   sectionTitle: {
     fontSize: 15,
+    marginBottom: 12,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     color: colors.dark100,
-    marginBottom: 16,
     textTransform: 'capitalize',
   },
   ratingRow: {
@@ -219,9 +217,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingValue: {
-    fontSize: 30,
+    fontSize: 25,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     marginRight: 8,
     color: colors.dark100,
   },
@@ -241,7 +238,6 @@ const styles = StyleSheet.create({
     color: colors.dark100,
     fontSize: 16,
     fontFamily: FONT_FAMILY.medium,
-    fontWeight: '500',
   },
   reviewsSection: {
     marginTop: 16,
@@ -255,8 +251,7 @@ const styles = StyleSheet.create({
   seeAllButton: {
     fontSize: 15,
     fontFamily: FONT_FAMILY.medium,
-    color: colors.secondaryMain,
-    fontWeight: '500',
+    color: colors.secondaryMain
   },
 });
 

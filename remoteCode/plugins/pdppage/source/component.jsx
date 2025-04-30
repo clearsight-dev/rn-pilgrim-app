@@ -239,7 +239,7 @@ export function ReactComponent({ model }) {
             <BenefitsCard 
               title={productData?.productByHandle?.textBenefits?.title} 
               benefits={productData?.productByHandle?.textBenefits?.items} 
-              style={{ marginBottom: 30 }}
+              style={{ marginBottom: 16 }}
             />
             {productData?.productByHandle?.benefitsImages?.length > 0 && (
               <BenefitsRoot
@@ -249,7 +249,7 @@ export function ReactComponent({ model }) {
                 cardWidthPercentage={cardWidthPercentage}
                 cardSpacing={cardSpacing}
                 images={productData?.productByHandle?.benefitsImages}
-                title="Key benefits"
+                title="Key Benefits"
               />
             )}
           </>
