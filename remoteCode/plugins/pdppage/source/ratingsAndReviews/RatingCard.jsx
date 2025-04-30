@@ -54,6 +54,7 @@ function ConsumerStudyResults ({ results = [] }) {
 };
 
 function RatingCard ({ 
+  isUserLoggedIn = false,
   rating = 2, 
   ratingCount = 0, 
   photos = [], 
@@ -95,7 +96,7 @@ function RatingCard ({
       </View>
       
       {/* Write Review Button */}
-      <Pressable 
+      {isUserLoggedIn && <Pressable 
         style={({pressed}) => [
           styles.writeReviewButton, 
           pressed && {opacity: 0.5}
@@ -103,7 +104,7 @@ function RatingCard ({
         onPress={handleWriteReviewPress}
       >
         <Text style={[typography.family, styles.writeReviewText]}>Write a review</Text>
-      </Pressable>
+      </Pressable>}
       
       {/* Consumer Study Results */}
       <ConsumerStudyResults results={consumerStudyResults} />

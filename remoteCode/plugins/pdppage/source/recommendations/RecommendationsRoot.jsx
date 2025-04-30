@@ -61,12 +61,12 @@ function RecommendationsRoot({
 
   return (
     <View>
-      {complementaryProduct && (
+      {/* {complementaryProduct && (
         <FrequentlyBoughtTogether 
           products={[mainProduct, complementaryProduct]}
           onAddToCart={handleAddToCart}
         />
-      )}
+      )} */}
       
       {/* Related Products Carousel */}
       {relatedProducts && relatedProducts.length > 0 && (

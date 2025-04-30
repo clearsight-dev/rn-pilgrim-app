@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    color:"#1A1A1A", 
     backgroundColor: colors.white,
   },
   reviewInput: {
@@ -233,6 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    color:"#1A1A1A",
     backgroundColor: colors.white,
     minHeight: 120,
   },

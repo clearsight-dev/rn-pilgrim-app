@@ -199,6 +199,7 @@ function RatingsReviewsRoot({ product }) {
 
   return (
     <RatingCard 
+      isUserLoggedIn={!!shopifyDSModel.get('loggedInUser')}
       rating={product?.rating} 
       ratingCount={product?.reviews?.value} 
       photos={reviews.filter(review => review.has_published_pictures).flatMap(review => review.pictures)}
