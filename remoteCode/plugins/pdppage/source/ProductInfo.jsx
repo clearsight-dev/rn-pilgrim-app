@@ -160,7 +160,7 @@ function ProductInfo({
             { fontFamily: FONT_FAMILY.bold, color: "#00726C" },
           ]}
         >
-          ₹{Math.ceil(parseInt(selectedVariant?.price?.amount) * 0.05)} PilgrimMILES
+          ₹{Math.floor(parseInt(selectedVariant?.price?.amount) * 0.05)} PilgrimMILES
         </Text>
         <Text style={styles.milesText}> on this product</Text>
       </View>}
