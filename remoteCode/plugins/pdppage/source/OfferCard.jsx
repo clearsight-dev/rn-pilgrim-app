@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   offerCardHeader: {
-    height: 33,
     backgroundColor: colors.primaryMain,
     paddingHorizontal: 8,
     paddingVertical: 8,

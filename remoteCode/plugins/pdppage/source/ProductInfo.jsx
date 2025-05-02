@@ -108,6 +108,19 @@ function ProductInfo({
   selectedVariant,
   setSelectedVariant,
 }) {
+  // Calculate discount percentage if compareAtPrice exists
+  let discountPercentage = selectedVariant?.compareAtPrice?.amount
+    ? Math.round(
+        ((selectedVariant?.compareAtPrice.amount -
+          selectedVariant?.price.amount) /
+          selectedVariant?.compareAtPrice.amount) *
+          100
+      )
+    : 0;
+  if (isNaN(discountPercentage)) {
+    discountPercentage = 0;
+  }
+
   return (
     <View style={styles.productInfoContainer}>
       {/* Bestseller tag */}
@@ -132,38 +145,61 @@ function ProductInfo({
       {/* Price - VERTICALLY ARRANGED */}
       {selectedVariant?.price?.amount && (
         <View style={styles.priceContainer}>
-          <View style={styles.priceRow}>
-            <Text style={styles.priceSymbol}>₹</Text>
-            <Text style={styles.price}>
-              {parseInt(selectedVariant?.price?.amount)}
-            </Text>
+          <View style={[{ flexDirection: "row", alignItems: "baseline" }]}>
+            <View style={[styles.priceRow, { marginRight: 4 }]}>
+              <Text style={styles.priceSymbol}>₹</Text>
+              <Text style={styles.price}>
+                {parseInt(selectedVariant?.price?.amount)}
+              </Text>
+            </View>
+
+            {selectedVariant?.compareAtPrice?.amount &&
+              discountPercentage > 0 && (
+                <>
+                  <Text
+                    style={[
+                      typography.slashedPrice,
+                      styles.compareAtPrice,
+                      { fontSize: 11, marginRight: 4 },
+                    ]}
+                  >
+                    ₹{parseInt(selectedVariant?.compareAtPrice?.amount)}
+                  </Text>
+                  <Text style={[typography.savings, { fontSize: 11 }]}>
+                    {discountPercentage}% Off
+                  </Text>
+                </>
+              )}
           </View>
           <Text style={styles.taxInfo}>MRP inclusive of all taxes</Text>
         </View>
       )}
 
       {/* Pilgrim miles */}
-      {selectedVariant?.price?.amount && <View style={styles.milesContainer}>
-        <Icon
-          iconType={"Ionicons"}
-          name={"sparkles-sharp"}
-          style={{
-            marginRight: 8,
-            fontSize: 20,
-            color: "#00726C"
-          }}
-        />
-        <Text style={styles.milesText}>Earn up to </Text>
-        <Text
-          style={[
-            styles.milesText,
-            { fontFamily: FONT_FAMILY.bold, color: "#00726C" },
-          ]}
-        >
-          ₹{Math.floor(parseInt(selectedVariant?.price?.amount) * 0.05)} PilgrimMILES
-        </Text>
-        <Text style={styles.milesText}> on this product</Text>
-      </View>}
+      {selectedVariant?.price?.amount && (
+        <View style={styles.milesContainer}>
+          <Icon
+            iconType={"Ionicons"}
+            name={"sparkles-sharp"}
+            style={{
+              marginRight: 8,
+              fontSize: 20,
+              color: "#00726C",
+            }}
+          />
+          <Text style={styles.milesText}>Earn up to </Text>
+          <Text
+            style={[
+              styles.milesText,
+              { fontFamily: FONT_FAMILY.bold, color: "#00726C" },
+            ]}
+          >
+            ₹{Math.floor(parseInt(selectedVariant?.price?.amount) * 0.05)}{" "}
+            PilgrimMILES
+          </Text>
+          <Text style={styles.milesText}> on this product</Text>
+        </View>
+      )}
 
       {/* Rating - Using parsed JSON value */}
       {product?.rating && (

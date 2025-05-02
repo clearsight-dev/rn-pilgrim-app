@@ -9,7 +9,7 @@ export const PRODUCT_CARD_INFO =
     id
     url
   }
-  images(first: 5) {
+  images(first: 250) {
     edges {
       node {
         id
