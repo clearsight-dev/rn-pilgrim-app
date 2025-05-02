@@ -61,6 +61,21 @@ function AboveThefoldContent({
     );
   }
 
+
+  // productImages = productImages.filter(img => 
+  //   !img.altText || 
+  //   (img.altText.startsWith('#Size_') ? 
+  //     img.altText.substring(6).trim() === selectedVariant?.options?.Size?.trim() : 
+  //     (img.altText.startsWith('#Color_') ? 
+  //       img.altText.substring(7).trim() === selectedVariant?.options?.Color?.trim() : 
+  //       false)
+  //   )
+  // );
+
+
+  // console.log("Product images: ", productImages);
+  // console.log("Selected variant", JSON.stringify(selectedVariant, null, 2));
+
   return (
     <View style={styles.scrollContainer}>
       {product?.productLabel2?.value && (

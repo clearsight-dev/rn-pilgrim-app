@@ -239,6 +239,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.dark20,
     marginBottom: 20,
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   tab: {
     paddingVertical: 12,

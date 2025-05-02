@@ -310,6 +310,7 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
           image {
             id
             url
+            altText
           }
           price {
             amount

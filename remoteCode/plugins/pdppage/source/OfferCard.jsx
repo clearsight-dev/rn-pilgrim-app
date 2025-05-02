@@ -95,14 +95,14 @@ export default function OfferCard({ title, description, code }) {
     <View style={styles.offerCardContainer}>
       {/* Header */}
       <View style={styles.offerCardHeader}>
-        <Text style={styles.offerCardHeaderText} numberOfLines={1}>
+        <Text style={styles.offerCardHeaderText}>
           {title}
         </Text>
       </View>
 
       {/* Body */}
       <View style={styles.offerCardBody}>
-        <Text style={styles.offerCardDescription} numberOfLines={2} ellipsizeMode="tail">
+        <Text style={styles.offerCardDescription} >
           {description}
         </Text>
 
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   // New Offer Card styles
   offerCardContainer: {
     width: 144,
-    height: 115,
+    minHeight: 115,
     borderRadius: 8,
     overflow: "hidden",
     backgroundColor: "white",

@@ -75,11 +75,19 @@ function InlineVariantSelector({
   return (
     <View style={styles.variantSelectorContainer}>
       {selectedVariant?.title && (
-        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-          <Text style={[styles.variantTitle, {fontFamily: FONT_FAMILY.regular}]}>{optionName}: </Text>
-          <Text style={styles.variantTitle}>
-            {selectedVariant.title}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 12,
+          }}
+        >
+          <Text
+            style={[styles.variantTitle, { fontFamily: FONT_FAMILY.regular }]}
+          >
+            {optionName}:{" "}
           </Text>
+          <Text style={styles.variantTitle}>{selectedVariant.title}</Text>
         </View>
       )}
       <ScrollView
@@ -133,6 +141,29 @@ function ProductInfo({
           <Text style={styles.taxInfo}>MRP inclusive of all taxes</Text>
         </View>
       )}
+
+      {/* Pilgrim miles */}
+      {selectedVariant?.price?.amount && <View style={styles.milesContainer}>
+        <Icon
+          iconType={"Ionicons"}
+          name={"sparkles-sharp"}
+          style={{
+            marginRight: 8,
+            fontSize: 20,
+            color: "#00726C"
+          }}
+        />
+        <Text style={styles.milesText}>Earn up to </Text>
+        <Text
+          style={[
+            styles.milesText,
+            { fontFamily: FONT_FAMILY.bold, color: "#00726C" },
+          ]}
+        >
+          ₹{Math.ceil(parseInt(selectedVariant?.price?.amount) * 0.05)} PilgrimMILES
+        </Text>
+        <Text style={styles.milesText}> on this product</Text>
+      </View>}
 
       {/* Rating - Using parsed JSON value */}
       {product?.rating && (
@@ -267,7 +298,11 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
     textDecorationLine: "underline",
   },
-  isSelectedBox:{ borderWidth: 2, borderColor: colors.primaryDark, padding: 2 },
+  isSelectedBox: {
+    borderWidth: 2,
+    borderColor: colors.primaryDark,
+    padding: 2,
+  },
 
   // Variant selector styles
   variantSelectorContainer: {
@@ -284,8 +319,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   // Offers section styles
-  offersSection: {
-  },
+  offersSection: {},
   offersSectionTitle: {
     fontSize: 19,
     fontFamily: FONT_FAMILY.bold,
@@ -320,6 +354,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderRadius: 4,
+  },
+  milesContainer: {
+    backgroundColor: "#E6F7F9",
+    marginBottom: 16,
+    padding: 12,
+    borderRadius: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  milesText: {
+    fontSize: 14,
+    fontFamily: FONT_FAMILY.medium,
+    color: "#313131",
   },
 });
 

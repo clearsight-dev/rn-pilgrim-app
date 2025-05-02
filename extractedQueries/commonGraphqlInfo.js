@@ -14,6 +14,7 @@ export const PRODUCT_CARD_INFO =
       node {
         id
         url
+        altText
       }
     }
   }
@@ -35,7 +36,8 @@ export const PRODUCT_CARD_INFO =
         }
         image {
           id
-          url
+          url 
+          altText
         }
         weight
         weightUnit
@@ -271,6 +273,7 @@ export const VARIANT_INFO = `
       image {
         id
         url
+        altText
       }
       price {
         amount
