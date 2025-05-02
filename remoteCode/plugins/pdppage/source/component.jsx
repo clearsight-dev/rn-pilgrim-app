@@ -348,7 +348,8 @@ export function ReactComponent({ model }) {
       />
       <PilgrimCartButton
         containerStyle={{
-          paddingVertical: 8,
+          padding: 16,
+          paddingHorizontal: 24,
           position: "absolute",
           bottom: 0,
           backgroundColor: "white",
