@@ -17,39 +17,12 @@ function AboveThefoldContent({
   setSelectedVariant,
   screenWidth,
 }) {
-  const carouselRef = useRef(null);
-  let productImages;
-  if (Array.isArray(product?.images)) {
-    productImages = product.images.slice();
-  } else {
-    productImages = [];
-  }
+  const handleVariantSelect = useCallback((variant) => {
+    setSelectedVariant(variant);
+  }, []);
 
-  for (let i = 0; i < variants.length; ++i) {
-    productImages.push({ ...variants[i].image, variantId: variants[i].id });
-  }
-
-  const handleVariantSelect = useCallback(
-    (variant) => {
-      setSelectedVariant(variant);
-      if (carouselRef.current) {
-        const requiredImage = variant.image?.url;
-        const index = productImages.findIndex(
-          (productImg) => productImg.url === requiredImage
-        );
-        if (index >= 0) {
-          carouselRef.current.scrollToIndex(index);
-        } else {
-          console.error("Could not find image: ", requiredImage, productImages);
-        }
-      }
-    },
-    [productImages, carouselRef]
-  );
-
-  if (loading) {
-    return <AboveThefoldSkeleton />;
-  }
+  // Handle loading and error states early
+  if (loading) return <AboveThefoldSkeleton />;
 
   if (error) {
     return (
@@ -61,26 +34,27 @@ function AboveThefoldContent({
     );
   }
 
+  // Process images
+  const productImages = Array.isArray(product?.images)
+    ? [...product.images]
+    : [];
 
-  // productImages = productImages.filter(img => 
-  //   !img.altText || 
-  //   (img.altText.startsWith('#Size_') ? 
-  //     img.altText.substring(6).trim() === selectedVariant?.options?.Size?.trim() : 
-  //     (img.altText.startsWith('#Color_') ? 
-  //       img.altText.substring(7).trim() === selectedVariant?.options?.Color?.trim() : 
-  //       false)
-  //   )
-  // );
+  // Filter images based on selected variant if needed
+  const imageFilteringTxt =
+    selectedVariant?.image?.altText?.startsWith("#Color_") ||
+    selectedVariant?.image?.altText?.startsWith("#Size_")
+      ? selectedVariant.image.altText
+      : null;
 
-
-  // console.log("Product images: ", productImages);
-  // console.log("Selected variant", JSON.stringify(selectedVariant, null, 2));
+  const filteredImages = imageFilteringTxt
+    ? productImages.filter((entry) => entry?.altText === imageFilteringTxt)
+    : productImages;
 
   return (
     <View style={styles.scrollContainer}>
       {product?.productLabel2?.value && (
         <ProductFlag
-          label={product?.productLabel2?.value}
+          label={product.productLabel2.value}
           color={colors.secondaryMain}
           style={styles.promoTagContainer}
           height={24}
@@ -88,27 +62,25 @@ function AboveThefoldContent({
           fontSize={12}
         />
       )}
+
       <Carousel
-        ref={carouselRef}
-        flatlistData={productImages}
+        flatlistData={filteredImages}
         scrollBubbleEnabled={true}
-        renderChildren={({ item }) => {
-          return (
-            <Image
-              source={{ uri: item.url }}
-              resizeMode="contain"
-              style={{
-                width: screenWidth,
-                aspectRatio: 1,
-                minHeight: 100,
-              }}
-            />
-          );
-        }}
+        renderChildren={({ item }) => (
+          <Image
+            source={{ uri: item.url }}
+            resizeMode="contain"
+            style={{
+              width: screenWidth,
+              aspectRatio: 1,
+              minHeight: 100,
+            }}
+          />
+        )}
         width={screenWidth}
         aspectRatio={1}
       />
-      {/* <Text>{JSON.stringify(productImages, null, 2)}</Text> */}
+
       <ProductInfo
         product={product}
         offers={product?.offers}
@@ -140,11 +112,7 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 1,
   },
-  promoTagText: {
-    fontFamily: FONT_FAMILY.bold,
-    color: colors.white,
-    fontSize: 90,
-  },
+  // Removed unused promoTagText style
 });
 
 export default AboveThefoldContent;
