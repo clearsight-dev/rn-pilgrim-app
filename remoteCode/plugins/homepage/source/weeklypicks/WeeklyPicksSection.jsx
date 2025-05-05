@@ -45,6 +45,7 @@ function WeeklyPicksSection ({
         itemWidth={ITEM_WIDTH}
         spacing={SPACING}
         width={width}
+        isHighlighted={true}
         onSelectShade={onSelectShade}
         onSelectVariant={onSelectVariant}
         loading={loading}

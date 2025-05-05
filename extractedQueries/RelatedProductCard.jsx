@@ -1,13 +1,13 @@
-import React, {memo} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import PilgrimCartButton from './PilgrimCartButton';
-import {Image} from './ImageComponent';
-import {navigateToScreen} from 'apptile-core';
-import {useDispatch} from 'react-redux';
+import { Image } from './ImageComponent';
+import { navigateToScreen } from 'apptile-core';
+import { useDispatch } from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
-import {addLineItemToCart} from './selectors';
-import {colors, FONT_FAMILY, typography} from './theme';
+import { addLineItemToCart } from './selectors';
+import { colors, FONT_FAMILY, typography } from './theme';
 
 function RelatedProductCard({
   product,
@@ -15,7 +15,8 @@ function RelatedProductCard({
   cardVariant,
   onSelectShade,
   onSelectVariant,
-  headingStyles = {}
+  headingStyles = {},
+  isHighlighted = false
 }) {
   const {
     handle,
@@ -38,8 +39,8 @@ function RelatedProductCard({
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = compareAtPrice?.amount
     ? Math.round(
-        ((compareAtPrice.amount - price.amount) / compareAtPrice.amount) * 100,
-      )
+      ((compareAtPrice.amount - price.amount) / compareAtPrice.amount) * 100,
+    )
     : 0;
   if (isNaN(discountPercentage)) {
     discountPercentage = 0;
@@ -70,16 +71,16 @@ function RelatedProductCard({
   const buttonText = isSelectShade
     ? 'Select Shade'
     : isChooseVariant
-    ? 'Choose Variant'
-    : 'Add to Cart';
+      ? 'Choose Variant'
+      : 'Add to Cart';
 
   const variantText = isSelectShade
     ? `${variantsCount} Shades`
     : isChooseVariant
-    ? `${variantsCount} Size`
-    : '';
+      ? `${variantsCount} Size`
+      : '';
 
-  const benefitText = textBenefits?.items[0]  
+  const benefitText = textBenefits?.items[0]
 
   const handleButtonPress = e => {
     if (isSelectShade && onSelectShade) {
@@ -94,13 +95,13 @@ function RelatedProductCard({
 
   return (
     <Pressable
-      style={({pressed}) => [
+      style={({ pressed }) => [
         styles.container,
-        pressed && {opacity: 0.4},
+        pressed && { opacity: 0.4 },
         style,
       ]}
       onPress={() => {
-        dispatch(navigateToScreen('Product', {productHandle: handle}));
+        dispatch(navigateToScreen('Product', { productHandle: handle }));
       }}>
       {/* Promo Tag */}
       {productLabel2?.value && (
@@ -116,7 +117,7 @@ function RelatedProductCard({
       {/* Product Image */}
       <View style={styles.imageContainer}>
         <Image
-          source={{uri: featuredImage?.url}}
+          source={{ uri: featuredImage?.url }}
           style={styles.image}
           resizeMode="contain"
         />
@@ -134,28 +135,28 @@ function RelatedProductCard({
       <View
         style={[
           styles.detailsContainer,
-          cardVariant === 'large' ? {alignItems: 'center'} : {},
+          cardVariant === 'large' ? { alignItems: 'center' } : {},
         ]}>
         {productLabel1?.value ? (
           <Text style={[typography.body14, typography.bestseller]}>
             {productLabel1?.value?.toUpperCase()}
           </Text>
         ) : (
-          <View style={{height: 11}}></View>
+          <View style={{ height: 11 }}></View>
         )}
         <Text
-          style={[typography.heading14, {marginBottom: 2}, headingStyles , {fontFamily: FONT_FAMILY.bold}]}
+          style={[typography.heading14, { marginBottom: 2 }, headingStyles, { fontFamily: FONT_FAMILY.bold }]}
           numberOfLines={2}>
           {title}
         </Text>
         {benefitText && (
-          <Text style={[styles.subtitle, typography.subHeading12 , {color:"#767676"}]}>
+          <Text style={[styles.subtitle, typography.subHeading12, { color: "#767676" }]}>
             {benefitText}
           </Text>
         )}
-        
+
         {variantText && (
-          <Text style={[styles.subtitle, typography.subHeading12, {color: "#767676"}]}>
+          <Text style={[styles.subtitle, typography.subHeading12, { color: "#767676" }]}>
             {variantText}
           </Text>
         )}
@@ -168,16 +169,16 @@ function RelatedProductCard({
             justifyContent: 'flex-end',
           }}>
           <View style={[styles.priceContainer]}>
-            <Text style={[typography.price, styles.price]}>
+            <Text style={[typography.price, styles.price, isHighlighted ? { textAlign: 'center' } : {}]}>
               ₹{parseInt(price.amount)}
             </Text>
 
             {compareAtPrice?.amount && discountPercentage > 0 && (
               <>
-                <Text style={[typography.slashedPrice, styles.compareAtPrice, {fontSize: 11}]}>
+                <Text style={[typography.slashedPrice, styles.compareAtPrice, { fontSize: 11 }]}>
                   ₹{parseInt(compareAtPrice?.amount)}
                 </Text>
-                <Text style={[typography.savings, {fontSize: 11}]}>
+                <Text style={[typography.savings, { fontSize: 11 }]}>
                   {discountPercentage}% Off
                 </Text>
               </>
@@ -264,6 +265,9 @@ const styles = StyleSheet.create({
   },
   price: {
     marginRight: 4,
+    minWidth: 100,
+    width: '100%',
+    marginBottom: 4,
   },
   compareAtPrice: {
     marginRight: 4,

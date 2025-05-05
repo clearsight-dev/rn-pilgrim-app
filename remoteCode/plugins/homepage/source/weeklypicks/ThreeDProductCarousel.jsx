@@ -16,6 +16,7 @@ function ThreeDProductCarousel({
   width,
   onSelectShade,
   onSelectVariant,
+  isHighlighted = false,
   loading
 }) {
   const gradientColors = [
@@ -155,6 +156,7 @@ function ThreeDProductCarousel({
                     cardVariant={"large"}
                     product={item}
                     onSelectShade={onSelectShade}
+                    isHighlighted={isHighlighted}
                     onSelectVariant={onSelectVariant}
                     style={styles.productCard}
                     headingStyles={styles.headingStyles}
