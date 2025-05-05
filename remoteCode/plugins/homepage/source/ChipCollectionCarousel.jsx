@@ -113,7 +113,7 @@ function ChipCollectionCarousel({
       </View>
 
       {/* Filter chips header */}
-      <Header
+      {/* <Header
         filterData={filterData}
         appliedFilters={selectedFilters}
         onFilterRemove={filter =>
@@ -125,7 +125,7 @@ function ChipCollectionCarousel({
         onClearAllFilters={() =>
           onFilterClear(collectionHandle, null, selectedFilters, filterData)
         }
-      />
+      /> */}
 
       {/* Cards */}
       {error ? (
