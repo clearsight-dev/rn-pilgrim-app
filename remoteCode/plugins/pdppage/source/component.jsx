@@ -192,12 +192,12 @@ export function ReactComponent({ model }) {
       key: "ratings",
       data: [{}],
     },
-    {
-      title: "Recommended Products",
-      type: "recommendations",
-      key: "recommendations",
-      data: [{}],
-    },
+    // {
+    //   title: "Recommended Products",
+    //   type: "recommendations",
+    //   key: "recommendations",
+    //   data: [{}],
+    // },
     {
       title: "Pilgrim Code",
       type: "pilgrim-code",
