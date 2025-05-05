@@ -150,6 +150,7 @@ export const dummy = [
     data: [{}],
     config: {
       title: 'Skincare Infused Makeup',
+      subtitle: 'Makeup Crafted for Skin',
       collection: 'makeup',
     },
   },
@@ -158,6 +159,7 @@ export const dummy = [
     data: [{}],
     config: {
       title: 'Specially Curated for Men',
+      subtitle: 'Essential Care, Tailored for Him',
       collection: 'mens-section',
     },
   },
@@ -379,7 +381,8 @@ export const dummy = [
     type: 'chip-collections',
     data: [{}],
     config: {
-      title: 'New Launch',
+      title: 'New Arrivals',
+      subtitle: 'Shop the Latest & Greatest',
       collection: 'new-launch',
     },
   },

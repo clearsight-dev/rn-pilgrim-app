@@ -16,7 +16,7 @@ function ChipCollectionCarousel({
   onFilterRemove,
   onFilterClear,
 }) {
-  const {collection: collectionHandle, title} = config;
+  const {collection: collectionHandle, title, subtitle} = config;
 
   // Get window dimensions
   const {width: screenWidth} = useApptileWindowDims();
@@ -101,7 +101,10 @@ function ChipCollectionCarousel({
     <View style={[styles.container, style]}>
       {/* Title and See All button */}
       <View style={styles.titleContainer}>
-        <Text style={[typography.heading19]}>{displayTitle}</Text>
+        <View style={{flexGrow: 1}}>
+          <Text style={[typography.heading19]}>{displayTitle}</Text>
+          {subtitle && <Text style={[typography.body14, {marginTop: 8, letterSpacing: 1}]}>{subtitle}</Text>}
+        </View>
         <TouchableOpacity onPress={handleSeeAllClick}>
           <Text style={[typography.heading14, styles.seeAllButton]}>
             See All
