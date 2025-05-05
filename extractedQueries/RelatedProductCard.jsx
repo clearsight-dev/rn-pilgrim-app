@@ -138,7 +138,7 @@ function RelatedProductCard({
           cardVariant === 'large' ? { alignItems: 'center' } : {},
         ]}>
         {productLabel1?.value ? (
-          <Text style={[typography.body14, typography.bestseller]}>
+          <Text style={[typography.heading14, typography.bestseller]}>
             {productLabel1?.value?.toUpperCase()}
           </Text>
         ) : (
