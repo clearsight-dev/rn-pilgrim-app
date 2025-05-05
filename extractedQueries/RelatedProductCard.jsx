@@ -172,18 +172,16 @@ function RelatedProductCard({
             <Text style={[typography.price, styles.price, isHighlighted ? { textAlign: 'center' } : {}]}>
               ₹{parseInt(price.amount)}
             </Text>
-
-            {compareAtPrice?.amount && discountPercentage > 0 && (
-              <>
-                <Text style={[typography.slashedPrice, styles.compareAtPrice, { fontSize: 11 }]}>
-                  ₹{parseInt(compareAtPrice?.amount)}
-                </Text>
-                <Text style={[typography.savings, { fontSize: 11 }]}>
-                  {discountPercentage}% Off
-                </Text>
-              </>
-            )}
           </View>
+          {compareAtPrice?.amount && discountPercentage > 0 && (
+            <View style={[styles.priceContainer, isHighlighted ? { justifyContent: 'center' } : {}]}>
+              <Text style={[typography.slashedPrice, styles.compareAtPrice, { fontSize: 11 }]}>
+                ₹{parseInt(compareAtPrice?.amount)}
+              </Text>
+              <Text style={[typography.savings, { fontSize: 11 }]}>
+                {discountPercentage}% Off
+              </Text>
+            </View>)}
         </View>
       </View>
       <PilgrimCartButton buttonText={buttonText} onPress={handleButtonPress} />
