@@ -332,7 +332,23 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
             value
             namespace
           }
-        }
+          no_skin_tone_image_url: metafield(key: "no_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+          deep_skin_tone_image_url: metafield(key: "deep_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+          medium_skin_tone_image_url: metafield(key: "medium_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+          light_skin_tone_image_url: metafield(key: "light_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+        }  
       }
     }
   }

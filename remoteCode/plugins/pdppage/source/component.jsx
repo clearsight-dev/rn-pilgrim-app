@@ -8,6 +8,7 @@ import {
 } from "../../../../extractedQueries/pdpquery";
 import AboveThefoldContent from "./AboveThefoldContent";
 import DescriptionCard from "./DescriptionCard";
+import SelectShade from './shadeSelector'
 import RecommendationsRoot from "./recommendations/RecommendationsRoot";
 import BenefitsRoot from "./keybenefits/BenefitsRoot";
 import BenefitsCard from "./keybenefits/BenefitsCard";
@@ -114,9 +115,9 @@ export function ReactComponent({ model }) {
       });
       setLoading(false);
       getVariants(productByHandle, setVariants, setSelectedVariant);
-      setTimeout(() => {
-        getProductRecommendations(productByHandle, setProductData);
-      }, 500);
+      // setTimeout(() => {
+      //   getProductRecommendations(productByHandle, setProductData);
+      // }, 500);
     }
 
     async function loadProductData() {
@@ -166,6 +167,12 @@ export function ReactComponent({ model }) {
       title: "Product Information",
       type: "above-the-fold",
       key: "above-the-fold",
+      data: [{}],
+    },
+    {
+      title: "Select Shade",
+      type: "select-shade",
+      key: "select-shade",
       data: [{}],
     },
     {
@@ -251,6 +258,15 @@ export function ReactComponent({ model }) {
           <DescriptionCard
             productData={productData?.productByHandle}
             loading={loading}
+          />
+        );
+      case "select-shade":
+        return (
+          <SelectShade
+            productData={productData?.productByHandle}
+            selectedVariant={selectedVariant}
+            variants={variants}
+            setSelectedVariant={setSelectedVariant}
           />
         );
       case "benefits":

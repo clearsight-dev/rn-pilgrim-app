@@ -14,7 +14,7 @@ import {
 } from "../../../../extractedQueries/theme";
 
 // Enhanced variant selector component using the new VariantCard
-function InlineVariantSelector({
+export function InlineVariantSelector({
   variants,
   selectedVariant,
   setSelectedVariant,
