@@ -75,6 +75,14 @@ export const PRODUCT_CARD_INFO = `
     namespace
     value
   }
+  product_size: metafield(key: "product_size", namespace: "custom") {
+    id
+    value
+  }
+  product_short_title: metafield(key: "product_short_title", namespace: "custom") {
+    id
+    value
+  }
   productLabel1: metafield(key: "product_label_1", namespace: "custom") {
     id
     key

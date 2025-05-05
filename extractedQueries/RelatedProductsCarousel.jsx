@@ -113,7 +113,9 @@ export function formatProduct(product) {
     howToUse: product.how_to_use?.value,
     studyResults,
     questions: product.questions,
-    answers: product.answers
+    answers: product.answers,
+    productSize: product?.product_size?.value,
+    productShortTitle: product?.product_short_title?.value,
   }
 }
 

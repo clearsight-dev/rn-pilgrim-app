@@ -31,10 +31,10 @@ function RelatedProductCard({
     productLabel2,
     weight,
     weightUnit,
-    textBenefits
+    textBenefits,
+    productSize,
+    productShortTitle
   } = product;
-
-  // console.log("Product [marker]", JSON.stringify(rest, null, 2));
 
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = compareAtPrice?.amount
@@ -78,7 +78,7 @@ function RelatedProductCard({
     ? `${variantsCount} Shades`
     : isChooseVariant
       ? `${variantsCount} Size`
-      : '';
+      : '' || productSize;
 
   const benefitText = textBenefits?.items[0]
 
@@ -147,7 +147,7 @@ function RelatedProductCard({
         <Text
           style={[typography.heading14, { marginBottom: 2 }, headingStyles, { fontFamily: FONT_FAMILY.bold }]}
           numberOfLines={2}>
-          {title}
+          {productShortTitle || title}
         </Text>
         {benefitText && (
           <Text style={[styles.subtitle, typography.subHeading12, { color: "#767676" }]}>
