@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, SectionList, Platform, Text, View } from "react-native";
 import { useApptileWindowDims } from "apptile-core";
 import { useRoute } from "@react-navigation/native";
@@ -80,6 +80,7 @@ async function getProductRecommendations(productByHandle, setProductData) {
 }
 
 export function ReactComponent({ model }) {
+  const sectionListRef = useRef();
   const route = useRoute();
   const productHandle =
     route.params?.productHandle ?? "3-redensyl-4-anagain-hair-growth-serum";
@@ -231,12 +232,23 @@ export function ReactComponent({ model }) {
     },
   ];
 
+  const scrollToSection = (sectionKey) => {
+    const sectionIndex = sections.findIndex((section) => section.key === sectionKey);
+    if (sectionIndex !== -1) {
+      sectionListRef.current?.scrollToLocation({
+        animated: true,
+        sectionIndex,
+        itemIndex: 0,
+      });
+    }
+  };
+
   // Render section headers
   const renderSectionHeader = ({ section }) =>
     null;
-    // <View style={styles.sectionHeader}>
-    //   <Text style={styles.sectionHeaderText}>{section.title}</Text>
-    // </View>
+  // <View style={styles.sectionHeader}>
+  //   <Text style={styles.sectionHeaderText}>{section.title}</Text>
+  // </View>
 
   // Render each section based on its type
   const renderItem = ({ item, section }) => {
@@ -251,6 +263,7 @@ export function ReactComponent({ model }) {
             selectedVariant={selectedVariant}
             setSelectedVariant={setSelectedVariant}
             screenWidth={screenWidth}
+            scrollToSection={scrollToSection}
           />
         );
       case "description":
@@ -321,15 +334,15 @@ export function ReactComponent({ model }) {
       case "pilgrim-code":
         return (
           <Accordion title={"The Pilgrim Code"}>
-            <PilgrimCode enableCodeText/>
+            <PilgrimCode enableCodeText />
           </Accordion>
         );
       case "additional-info":
         return (
           <Accordion title={"Additional Information"}>
             <Text style={styles.additionalInfoTxt}>
-            Marketed in India by: Heavenly Secrets Pvt. Ltd., 74 Technopark, MIDC, Andheri (E), Mumbai, India - 400093
-            Manufactured by: Naturis Cosmetics Pvt. Ltd, 1-EPIP, SIDCO Industrial Complex, Bari Brahmana, Jammu (J&K), India - 181133
+              Marketed in India by: Heavenly Secrets Pvt. Ltd., 74 Technopark, MIDC, Andheri (E), Mumbai, India - 400093
+              Manufactured by: Naturis Cosmetics Pvt. Ltd, 1-EPIP, SIDCO Industrial Complex, Bari Brahmana, Jammu (J&K), India - 181133
             </Text>
           </Accordion>
         );
@@ -349,6 +362,7 @@ export function ReactComponent({ model }) {
       }}
     >
       <SectionList
+        ref={sectionListRef}
         style={[styles.container, { height: screenHeight }]}
         contentContainerStyle={styles.contentContainer}
         sections={sections}
@@ -412,7 +426,7 @@ const styles = StyleSheet.create({
     color: colors.dark70,
     textAlign: "center",
   },
-  additionalInfoTxt:{
+  additionalInfoTxt: {
     fontFamily: FONT_FAMILY.regular,
     fontSize: 14,
     color: "#313131",
