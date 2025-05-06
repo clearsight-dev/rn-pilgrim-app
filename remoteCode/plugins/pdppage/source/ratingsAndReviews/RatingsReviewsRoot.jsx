@@ -92,8 +92,8 @@ function RatingsReviewsRoot({ product }) {
         const listProductReviews = judgeMeQueries.listProductReviews;
         let allReviews = [];
         let imageCount = 0;
-        
-        // 1. Fetch 100 reviews with rating 4 (page 1)
+
+        // 1. Fetch 100 reviews with rating 5 (page 1)
         endpoint = listProductReviews.endpointResolver(listProductReviews.endpoint, {
           judgeMeProductId: judgeMeId,
           size: 100,
@@ -105,10 +105,10 @@ function RatingsReviewsRoot({ product }) {
         const res1 = await judgeMeQueryRunner.runQuery('get', endpoint, null, {});
         const reviewData1 = transformReviewData(res1?.data?.reviews);
         allReviews = [...reviewData1];
-        
+
         // Count images in first batch
         imageCount = allReviews.filter(review => review.has_published_pictures).length;
-        
+
         // 2. If images < 4, fetch second page of reviews with rating 5
         if (imageCount < 1) {
           endpoint = listProductReviews.endpointResolver(listProductReviews.endpoint, {
@@ -122,16 +122,16 @@ function RatingsReviewsRoot({ product }) {
           const res2 = await judgeMeQueryRunner.runQuery('get', endpoint, null, {});
           const reviewData2 = transformReviewData(res2?.data?.reviews);
           allReviews = [...allReviews, ...reviewData2];
-          
+
           // Recount images
           imageCount = allReviews.filter(review => review.has_published_pictures).length;
         }
-        
+
         // 3. If still no images, fetch reviews without rating filter (pages 1-3)
         if (imageCount < 1) {
           for (let page = 1; page <= 3; page++) {
             if (imageCount >= 1) break;
-            
+
             endpoint = listProductReviews.endpointResolver(listProductReviews.endpoint, {
               judgeMeProductId: judgeMeId,
               size: 100
@@ -142,47 +142,23 @@ function RatingsReviewsRoot({ product }) {
             endpoint = formatEndpoint(endpoint);
             const resUnfiltered = await judgeMeQueryRunner.runQuery('get', endpoint, null, {});
             const reviewDataUnfiltered = transformReviewData(resUnfiltered?.data?.reviews);
-            
+
             // Add new reviews that aren't already in the array (avoid duplicates)
             const newReviews = reviewDataUnfiltered.filter(
               newReview => !allReviews.some(existingReview => existingReview.id === newReview.id)
             );
             allReviews = [...allReviews, ...newReviews];
-            
+
             // Recount images
             imageCount = allReviews.filter(review => review.has_published_pictures).length;
           }
         }
-        
+
         // 4. Bring verified purchase reviews to the front (up to 2)
         const verifiedReviews = allReviews.filter(review => review.verified === 'verified-purchase');
-        const nonVerifiedReviews = allReviews.filter(review => review.verified !== 'verified-purchase');
-        
-        // 5. Bring reviews with images to positions 2 onwards (up to 10)
-        const reviewsWithImages = nonVerifiedReviews.filter(review => review.has_published_pictures);
-        const reviewsWithoutImages = nonVerifiedReviews.filter(review => !review.has_published_pictures);
-        
-        // Construct the final array
-        let finalReviews = [];
-        
-        // Add up to 2 verified reviews at the front
-        finalReviews = [...verifiedReviews.slice(0, 2)];
-        
-        // Add up to 10 reviews with images starting at index 2
-        finalReviews = [...finalReviews, ...reviewsWithImages.slice(0, 10)];
-        
-        // Add remaining reviews
-        finalReviews = [
-          ...finalReviews,
-          ...verifiedReviews.slice(2),
-          ...reviewsWithImages.slice(10),
-          ...reviewsWithoutImages
-        ];
-        
-        // 6. Limit to 200 reviews
-        finalReviews = finalReviews.slice(0, 200);
+
         setJudgeMeProductId(judgeMeId);
-        setReviews(finalReviews);
+        setReviews(verifiedReviews);
         setIsLoading(false);
       }
     }
@@ -198,10 +174,10 @@ function RatingsReviewsRoot({ product }) {
   }, [judgemeDSModel, productHandle])
 
   return (
-    <RatingCard 
+    <RatingCard
       isUserLoggedIn={!!shopifyDSModel.get('loggedInUser')}
-      rating={product?.rating} 
-      ratingCount={product?.reviews?.value} 
+      rating={product?.rating}
+      ratingCount={product?.reviews?.value}
       photos={reviews.filter(review => review.has_published_pictures).flatMap(review => review.pictures)}
       reviews={reviews}
       isLoading={isLoading}
