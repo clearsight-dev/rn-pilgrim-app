@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import {Image} from '../../../../../extractedQueries/ImageComponent';
+import { Image } from '../../../../../extractedQueries/ImageComponent';
 import { ImageSkeleton } from './SkeletonLoaders';
 import { colors, FONT_FAMILY } from '../../../../../extractedQueries/theme';
 
 const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
+  if (!isLoading && photos?.length === 0) return null;
 
   return (
     <View style={styles.container}>
@@ -14,9 +15,9 @@ const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
           <Text style={styles.seeAllButton}>See all</Text>
         </TouchableOpacity> */}
       </View>
-      
-      <ScrollView 
-        horizontal 
+
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
       >
         {isLoading ? (
@@ -30,10 +31,10 @@ const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
           // Show actual photos when loaded
           photos.map((photo) => (
             <View key={photo.id} style={styles.photoWrapper}>
-              <Image 
-                source={{ uri: photo.url }} 
-                style={styles.photo} 
-                resizeMode="cover"
+              <Image
+                source={{ uri: photo.url }}
+                style={styles.photo}
+                resizeMode="contain"
               />
             </View>
           ))
@@ -69,6 +70,7 @@ const styles = StyleSheet.create({
     height: 100,
     marginHorizontal: 4,
     borderRadius: 8,
+    backgroundColor: colors.dark10,
     overflow: 'hidden',
   },
   photo: {

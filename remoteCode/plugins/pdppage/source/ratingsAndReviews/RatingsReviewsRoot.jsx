@@ -72,8 +72,8 @@ function RatingsReviewsRoot({ product }) {
           created_at: review.created_at,
           name: review.reviewer?.name || 'Anonymous',
           pictures: review.pictures.map(picture => ({
-            id: picture.urls.small,
-            url: picture.urls.small
+            id: picture.urls.huge,
+            url: picture.urls.huge
           })),
           has_published_pictures: review.has_published_pictures
         }));
