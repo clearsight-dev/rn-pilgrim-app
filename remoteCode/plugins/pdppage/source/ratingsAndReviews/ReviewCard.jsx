@@ -68,7 +68,7 @@ const ReviewCard = ({ review }) => {
               key={`${picture.id}-${index}`}
               source={{ uri: picture.url }} 
               style={styles.image} 
-              resizeMode="cover"
+              resizeMode="contain"
             />
           ))}
         </View>
@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   image: {
+    backgroundColor: colors.dark10,
     width: 80,
     height: 80,
     borderRadius: 4,
