@@ -188,8 +188,7 @@ const Footer = React.forwardRef(({
 
   // Render filter category tab
   const renderFilterTab = (filter, index) => {
-    const isActive = activeFilterTab === index;
-    debugger
+    const isActive = activeFilterTab === index;  
     const currentEditableCopyOfCategory = editableCopyOfSelectedFilters.find(it => it?.id === filter?.id)
     const numSelected = currentEditableCopyOfCategory?.values?.length;
     return (
@@ -201,7 +200,7 @@ const Footer = React.forwardRef(({
         <Text style={[typography.family, styles.filterTabText, isActive && styles.activeFilterTabText]}>
           {filter.label}
         </Text>
-        {numSelected > 0 && <Text style={[styles.filterTabText, {color: colors.secondaryMain}]}>{numSelected}</Text>}
+        {numSelected > 0 && <Text style={[styles.filterTabText, {color: '#009FAD', fontFamily: FONT_FAMILY.medium}]}>{numSelected}</Text>}
       </Pressable>
     );
   };
@@ -211,7 +210,7 @@ const Footer = React.forwardRef(({
     const isSelected = sortOption === option.value && sortReverse === option.reverse;
     
     return (
-      <View key={`sort-option-${index}`} style={styles.sortOptionItem}>
+      <View key={`sort-option-${index}`} style={[styles.sortOptionItem, isSelected && {backgroundColor: '#00AEBD0A'}]}>
         <RadioButton
           label={option.label}
           initialValue={isSelected}
@@ -223,6 +222,7 @@ const Footer = React.forwardRef(({
           style={styles.sortRadioButton}
           labelStyle={[styles.sortOptionText, isSelected && styles.selectedSortOptionText]}
           controlsPosition="right"
+          containerStyle={{}}
         />
       </View>
     );
@@ -444,25 +444,21 @@ const styles = StyleSheet.create({
     marginRight: 8,
     fontSize: 20,
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     color: colors.dark100,
   },
   buttonSubtext: {
     fontSize: 12,
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     color: colors.dark70
   },
   buttonText: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.medium,
     lineHeight: 20,
-    fontWeight: '500',
     color: colors.dark100,
   },
   // Bottom sheet content styles
   bottomSheetContent: {
-    padding: 16,
     flex: 1,
   },
   // Sort options styles
@@ -470,20 +466,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.dark10,
+    padding: 16
   },
   selectedSortOption: {
     backgroundColor: colors.dark10,
   },
   sortOptionText: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 16,
     color: colors.dark90,
   },
   selectedSortOptionText: {
-    fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
+    fontFamily: FONT_FAMILY.medium,
     color: colors.dark100,
   },
   checkIcon: {
@@ -519,15 +513,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   filterTabText: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.dark100,
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400'
   },
   activeFilterTabText: {
     color: colors.dark100,
     fontFamily: FONT_FAMILY.medium,
-    fontWeight: '500',
   },
   filterValuesContainer: {
     flex: 1,
@@ -538,19 +530,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.dark10,
   },
   selectedFilterValue: {
     backgroundColor: colors.dark10,
   },
   filterValueText: {
+    fontFamily: FONT_FAMILY.regular,
     fontSize: 16,
     color: colors.dark90,
   },
   selectedFilterValueText: {
-    // fontFamily: FONT_FAMILY.bold,
-    // fontWeight: '600',
+    // fontFamily: FONT_FAMILY.medium,
     color: colors.dark100,
   },
   filterActionBar: {
@@ -575,7 +565,6 @@ const styles = StyleSheet.create({
   filterCountText: {
     fontFamily: FONT_FAMILY.medium,
     fontSize: 16,
-    fontWeight: '500',
     color: colors.dark90,
   },
   filterButtonsContainer: {
@@ -593,7 +582,6 @@ const styles = StyleSheet.create({
   applyButtonText: {
     fontFamily: FONT_FAMILY.bold,
     fontSize: 16,
-    fontWeight: '600',
     color: colors.dark100,
   },
   disabledButton: {

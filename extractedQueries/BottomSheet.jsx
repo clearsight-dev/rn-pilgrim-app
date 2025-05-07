@@ -198,11 +198,11 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FONT_FAMILY.bold,
     fontSize: 18,
-    fontWeight: '600',
     color: colors.dark100,
   },
   closeButton: {
     fontSize: 16,
+    fontFamily: FONT_FAMILY.regular,
     color: colors.dark70,
   },
   contentContainer: {
