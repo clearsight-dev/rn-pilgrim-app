@@ -46,6 +46,11 @@ const RTTagsStyles = {
 const DescriptionCard = ({ productData, loading }) => {
   const { width } = useWindowDimensions();
 
+  const isMakeUpProduct = React.useMemo(
+    () => productData?.productType?.toLowerCase().includes("makeup"),
+    [productData]
+  );
+
   const [activeTab, setActiveTab] = useState("description");
   const bottomSheetRef = useRef(null);
   const [description, setDescription] = useState({
@@ -115,7 +120,7 @@ const DescriptionCard = ({ productData, loading }) => {
     <View style={styles.container}>
       <Text style={[typography.family, styles.header]}>Product Details</Text>
 
-      {/* <View style={styles.tabContainer}>
+      {!isMakeUpProduct && <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === "description" && styles.activeTab]}
           onPress={() => setActiveTab("description")}
@@ -151,29 +156,43 @@ const DescriptionCard = ({ productData, loading }) => {
             <View style={styles.activeTabIndicator} />
           )}
         </TouchableOpacity>
-      </View> */}
+      </View>}
 
       <View style={styles.contentContainer}>
-        <View>
-          <RenderHtml
-            systemFonts={RTSystemFonts}
-            contentWidth={width}
-            baseStyle={RTBaseStyle}
-            tagsStyles={RTTagsStyles}
-            source={{
-              html: `${description?.valueHtml?.substring(0, 300)}...`,
-            }}
-          />
-          <TouchableOpacity
-            onPress={openBottomSheet}
-            style={styles.readMoreButton}
-          >
-            <Text style={[typography.family, styles.readMoreText]}>
-              Read more{" "}
-            </Text>
-            <Text style={[typography.family, styles.readMoreArrow]}>›</Text>
-          </TouchableOpacity>
-        </View>
+        {activeTab === "description" ? (
+          <View>
+            <RenderHtml
+              systemFonts={RTSystemFonts}
+              contentWidth={width}
+              baseStyle={RTBaseStyle}
+              tagsStyles={RTTagsStyles}
+              source={{
+                html: `${description?.valueHtml?.substring(0, 300)}...`,
+              }}
+            />
+            <TouchableOpacity
+              onPress={openBottomSheet}
+              style={styles.readMoreButton}
+            >
+              <Text style={[typography.family, styles.readMoreText]}>
+                Read more{" "}
+              </Text>
+              <Text style={[typography.family, styles.readMoreArrow]}>›</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.howToUseContainer}>
+            <RenderHtml
+              systemFonts={RTSystemFonts}
+              contentWidth={width}
+              baseStyle={RTBaseStyle}
+              tagsStyles={RTTagsStyles}
+              source={{
+                html: howToUseContent,
+              }}
+            />
+          </View>
+        )}
       </View>
 
       {productData && (
