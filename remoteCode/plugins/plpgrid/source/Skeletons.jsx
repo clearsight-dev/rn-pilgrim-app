@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Animated, Easing, ScrollView } from 'react-native';
+import { View, StyleSheet, Animated, Easing, ScrollView, FlatList } from 'react-native';
 
 // Animated skeleton component with shimmer effect
 const SkeletonBase = ({ style, children }) => {
@@ -63,15 +63,21 @@ export const ProductCardSkeleton = () => (
 // Grid of product card skeletons
 export const ProductGridSkeleton = ({ numColumns = 2, numItems = 6 }) => {
   const items = Array(numItems).fill(0);
-  
+
   return (
-    <ScrollView contentContainerStyle={styles.gridContainer} showsVerticalScrollIndicator={false}>
-      {items.map((_, index) => (
-        <View key={`skeleton-${index}`} style={[styles.cardWrapper, { width: `${100 / numColumns}%` }]}>
+    <FlatList
+      data={items}
+      renderItem={({ index }) => (
+        <View style={[[styles.cardWrapper, {width: `${100 / numColumns}%` }]]}>
           <ProductCardSkeleton />
         </View>
-      ))}
-    </ScrollView>
+      )}
+      horizontal={false}
+      keyExtractor={(item, index) => `skeleton-${index}`}
+      numColumns={numColumns}
+      columnWrapperStyle={{ justifyContent: 'space-between' }}
+      showsVerticalScrollIndicator={false}
+    />
   );
 };
 
@@ -137,11 +143,12 @@ const styles = StyleSheet.create({
     width: '30%',
   },
   gridContainer: {
+    flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingBottom: 80, // Add padding to account for bottom buttons
-    widht: '100%'
+    width: '100%'
   },
   cardWrapper: {
     paddingHorizontal: 4,
