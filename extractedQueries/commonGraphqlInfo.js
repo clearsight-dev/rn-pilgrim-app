@@ -6,13 +6,13 @@ export const PRODUCT_CARD_INFO = `
   productType
   featuredImage {
     id
-    url
+    url (transform: {maxWidth: 480, maxHeight: 480})
   }
   images(first: 250) {
     edges {
       node {
         id
-        url
+        url (transform: {maxWidth: 480, maxHeight: 480})
         altText
       }
     }
@@ -35,7 +35,7 @@ export const PRODUCT_CARD_INFO = `
         }
         image {
           id
-          url 
+          url (transform: {maxWidth: 480, maxHeight: 480})
           altText
         }
         weight
@@ -295,7 +295,7 @@ export const VARIANT_INFO = `
       title
       image {
         id
-        url
+        url (transform: {maxWidth: 480, maxHeight: 480})
         altText
       }
       price {
