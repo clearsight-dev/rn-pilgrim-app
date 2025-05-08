@@ -1,10 +1,40 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, BackHandler } from 'react-native';
 import { Image } from '../../../../../extractedQueries/ImageComponent';
 import { ImageSkeleton } from './SkeletonLoaders';
 import { colors, FONT_FAMILY } from '../../../../../extractedQueries/theme';
+import { Portal } from '@gorhom/portal';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
+  const [selectedImage, setSelectedImage] = React.useState(null);
+  const [isFullScreen, setIsFullScreen] = React.useState(false);
+
+  const handleImagePress = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    setIsFullScreen(true);
+  };
+
+  const handleCloseFullScreen = () => {
+    setSelectedImage(null);
+    setIsFullScreen(false);
+  };
+
+  // Handle back button press when in full screen mode
+  React.useEffect(() => {
+    if (isFullScreen) {
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => {
+          handleCloseFullScreen();
+          return true;
+        }
+      );
+
+      return () => backHandler.remove();
+    }
+  }, [isFullScreen]);
+
   if (!isLoading && photos?.length === 0) return null;
 
   return (
@@ -30,21 +60,61 @@ const UserPhotos = ({ photos = [], onSeeAllPress, isLoading = false }) => {
         ) : (
           // Show actual photos when loaded
           photos.map((photo) => (
-            <View key={photo.id} style={styles.photoWrapper}>
-              <Image
-                source={{ uri: photo.url }}
-                style={styles.photo}
-                resizeMode="contain"
-              />
-            </View>
+            <TouchableOpacity
+              key={photo.id}
+              onPress={() => handleImagePress(photo.url)}
+              activeOpacity={0.8}
+            >
+              <View style={styles.photoWrapper}>
+                <Image
+                  source={{ uri: photo.url }}
+                  style={styles.photo}
+                  resizeMode="contain"
+                />
+              </View>
+            </TouchableOpacity>
           ))
         )}
       </ScrollView>
+
+      <Portal>
+        {isFullScreen && selectedImage && (
+          <GestureHandlerRootView style={styles.fullScreenContainer}>
+            <TouchableOpacity
+              style={styles.fullScreenOverlay}
+              onPress={handleCloseFullScreen}
+            >
+              <Image
+                source={{ uri: selectedImage }}
+                style={styles.fullScreenImage}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          </GestureHandlerRootView>
+        )}
+      </Portal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  fullScreenContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullScreenOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  fullScreenImage: {
+    width: '100%',
+    height: '100%',
+  },
   container: {
     marginVertical: 16,
   },
