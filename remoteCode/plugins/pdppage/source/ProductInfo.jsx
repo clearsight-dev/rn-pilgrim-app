@@ -6,6 +6,7 @@ import RatingPill from "../../../../extractedQueries/RatingPill";
 import OfferCard from "./OfferCard";
 import VariantCard from "../../../../extractedQueries/VariantCard";
 import { normalizeOption } from "../../../../extractedQueries/ShadeSelector";
+import _ from "lodash-es";
 
 import {
   colors,
@@ -121,7 +122,7 @@ function ProductInfo({
   if (isNaN(discountPercentage)) {
     discountPercentage = 0;
   }
-
+  
   return (
     <View style={styles.productInfoContainer}>
       {/* Bestseller tag */}
@@ -203,7 +204,7 @@ function ProductInfo({
       )}
 
       {/* Rating - Using parsed JSON value */}
-      {product?.rating && (
+      {!_.isEmpty(product?.rating) && (
         <Pressable onPress={() => scrollToSection("ratings")}>
         <View style={styles.ratingContainer}>
           <RatingPill
@@ -211,7 +212,7 @@ function ProductInfo({
             size={16}
             backgroundColor={colors.primaryDark}
           />
-          <View style={styles.reviewCount}>
+          {product?.reviews?.value && <View style={styles.reviewCount}>
             <Text
               style={{
                 marginRight: 5,
@@ -232,7 +233,7 @@ function ProductInfo({
               }}
             />
             <Text style={styles.verifiedText}>Verified reviews</Text>
-          </View>
+          </View>}
         </View>
         </Pressable>
       )}
@@ -326,9 +327,7 @@ const styles = StyleSheet.create({
   reviewCount: {
     flexDirection: "row",
     marginLeft: 8,
-    fontSize: 14,
     alignItems: "center",
-    color: "#333",
   },
   verifiedText: {
     fontSize: 12,
