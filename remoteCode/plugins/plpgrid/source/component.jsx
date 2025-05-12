@@ -356,7 +356,7 @@ export function ReactComponent({ model }) {
   }, [collectionHandle, sortOption, sortReverse]);
 
   return (
-    <View style={[styles.container, loading && {paddingTop: 0}]}>
+    <View style={[styles.container, loading && { paddingTop: 0 }]}>
       {!loading && <>
         <Text style={[styles.title]}>{collectionTitle}</Text>
         <View style={styles.headerContainer}>
@@ -401,6 +401,9 @@ export function ReactComponent({ model }) {
           data={products}
           renderItem={renderProductItem}
           numColumns={2}
+          keyExtractor={(item, index) => {
+            return item.id;
+          }}
           initialNumToRender={4}
           maxToRenderPerBatch={6}
           windowSize={5}

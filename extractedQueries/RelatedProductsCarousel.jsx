@@ -89,6 +89,7 @@ export function formatProduct(product) {
   return {
     id: product.id,
     firstVariantId: firstVariant?.id ?? null,
+    availableForSale: product.availableForSale,
     title: product.title,
     handle: product.handle,
     featuredImage: product.featuredImage,

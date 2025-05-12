@@ -387,6 +387,7 @@ export function ReactComponent({ model }) {
         }}
         buttonText={"Add to Cart"}
         variant="large"
+        isAvailable={selectedVariant?.availableForSale}
         onPress={() => addLineItemToCart(selectedVariant.id)}
       />
     </View>

@@ -121,7 +121,6 @@ function RelatedProductCard({
     }
   };
 
-
   return (
     <Pressable
       style={({ pressed }) => [
@@ -213,7 +212,7 @@ function RelatedProductCard({
             </View>)}
         </View>
       </View>
-      <PilgrimCartButton buttonText={buttonText} onPress={handleButtonPress} />
+      <PilgrimCartButton buttonText={buttonText} onPress={handleButtonPress} isAvailable={product?.availableForSale}/>
     </Pressable>
   );
 }

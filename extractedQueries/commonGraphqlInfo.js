@@ -4,6 +4,7 @@ export const PRODUCT_CARD_INFO = `
   handle
   title
   productType
+  availableForSale
   featuredImage {
     id
     url (transform: {maxWidth: 480, maxHeight: 480})
@@ -29,6 +30,7 @@ export const PRODUCT_CARD_INFO = `
           amount
           currencyCode
         }
+        availableForSale
         compareAtPrice {
           amount
           currencyCode
@@ -293,6 +295,7 @@ export const VARIANT_INFO = `
     node {
       id
       title
+      availableForSale
       image {
         id
         url (transform: {maxWidth: 480, maxHeight: 480})

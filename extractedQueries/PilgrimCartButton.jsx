@@ -17,8 +17,10 @@ function PilgrimCartButton({
   textStyle,
   containerStyle,
   disabled = false,
+  isAvailable = true,
   variant = "regular"
 }) {
+
   // State to track if we're in loading state
   const [isLoading, setIsLoading] = useState(false);
   // State to track if we should show the activity indicator (after progress animation completes)
@@ -81,7 +83,7 @@ function PilgrimCartButton({
   const handlePress = async (e) => {
     e.stopPropagation();
 
-    if (disabled) {
+    if (disabled || !isAvailable) {
       return;
     }
     
@@ -160,6 +162,24 @@ function PilgrimCartButton({
 
   // Determine which button style to render based on loading state
   const renderButtonContent = () => {
+    if (!isAvailable) {
+      // Out of stock state
+      return (
+        <View style={styles.outOfStockButton}>
+          <Text 
+            style={[
+              typography.heading14,
+              styles.outOfStockText,
+              (variant === "large") && styles.buttonLargeText,
+              textStyle
+            ]}
+          >
+            Out of Stock
+          </Text>
+        </View>
+      );
+    }
+
     if (isLoading) {
       // Loading state with white background and centered "Adding..." text
       return (
@@ -293,7 +313,21 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     backgroundColor: colors.dark20
-  }
+  },
+  outOfStockButton: {
+    position: 'relative',
+    backgroundColor: colors.dark20,
+    borderRadius: 6,
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  outOfStockText: {
+    color: colors.dark80,
+    zIndex: 2, // Ensure text is above the progress bar
+  },
 });
 
 export default PilgrimCartButton;

@@ -291,6 +291,7 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
   product(handle: $handle) {
     id
     handle
+    availableForSale
     options {
       id
       name
@@ -307,6 +308,7 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
         node {
           id
           title
+          availableForSale
           image {
             id
             url
