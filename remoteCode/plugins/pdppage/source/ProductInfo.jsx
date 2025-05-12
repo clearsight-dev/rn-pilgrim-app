@@ -122,6 +122,7 @@ function ProductInfo({
   if (isNaN(discountPercentage)) {
     discountPercentage = 0;
   }
+
   
   return (
     <View style={styles.productInfoContainer}>
@@ -204,7 +205,7 @@ function ProductInfo({
       )}
 
       {/* Rating - Using parsed JSON value */}
-      {!_.isEmpty(product?.rating) && (
+      {!!product?.rating && (
         <Pressable onPress={() => scrollToSection("ratings")}>
         <View style={styles.ratingContainer}>
           <RatingPill
