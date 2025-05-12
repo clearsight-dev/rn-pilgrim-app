@@ -18,20 +18,20 @@ import {
 import RenderHtml, { defaultSystemFonts } from "react-native-render-html";
 import { useWindowDimensions } from "react-native";
 
-const RTSystemFonts = [
+export const RTSystemFonts = [
   ...defaultSystemFonts,
   FONT_FAMILY.bold,
   FONT_FAMILY.medium,
   FONT_FAMILY.regular,
 ];
 
-const RTBaseStyle = {
+export const RTBaseStyle = {
   fontFamily: FONT_FAMILY.regular,
   fontSize: 14,
   color: colors.dark90,
 };
 
-const RTTagsStyles = {
+export const RTTagsStyles = {
   b: {
     fontFamily: FONT_FAMILY.bold,
   },

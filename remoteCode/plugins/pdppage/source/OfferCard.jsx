@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Svg, { Rect, Path, Circle } from "react-native-svg";
 import { colors, FONT_FAMILY } from "../../../../extractedQueries/theme";
 import Clipboard from '@react-native-clipboard/clipboard';
+import RenderHtml from "react-native-render-html";
+
+import { RTSystemFonts, RTBaseStyle, RTTagsStyles } from "./DescriptionCard";
 
 // Fixed Ticket-shaped coupon component with SVG
 function CouponTicket({ code, isAutoApplied = false, onCopy }) {
@@ -47,15 +50,13 @@ function CouponTicket({ code, isAutoApplied = false, onCopy }) {
           d={`M ${circleRadius},0
               H ${ticketWidth}
               V ${ticketHeight / 3}
-              A ${ticketHeight / 6} ${ticketHeight / 6} 0 0 0 ${ticketWidth} ${
-            (2 * ticketHeight) / 3
-          }
+              A ${ticketHeight / 6} ${ticketHeight / 6} 0 0 0 ${ticketWidth} ${(2 * ticketHeight) / 3
+            }
               V ${ticketHeight}
               H 0
               V ${(2 * ticketHeight) / 3}
-              A ${ticketHeight / 6} ${ticketHeight / 6} 0 0 0 0 ${
-            ticketHeight / 3
-          }
+              A ${ticketHeight / 6} ${ticketHeight / 6} 0 0 0 0 ${ticketHeight / 3
+            }
               V 0
               Z
             `}
@@ -102,9 +103,17 @@ export default function OfferCard({ title, description, code }) {
 
       {/* Body */}
       <View style={styles.offerCardBody}>
-        <Text style={styles.offerCardDescription} >
-          {description}
-        </Text>
+        <View style={styles.offerCardDescription}>
+          <RenderHtml
+            systemFonts={RTSystemFonts}
+            contentWidth={144}
+            baseStyle={RTBaseStyle}
+            tagsStyles={RTTagsStyles}
+            source={{
+              html: description,
+            }}
+          />
+        </View>
 
         {/* Coupon ticket */}
         <CouponTicket
@@ -158,11 +167,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 8,
   },
   offerCardDescription: {
-    fontSize: 12,
-    color: colors.dark80,
-    fontFamily: FONT_FAMILY.regular,
     marginBottom: 6,
-    lineHeight: 16,
   },
 
   // Coupon ticket styles

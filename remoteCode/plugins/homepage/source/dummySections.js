@@ -738,7 +738,7 @@ export const dummy = [
           collection: 'manishas-curation',
           image: {
             value:
-              'https://cdn.apptile.io/6a1f4f33-744a-418c-947e-30247efdbe91/e46596fd-500e-43ce-b8e5-41f55d850ec7/original.png',
+              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/69c41b69-3b84-41b6-9693-e1b4e34270b0/original.png',
           },
         },
         {
@@ -746,7 +746,7 @@ export const dummy = [
           collection: 'jennifers-fav',
           image: {
             value:
-              'https://cdn.apptile.io/6a1f4f33-744a-418c-947e-30247efdbe91/4ff58c7f-9b9e-4af2-b40a-182d5a904d48/original.png',
+              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2aff2d19-dad1-41aa-bf74-9f78ab10f783/original.png',
           },
         },
         {
@@ -754,7 +754,7 @@ export const dummy = [
           collection: 'rashmikas-fav',
           image: {
             value:
-              'https://cdn.apptile.io/6a1f4f33-744a-418c-947e-30247efdbe91/36aa2bbf-e2f6-45c6-b829-862676d9654e/original.png',
+              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/dd4c14b4-28b8-415a-8ad3-ced6a7fab795/original.png',
           },
         },
       ],
