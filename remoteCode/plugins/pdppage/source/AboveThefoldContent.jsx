@@ -6,7 +6,7 @@ import ProductFlag from "../../../../extractedQueries/ProductFlag";
 import ProductInfo from "./ProductInfo";
 import AboveThefoldSkeleton from "./AboveThefoldSkeleton";
 import { colors, typography } from "../../../../extractedQueries/theme";
-import { FONT_FAMILY } from "../../../../extractedQueries/theme";
+import { isValidColor } from "../../../../extractedQueries/RelatedProductCard";
 
 function AboveThefoldContent({
   loading,
@@ -51,12 +51,15 @@ function AboveThefoldContent({
     ? productImages.filter((entry) => entry?.altText === imageFilteringTxt)
     : productImages;
 
+  const productLabel2Text = product?.productLabel2?.value?.split("|")[0]?.trim();
+  const productLabel2Color = product?.productLabel2?.value?.split("|")[1]?.trim();
+
   return (
     <View style={styles.scrollContainer}>
-      {product?.productLabel2?.value && (
+      {productLabel2Text && (
         <ProductFlag
-          label={product.productLabel2.value}
-          color={colors.secondaryMain}
+          label={productLabel2Text}
+          color={isValidColor(productLabel2Color) ? productLabel2Color : colors.secondaryMain}
           style={styles.promoTagContainer}
           height={24}
           width={104}

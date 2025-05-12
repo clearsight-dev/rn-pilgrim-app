@@ -9,6 +9,32 @@ import ProductFlag from './ProductFlag';
 import { addLineItemToCart } from './selectors';
 import { colors, FONT_FAMILY, typography } from './theme';
 
+export function isValidColor(color) {
+  if (typeof color !== 'string') return false;
+
+  const namedColors = new Set([
+    'transparent', 'black', 'white', 'red', 'green', 'blue', 'yellow', 'cyan', 'magenta', 'gray',
+    'grey', 'orange', 'purple', 'brown', 'pink', 'lime', 'teal', 'navy', 'gold', 'silver', 'maroon',
+    // Add more named colors if needed
+  ]);
+
+  const hexRegex = /^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+  const rgbRegex = /^rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)$/;
+  const rgbaRegex = /^rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(0|1|0?\.\d+)\s*\)$/;
+  const hslRegex = /^hsl\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*\)$/;
+  const hslaRegex = /^hsla\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*,\s*(0|1|0?\.\d+)\s*\)$/;
+
+  return (
+    namedColors.has(color.toLowerCase()) ||
+    hexRegex.test(color) ||
+    rgbRegex.test(color) ||
+    rgbaRegex.test(color) ||
+    hslRegex.test(color) ||
+    hslaRegex.test(color)
+  );
+}
+
+
 function RelatedProductCard({
   product,
   style,
@@ -35,6 +61,9 @@ function RelatedProductCard({
     productSize,
     productShortTitle
   } = product;
+
+  const productLabel2Text = productLabel2?.value?.split("|")[0]?.trim();
+  const productLabel2Color = productLabel2?.value?.split("|")[1]?.trim();
 
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = compareAtPrice?.amount
@@ -104,10 +133,10 @@ function RelatedProductCard({
         dispatch(navigateToScreen('Product', { productHandle: handle }));
       }}>
       {/* Promo Tag */}
-      {productLabel2?.value && (
+      {productLabel2Text && (
         <ProductFlag
-          label={productLabel2?.value}
-          color={colors.secondaryMain}
+          label={productLabel2Text}
+          color={isValidColor(productLabel2Color) ? productLabel2Color : colors.secondaryMain}
           style={styles.promoTagContainer}
           height={20}
           width={80}
