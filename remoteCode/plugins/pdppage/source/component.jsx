@@ -26,6 +26,7 @@ import FAQComponent from "./FAQComponent";
 import ImageBand from "./keybenefits/ImageBand";
 import { colors, FONT_FAMILY } from "../../../../extractedQueries/theme";
 import Accordion from "../../../../extractedQueries/Accordion";
+import _ from 'lodash-es'
 
 async function getVariants(product, setVariants, setSelectedVariant) {
   const res = await fetchProductOptions(product.handle, product.variantsCount);
@@ -376,7 +377,7 @@ export function ReactComponent({ model }) {
         windowSize={5} // Reduce window size for better performance
         removeClippedSubviews={true} // Important for performance
       />
-      <PilgrimCartButton
+      {!loading  && !_.isNil(selectedVariant?.availableForSale) && <PilgrimCartButton
         containerStyle={{
           padding: 16,
           paddingHorizontal: 24,
@@ -389,7 +390,7 @@ export function ReactComponent({ model }) {
         variant="large"
         isAvailable={selectedVariant?.availableForSale}
         onPress={() => addLineItemToCart(selectedVariant.id)}
-      />
+      />}
     </View>
   );
 }
