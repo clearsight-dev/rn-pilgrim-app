@@ -54,7 +54,7 @@ function AboveThefoldContent({
 
   const productLabel2Text = product?.productLabel2?.value?.split("|")[0]?.trim();
   const productLabel2Color = product?.productLabel2?.value?.split("|")[1]?.trim();
-  const productLabel2Width = _.clamp(productLabel2Text?.length * 8 || 0, 80, 150);
+  const productLabel2Width = _.clamp((productLabel2Text?.length || 10) * 8 , 80, 150);
 
   return (
     <View style={styles.scrollContainer}>

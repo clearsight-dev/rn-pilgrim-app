@@ -65,8 +65,8 @@ function RelatedProductCard({
 
   const productLabel2Text = productLabel2?.value?.split("|")[0]?.trim();
   const productLabel2Color = productLabel2?.value?.split("|")[1]?.trim();
-  const productLabel2Width = _.clamp(productLabel2Text?.length * 8 || 0, 80, 150);
-  
+  const productLabel2Width = _.clamp((productLabel2Text?.length || 10) * 8, 80, 150);
+
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = compareAtPrice?.amount
     ? Math.round(
