@@ -234,14 +234,14 @@ export function ReactComponent({ model }) {
   ];
 
   const scrollToSection = (sectionKey) => {
-    const sectionIndex = sections.findIndex((section) => section.key === sectionKey);
-    if (sectionIndex !== -1) {
-      sectionListRef.current?.scrollToLocation({
-        animated: true,
-        sectionIndex,
-        itemIndex: 0,
-      });
-    }
+    // const sectionIndex = sections.findIndex((section) => section.key === sectionKey);
+    // if (sectionIndex !== -1) {
+    //   sectionListRef.current?.scrollToLocation({
+    //     animated: true,
+    //     sectionIndex,
+    //     itemIndex: 0,
+    //   });
+    // }
   };
 
   // Render section headers
