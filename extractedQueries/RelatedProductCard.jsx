@@ -8,6 +8,7 @@ import Star from './Star';
 import ProductFlag from './ProductFlag';
 import { addLineItemToCart } from './selectors';
 import { colors, FONT_FAMILY, typography } from './theme';
+import _ from 'lodash-es'
 
 export function isValidColor(color) {
   if (typeof color !== 'string') return false;
@@ -64,7 +65,8 @@ function RelatedProductCard({
 
   const productLabel2Text = productLabel2?.value?.split("|")[0]?.trim();
   const productLabel2Color = productLabel2?.value?.split("|")[1]?.trim();
-
+  const productLabel2Width = _.clamp(productLabel2Text.length * 8, 80, 150);
+  
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = compareAtPrice?.amount
     ? Math.round(
@@ -121,6 +123,8 @@ function RelatedProductCard({
     }
   };
 
+
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -138,7 +142,7 @@ function RelatedProductCard({
           color={isValidColor(productLabel2Color) ? productLabel2Color : colors.secondaryMain}
           style={styles.promoTagContainer}
           height={20}
-          width={80}
+          width={productLabel2Width}
         />
       )}
 

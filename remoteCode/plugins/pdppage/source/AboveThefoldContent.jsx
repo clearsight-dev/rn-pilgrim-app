@@ -7,6 +7,7 @@ import ProductInfo from "./ProductInfo";
 import AboveThefoldSkeleton from "./AboveThefoldSkeleton";
 import { colors, typography } from "../../../../extractedQueries/theme";
 import { isValidColor } from "../../../../extractedQueries/RelatedProductCard";
+import _ from 'lodash-es'
 
 function AboveThefoldContent({
   loading,
@@ -53,6 +54,7 @@ function AboveThefoldContent({
 
   const productLabel2Text = product?.productLabel2?.value?.split("|")[0]?.trim();
   const productLabel2Color = product?.productLabel2?.value?.split("|")[1]?.trim();
+  const productLabel2Width = _.clamp(productLabel2Text.length * 8, 80, 150);
 
   return (
     <View style={styles.scrollContainer}>
@@ -62,7 +64,7 @@ function AboveThefoldContent({
           color={isValidColor(productLabel2Color) ? productLabel2Color : colors.secondaryMain}
           style={styles.promoTagContainer}
           height={24}
-          width={104}
+          width={productLabel2Width}
           fontSize={12}
         />
       )}
