@@ -17,7 +17,7 @@ function PilgrimCartButton({
   textStyle,
   containerStyle,
   disabled = false,
-  isAvailable,
+  isAvailable = true,
   variant = "regular"
 }) {
 
