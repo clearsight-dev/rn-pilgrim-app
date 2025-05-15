@@ -169,6 +169,7 @@ function ShadeSelector({
             buttonText={selectedVariant ? "Add to Cart" : "Select a Shade"}
             onPress={handleAddToCart}
             disabled={!selectedVariant}
+            isAvailable={selectedVariant?.availableForSale}
             variant='large'
           />
         </View>
