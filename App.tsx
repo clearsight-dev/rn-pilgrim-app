@@ -15,7 +15,7 @@ import {
 } from 'apptile-core';
 import {Linking, NativeModules} from 'react-native';
 
-import UpdateModal from './components/UpdateModal';
+import DeveloperScreen from './components/UpdateModal';
 import AdminPage from './components/AdminPage';
 import {PilgrimContext} from './PilgrimContext';
 import {fillCaches} from './extractedQueries/homepageQueries';
@@ -131,8 +131,8 @@ function App(): React.JSX.Element {
         />
         <Stack.Screen
           name="NativeUtils"
-          component={UpdateModal}
-          options={{headerShown: true}}
+          component={DeveloperScreen}
+          options={{headerShown: true, title: 'Developer Mode'}}
           initialParams={{appId: status.appId}}
         />
         <Stack.Screen
