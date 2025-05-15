@@ -34,7 +34,7 @@ import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
 
-import {dummy as sections} from './dummySections';
+// import {dummy as sections} from './dummySections';
 
 import {fetchPageData} from '../../../../queries/pageQuery';
 // import {typography} from '../../../../extractedQueries/theme'
@@ -190,7 +190,7 @@ export function ReactComponent({model}) {
   // Get collection handle and number of products from model props or use defaults
 
   const {width: screenWidth, height: screenHeight} = useApptileWindowDims();
-  // let sections = model.get('widgetList') || [];
+  let sections = model.get('widgetList') || [];
 
   // const [sections, setSections] = React.useState([]);
   const celebPicksData = model.get('celebPicksData') || [];
