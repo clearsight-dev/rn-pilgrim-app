@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Pressable, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
   FlatList,
-  Image,
 } from 'react-native';
 import { useApptileWindowDims, Icon } from 'apptile-core';
 import BottomSheet from './BottomSheet';
@@ -14,8 +13,10 @@ import { fetchProductOptions } from './collectionqueries';
 import { addLineItemToCart } from './selectors';
 import PilgrimCartButton from './PilgrimCartButton';
 import { colors, FONT_FAMILY, gradients, typography } from './theme';
+import { ProductPreviewCard } from './VariantSelector';
+import { Image } from './ImageComponent'
 
-export function normalizeOption (value) {
+export function normalizeOption(value) {
   const normalizedName = value?.toLowerCase()
     .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -25,17 +26,17 @@ export function normalizeOption (value) {
   if (!colorHex) {
     imageUrl = imageSwatches[normalizedName];
   }
-  return {colorHex, imageUrl};
+  return { colorHex, imageUrl };
 }
 
-function ShadeSelector({ 
-  bottomSheetRef, 
-  product, 
+function ShadeSelector({
+  bottomSheetRef,
+  product,
   onClose
 }) {
   const [shades, setShades] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const {width: screenWidth} = useApptileWindowDims();
+  const { width: screenWidth } = useApptileWindowDims();
 
   // This has no loader, maybe add on. Haven't seen the need for one yet though
   // Process product options to get shade data
@@ -48,10 +49,10 @@ function ShadeSelector({
       const variants = res?.variants ?? [];
 
       // Find the color option
-      const option = options?.find(option => 
-        option.name.toLowerCase() === 'color' 
+      const option = options?.find(option =>
+        option.name.toLowerCase() === 'color'
       );
-      
+
       if (!option) return;
       // Process each color value
       const processedVariants = [];
@@ -88,38 +89,38 @@ function ShadeSelector({
 
   // Render a shade item
   const renderShadeItem = ({ item }) => {
-    const {colorHex, imageUrl} = normalizeOption(item.title)
+    const { colorHex, imageUrl } = normalizeOption(item.title)
     return (
-      <Pressable 
+      <Pressable
         style={styles.shadeItem}
         onPress={() => setSelectedVariant(item)}
       >
         <View style={styles.shadeContainer}>
           {colorHex ? (
             <View style={[
-              styles.shadeTablet, 
+              styles.shadeTablet,
               { backgroundColor: colorHex }
             ]} />
           ) : imageUrl ? (
-            <Image 
-              source={{ uri: imageUrl }} 
+            <Image
+              source={{ uri: imageUrl }}
               style={styles.shadeImage}
               resizeMode="cover"
             />
           ) : (
             <View style={[
-              styles.shadeTablet, 
+              styles.shadeTablet,
               { backgroundColor: colors.dark20 }
             ]} />
           )}
-          
+
           {/* Checkmark overlay for selected shade */}
           {selectedVariant?.id === item.id && (
             <View style={styles.checkmarkContainer}>
-              <Icon 
-                name="check" 
-                size={24} 
-                color={colors.white} 
+              <Icon
+                name="check"
+                size={24}
+                color={colors.white}
               />
             </View>
           )}
@@ -134,7 +135,7 @@ function ShadeSelector({
   };
 
   return (
-    <BottomSheet 
+    <BottomSheet
       ref={bottomSheetRef}
       title={"Select Shade"}
       sheetHeightFraction={0.8} // 80% of screen height
@@ -145,54 +146,26 @@ function ShadeSelector({
       {product && (
         <View style={styles.bottomSheetContent}>
           {/* Product Header */}
-          <View style={styles.productHeader}>
-            <Image 
-              source={{ uri: selectedVariant?.image?.url }} 
-              style={[
-                styles.productImage,
-                {
-                  height: screenWidth / 2.1
-                }
-              ]}
-              resizeMode="contain"
-            />
-            <View style={styles.productInfo}>
-              <Text style={[typography.subHeading15, styles.productTitle]} numberOfLines={2}>
-                {product.title}
-              </Text>
-              <Text style={styles.productPrice}>
-                ₹{parseInt(selectedVariant?.price?.amount).toLocaleString()}
-              </Text>
-              {selectedVariant?.weight > 0 && (
-                <Text style={styles.productWeight}>
-                  {selectedVariant.weight} {selectedVariant.weightUnit.toLowerCase()}
-                </Text>
-              )}
-              <Text style={styles.productWeight}>
-                Shade: {selectedVariant?.title}
-              </Text>
-              <Text style={styles.productWeight}>
-                {selectedVariant?.variantSubtitle?.value}
-              </Text>
-            </View>
-          </View>
-          
+          <ProductPreviewCard product={product} selectedVariant={selectedVariant} />
+
           {/* Divider */}
           <View style={styles.divider} />
-          
-          {/* Shade Selection */}
+
           <FlatList
             data={shades}
             renderItem={renderShadeItem}
-            keyExtractor={item => item.id}
-            numColumns={4}
+            keyExtractor={item => {
+              return item.id
+            }}
+            numColumns={3}
+
             contentContainerStyle={styles.shadeGrid}
-            showsVerticalScrollIndicator={true}
+            showsVerticalScrollIndicator={false}
             style={styles.flatListContainer}
           />
-          
+
           {/* Add to Cart Button */}
-          <PilgrimCartButton 
+          <PilgrimCartButton
             buttonText={selectedVariant ? "Add to Cart" : "Select a Shade"}
             onPress={handleAddToCart}
             disabled={!selectedVariant}
@@ -239,8 +212,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   productWeight: {
-    fontSize: 14,
-    color: colors.dark60,
+    fontSize: 18,
+    color: '#333',
   },
   loadingContainer: {
     width: 180,
@@ -263,16 +236,16 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   shadeItem: {
-    width: '25%',
+    width: '33%',
     alignItems: 'center',
-    marginBottom: 16,
-    padding: 8
+    paddingHorizontal: 4,
+    paddingBottom: 8,
   },
   shadeContainer: {
     position: 'relative',
     width: '100%',
     height: 56,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   shadeTablet: {
     width: '100%',
@@ -292,18 +265,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderRadius: 4,
   },
   shadeName: {
-    fontSize: 12,
+    fontSize: 14,
     color: gradients.otherStroke.end,
     textAlign: 'center',
   },
   selectedShadeName: {
-    fontFamily: FONT_FAMILY.bold,
     color: colors.secondaryMain,
-    fontWeight: '600'
   }
 });
 
