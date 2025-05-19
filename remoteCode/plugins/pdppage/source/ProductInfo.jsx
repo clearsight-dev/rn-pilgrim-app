@@ -6,6 +6,7 @@ import RatingPill from "../../../../extractedQueries/RatingPill";
 import OfferCard from "./OfferCard";
 import VariantCard from "../../../../extractedQueries/VariantCard";
 import { normalizeOption } from "../../../../extractedQueries/ShadeSelector";
+import { isValidColor } from "../../../../extractedQueries/RelatedProductCard";
 import _ from "lodash-es";
 
 import {
@@ -113,24 +114,27 @@ function ProductInfo({
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = selectedVariant?.compareAtPrice?.amount
     ? Math.round(
-        ((selectedVariant?.compareAtPrice.amount -
-          selectedVariant?.price.amount) /
-          selectedVariant?.compareAtPrice.amount) *
-          100
-      )
+      ((selectedVariant?.compareAtPrice.amount -
+        selectedVariant?.price.amount) /
+        selectedVariant?.compareAtPrice.amount) *
+      100
+    )
     : 0;
   if (isNaN(discountPercentage)) {
     discountPercentage = 0;
   }
 
-  
+
+  const productLabel1Text = product?.productLabel1?.value?.split("|")[0]?.trim();
+  const productLabel1Color = product?.productLabel1?.value?.split("|")[1]?.trim();
+
   return (
     <View style={styles.productInfoContainer}>
       {/* Bestseller tag */}
-      {product?.productLabel1?.value && (
+      {productLabel1Text && (
         <View style={styles.bestsellerContainer}>
-          <Text style={[styles.bestsellerText]}>
-            {product?.productLabel1?.value?.toUpperCase()}
+          <Text style={[styles.bestsellerText, { color: isValidColor(productLabel1Color) ? productLabel1Color : colors.accentCoral }]}>
+            {productLabel1Text.toUpperCase()}
           </Text>
         </View>
       )}
@@ -207,35 +211,35 @@ function ProductInfo({
       {/* Rating - Using parsed JSON value */}
       {!!product?.rating && (
         <Pressable onPress={() => scrollToSection("ratings")}>
-        <View style={styles.ratingContainer}>
-          <RatingPill
-            rating={product?.rating}
-            size={16}
-            backgroundColor={colors.primaryDark}
-          />
-          {product?.reviews?.value && <View style={styles.reviewCount}>
-            <Text
-              style={{
-                marginRight: 5,
-                fontFamily: FONT_FAMILY.regular,
-                fontSize: 14,
-                color: "#1A1A1A",
-              }}
-            >
-              {product?.reviews?.value}
-            </Text>
-            <Icon
-              iconType={"Material Icon"}
-              name={"check-decagram"}
-              style={{
-                marginRight: 2,
-                fontSize: 20,
-                color: "#00AEEF",
-              }}
+          <View style={styles.ratingContainer}>
+            <RatingPill
+              rating={product?.rating}
+              size={16}
+              backgroundColor={colors.primaryDark}
             />
-            <Text style={styles.verifiedText}>Verified reviews</Text>
-          </View>}
-        </View>
+            {product?.reviews?.value && <View style={styles.reviewCount}>
+              <Text
+                style={{
+                  marginRight: 5,
+                  fontFamily: FONT_FAMILY.regular,
+                  fontSize: 14,
+                  color: "#1A1A1A",
+                }}
+              >
+                {product?.reviews?.value}
+              </Text>
+              <Icon
+                iconType={"Material Icon"}
+                name={"check-decagram"}
+                style={{
+                  marginRight: 2,
+                  fontSize: 20,
+                  color: "#00AEEF",
+                }}
+              />
+              <Text style={styles.verifiedText}>Verified reviews</Text>
+            </View>}
+          </View>
         </Pressable>
       )}
 

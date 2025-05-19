@@ -63,6 +63,9 @@ function RelatedProductCard({
     productShortTitle
   } = product;
 
+  const productLabel1Text = productLabel1?.value?.split("|")[0]?.trim();
+  const productLabel1Color = productLabel1?.value?.split("|")[1]?.trim();
+
   const productLabel2Text = productLabel2?.value?.split("|")[0]?.trim();
   const productLabel2Color = productLabel2?.value?.split("|")[1]?.trim();
   const productLabel2Width = _.clamp((productLabel2Text?.length || 10) * 8, 80, 150);
@@ -169,9 +172,9 @@ function RelatedProductCard({
           styles.detailsContainer,
           cardVariant === 'large' ? { alignItems: 'center' } : {},
         ]}>
-        {productLabel1?.value ? (
-          <Text style={[typography.heading14, typography.bestseller]}>
-            {productLabel1?.value?.toUpperCase()}
+        {productLabel1Text ? (
+          <Text style={[typography.heading14, typography.bestseller, { color: isValidColor(productLabel1Color) ? productLabel1Color : colors.accentCoral }]}>
+            {productLabel1Text?.toUpperCase()}
           </Text>
         ) : (
           <View style={{ height: 11 }}></View>
@@ -216,7 +219,7 @@ function RelatedProductCard({
             </View>)}
         </View>
       </View>
-      <PilgrimCartButton buttonText={buttonText} onPress={handleButtonPress} isAvailable={product?.availableForSale}/>
+      <PilgrimCartButton buttonText={buttonText} onPress={handleButtonPress} isAvailable={product?.availableForSale} />
     </Pressable>
   );
 }
