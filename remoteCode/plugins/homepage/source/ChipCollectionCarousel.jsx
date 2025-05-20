@@ -1,10 +1,10 @@
-import React, {memo, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Animated} from 'react-native';
-import {useDispatch} from 'react-redux';
-import {navigateToScreen, useApptileWindowDims} from 'apptile-core';
+import React, { memo, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import RelatedProductsCarousel from '../../../../extractedQueries/RelatedProductsCarousel';
-import Header from '../../../../extractedQueries/CollectionFilterChips';
-import {colors, typography} from '../../../../extractedQueries/theme';
+import { colors, typography } from '../../../../extractedQueries/theme';
+import { ChipCarouselSkeletonLoader } from '../../../../components/skeleton/chipCollection';
 
 function ChipCollectionCarousel({
   config = {},
@@ -15,35 +15,32 @@ function ChipCollectionCarousel({
   onFilterSelect,
   onFilterRemove,
   onFilterClear,
+  loading,
 }) {
-  const {collection: collectionHandle, title, subtitle} = config;
+  const { collection: collectionHandle, title, subtitle } = config;
 
   // Get window dimensions
-  const {width: screenWidth} = useApptileWindowDims();
-
+  const { width: screenWidth } = useApptileWindowDims();
   // Animation for loading indicator
   const loadingAnimation = useRef(new Animated.Value(-100)).current;
   const animationRef = useRef(null);
   const dispatch = useDispatch();
+
   const products = data.products;
-  let loading = false;
-  if (data.status === 'loading') {
-    loading = true;
-  }
   const error = data.error;
   const filterData = data.filters;
   const selectedFilters = data.selectedFilters;
 
   // Handle "See All" button click
   const handleSeeAllClick = () => {
-    dispatch(navigateToScreen('Collection', {collectionHandle}));
+    dispatch(navigateToScreen('Collection', { collectionHandle }));
   };
 
   // Display title with capitalized first letter and spaces instead of hyphens
   const displayTitle =
     title ||
     collectionHandle.charAt(0).toUpperCase() +
-      collectionHandle.slice(1).replace(/-/g, ' ');
+    collectionHandle.slice(1).replace(/-/g, ' ');
 
   // Animation effect
   useEffect(() => {
@@ -60,7 +57,7 @@ function ChipCollectionCarousel({
       });
 
       // Start animation and set up the loop with pause
-      animationRef.current.start(({finished}) => {
+      animationRef.current.start(({ finished }) => {
         // When animation completes, wait 500ms before restarting
         if (finished) {
           if (!loading) {
@@ -97,13 +94,17 @@ function ChipCollectionCarousel({
     };
   }, [loading, loadingAnimation, screenWidth]);
 
+  if (loading) {
+    return <ChipCarouselSkeletonLoader width={screenWidth} />
+  }
+
   return (
     <View style={[styles.container, style]}>
       {/* Title and See All button */}
       <View style={styles.titleContainer}>
-        <View style={{flexGrow: 1}}>
+        <View style={{ flexGrow: 1 }}>
           <Text style={[typography.heading19]}>{displayTitle}</Text>
-          {subtitle && <Text style={[typography.body14, {marginTop: 8, letterSpacing: 1}]}>{subtitle}</Text>}
+          {subtitle && <Text style={[typography.body14, { marginTop: 8, letterSpacing: 1 }]}>{subtitle}</Text>}
         </View>
         <TouchableOpacity onPress={handleSeeAllClick}>
           <Text style={[typography.heading14, styles.seeAllButton]}>
@@ -139,7 +140,7 @@ function ChipCollectionCarousel({
       ) : (
         <>
           {
-            <View style={{height: 2, width: '100%', overflow: 'hidden'}}>
+            <View style={{ height: 2, width: '100%', overflow: 'hidden' }}>
               <Animated.View
                 style={{
                   height: 2,

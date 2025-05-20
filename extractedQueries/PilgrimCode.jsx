@@ -1,11 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "./ImageComponent";
-import Accordion from "./Accordion";
-import { colors, FONT_FAMILY, typography } from "./theme";
+import { colors, FONT_FAMILY } from "./theme";
 import GradientText from "./GradientText";
+import { useApptileWindowDims } from 'apptile-core';
+import { GridSkeletonLoader } from '../components/skeleton/imageGrid';
 
-export function PilgrimCode({ enableCodeText = false }) {
+export function PilgrimCode({ enableCodeText = false, loading = false }) {
+  const { width } = useApptileWindowDims();
+
   const content = [
     {
       blurb: "Natural World Ingredients",
@@ -90,11 +93,15 @@ export function PilgrimCode({ enableCodeText = false }) {
     secondRow.push(createLabelledItem(i));
   }
 
+  if (loading) {
+    return <GridSkeletonLoader width={width} />
+  }
+
   return (
     <View
       style={{
         flexDirection: "column",
-        paddingVertical: enableCodeText ? 0 :24,
+        paddingVertical: enableCodeText ? 0 : 24,
       }}
     >
       {enableCodeText ? (

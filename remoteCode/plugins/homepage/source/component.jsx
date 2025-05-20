@@ -401,16 +401,6 @@ export function ReactComponent({ model }) {
   }, [sections]);
 
 
-  useEffect(() => {
-    if (dataLoadingState === 'DONE' && Platform.OS !== 'web') {
-      console.log('[AGENT] Dismissing splash');
-      setTimeout(() => {
-        const { RNApptile } = NativeModules;
-        RNApptile.notifyJSReady();
-      }, 50);
-    }
-  }, [dataLoadingState]);
-
   const onSelectShade = useCallback(product => {
     setSelectedProduct(product);
     shadeBottomSheetRef.current?.show();
@@ -443,6 +433,7 @@ export function ReactComponent({ model }) {
         case 'metafield-carousel':
           return (
             <MetafieldBannerCarousel
+              loading={dataLoadingState !== 'DONE'}
               items={metafieldCarousalData}
               screenWidth={screenWidth}
               onNavigate={(screen, params) =>
@@ -453,6 +444,7 @@ export function ReactComponent({ model }) {
         case 'banner-carousel':
           return (
             <BannerCarousel
+              loading={dataLoadingState !== 'DONE'}
               config={section.config}
               screenWidth={screenWidth}
               onNavigate={(screen, params) =>
@@ -461,7 +453,7 @@ export function ReactComponent({ model }) {
             />
           );
         case 'quick-collections':
-          return <QuickCollections config={section.config} />;
+          return <QuickCollections config={section.config} loading={dataLoadingState !== 'DONE'} />;
         case 'highlighted-collections':
           // Get collection from config
           const collectionHandle = section.config?.collection;
@@ -477,7 +469,7 @@ export function ReactComponent({ model }) {
             <WeeklyPicksSection
               config={section.config}
               products={collectionData.products}
-              loading={collectionData.status !== 'loaded'}
+              loading={collectionData.status !== 'loaded' || dataLoadingState !== 'DONE'}
               error={collectionData.error}
               onSelectShade={onSelectShade}
               onSelectVariant={onSelectVariant}
@@ -506,12 +498,13 @@ export function ReactComponent({ model }) {
               onFilterSelect={onFilterSelect}
               onFilterRemove={onFilterRemove}
               onFilterClear={onClearAllFilters}
+              loading={data.status !== 'loaded' || dataLoadingState !== 'DONE'}
             />
           );
         case 'celeb-picks':
-          return <CelebPicks config={section.config} />;
+          return <CelebPicks config={section.config} loading={dataLoadingState !== 'DONE'} />;
         case 'pilgrim-code':
-          return <PilgrimCode />;
+          return <PilgrimCode loading={dataLoadingState !== 'DONE'} />;
         default:
           return null;
       }
@@ -526,12 +519,13 @@ export function ReactComponent({ model }) {
       onFilterSelect,
       onFilterRemove,
       onClearAllFilters,
+      dataLoadingState
     ],
   );
 
   return (
     <>
-      {dataLoadingState === 'DONE' ? (<SectionList
+      <SectionList
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         sections={sections}
@@ -546,11 +540,7 @@ export function ReactComponent({ model }) {
         windowSize={5}
         removeClippedSubviews={Platform.OS !== 'web'}
         updateCellsBatchingPeriod={50}
-      />) : (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
-        </View>
-      )}
+      />
 
       {/* Shade Selector Modal */}
       <ShadeSelector
@@ -615,3 +605,8 @@ export const WrapperTileConfig = {
     numberOfProducts: 5,
   },
 };
+
+
+// Need proper loading state for each component
+// wait for data to load to open the app seems bad
+// section list loading skeleton

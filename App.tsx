@@ -90,13 +90,13 @@ function App(): React.JSX.Element {
           urlBuffer.clear()
         }
 
-        // if (_.isEmpty(url)) {
-        //   // Dismissing splash screen for home page
-        //   setTimeout(() => {
-        //     RNApptile.notifyJSReady();
-        //   }, 50)
-        //   return;
-        // }
+        if (_.isEmpty(url)) {
+          // Dismissing splash screen for home page
+          setTimeout(() => {
+            RNApptile.notifyJSReady();
+          }, 50)
+          return;
+        }
 
         setTimeout(async () => {
           if (url) {
