@@ -12,6 +12,9 @@ import { fetchFilteredProductsCount, getFilterAndProductsForCollection } from '.
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
+import { Image } from "../../../../extractedQueries/ImageComponent"
+import { CollectionHeaderSkeleton } from '../../../../components/skeleton/collectionHeaderSkeleton';
+import { RelatedProductCardSkeleton } from '../../../../components/skeleton/productCard'
 import Header from '../../../../extractedQueries/CollectionFilterChips';
 import Footer, { getShopifyFilters } from './Footer';
 import styles from './styles';
@@ -36,6 +39,7 @@ export function ReactComponent({ model }) {
   const [currentCursor, setCurrentCursor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [collectionTitle, setCollectionTitle] = useState('');
+  const [image, setImage] = useState(null);
   const [sortOption, setSortOption] = useState('BEST_SELLING');
   const [sortReverse, setSortReverse] = useState(false);
   const [filterData, setFilterData] = useState({ filters: [], unflattenedFilters: [] });
@@ -117,6 +121,7 @@ export function ReactComponent({ model }) {
         setHasNextPage(res.hasNextPage);
         setCurrentCursor(res.lastCursor);
         setCollectionTitle(res.title);
+        setImage(res.image);
         setFilterData({
           filters: res.filters,
           unflattenedFilters: res.unflattenedFilters
@@ -266,11 +271,11 @@ export function ReactComponent({ model }) {
     if (Platform.OS === "android") {
       setTimeout(() => {
         fetchTotalProductsCount(collectionHandle);
-        fetchData(collectionHandle, null, false, "BEST_SELLING", false);
+        fetchData(collectionHandle, null, false, "COLLECTION_DEFAULT", false);
       }, 50);
     } else {
       fetchTotalProductsCount(collectionHandle);
-      fetchData(collectionHandle, null, false, "BEST_SELLING", false);
+      fetchData(collectionHandle, null, false, "COLLECTION_DEFAULT", false);
     }
   }, [collectionHandle]);
 
@@ -296,14 +301,19 @@ export function ReactComponent({ model }) {
   };
 
   // Render a product item in the grid
-  const renderProductItem = ({ item, index }) => (
-    <RelatedProductCard
-      product={item}
-      style={styles.productCard}
-      onSelectShade={onSelectShade}
-      onSelectVariant={onSelectVariant}
-    />
-  );
+  const renderProductItem = ({ item, index }) => {
+    if (loading) {
+      return <RelatedProductCardSkeleton />
+    }
+
+    return (
+      <RelatedProductCard
+        product={item}
+        style={styles.productCard}
+        onSelectShade={onSelectShade}
+        onSelectVariant={onSelectVariant}
+      />)
+  };
 
   // Render footer with loading indicator when loading more products
   const renderFooter = () => {
@@ -316,6 +326,46 @@ export function ReactComponent({ model }) {
       </View>
     );
   };
+
+  const renderListHeader = () => {
+    if (loading) return <CollectionHeaderSkeleton />;
+
+    return (
+      <>
+        {image?.url && image?.width && image?.height && (
+          <Image
+            source={{ uri: image.url }}
+            style={{
+              aspectRatio: image.width / image.height,
+            }}
+          />
+        )}
+        <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 0 }}>
+          <Text style={[styles.title]}>{collectionTitle}</Text>
+          <View style={styles.headerContainer}>
+            {appliedFilters.length > 0 ? (
+              isLoadingFilteredCount ? (
+                <ProductCountSkeleton />
+              ) : (
+                <Text style={[typography.family, styles.productsCount]}>
+                  {isMaxFilteredCount ? '90+ Products' : `${filteredProductsCount} Products`}
+                </Text>
+              )
+            ) : (
+              isLoadingTotalCount ? (
+                <ProductCountSkeleton />
+              ) : (
+                <Text style={[typography.family, styles.productsCount]}>
+                  {totalProductsCount.isMaxCount ? '90+ Products' : `${totalProductsCount.count} Products`}
+                </Text>
+              )
+            )}
+          </View>
+        </View>
+      </>
+    );
+  };
+
 
   const onFilterSelect = useCallback((filter) => {
     const newSelectedFilters = appliedFilters.concat(filter);
@@ -356,32 +406,7 @@ export function ReactComponent({ model }) {
   }, [collectionHandle, sortOption, sortReverse]);
 
   return (
-    <View style={[styles.container, loading && { paddingTop: 0 }]}>
-      {!loading && <>
-        <Text style={[styles.title]}>{collectionTitle}</Text>
-        <View style={styles.headerContainer}>
-          {appliedFilters.length > 0 ? (
-            // Show filtered count when filters are applied
-            isLoadingFilteredCount ? (
-              <ProductCountSkeleton />
-            ) : (
-              <Text style={[typography.family, styles.productsCount]}>
-                {isMaxFilteredCount ? '90+ Products' : `${filteredProductsCount} Products`}
-              </Text>
-            )
-          ) : (
-            // Show total count when no filters are applied
-            isLoadingTotalCount ? (
-              <ProductCountSkeleton />
-            ) : (
-              <Text style={[typography.family, styles.productsCount]}>
-                {totalProductsCount.isMaxCount ? '90+ Products' : `${totalProductsCount.count} Products`}
-              </Text>
-            )
-          )}
-        </View>
-      </>}
-
+    <View style={[styles.container, { padding: 0 }]}>
       {/* Filter chips header */}
       {/* <Header 
         filterData={filterData.filters}
@@ -391,33 +416,25 @@ export function ReactComponent({ model }) {
         onClearAllFilters={onClearAllFilters}
       /> */}
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ProductGridSkeleton />
-        </View>
-      ) : (
-        <FlatList
-          ref={flatListRef}
-          data={products}
-          renderItem={renderProductItem}
-          numColumns={2}
-          keyExtractor={(item, index) => {
-            return item.id;
-          }}
-          initialNumToRender={4}
-          maxToRenderPerBatch={6}
-          windowSize={5}
-          contentContainerStyle={styles.gridContainer}
-          columnWrapperStyle={styles.row}
-          showsVerticalScrollIndicator={false}
-          onEndReached={() => handleLoadMore(collectionHandle)}
-          onEndReachedThreshold={1.5} // Trigger when 30% from the end
-          ListFooterComponent={renderFooter}
-          ListEmptyComponent={
-            <Text style={[typography.family, styles.emptyText]}>No products found</Text>
-          }
-        />
-      )}
+      <FlatList
+        ref={flatListRef}
+        data={loading ? Array(12).fill(0) : products}
+        renderItem={renderProductItem}
+        numColumns={2}
+        initialNumToRender={4}
+        maxToRenderPerBatch={6}
+        windowSize={5}
+        contentContainerStyle={styles.gridContainer}
+        columnWrapperStyle={styles.row}
+        showsVerticalScrollIndicator={false}
+        onEndReached={() => handleLoadMore(collectionHandle)}
+        onEndReachedThreshold={1.5} // Trigger when 30% from the end
+        ListFooterComponent={renderFooter}
+        ListHeaderComponent={renderListHeader}
+        ListEmptyComponent={
+          <Text style={[typography.family, styles.emptyText]}>No products found</Text>
+        }
+      />
 
       {!loading && <Footer
         ref={footerRef}

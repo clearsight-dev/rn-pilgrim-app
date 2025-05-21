@@ -30,6 +30,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
+    paddingHorizontal: 16,
   },
   loading: {
     fontSize: 16,
@@ -52,10 +53,10 @@ export const styles = StyleSheet.create({
   row: {
     justifyContent: 'space-between',
     marginBottom: 16,
+    paddingHorizontal: 16,
   },
   productCard: {
     width: '48%',
-    marginRight: 0,
     marginBottom: 16,
   },
   emptyText: {

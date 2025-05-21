@@ -53,6 +53,7 @@ export async function getFilterAndProductsForCollection(
     result.hasNextPage = res?.data?.pagination?.hasNextPage ?? false;
     result.lastCursor = res?.data?.pagination?.lastCursor ?? null;
     result.title = res?.data?.collection?.title;
+    result.image = res?.data?.collection?.image;
   } catch (err) {
     console.error("Failed to fetch data for chip carousel for the collection: ", collectionHandle);
   } 
@@ -208,6 +209,13 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
     id
     handle
     title
+    image {
+      id
+      altText
+      height
+      width
+      url
+    }
     products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
       pageInfo {
         hasNextPage
