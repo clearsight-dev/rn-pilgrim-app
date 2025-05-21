@@ -10,13 +10,12 @@ interface CountdownTimerProps {
     style?: {
       container?: ViewStyle;
       label?: TextStyle;
-      timer?: TextStyle; // Currently unused directly, could be split if you separate timer digits
+      timer?: TextStyle;
     };
   };
 }
 
 interface TimeLeft {
-  days: string;
   hours: string;
   minutes: string;
   seconds: string;
@@ -31,29 +30,17 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config, loading }) => {
 
     if (difference <= 0) {
       return {
-        days: "00",
         hours: "00",
         minutes: "00",
         seconds: "00",
       };
     }
 
-    const days = String(
-      Math.floor(difference / (1000 * 60 * 60 * 24))
-    ).padStart(2, "0");
-    const hours = String(
-      Math.floor((difference / (1000 * 60 * 60)) % 24)
-    ).padStart(2, "0");
-    const minutes = String(Math.floor((difference / 1000 / 60) % 60)).padStart(
-      2,
-      "0"
-    );
-    const seconds = String(Math.floor((difference / 1000) % 60)).padStart(
-      2,
-      "0"
-    );
+    const hours = String(Math.floor(difference / (1000 * 60 * 60))).padStart(2, "0");
+    const minutes = String(Math.floor((difference / 1000 / 60) % 60)).padStart(2, "0");
+    const seconds = String(Math.floor((difference / 1000) % 60)).padStart(2, "0");
 
-    return { days, hours, minutes, seconds };
+    return { hours, minutes, seconds };
   };
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
@@ -69,15 +56,17 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config, loading }) => {
   if (loading) return null;
 
   const mergedContainerStyle = [styles.container, config?.style?.container];
-
   const mergedLabelStyle = [styles.label, config?.style?.label];
+  const mergedTimerStyle = [styles.timer, config?.style?.timer];
 
   return (
     <View style={styles.wrapper}>
       <View style={mergedContainerStyle}>
         <Text style={mergedLabelStyle}>
-          {config.content || "Exclusive access ends in"} {timeLeft.days}D:
-          {timeLeft.hours}H:{timeLeft.minutes}M:{timeLeft.seconds}S
+          {config.content || "Exclusive access ends in"}{" "}
+          <Text style={mergedTimerStyle}>
+            {timeLeft.hours}H:{timeLeft.minutes}M:{timeLeft.seconds}S
+          </Text>
         </Text>
       </View>
     </View>
@@ -96,7 +85,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: colors.primaryMain,
     borderRadius: 24,
+    borderColor: colors.primaryDark,
     minWidth: 280,
+    borderWidth: 2
   },
   label: {
     fontSize: 12,
@@ -106,6 +97,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     paddingVertical: 8,
     paddingHorizontal: 16,
+  },
+  timer: {
+    fontFamily: FONT_FAMILY?.bold,
+    color: "#fff",
   },
 });
 
