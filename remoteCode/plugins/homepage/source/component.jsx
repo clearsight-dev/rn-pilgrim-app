@@ -194,7 +194,7 @@ export function ReactComponent({ model }) {
   // Get collection handle and number of products from model props or use defaults
 
   const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
-  let sections = model.get('widgetList') || [];
+  let sections = Array.isArray(model.get('widgetList')) ? model.get('widgetList') : [];
 
   // const [sections, setSections] = React.useState([]);
   const celebPicksData = model.get('celebPicksData') || [];
