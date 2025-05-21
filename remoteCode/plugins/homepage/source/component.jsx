@@ -34,7 +34,7 @@ import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
-
+import CountdownTimer from './CountdownTimer'
 // import {dummy as sections} from './dummySections';
 
 import { fetchPageData } from '../../../../queries/pageQuery';
@@ -505,6 +505,8 @@ export function ReactComponent({ model }) {
           return <CelebPicks config={section.config} loading={dataLoadingState !== 'DONE'} />;
         case 'pilgrim-code':
           return <PilgrimCode loading={dataLoadingState !== 'DONE'} />;
+        case 'countdown-timer':
+          return <CountdownTimer loading={dataLoadingState !== 'DONE'} config={section.config} />;
         default:
           return null;
       }
