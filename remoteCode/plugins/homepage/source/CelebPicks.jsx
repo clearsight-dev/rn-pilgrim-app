@@ -1,61 +1,74 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {Image} from '../../../../extractedQueries/ImageComponent';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import { Image } from '../../../../extractedQueries/ImageComponent';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import GradientText from '../../../../extractedQueries/GradientText';
 import Underline from '../../../../extractedQueries/Underline';
-import {useApptileWindowDims, navigateToScreen} from 'apptile-core';
-import {colors, typography} from '../../../../extractedQueries/theme';
+import { useApptileWindowDims, navigateToScreen } from 'apptile-core';
+import { typography } from '../../../../extractedQueries/theme';
 import { useDispatch } from 'react-redux';
+import { GridSkeletonLoader } from '../../../../components/skeleton/imageGrid';
 
 
-const CelebPicks = ({ config = {}}) => {
-  const {title, subtitle, items=[]} = config;
-  const {width} = useApptileWindowDims();
+const CelebPicks = ({ config = {}, loading = false }) => {
+  const { title, subtitle, items = [] } = config;
+  const { width } = useApptileWindowDims();
   const itemWidth = width / 3.5;
+  const dispatch = useDispatch();
 
-  // Empty onPress handler to be implemented later
-  const handleCelebPress = collectionHandle => {
+  const handleCelebPress = (collectionHandle) => {
     dispatch(navigateToScreen('Collection', { collectionHandle }));
   };
 
-  const dispatch = useDispatch();
+  if (loading) {
+    return <GridSkeletonLoader width={width} />
+  }
 
   return (
     <GradientBackground
       gradientColors={[
-        {offset: '0%', color: '#C5FAFF'},
-        {offset: '85%', color: '#fff'},
+        { offset: '0%', color: '#C5FAFF' },
+        { offset: '85%', color: '#fff' },
       ]}>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          {title && <GradientText
-            text={title}
-            fontSize={22}
-            width="100%"
-            height={32}
-            gradientColors={[
-              {offset: '0%', color: '#009FAD'},
-              {offset: '33%', color: '#00707A'},
-              {offset: '66%', color: '#009FAD'},
-              {offset: '100%', color: '#00707A'},
-            ]}
-          />}
-          {subtitle && <View
-            style={{
-              alignSelf: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-            <Text style={[typography.body14,styles.subtitle]}>{subtitle}</Text>
-            <Underline style={{height: 12, width: 90, alignSelf: 'flex-end'}} />
-          </View>}
+          {title && (
+            <GradientText
+              text={title}
+              fontSize={22}
+              width="100%"
+              height={32}
+              gradientColors={[
+                { offset: '0%', color: '#009FAD' },
+                { offset: '33%', color: '#00707A' },
+                { offset: '66%', color: '#009FAD' },
+                { offset: '100%', color: '#00707A' },
+              ]}
+            />
+          )}
+          {subtitle && (
+            <View
+              style={{
+                alignSelf: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
+              <Text style={[typography.body14, styles.subtitle]}>{subtitle}</Text>
+              <Underline style={{ height: 12, width: 90, alignSelf: 'flex-end' }} />
+            </View>
+          )}
         </View>
+
         <View style={styles.celebsContainer}>
           {items.map((celeb, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.celebItem, {width: itemWidth}]}
+              style={[styles.celebItem, { width: itemWidth }]}
               onPress={() => handleCelebPress(celeb.collection)}>
               <View
                 style={[
@@ -67,7 +80,12 @@ const CelebPicks = ({ config = {}}) => {
                   },
                 ]}>
                 <Image
-                  source={{ uri: celeb?.image?.value ||  celeb?.url || celeb?.urls[Math.floor(celeb?.urls.length/2)]}}
+                  source={{
+                    uri:
+                      celeb?.image?.value ||
+                      celeb?.url ||
+                      celeb?.urls?.[Math.floor(celeb?.urls.length / 2)],
+                  }}
                   style={styles.celebImage}
                   resizeMode="cover"
                 />

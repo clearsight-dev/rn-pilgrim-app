@@ -1,4 +1,4 @@
-import _, {min, set} from 'lodash';
+import _, { min, set } from 'lodash';
 import React, {
   useEffect,
   useContext,
@@ -15,9 +15,10 @@ import {
   NativeModules,
   SectionList,
   Platform,
+  ActivityIndicator
 } from 'react-native';
-import {navigateToScreen, useApptileWindowDims} from 'apptile-core';
-import {useDispatch} from 'react-redux';
+import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
+import { useDispatch } from 'react-redux';
 import {
   fetchCollectionCarouselData,
   getFilterAndProductsForCollection,
@@ -26,17 +27,17 @@ import ChipCollectionCarousel from './ChipCollectionCarousel';
 import QuickCollections from './QuickCollections';
 import CelebPicks from './CelebPicks';
 import MultiCollectionCarousel from './MultiCollectionCarousel';
-import {MetafieldBannerCarousel, BannerCarousel} from './BannerCarousel';
+import { MetafieldBannerCarousel, BannerCarousel } from './BannerCarousel';
 // import {PilgrimContext} from '../../../../PilgrimContext';
 import WeeklyPicksSection from './weeklypicks/WeeklyPicksSection';
 import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
 import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
-
+import CountdownTimer from './CountdownTimer'
 // import {dummy as sections} from './dummySections';
 
-import {fetchPageData} from '../../../../queries/pageQuery';
+import { fetchPageData } from '../../../../queries/pageQuery';
 // import {typography} from '../../../../extractedQueries/theme'
 
 const extractCollectionsFromSections = (sections, sectionToPick) => {
@@ -158,14 +159,14 @@ export function extractBannerNavigation(transformedData) {
         ['reference', 'handle'],
         '',
       );
-      navigateToScreenParam = {collectionHandle};
+      navigateToScreenParam = { collectionHandle };
     } else if (navigateTo === 'Product') {
       const productHandle = _.get(
         _.find(fields, o => ['navigate_to_product'].includes(o?.key)) || {},
         ['reference', 'handle'],
         '',
       );
-      navigateToScreenParam = {productHandle};
+      navigateToScreenParam = { productHandle };
     }
 
     // Return array in the requested format
@@ -180,7 +181,10 @@ export function extractBannerNavigation(transformedData) {
 
 const numberOfProducts = 5;
 
-export function ReactComponent({model}) {
+export function ReactComponent({ model }) {
+  const loadedRef = useRef(false);
+  const [dataLoadingState, setDataLoadingState] = useState('NOT-STARTED'); // 'IN-PROGRESS' | 'DONE'
+
   const shadeBottomSheetRef = useRef(null);
   const variantBottomSheetRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -189,8 +193,8 @@ export function ReactComponent({model}) {
 
   // Get collection handle and number of products from model props or use defaults
 
-  const {width: screenWidth, height: screenHeight} = useApptileWindowDims();
-  let sections = model.get('widgetList') || [];
+  const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
+  let sections = Array.isArray(model.get('widgetList')) ? model.get('widgetList') : [];
 
   // const [sections, setSections] = React.useState([]);
   const celebPicksData = model.get('celebPicksData') || [];
@@ -314,21 +318,18 @@ export function ReactComponent({model}) {
   );
 
   useEffect(() => {
-    if (Platform.OS !== 'web') {
-      console.log('[AGENT] Dismissing splash');
-      setTimeout(() => {
-        const {RNApptile} = NativeModules;
-        RNApptile.notifyJSReady();
-      }, 50);
+    if (loadedRef.current) {
+      return;
     }
+    const loadData = async () => {
+      setDataLoadingState('IN-PROGRESS');
+      const collectionsToFetch = extractCollectionsFromSections(sections, [
+        'highlighted-collections',
+        'chip-collections',
+      ]);
 
-    const collectionsToFetch = extractCollectionsFromSections(sections, [
-      'highlighted-collections',
-      'chip-collections',
-    ]);
-
-    fetchHomepageCollectionsData(collectionsToFetch)
-      .then(collectionsData => {
+      try {
+        const collectionsData = await fetchHomepageCollectionsData(collectionsToFetch);
         console.log('Finishing carousel data fetch for collections');
 
         // Convert the results to the format expected by chipCollectionData
@@ -344,8 +345,7 @@ export function ReactComponent({model}) {
         });
 
         setChipCollectionData(formattedData);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Failed to fetch data for homepage', err);
         const errorMessage = 'Error: ' + err.toString();
 
@@ -362,36 +362,44 @@ export function ReactComponent({model}) {
         });
 
         setChipCollectionData(errorData);
-      });
+      }
 
-    const pageParams = {
-      handle: 'app-homepage',
-      pageMetafields: [
-        {
-          key: 'app_top_banner_content',
-          namespace: 'custom',
-        },
-        {
-          key: 'app_banner_heading',
-          namespace: 'custom',
-        },
-        {
-          key: 'banner_contents',
-          namespace: 'custom',
-        },
-      ],
-    };
+      const pageParams = {
+        handle: 'app-homepage',
+        pageMetafields: [
+          {
+            key: 'app_top_banner_content',
+            namespace: 'custom',
+          },
+          {
+            key: 'app_banner_heading',
+            namespace: 'custom',
+          },
+          {
+            key: 'banner_contents',
+            namespace: 'custom',
+          },
+        ],
+      };
 
-    fetchPageData(pageParams.handle, pageParams.pageMetafields)
-      .then(data => {
+      try {
+        const data = await fetchPageData(pageParams.handle, pageParams.pageMetafields);
         setMetafieldCarousalData(
           extractBannerNavigation(transformPageData(data)),
         );
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Page data [Marker error]', err);
-      });
+      }
+
+
+      setDataLoadingState('DONE');
+    }
+
+    loadData();
+
+    loadedRef.current = true;
   }, [sections]);
+
 
   const onSelectShade = useCallback(product => {
     setSelectedProduct(product);
@@ -416,15 +424,16 @@ export function ReactComponent({model}) {
   // }, [widgetList]);
 
   // Render section headers (currently not displaying any headers)
-  const renderSectionHeader = ({section}) => null;
+  const renderSectionHeader = ({ section }) => null;
 
   // Memoize render function to prevent unnecessary re-renders
   const renderItem = useCallback(
-    ({item, section}) => {
+    ({ item, section }) => {
       switch (section.type) {
         case 'metafield-carousel':
           return (
             <MetafieldBannerCarousel
+              loading={dataLoadingState !== 'DONE'}
               items={metafieldCarousalData}
               screenWidth={screenWidth}
               onNavigate={(screen, params) =>
@@ -435,6 +444,7 @@ export function ReactComponent({model}) {
         case 'banner-carousel':
           return (
             <BannerCarousel
+              loading={dataLoadingState !== 'DONE'}
               config={section.config}
               screenWidth={screenWidth}
               onNavigate={(screen, params) =>
@@ -443,7 +453,7 @@ export function ReactComponent({model}) {
             />
           );
         case 'quick-collections':
-          return <QuickCollections config={section.config} />;
+          return <QuickCollections config={section.config} loading={dataLoadingState !== 'DONE'} />;
         case 'highlighted-collections':
           // Get collection from config
           const collectionHandle = section.config?.collection;
@@ -459,7 +469,7 @@ export function ReactComponent({model}) {
             <WeeklyPicksSection
               config={section.config}
               products={collectionData.products}
-              loading={collectionData.status !== 'loaded'}
+              loading={collectionData.status !== 'loaded' || dataLoadingState !== 'DONE'}
               error={collectionData.error}
               onSelectShade={onSelectShade}
               onSelectVariant={onSelectVariant}
@@ -488,12 +498,15 @@ export function ReactComponent({model}) {
               onFilterSelect={onFilterSelect}
               onFilterRemove={onFilterRemove}
               onFilterClear={onClearAllFilters}
+              loading={data.status !== 'loaded' || dataLoadingState !== 'DONE'}
             />
           );
         case 'celeb-picks':
-          return <CelebPicks config={section.config} />;
+          return <CelebPicks config={section.config} loading={dataLoadingState !== 'DONE'} />;
         case 'pilgrim-code':
-          return <PilgrimCode />;
+          return <PilgrimCode loading={dataLoadingState !== 'DONE'} />;
+        case 'countdown-timer':
+          return <CountdownTimer loading={dataLoadingState !== 'DONE'} config={section.config} />;
         default:
           return null;
       }
@@ -508,6 +521,7 @@ export function ReactComponent({model}) {
       onFilterSelect,
       onFilterRemove,
       onClearAllFilters,
+      dataLoadingState
     ],
   );
 
@@ -549,6 +563,11 @@ export function ReactComponent({model}) {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -588,3 +607,8 @@ export const WrapperTileConfig = {
     numberOfProducts: 5,
   },
 };
+
+
+// Need proper loading state for each component
+// wait for data to load to open the app seems bad
+// section list loading skeleton

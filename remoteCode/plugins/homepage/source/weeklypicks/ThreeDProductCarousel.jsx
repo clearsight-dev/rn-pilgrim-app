@@ -6,6 +6,7 @@ import GradientBackground from '../../../../../extractedQueries/GradientBackgrou
 import Underline from '../../../../../extractedQueries/Underline';
 import RelatedProductCard from '../../../../../extractedQueries/RelatedProductCard';
 import { typography } from '../../../../../extractedQueries/theme';
+import {RelatedProductCardSkeleton} from '../../../../../components/skeleton/productCard'
 
 function ThreeDProductCarousel({ 
   title,
@@ -144,13 +145,7 @@ function ThreeDProductCarousel({
                 ]}
               >
                 {loading ? (
-                    <View 
-                      style={[
-                        styles.productCard,
-                        {minHeight: 400, backgroundColor: 'white'}
-                      ]}
-                    >
-                    </View>
+                    <RelatedProductCardSkeleton width={itemWidth}/>
                   ): (
                   <RelatedProductCard 
                     cardVariant={"large"}

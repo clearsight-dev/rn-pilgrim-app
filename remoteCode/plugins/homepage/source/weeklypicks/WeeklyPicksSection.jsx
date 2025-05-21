@@ -32,7 +32,7 @@ function WeeklyPicksSection ({
 
   // Format products for the carousel
 
-  if (error || !products) {
+  if (error || !products || loading) {
     return null; // Or an error message
   }
 

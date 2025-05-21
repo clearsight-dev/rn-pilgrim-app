@@ -7,13 +7,13 @@ export const PRODUCT_CARD_INFO = `
   availableForSale
   featuredImage {
     id
-    url (transform: {maxWidth: 480, maxHeight: 480})
+    url 
   }
   images(first: 250) {
     edges {
       node {
         id
-        url (transform: {maxWidth: 480, maxHeight: 480})
+        url 
         altText
       }
     }
@@ -37,7 +37,7 @@ export const PRODUCT_CARD_INFO = `
         }
         image {
           id
-          url (transform: {maxWidth: 480, maxHeight: 480})
+          url 
           altText
         }
         weight
@@ -298,7 +298,7 @@ export const VARIANT_INFO = `
       availableForSale
       image {
         id
-        url (transform: {maxWidth: 480, maxHeight: 480})
+        url 
         altText
       }
       price {

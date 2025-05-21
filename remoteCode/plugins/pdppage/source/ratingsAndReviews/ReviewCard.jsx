@@ -69,7 +69,7 @@ const ReviewCard = ({ review }) => {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <RatingPill rating={rating} size={16} />
-          <Text style={styles.date}>{timeAgo}</Text>
+          {/* <Text style={styles.date}>{timeAgo}</Text> */}
         </View>
       </View>
 
@@ -82,7 +82,7 @@ const ReviewCard = ({ review }) => {
       {/* Verified Badge */}
       {verified === 'verified-purchase' && (
         <View style={styles.verifiedContainer}>
-          <Text style={styles.verifiedText}>Verified Purchase</Text>
+          <Text style={styles.verifiedText}>Verified Buyer</Text>
         </View>
       )}
 

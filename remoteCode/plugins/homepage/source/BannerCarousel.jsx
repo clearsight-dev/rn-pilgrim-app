@@ -1,9 +1,11 @@
 import React from "react";
-import {Carousel} from '../../../../extractedQueries/ImageCarousel';
-import {View, Text, Pressable} from 'react-native';
-import {Image} from "../../../../extractedQueries/ImageComponent";
-import { colors, FONT_FAMILY, typography } from "../../../../extractedQueries/theme";
+import { Carousel } from '../../../../extractedQueries/ImageCarousel';
+import { View, Text, Pressable } from 'react-native';
+import { Image } from "../../../../extractedQueries/ImageComponent";
+import { typography } from "../../../../extractedQueries/theme";
+import { SkeletonBanner } from "../../../../components/skeleton/imageCarousel"
 
+// MetafieldBannerCarouselSkeleton.tsx  
 
 /**
  * Banner Carousel Section Schema
@@ -43,14 +45,18 @@ import { colors, FONT_FAMILY, typography } from "../../../../extractedQueries/th
  *   },
  * }
  */
-export function BannerCarousel({ config, screenWidth, onNavigate }) {
+export function BannerCarousel({ config, screenWidth, onNavigate, loading }) {
   const { items, title, styles, layout } = config;
-  const { aspectRatio, itemWidth, margin} = styles || {};
-  const { enableScrollBubbles} = layout || {}
+  const { aspectRatio, itemWidth, margin } = styles || {};
+  const { enableScrollBubbles } = layout || {}
+
+  if (loading) {
+    return <SkeletonBanner width={screenWidth} />
+  }
 
   return (
     <View style={{ position: 'relative', marginBottom: 20 }}>
-      {title && <Text style={{marginBottom: 12, ...typography.heading19, paddingHorizontal: 16}}>{title}</Text>}
+      {title && <Text style={{ marginBottom: 12, ...typography.heading19, paddingHorizontal: 16 }}>{title}</Text>}
       <Carousel
         flatlistData={items.map((it, i) => ({
           id: i,
@@ -88,7 +94,10 @@ export function BannerCarousel({ config, screenWidth, onNavigate }) {
   );
 }
 
-export function MetafieldBannerCarousel({ items, screenWidth, onNavigate }) {
+export function MetafieldBannerCarousel({ loading, items, screenWidth, onNavigate }) {
+  if (loading) {
+    return <SkeletonBanner width={screenWidth} />
+  }
   return (
     <View style={{ position: 'relative', marginBottom: 20 }}>
       <Carousel
