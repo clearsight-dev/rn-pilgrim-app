@@ -1,6 +1,6 @@
 import React from "react";
 import { Carousel } from '../../../../extractedQueries/ImageCarousel';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Image } from "../../../../extractedQueries/ImageComponent";
 import { typography } from "../../../../extractedQueries/theme";
 import { SkeletonBanner } from "../../../../components/skeleton/imageCarousel"
@@ -46,16 +46,18 @@ import { SkeletonBanner } from "../../../../components/skeleton/imageCarousel"
  * }
  */
 export function BannerCarousel({ config, screenWidth, onNavigate, loading }) {
-  const { items, title, styles, layout } = config;
-  const { aspectRatio, itemWidth, margin } = styles || {};
+  const { items, title, layout } = config;
+  const { aspectRatio, itemWidth, margin } = config?.styles || {};
   const { enableScrollBubbles } = layout || {}
 
   if (loading) {
     return <SkeletonBanner width={screenWidth} />
   }
 
+  const mergedContainerStyle = [styles.container, config?.styles?.container];
+
   return (
-    <View style={{ position: 'relative', marginBottom: 20 }}>
+    <View style={mergedContainerStyle}>
       {title && <Text style={{ marginBottom: 12, ...typography.heading19, paddingHorizontal: 16 }}>{title}</Text>}
       <Carousel
         flatlistData={items.map((it, i) => ({
@@ -94,12 +96,15 @@ export function BannerCarousel({ config, screenWidth, onNavigate, loading }) {
   );
 }
 
-export function MetafieldBannerCarousel({ loading, items, screenWidth, onNavigate }) {
+export function MetafieldBannerCarousel({ loading, items, screenWidth, onNavigate, config }) {
   if (loading) {
     return <SkeletonBanner width={screenWidth} />
   }
+
+  const mergedContainerStyle = [styles.container, config?.styles?.container];
+
   return (
-    <View style={{ position: 'relative', marginBottom: 20 }}>
+    <View style={mergedContainerStyle}>
       <Carousel
         flatlistData={items.map((item, i) => ({
           id: i,
@@ -129,3 +134,10 @@ export function MetafieldBannerCarousel({ loading, items, screenWidth, onNavigat
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+});

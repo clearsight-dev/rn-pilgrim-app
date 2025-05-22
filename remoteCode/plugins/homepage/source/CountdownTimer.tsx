@@ -7,7 +7,7 @@ interface CountdownTimerProps {
   config: {
     content?: string;
     endDate?: string | Date;
-    style?: {
+    styles?: {
       container?: ViewStyle;
       label?: TextStyle;
       timer?: TextStyle;
@@ -56,10 +56,10 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config, loading }) => {
 
   if (loading) return null;
 
-  const mergedContainerStyle = [styles.container, config?.style?.container];
-  const mergedLabelStyle = [styles.label, config?.style?.label];
-  const mergedTimerStyle = [styles.timer, config?.style?.timer];
-  const mergedWrapperStyle = [styles.wrapper, config?.style?.wrapper];
+  const mergedContainerStyle = [styles.container, config?.styles?.container];
+  const mergedLabelStyle = [styles.label, config?.styles?.label];
+  const mergedTimerStyle = [styles.timer, config?.styles?.timer];
+  const mergedWrapperStyle = [styles.wrapper, config?.styles?.wrapper];
 
   return (
     <View style={mergedWrapperStyle}>

@@ -435,6 +435,7 @@ export function ReactComponent({ model }) {
             <MetafieldBannerCarousel
               loading={dataLoadingState !== 'DONE'}
               items={metafieldCarousalData}
+              config={section.config}
               screenWidth={screenWidth}
               onNavigate={(screen, params) =>
                 dispatch(navigateToScreen(screen, params))
