@@ -11,6 +11,7 @@ interface CountdownTimerProps {
       container?: ViewStyle;
       label?: TextStyle;
       timer?: TextStyle;
+      wrapper?: ViewStyle;
     };
   };
 }
@@ -58,9 +59,10 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ config, loading }) => {
   const mergedContainerStyle = [styles.container, config?.style?.container];
   const mergedLabelStyle = [styles.label, config?.style?.label];
   const mergedTimerStyle = [styles.timer, config?.style?.timer];
+  const mergedWrapperStyle = [styles.wrapper, config?.style?.wrapper];
 
   return (
-    <View style={styles.wrapper}>
+    <View style={mergedWrapperStyle}>
       <View style={mergedContainerStyle}>
         <Text style={mergedLabelStyle}>
           {config.content || "Exclusive access ends in"}{" "}
