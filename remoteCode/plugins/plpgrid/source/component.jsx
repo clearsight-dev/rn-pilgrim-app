@@ -19,9 +19,10 @@ import Header from '../../../../extractedQueries/CollectionFilterChips';
 import Footer, { getShopifyFilters } from './Footer';
 import styles from './styles';
 import { colors, typography } from '../../../../extractedQueries/theme';
+import CountdownTimer from '../../homepage/source/CountdownTimer'
+import { isPlainObject } from 'lodash-es';
 
 export function ReactComponent({ model }) {
-  // const collectionHandle = model.get('collectionHandle') || '';
   const route = useRoute();
   const collectionHandle = route.params?.collectionHandle ?? 'bestsellers';
   const selectedCategory = route.params?.category;
@@ -50,6 +51,11 @@ export function ReactComponent({ model }) {
   const [totalProductsCount, setTotalProductsCount] = useState({ isMaxCount: false, count: 0 });
   const [isLoadingTotalCount, setIsLoadingTotalCount] = useState(false);
   const flatListRef = useRef(null);
+
+  // this is only for sale on may 23 to 27th
+  const timerWidgetConfig = isPlainObject(model.get('timerWidgetConfig')) ? model.get('timerWidgetConfig') : {};
+  const timerCollectionHandles = Array.isArray(model.get('timerCollectionHandles')) ? model.get('timerCollectionHandles') : [];
+
 
   const onSelectShade = (product) => {
     setSelectedProduct(product);
@@ -362,6 +368,9 @@ export function ReactComponent({ model }) {
             )}
           </View>
         </View>
+        {timerCollectionHandles?.includes(collectionHandle) && (
+          <CountdownTimer config={timerWidgetConfig}/>
+        )}
       </>
     );
   };
@@ -467,16 +476,24 @@ export function ReactComponent({ model }) {
 }
 
 export const WidgetConfig = {
-  collectionHandle: ''
+  timerWidgetConfig: '{{{}}}',
+  timerCollectionHandles: '{{[]}}'
 };
 
 export const WidgetEditors = {
   basic: [
     {
       type: 'codeInput',
-      name: 'collectionHandle',
+      name: 'timerWidgetConfig',
       props: {
-        label: 'Collection Handle'
+        label: 'Timer Widget Config'
+      }
+    },
+    {
+      type: 'codeInput',
+      name: 'timerCollectionHandles',
+      props: {
+        label: 'Timer Collection Handles'
       }
     }
   ],
