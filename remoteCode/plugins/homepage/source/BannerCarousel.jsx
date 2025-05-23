@@ -4,6 +4,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Image } from "../../../../extractedQueries/ImageComponent";
 import { typography } from "../../../../extractedQueries/theme";
 import { SkeletonBanner } from "../../../../components/skeleton/imageCarousel"
+import _ from 'lodash-es'
 
 // MetafieldBannerCarouselSkeleton.tsx  
 
@@ -96,12 +97,18 @@ export function BannerCarousel({ config, screenWidth, onNavigate, loading }) {
   );
 }
 
-export function MetafieldBannerCarousel({ loading, items, screenWidth, onNavigate, config }) {
+export function MetafieldBannerCarousel({ loading, data = {}, screenWidth, onNavigate, config }) {
+  const { bannerKey } = config;
+  const { aspectRatio } = config?.styles || {};
+  const items = _.get(data, bannerKey, []);
+  const mergedContainerStyle = [styles.container, config?.styles?.container];
+
   if (loading) {
     return <SkeletonBanner width={screenWidth} />
   }
 
-  const mergedContainerStyle = [styles.container, config?.styles?.container];
+  if (_.isEmpty(items)) return <></>;
+
 
   return (
     <View style={mergedContainerStyle}>
@@ -125,7 +132,7 @@ export function MetafieldBannerCarousel({ loading, items, screenWidth, onNavigat
               resizeMode="cover"
               style={{
                 width: screenWidth,
-                aspectRatio: 1.3
+                aspectRatio: aspectRatio || 1.3
               }}
             />
           </Pressable>

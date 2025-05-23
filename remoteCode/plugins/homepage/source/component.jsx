@@ -15,7 +15,8 @@ import {
   NativeModules,
   SectionList,
   Platform,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { navigateToScreen, useApptileWindowDims } from 'apptile-core';
 import { useDispatch } from 'react-redux';
@@ -35,7 +36,7 @@ import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
 import CountdownTimer from './CountdownTimer'
-// import {dummy as sections} from './dummySections';
+// import { dummy as sections } from './dummySections';
 
 import { fetchPageData } from '../../../../queries/pageQuery';
 // import {typography} from '../../../../extractedQueries/theme'
@@ -63,7 +64,7 @@ async function fetchHomepageCollectionsData(collections) {
 
   // Create an array of promises for all collections
   const collectionPromises = collections.map(collection =>
-    getFilterAndProductsForCollection(collection),
+    getFilterAndProductsForCollection(collection)
   );
 
   // Return results as an object with collection handles as keys
@@ -83,14 +84,12 @@ async function fetchHomepageCollectionsData(collections) {
 export function transformPageData(pageData) {
   if (!pageData?.data?.page) {
     return {
-      pageInfo: {},
-      metafields: {},
-      bannerContents: [],
+      bannerContents: {},
     };
   }
 
   const page = pageData.data.page;
-  const metafields = page.metafields || [];
+  const metafields = (page.metafields || []).filter(Boolean);
 
   // Extract banner contents from metafields
   const bannerContentsMetafield = _.find(
@@ -98,24 +97,16 @@ export function transformPageData(pageData) {
     o => ['banner_contents'].includes(o?.key) && o?.namespace === 'custom',
   );
 
-  const bannerContents = _.get(bannerContentsMetafield, 'references.nodes', []);
-
-  // Extract other individual metafields for easy access
-  const metafieldValues = {};
-  metafields.forEach(metafield => {
-    if (metafield.namespace === 'custom') {
-      metafieldValues[metafield.key] = metafield.value;
-    }
-  });
+  const appBannerCarousel2Metafield = _.find(
+    metafields,
+    o => ['app_banner_carousel_2'].includes(o?.key) && o?.namespace === 'custom',
+  );
 
   return {
-    pageInfo: {
-      id: page.id,
-      handle: page.handle,
-      title: page.title,
+    bannerContents: {
+      banner_contents: _.get(bannerContentsMetafield, 'references.nodes', []),
+      app_banner_carousel_2: _.get(appBannerCarousel2Metafield, 'references.nodes', [])
     },
-    metafields: metafieldValues,
-    bannerContents: bannerContents,
   };
 }
 
@@ -125,10 +116,7 @@ export function transformPageData(pageData) {
  * @param {Object} transformedData - Data returned from transformPageData function
  * @returns {Array} - Array of banner navigation arrays in format [imageUrl, isNavigatable, navigateToScreen, navigateToScreenParam]
  */
-export function extractBannerNavigation(transformedData) {
-  // Extract banner contents from the transformed data
-  const bannerContents = _.get(transformedData, 'bannerContents', []);
-
+export function extractBannerNavigation(bannerContents) {
   // Map each banner to the required format
   return bannerContents.map(banner => {
     const fields = banner.fields || [];
@@ -182,14 +170,15 @@ export function extractBannerNavigation(transformedData) {
 const numberOfProducts = 5;
 
 export function ReactComponent({ model }) {
-  const loadedRef = useRef(false);
+  const isInitialLoadRef = useRef(false);
   const [dataLoadingState, setDataLoadingState] = useState('NOT-STARTED'); // 'IN-PROGRESS' | 'DONE'
 
   const shadeBottomSheetRef = useRef(null);
   const variantBottomSheetRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [metafieldCarousalData, setMetafieldCarousalData] = useState([]);
+  const [metafieldCarousalData, setMetafieldCarousalData] = useState({});
   const dispatch = useDispatch();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Get collection handle and number of products from model props or use defaults
 
@@ -317,88 +306,107 @@ export function ReactComponent({ model }) {
     [],
   );
 
+  const loadData = useCallback(async (revalidateCaches = false) => {
+    setDataLoadingState('IN-PROGRESS');
+    const collectionsToFetch = extractCollectionsFromSections(sections, [
+      'highlighted-collections',
+      'chip-collections',
+    ]);
+
+    try {
+      const collectionsData = await fetchHomepageCollectionsData(collectionsToFetch);
+      // Convert the results to the format expected by chipCollectionData
+      const formattedData = {};
+      Object.entries(collectionsData).forEach(([collection, data]) => {
+        formattedData[collection] = {
+          status: 'loaded',
+          products: data.products,
+          filters: data.filters,
+          selectedFilters: [],
+          error: '',
+        };
+      });
+
+      setChipCollectionData(formattedData);
+    } catch (err) {
+      console.error('Failed to fetch data for homepage', err);
+      const errorMessage = 'Error: ' + err.toString();
+
+      // Create an error state for each collection
+      const errorData = {};
+      collectionsToFetch.forEach(collection => {
+        errorData[collection] = {
+          status: 'error',
+          products: [],
+          filters: [],
+          selectedFilters: [],
+          error: errorMessage,
+        };
+      });
+
+      setChipCollectionData(errorData);
+    }
+
+    const pageParams = {
+      handle: 'app-homepage',
+      pageMetafields: [
+        {
+          key: 'app_top_banner_content',
+          namespace: 'custom',
+        },
+        {
+          key: 'app_banner_heading',
+          namespace: 'custom',
+        },
+        {
+          key: 'banner_contents',
+          namespace: 'custom',
+        },
+        {
+          key: 'app_banner_carousel_2',
+          namespace: 'custom',
+        },
+      ],
+    };
+
+    try {
+      const data = await fetchPageData(pageParams.handle, pageParams.pageMetafields, revalidateCaches);
+      const transformedPageData = _.get(transformPageData(data), "bannerContents", {});
+      const contructedData = {}
+      for (const key in transformedPageData) {
+        contructedData[key] = extractBannerNavigation(transformedPageData[key])
+      }
+      setMetafieldCarousalData(contructedData)
+    } catch (err) {
+      console.error('Page data [Marker error]', err);
+    }
+
+    setDataLoadingState('DONE');
+  }, [sections])
+
+
   useEffect(() => {
-    if (loadedRef.current) {
+    if (sections.length === 0 || isInitialLoadRef.current) {
       return;
     }
-    const loadData = async () => {
-      setDataLoadingState('IN-PROGRESS');
-      const collectionsToFetch = extractCollectionsFromSections(sections, [
-        'highlighted-collections',
-        'chip-collections',
-      ]);
 
-      try {
-        const collectionsData = await fetchHomepageCollectionsData(collectionsToFetch);
-        console.log('Finishing carousel data fetch for collections');
+    isInitialLoadRef.current = true;
+    (async () => {
+      await loadData()
 
-        // Convert the results to the format expected by chipCollectionData
-        const formattedData = {};
-        Object.entries(collectionsData).forEach(([collection, data]) => {
-          formattedData[collection] = {
-            status: 'loaded',
-            products: data.products,
-            filters: data.filters,
-            selectedFilters: [],
-            error: '',
-          };
-        });
+    })()
+  }, [sections])
 
-        setChipCollectionData(formattedData);
-      } catch (err) {
-        console.error('Failed to fetch data for homepage', err);
-        const errorMessage = 'Error: ' + err.toString();
-
-        // Create an error state for each collection
-        const errorData = {};
-        collectionsToFetch.forEach(collection => {
-          errorData[collection] = {
-            status: 'error',
-            products: [],
-            filters: [],
-            selectedFilters: [],
-            error: errorMessage,
-          };
-        });
-
-        setChipCollectionData(errorData);
-      }
-
-      const pageParams = {
-        handle: 'app-homepage',
-        pageMetafields: [
-          {
-            key: 'app_top_banner_content',
-            namespace: 'custom',
-          },
-          {
-            key: 'app_banner_heading',
-            namespace: 'custom',
-          },
-          {
-            key: 'banner_contents',
-            namespace: 'custom',
-          },
-        ],
-      };
-
-      try {
-        const data = await fetchPageData(pageParams.handle, pageParams.pageMetafields);
-        setMetafieldCarousalData(
-          extractBannerNavigation(transformPageData(data)),
-        );
-      } catch (err) {
-        console.error('Page data [Marker error]', err);
-      }
-
-
-      setDataLoadingState('DONE');
+  const onRefresh = () => {
+    if (dataLoadingState === "DONE") {
+      setIsRefreshing(true);
+      (async () => {
+        await loadData(true)
+        setIsRefreshing(false);
+      })()
     }
+  };
 
-    loadData();
-
-    loadedRef.current = true;
-  }, [sections]);
 
 
   const onSelectShade = useCallback(product => {
@@ -434,7 +442,7 @@ export function ReactComponent({ model }) {
           return (
             <MetafieldBannerCarousel
               loading={dataLoadingState !== 'DONE'}
-              items={metafieldCarousalData}
+              data={metafieldCarousalData}
               config={section.config}
               screenWidth={screenWidth}
               onNavigate={(screen, params) =>
@@ -543,6 +551,12 @@ export function ReactComponent({ model }) {
         windowSize={5}
         removeClippedSubviews={Platform.OS !== 'web'}
         updateCellsBatchingPeriod={50}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+          />
+        }
       />
 
       {/* Shade Selector Modal */}
