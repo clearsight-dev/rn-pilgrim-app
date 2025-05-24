@@ -297,7 +297,7 @@ export function ReactComponent({ model }) {
           sortOption,
           sortReverse,
           appliedFilters,
-          filterData.filters
+          filterData
         );
       } else {
         // Otherwise, use the regular fetchData
