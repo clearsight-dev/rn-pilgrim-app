@@ -18,7 +18,7 @@ const Image = (props: FastImageProps) => {
           setLoaded(true);
           props.onLoadEnd?.();
         }}
-        style={[StyleSheet.absoluteFill, props.style]}
+        style={[StyleSheet.absoluteFill]}
       /> 
     </View>
   );
