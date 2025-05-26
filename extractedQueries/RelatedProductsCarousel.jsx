@@ -104,6 +104,7 @@ export function formatProduct(product) {
     reviews: product?.reviews,
     productLabel1: product.productLabel1,
     productLabel2: product.productLabel2,
+    productLabel3: product.productLabel3,
     weight: firstVariant?.weight,
     weightUnit: firstVariant?.weightUnit,
     subtitle: product.subtitle,

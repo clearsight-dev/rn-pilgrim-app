@@ -41,7 +41,7 @@ export function ReactComponent({ model }) {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [collectionTitle, setCollectionTitle] = useState('');
   const [image, setImage] = useState(null);
-  const [sortOption, setSortOption] = useState('BEST_SELLING');
+  const [sortOption, setSortOption] = useState('COLLECTION_DEFAULT');
   const [sortReverse, setSortReverse] = useState(false);
   const [filterData, setFilterData] = useState({ filters: [], unflattenedFilters: [] });
   const [appliedFilters, setAppliedFilters] = useState([]); // Track applied filters separately
@@ -51,6 +51,7 @@ export function ReactComponent({ model }) {
   const [totalProductsCount, setTotalProductsCount] = useState({ isMaxCount: false, count: 0 });
   const [isLoadingTotalCount, setIsLoadingTotalCount] = useState(false);
   const flatListRef = useRef(null);
+  const fetchedCursors = useRef(new Set());
 
   // this is only for sale on may 23 to 27th
   const timerWidgetConfig = isPlainObject(model.get('timerWidgetConfig')) ? model.get('timerWidgetConfig') : {};
@@ -88,6 +89,7 @@ export function ReactComponent({ model }) {
     // Reload products with new sort option
     setProducts([]);
     setCurrentCursor(null);
+    fetchedCursors.current.clear();
     fetchData(collectionHandle, null, false, option.value, option.reverse);
 
     // Refresh the total count when sort option changes
@@ -203,6 +205,7 @@ export function ReactComponent({ model }) {
     // Reload products with selected filters
     setProducts([]);
     setCurrentCursor(null);
+    fetchedCursors.current.clear();
 
     // Fetch data with filters
     fetchDataWithFilters(collectionHandle, null, false, sortOption, sortReverse, filterIds, filterData);
@@ -221,7 +224,7 @@ export function ReactComponent({ model }) {
     collectionHandle,
     cursor = null,
     isLoadingMore = false,
-    sortKey = "BEST_SELLING",
+    sortKey = "COLLECTION_DEFAULT",
     reverse = false,
     filterIds = [],
     filterData
@@ -274,6 +277,7 @@ export function ReactComponent({ model }) {
   }
 
   useEffect(() => {
+    fetchedCursors.current.clear();
     if (Platform.OS === "android") {
       setTimeout(() => {
         fetchTotalProductsCount(collectionHandle);
@@ -287,7 +291,15 @@ export function ReactComponent({ model }) {
 
   // Handle loading more products when reaching the end of the list
   const handleLoadMore = (collectionHandle) => {
-    if (hasNextPage && !loadingMore && !loading) {
+    if (hasNextPage && !loadingMore && !loading && currentCursor) {
+      //!Fix me: Check if the current cursor has already been fetched <== this is not a good way to do this, but it works for now
+      if (fetchedCursors.current.has(currentCursor)) {
+        console.log('[SKIPPED] Already fetched cursor:', currentCursor, fetchedCursors.current);
+        return;
+      }
+
+      fetchedCursors.current.add(currentCursor)
+
       if (appliedFilters.length > 0) {
         // If filters are applied, use fetchDataWithFilters
         fetchDataWithFilters(
@@ -369,7 +381,7 @@ export function ReactComponent({ model }) {
           </View>
         </View>
         {timerCollectionHandles?.includes(collectionHandle) && (
-          <CountdownTimer config={timerWidgetConfig}/>
+          <CountdownTimer config={timerWidgetConfig} />
         )}
       </>
     );
@@ -414,6 +426,10 @@ export function ReactComponent({ model }) {
     );
   }, [collectionHandle, sortOption, sortReverse]);
 
+  const dummyData = Array(12).fill().map((_, index) => ({
+    id: `dummy-${index}`,
+  }));
+
   return (
     <View style={[styles.container, { padding: 0 }]}>
       {/* Filter chips header */}
@@ -427,8 +443,9 @@ export function ReactComponent({ model }) {
 
       <FlatList
         ref={flatListRef}
-        data={loading ? Array(12).fill(0) : products}
+        data={loading ? dummyData : products}
         renderItem={renderProductItem}
+        keyExtractor={(item) => item.id}
         numColumns={2}
         initialNumToRender={4}
         maxToRenderPerBatch={6}

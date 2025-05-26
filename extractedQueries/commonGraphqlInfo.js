@@ -97,6 +97,12 @@ export const PRODUCT_CARD_INFO = `
     namespace
     value
   }
+  productLabel3: metafield(key: "product_label_3", namespace: "custom") {
+    id
+    key
+    namespace
+    value
+  }
   subtitle: metafield(key: "subtitle", namespace: "descriptors") {
     id
     key
