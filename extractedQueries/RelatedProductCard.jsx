@@ -56,6 +56,7 @@ function RelatedProductCard({
     variantsCount,
     productLabel1,
     productLabel2,
+    productLabel3,
     weight,
     weightUnit,
     textBenefits,
@@ -68,7 +69,13 @@ function RelatedProductCard({
 
   const productLabel2Text = productLabel2?.value?.split("|")[0]?.trim();
   const productLabel2Color = productLabel2?.value?.split("|")[1]?.trim();
-  const productLabel2Width = _.clamp((productLabel2Text?.length || 10) * 8, 80, 150);
+
+  const productLabel3Text = productLabel3?.value?.split("|")[0]?.trim();
+  const productLabel3Color = productLabel3?.value?.split("|")[1]?.trim();
+
+  const productLabelColor = productLabel3Color || productLabel2Color
+  const productLabelText = productLabel3Text || productLabel2Text
+  const productLabelWidth = _.clamp((productLabelText?.length || 10) * 8, 80, 150);
 
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = compareAtPrice?.amount
@@ -139,13 +146,13 @@ function RelatedProductCard({
         dispatch(navigateToScreen('Product', { productHandle: handle }));
       }}>
       {/* Promo Tag */}
-      {productLabel2Text && (
+      {(productLabelText) && (
         <ProductFlag
-          label={productLabel2Text}
-          color={isValidColor(productLabel2Color) ? productLabel2Color : colors.secondaryMain}
+          label={productLabelText}
+          color={isValidColor(productLabelColor) ? productLabelColor : colors.secondaryMain}
           style={styles.promoTagContainer}
           height={20}
-          width={productLabel2Width}
+          width={productLabelWidth}
         />
       )}
 
