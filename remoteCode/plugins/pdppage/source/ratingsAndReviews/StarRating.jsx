@@ -33,7 +33,7 @@ const StarRating = ({ rating = 0, size = 16, maxRating = 5, ratingCount }) => {
           );
         })}
       </View>
-      {ratingCount && <View style={{ flexDirection: 'row', marginTop: 2, alignItems: 'center' }}>
+      {!!ratingCount && <View style={{ flexDirection: 'row', marginTop: 2, alignItems: 'center' }}>
         {/* <Text style={styles.dark}>29,000 Ratings</Text>
         <Text style={styles.dot}>·</Text> */}
         <Icon
