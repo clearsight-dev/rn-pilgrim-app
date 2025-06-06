@@ -1,5 +1,6 @@
-// menuQuery.ts
 import { gql } from "@apollo/client";
+
+// [Apptile Connectors]
 import { cheaplyGetShopifyQueryRunner } from "../../../../extractedQueries/selectors";
 
 export const GET_MENU = gql`

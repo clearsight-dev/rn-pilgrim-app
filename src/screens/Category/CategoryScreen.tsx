@@ -11,10 +11,12 @@ import {
   Platform,
 } from "react-native";
 import { FONT_FAMILY } from "../../../extractedQueries/theme";
-import { Icon } from "apptile-core";
 import { useNavigation } from "@react-navigation/native";
 import { fetchMenu } from "../../queries/graphql/menu/menu";
 import SkeletonBase from "../../../components/skeleton/skeletonBase";
+
+// [Apptile Connectors]
+import { Icon } from "apptile-core";
 
 if (
   Platform.OS === "android" &&
@@ -28,7 +30,9 @@ const CategoryScreen: React.FC = () => {
   const [menu, setMenu] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeMenu, setActiveMenu] = useState<string>("");
-  const [expandedGroups, setExpandedGroups] = useState<{ [key: string]: boolean }>({});
+  const [expandedGroups, setExpandedGroups] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -159,12 +163,14 @@ const CategoryScreen: React.FC = () => {
           { justifyContent: "center", alignItems: "center" },
         ]}
       >
-        <Text>Failed to load menu.</Text>
+        <Text style={styles.failedToLoadText}>Failed to load menu.</Text>
       </View>
     );
   }
 
-  const selectedMainItem = menu.items.find((item: any) => item.id === activeMenu);
+  const selectedMainItem = menu.items.find(
+    (item: any) => item.id === activeMenu
+  );
 
   return (
     <View style={[styles.container, styles.filler]}>
@@ -308,6 +314,9 @@ const styles = StyleSheet.create({
   sidebarItemText: {
     fontSize: 16,
     color: "#313131",
+    fontFamily: FONT_FAMILY?.regular,
+  },
+  failedToLoadText: {
     fontFamily: FONT_FAMILY?.regular,
   },
   activeSidebarItemText: {
