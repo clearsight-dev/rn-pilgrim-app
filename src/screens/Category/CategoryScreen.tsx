@@ -222,6 +222,7 @@ const CategoryScreen: React.FC = () => {
 
       {/* Submenu content */}
       <Animated.ScrollView
+        showsVerticalScrollIndicator={false}
         style={[
           styles.submenu,
           {
