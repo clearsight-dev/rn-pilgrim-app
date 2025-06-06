@@ -9,7 +9,6 @@ import {
   LayoutAnimation,
   UIManager,
   Platform,
-  ActivityIndicator,
 } from "react-native";
 import { FONT_FAMILY } from "../../../extractedQueries/theme";
 import { Icon } from "apptile-core";
@@ -26,7 +25,6 @@ if (
 
 const CategoryScreen: React.FC = () => {
   const navigation = useNavigation();
-
   const [menu, setMenu] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeMenu, setActiveMenu] = useState<string>("");
@@ -35,6 +33,8 @@ const CategoryScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
   const indicatorAnim = useRef(new Animated.Value(0)).current;
+
+  const stickHeightAnim = useRef(new Animated.Value(56)).current;
   const itemRefs = useRef<{ [key: string]: number }>({});
 
   useEffect(() => {
@@ -55,12 +55,23 @@ const CategoryScreen: React.FC = () => {
 
   useEffect(() => {
     const targetY = itemRefs.current[activeMenu] ?? 0;
+
+    // Move background highlight
     Animated.timing(indicatorAnim, {
       toValue: targetY,
       duration: 300,
       useNativeDriver: true,
     }).start();
 
+    // Animate stick height from 0 to 56
+    stickHeightAnim.setValue(0);
+    Animated.timing(stickHeightAnim, {
+      toValue: 56,
+      duration: 500,
+      useNativeDriver: false, // height requires useNativeDriver: false
+    }).start();
+
+    // Animate content transition
     Animated.sequence([
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -104,15 +115,33 @@ const CategoryScreen: React.FC = () => {
       <View style={[styles.container, styles.filler]}>
         <View style={styles.sidebar}>
           {[...Array(12)].map((_, i) => (
-            <SkeletonBase key={i} style={{ height: 56, marginBottom: 8, borderRadius: 4 }} />
+            <SkeletonBase
+              key={i}
+              style={{ height: 56, marginBottom: 8, borderRadius: 4 }}
+            />
           ))}
         </View>
         <ScrollView style={styles.submenu}>
           {[...Array(12)].map((_, i) => (
             <View key={i} style={{ marginBottom: 24 }}>
-              <SkeletonBase style={{ height: 20, width: "60%", marginBottom: 12, borderRadius: 4 }} />
+              <SkeletonBase
+                style={{
+                  height: 20,
+                  width: "60%",
+                  marginBottom: 12,
+                  borderRadius: 4,
+                }}
+              />
               {[...Array(2)].map((_, j) => (
-                <SkeletonBase key={j} style={{ height: 20, width: "100%", marginBottom: 8, borderRadius: 4 }} />
+                <SkeletonBase
+                  key={j}
+                  style={{
+                    height: 20,
+                    width: "100%",
+                    marginBottom: 8,
+                    borderRadius: 4,
+                  }}
+                />
               ))}
             </View>
           ))}
@@ -123,7 +152,13 @@ const CategoryScreen: React.FC = () => {
 
   if (!menu) {
     return (
-      <View style={[styles.container, styles.filler, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          styles.container,
+          styles.filler,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <Text>Failed to load menu.</Text>
       </View>
     );
@@ -133,7 +168,7 @@ const CategoryScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, styles.filler]}>
-      {/* Left Sidebar */}
+      {/* Sidebar */}
       <View style={styles.sidebar}>
         <Animated.View
           style={[
@@ -142,7 +177,18 @@ const CategoryScreen: React.FC = () => {
               transform: [{ translateY: indicatorAnim }],
             },
           ]}
-        />
+        >
+          {/* Animated stick */}
+          <Animated.View
+            style={[
+              styles.activeIndicatorStick,
+              {
+                height: stickHeightAnim,
+              },
+            ]}
+          />
+        </Animated.View>
+
         {menu.items.map((item: any) => (
           <TouchableOpacity
             key={item.id}
@@ -168,7 +214,7 @@ const CategoryScreen: React.FC = () => {
         ))}
       </View>
 
-      {/* Right Submenu */}
+      {/* Submenu content */}
       <Animated.ScrollView
         style={[
           styles.submenu,
@@ -188,9 +234,19 @@ const CategoryScreen: React.FC = () => {
               >
                 <Text style={styles.groupTitle}>{subItem.title}</Text>
                 {isExpanded ? (
-                  <Icon iconType="MaterialCommunityIcons" size={20} color="#00796b" name="minus" />
+                  <Icon
+                    iconType="MaterialCommunityIcons"
+                    size={20}
+                    color="#00796b"
+                    name="minus"
+                  />
                 ) : (
-                  <Icon iconType="MaterialCommunityIcons" size={20} color="#00796b" name="plus" />
+                  <Icon
+                    iconType="MaterialCommunityIcons"
+                    size={20}
+                    color="#00796b"
+                    name="plus"
+                  />
                 )}
               </TouchableOpacity>
 
@@ -207,9 +263,15 @@ const CategoryScreen: React.FC = () => {
                         if (!handle) return;
 
                         if (resourceId.startsWith("gid://shopify/Product")) {
-                          navigation.navigate("Product", { productHandle: handle });
-                        } else if (resourceId.startsWith("gid://shopify/Collection")) {
-                          navigation.navigate("Collection", { collectionHandle: handle });
+                          navigation.navigate("Product", {
+                            productHandle: handle,
+                          });
+                        } else if (
+                          resourceId.startsWith("gid://shopify/Collection")
+                        ) {
+                          navigation.navigate("Collection", {
+                            collectionHandle: handle,
+                          });
                         }
                       }}
                     >
@@ -226,7 +288,7 @@ const CategoryScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  filler: { marginTop: 50 },
+  filler: { marginTop: 70 },
   container: {
     flexDirection: "row",
     flex: 1,
@@ -259,11 +321,17 @@ const styles = StyleSheet.create({
     width: 140,
     height: 56,
     backgroundColor: "#e6f2f0",
-    borderLeftWidth: 4,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
-    borderLeftColor: "#00796b",
     zIndex: -1,
+    overflow: "hidden",
+  },
+  activeIndicatorStick: {
+    width: 4,
+    backgroundColor: "#00796b",
+    borderTopRightRadius: 240,
+    borderBottomRightRadius: 240,
+    alignSelf: "flex-start",
   },
   submenu: {
     flex: 1,
