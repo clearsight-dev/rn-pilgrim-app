@@ -25,6 +25,20 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+const handleRedirection = (handle: string, resourceId: string, navigation) => {
+  if (!handle) return;
+
+  if (resourceId.startsWith("gid://shopify/Product")) {
+    navigation.navigate("Product", {
+      productHandle: handle,
+    });
+  } else if (resourceId.startsWith("gid://shopify/Collection")) {
+    navigation.navigate("Collection", {
+      collectionHandle: handle,
+    });
+  }
+};
+
 const CategoryScreen: React.FC = () => {
   const navigation = useNavigation();
   const [menu, setMenu] = useState<any>(null);
@@ -44,7 +58,7 @@ const CategoryScreen: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await fetchMenu({ handle: "main-menu" });
+        const { data } = await fetchMenu({ handle: "main-menu-app" });
         if (data?.items?.length > 0) {
           setMenu(data);
           setActiveMenu(data.items[0].id);
@@ -233,11 +247,19 @@ const CategoryScreen: React.FC = () => {
       >
         {selectedMainItem?.items?.map((subItem: any) => {
           const isExpanded = expandedGroups[subItem.id] ?? true;
+          const isSubItemsExist = subItem.items && subItem.items.length > 0;
+
           return (
             <View key={subItem.id} style={styles.group}>
               <TouchableOpacity
                 style={{ alignItems: "center", flexDirection: "row" }}
-                onPress={() => toggleGroup(subItem.id)}
+                onPress={() => {
+                  if(isSubItemsExist){
+                    toggleGroup(subItem.id);
+                  }else{
+                    handleRedirection(subItem.resource?.handle, subItem.resourceId || "", navigation);
+                  }
+                }}
               >
                 <Text style={styles.groupTitle}>{subItem.title}</Text>
                 {isExpanded ? (
@@ -245,7 +267,7 @@ const CategoryScreen: React.FC = () => {
                     iconType="MaterialCommunityIcons"
                     size={20}
                     color="#00796b"
-                    name="minus"
+                    name={isSubItemsExist ? "minus": "chevron-right"}
                   />
                 ) : (
                   <Icon
@@ -267,19 +289,7 @@ const CategoryScreen: React.FC = () => {
                       key={grandItem.id}
                       style={styles.linkItem}
                       onPress={() => {
-                        if (!handle) return;
-
-                        if (resourceId.startsWith("gid://shopify/Product")) {
-                          navigation.navigate("Product", {
-                            productHandle: handle,
-                          });
-                        } else if (
-                          resourceId.startsWith("gid://shopify/Collection")
-                        ) {
-                          navigation.navigate("Collection", {
-                            collectionHandle: handle,
-                          });
-                        }
+                        handleRedirection(handle, resourceId, navigation);
                       }}
                     >
                       <Text style={styles.linkText}>{grandItem.title}</Text>
