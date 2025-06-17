@@ -124,7 +124,7 @@ const CategoryScreen: React.FC = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedGroups((prev) => ({
       ...prev,
-      [groupId]: !prev[groupId],
+      [groupId]: prev?.hasOwnProperty(groupId) ? !prev[groupId] : !true ,
     }));
   };
 
