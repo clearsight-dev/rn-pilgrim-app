@@ -8,8 +8,6 @@ import {
   FlatList,
   Text,
   Pressable,
-  SafeAreaView,
-  Platform,StatusBar
 } from "react-native";
 import { typography, FONT_FAMILY } from "../../../extractedQueries/theme";
 
@@ -132,54 +130,52 @@ const SearchScreen = () => {
   }, [inputValue]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <SearchBar
-          isEditable={true}
-          inputValue={inputValue}
-          setInputValue={setInputValue}
-        />
-        {suggestions.length > 0 && (
-          <FlatList
-            data={suggestions}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => {
-                  navigation.navigate("SearchResultsScreen", {
-                    query: item.text,
-                  });
-                }}
-              >
-                <View style={styles.item}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      flexGrow: 2,
-                    }}
-                  >
-                    <Icon
-                      iconType="Ionicons"
-                      name="search"
-                      size={20}
-                      color="#8C8C8C"
-                    />
-                    <Text style={styles.itemText}>{item.text}</Text>
-                  </View>
+    <View style={styles.container}>
+      <SearchBar
+        isEditable={true}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+      />
+      {suggestions.length > 0 && (
+        <FlatList
+          data={suggestions}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => {
+                navigation.navigate("SearchResultsScreen", {
+                  query: item.text,
+                });
+              }}
+            >
+              <View style={styles.item}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    flexGrow: 2,
+                  }}
+                >
                   <Icon
-                    iconType="Feather"
-                    name="arrow-up-left"
+                    iconType="Ionicons"
+                    name="search"
                     size={20}
                     color="#8C8C8C"
                   />
+                  <Text style={styles.itemText}>{item.text}</Text>
                 </View>
-              </Pressable>
-            )}
-          />
-        )}
-      </View>
-    </SafeAreaView>
+                <Icon
+                  iconType="Feather"
+                  name="arrow-up-left"
+                  size={20}
+                  color="#8C8C8C"
+                />
+              </View>
+            </Pressable>
+          )}
+        />
+      )}
+    </View>
   );
 };
 
@@ -197,7 +193,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 56,
     backgroundColor: "#fff",
-    marginTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
