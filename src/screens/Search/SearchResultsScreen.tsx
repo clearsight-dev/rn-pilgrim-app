@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  SafeAreaView,
   Platform,
 } from "react-native";
 
@@ -139,7 +138,6 @@ const SearchScreen = () => {
   const navigation = useNavigation();
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <SearchBar
         isEditable={false}
@@ -180,7 +178,6 @@ const SearchScreen = () => {
         onClose={() => setSelectedProduct(null)}
       />
     </View>
-    </SafeAreaView>
   );
 };
 
