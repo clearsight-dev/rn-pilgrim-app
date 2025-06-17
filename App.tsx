@@ -157,7 +157,6 @@ function App(): React.JSX.Element {
           });
         }}>
         {body}
-        {/* {(!status.modelReady) && <JSSplash/>} */}
       </ApptileWrapper>
     </PilgrimContext.Provider>
   );
