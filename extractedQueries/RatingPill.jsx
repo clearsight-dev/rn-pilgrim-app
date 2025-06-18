@@ -23,8 +23,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   ratingText: {
-    fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
+    fontFamily: FONT_FAMILY.medium,
     marginLeft: 4,
   },
 });

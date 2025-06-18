@@ -106,9 +106,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkboxSelected: {
-    backgroundColor: colors.secondaryMain,
+    backgroundColor: colors.primaryDark,
     borderWidth: 1.82,
-    borderColor: colors.secondaryMain,
+    borderColor: colors.primaryDark,
   },
   checkboxUnselected: {
     backgroundColor: colors.dark10,

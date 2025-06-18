@@ -1,85 +1,150 @@
 import React from "react";
-import {Carousel} from '../../../../extractedQueries/ImageCarousel';
-import {View, Text, Pressable} from 'react-native';
-import {Image} from "../../../../extractedQueries/ImageComponent";
-import { colors, FONT_FAMILY, typography } from "../../../../extractedQueries/theme";
+import { Carousel } from '../../../../extractedQueries/ImageCarousel';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { Image } from "../../../../extractedQueries/ImageComponent";
+import { typography } from "../../../../extractedQueries/theme";
+import { SkeletonBanner } from "../../../../components/skeleton/imageCarousel"
+import _ from 'lodash-es'
 
-export default function BannerCarousel({items, screenWidth, onNavigate}) {
+// MetafieldBannerCarouselSkeleton.tsx  
+
+/**
+ * Banner Carousel Section Schema
+ * 
+ * This schema defines the structure for a banner carousel section in the SectionList.
+ * It configures a carousel of banner images that can navigate to collections or products.
+ * 
+ * @typedef {Object} BannerCarouselSection
+ * @property {Object} config - Configuration object for the carousel
+ * @property {string} [config.title] - Optional title to display above the carousel
+ * @property {Array<Object>} config.items - Array of items to display in the carousel
+ * @property {string} [config.items[].collection] - Optional collection handle for navigation
+ * @property {string} [config.items[].product] - Optional product handle for navigation
+ * @property {Object} config.items[].image - Image object for the carousel item
+ * @property {string} config.items[].image.value - URL of the image
+ * @property {Object} [config.layout] - Reserved for layout options (currently unused)
+ * @property {Object} [config.styles] - Style configuration for the carousel
+ * @property {number} [config.styles.aspectRatio] - Aspect ratio for the images (width/height)
+ * 
+ * @example
+ * {
+ *   type: 'banner-carousel',
+ *   data: [{}],
+ *   config: {
+ *     title: 'Featured In',
+ *     items: [
+ *       {
+ *         collection: 'bestsellers',
+ *         image: {
+ *           value: 'https://example.com/image.jpg',
+ *         },
+ *       },
+ *     ],
+ *     styles: {
+ *       aspectRatio: 1.7,
+ *     }
+ *   },
+ * }
+ */
+export function BannerCarousel({ config, screenWidth, onNavigate, loading }) {
+  const { items, title, layout } = config;
+  const { aspectRatio, itemWidth, margin } = config?.styles || {};
+  const { enableScrollBubbles } = layout || {}
+
+  if (loading) {
+    return <SkeletonBanner width={screenWidth} />
+  }
+
+  const mergedContainerStyle = [styles.container, config?.styles?.container];
+
   return (
-    <View style={{ position: 'relative' }}>
+    <View style={mergedContainerStyle}>
+      {title && <Text style={{ marginBottom: 12, ...typography.heading19, paddingHorizontal: 16 }}>{title}</Text>}
       <Carousel
-        flatlistData={items.map(
-          (it, i) => ({
-            id: i,
-            ...it,
-            url: it.image?.value,
-          })
-        )}
+        flatlistData={items.map((it, i) => ({
+          id: i,
+          ...it,
+          url: it.image?.value,
+        }))}
+        scrollBubbleEnabled={enableScrollBubbles}
         width={screenWidth}
         renderChildren={({ item }) => {
           return (
-            <View style={{ position: 'relative' }}>
+            <Pressable
+              onPress={() => {
+                if (item.collection) {
+                  onNavigate('Collection', { collectionHandle: item.collection });
+                } else if (item.product) {
+                  onNavigate('Product', { productHandle: item.product });
+                }
+              }}
+              style={{ position: 'relative' }}
+            >
               <Image
-                source={{ uri: item.url }}
+                source={{ uri: item.url || item.urls[Math.floor(item.urls.length / 2)] }}
                 resizeMode="contain"
                 style={{
-                  width: screenWidth,
-                  aspectRatio: 1.7,
-                  minHeight: 100,
+                  width: itemWidth || screenWidth,
+                  aspectRatio: aspectRatio,
+                  margin: margin || 0
                 }}
               />
-              <View
-                style={{
-                  position: 'absolute',
-                  width: 150,
-                  left: 40,
-                  top: 25,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 30,
-                    fontFamily: FONT_FAMILY.bold,
-                    fontWeight: '600',
-                    color: colors.dark100
-                  }}
-                >
-                  {item.title}
-                </Text>
-                <Text
-                  style={typography.subHeading14}
-                >
-                  {item.subtitle}
-                </Text>
-                <Pressable
-                  onPress={() => {
-                    if (item.collection) {
-                      onNavigate('NewCollection', { collectionHandle: item.collection });
-                    } else if (item.product) {
-                      onNavigate('NewProduct', { productHandle: item.product });
-                    }
-                  }}
-                  style={{
-                    height: 33,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#ffffff88',
-                    marginTop: 20,
-                    paddingHorizontal: 10,
-                    borderRadius: 8,
-                    width: 120,
-                  }}
-                >
-                  <Text 
-                    style={[typography.subHeading15]}
-                  >
-                    Shop now -&gt;
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
+            </Pressable>
           );
         }}
       />
-    </View>)
+    </View>
+  );
 }
+
+export function MetafieldBannerCarousel({ loading, data = {}, screenWidth, onNavigate, config }) {
+  const { bannerKey } = config;
+  const { aspectRatio } = config?.styles || {};
+  const items = _.get(data, bannerKey, []);
+  const mergedContainerStyle = [styles.container, config?.styles?.container];
+
+  if (loading) {
+    return <SkeletonBanner width={screenWidth} />
+  }
+
+  if (_.isEmpty(items)) return <></>;
+
+
+  return (
+    <View style={mergedContainerStyle}>
+      <Carousel
+        flatlistData={items.map((item, i) => ({
+          id: i,
+          ...item,
+          url: item.imageUrl,
+        }))}
+        width={screenWidth}
+        renderChildren={({ item }) => (
+          <Pressable
+            onPress={() => {
+              if (item.isNavigatable && item.navigateToScreen) {
+                onNavigate(item.navigateToScreen, item.navigateToScreenParam);
+              }
+            }}
+          >
+            <Image
+              source={{ uri: item.url }}
+              resizeMode="cover"
+              style={{
+                width: screenWidth,
+                aspectRatio: aspectRatio || 1.3
+              }}
+            />
+          </Pressable>
+        )}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+});

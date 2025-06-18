@@ -1,20 +1,50 @@
-import React, {memo} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import PilgrimCartButton from './PilgrimCartButton';
-import {Image} from './ImageComponent';
-import {navigateToScreen} from 'apptile-core';
-import {useDispatch} from 'react-redux';
+import { Image } from './ImageComponent';
+import { navigateToScreen } from 'apptile-core';
+import { useDispatch } from 'react-redux';
 import Star from './Star';
 import ProductFlag from './ProductFlag';
-import {addLineItemToCart} from './selectors';
+import { addLineItemToCart } from './selectors';
 import { colors, FONT_FAMILY, typography } from './theme';
+import _ from 'lodash-es'
 
-function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelectVariant}) {
+export function isValidColor(color) {
+  if (typeof color !== 'string') return false;
+
+  const namedColors = new Set([
+    'transparent', 'black', 'white', 'red', 'green', 'blue', 'yellow', 'cyan', 'magenta', 'gray',
+    'grey', 'orange', 'purple', 'brown', 'pink', 'lime', 'teal', 'navy', 'gold', 'silver', 'maroon',
+    // Add more named colors if needed
+  ]);
+
+  const hexRegex = /^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+  const rgbRegex = /^rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)$/;
+  const rgbaRegex = /^rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(0|1|0?\.\d+)\s*\)$/;
+  const hslRegex = /^hsl\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*\)$/;
+  const hslaRegex = /^hsla\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*,\s*(0|1|0?\.\d+)\s*\)$/;
+
+  return (
+    namedColors.has(color.toLowerCase()) ||
+    hexRegex.test(color) ||
+    rgbRegex.test(color) ||
+    rgbaRegex.test(color) ||
+    hslRegex.test(color) ||
+    hslaRegex.test(color)
+  );
+}
+
+
+function RelatedProductCard({
+  product,
+  style,
+  cardVariant,
+  onSelectShade,
+  onSelectVariant,
+  headingStyles = {},
+  isHighlighted = false
+}) {
   const {
     handle,
     title,
@@ -26,26 +56,40 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
     variantsCount,
     productLabel1,
     productLabel2,
+    productLabel3,
     weight,
     weightUnit,
+    textBenefits,
+    productSize,
+    productShortTitle
   } = product;
+
+  const productLabel1Text = productLabel1?.value?.split("|")[0]?.trim();
+  const productLabel1Color = productLabel1?.value?.split("|")[1]?.trim();
+
+  const productLabel2Text = productLabel2?.value?.split("|")[0]?.trim();
+  const productLabel2Color = productLabel2?.value?.split("|")[1]?.trim();
+
+  const productLabel3Text = productLabel3?.value?.split("|")[0]?.trim();
+  const productLabel3Color = productLabel3?.value?.split("|")[1]?.trim();
+
+  const productLabelColor = productLabel3Color || productLabel2Color
+  const productLabelText = productLabel3Text || productLabel2Text
+  const productLabelWidth = _.clamp((productLabelText?.length || 10) * 8, 80, 150);
 
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = compareAtPrice?.amount
-    ? Math.round(((compareAtPrice.amount - price.amount) / compareAtPrice.amount) * 100)
+    ? Math.round(
+      ((compareAtPrice.amount - price.amount) / compareAtPrice.amount) * 100,
+    )
     : 0;
   if (isNaN(discountPercentage)) {
     discountPercentage = 0;
   }
 
-  let weightString = "";
+  let weightString = '';
   if (weight && weightUnit && weightUnit.toString) {
     weightString = `${weight}${weightUnit.toString().toLowerCase()}`;
-  }
-
-  let isBestSeller = false;
-  if (productLabel1?.value?.toString().toLowerCase().includes("bestseller")) {
-    isBestSeller = true;
   }
 
   const dispatch = useDispatch();
@@ -53,8 +97,8 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
   // Find the first non-color option for variant selection
   let variantOptionName = 'Shade';
   if (product.options && product.options.length > 0) {
-    const nonColorOption = product.options.find(option => 
-      option.name.toLowerCase() !== 'color'
+    const nonColorOption = product.options.find(
+      option => option.name.toLowerCase() !== 'color',
     );
     if (nonColorOption) {
       variantOptionName = nonColorOption.name;
@@ -68,10 +112,18 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
   const buttonText = isSelectShade
     ? 'Select Shade'
     : isChooseVariant
-    ? 'Choose Variant'
-    : 'Add to Cart';
+      ? 'Choose Variant'
+      : 'Add to Cart';
 
-  const handleButtonPress = (e) => {
+  const variantText = isSelectShade
+    ? `${variantsCount} Shades`
+    : isChooseVariant
+      ? `${variantsCount} Size`
+      : '' || productSize;
+
+  const benefitText = textBenefits?.items[0]
+
+  const handleButtonPress = e => {
     if (isSelectShade && onSelectShade) {
       return onSelectShade(product);
     } else if (isChooseVariant && onSelectVariant) {
@@ -81,81 +133,103 @@ function RelatedProductCard({product, style, cardVariant, onSelectShade, onSelec
     }
   };
 
+
+
   return (
     <Pressable
-      style={({pressed}) => [
-        styles.container, 
-        pressed && {opacity: 0.4},
-        style
+      style={({ pressed }) => [
+        styles.container,
+        pressed && { opacity: 0.4 },
+        style,
       ]}
       onPress={() => {
-        dispatch(navigateToScreen('Product', {productHandle: handle}));
-      }
-    }>
+        dispatch(navigateToScreen('Product', { productHandle: handle }));
+      }}>
       {/* Promo Tag */}
-      {productLabel2?.value && <ProductFlag
-        label={productLabel2?.value}
-        color={colors.secondaryMain}
-        style={styles.promoTagContainer}
-        textStyle={styles.promoTagText}
-        height={18}
-        width={95}
-      />}
+      {(productLabelText) && (
+        <ProductFlag
+          label={productLabelText}
+          color={isValidColor(productLabelColor) ? productLabelColor : colors.secondaryMain}
+          style={styles.promoTagContainer}
+          height={20}
+          width={productLabelWidth}
+        />
+      )}
 
       {/* Product Image */}
       <View style={styles.imageContainer}>
         <Image
-          source={{uri: featuredImage?.url}}
+          source={{ uri: featuredImage?.url }}
           style={styles.image}
           resizeMode="contain"
         />
-        {(rating > 0) && (<View style={styles.ratingContainer}>
-          <Text style={styles.ratingText}>{rating}</Text>
-          <Star color={colors.secondaryMain} size={12} fillPercentage={1} />
-        </View>)}
-      </View> 
+        {rating > 0 && (
+          <View style={styles.ratingContainer}>
+            <Text style={[typography.subHeading14, styles.ratingText]}>
+              {rating}
+            </Text>
+            <Star color={colors.secondaryMain} size={12} fillPercentage={1} />
+          </View>
+        )}
+      </View>
 
       {/* Product Details */}
-      <View style={[styles.detailsContainer, cardVariant === "large" ? {alignItems: "center"} : {}]}>
-        {
-          isBestSeller ? (
-            <Text style={typography.bestseller}>
-              BESTSELLER
-            </Text>
-          ) : (
-            <View style={{height: 11}}></View>
-          )
-        }
-        <Text style={typography.heading14} numberOfLines={2}>
-          {title}
+      <View
+        style={[
+          styles.detailsContainer,
+          cardVariant === 'large' ? { alignItems: 'center' } : {},
+        ]}>
+        {productLabel1Text ? (
+          <Text style={[typography.heading14, typography.bestseller, { color: isValidColor(productLabel1Color) ? productLabel1Color : colors.accentCoral }]}>
+            {productLabel1Text?.toUpperCase()}
+          </Text>
+        ) : (
+          <View style={{ height: 11 }}></View>
+        )}
+        <Text
+          style={[typography.heading14, { marginBottom: 2 }, headingStyles, { fontFamily: FONT_FAMILY.bold }]}
+          numberOfLines={2}>
+          {productShortTitle || title}
         </Text>
-        <Text style={[styles.subtitle, typography.subHeading12]}>{weightString}</Text>
+        {benefitText && (
+          <Text style={[styles.subtitle, typography.subHeading12, { color: "#767676" }]}>
+            {benefitText}
+          </Text>
+        )}
+
+        {variantText && (
+          <Text style={[styles.subtitle, typography.subHeading12, { color: "#767676" }]}>
+            {variantText}
+          </Text>
+        )}
 
         {/* Price Section */}
-        <View style={{flexGrow: 1, flexDirection: 'column', justifyContent: 'flex-end'}}>
-          <View style={styles.priceContainer}>
-            <Text style={[typography.price, styles.price]}>
-              ₹{parseInt(price.amount).toLocaleString()}
+        <View
+          style={{
+            flexGrow: 1,
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+          }}>
+          <View style={[styles.priceContainer]}>
+            <Text style={[typography.price, styles.price, isHighlighted ? { textAlign: 'center' } : {}]}>
+              ₹{parseInt(price.amount)}
             </Text>
-
-            {(compareAtPrice?.amount && discountPercentage > 0) && (
-              <>
-                <Text style={[typography.slashedPrice, styles.compareAtPrice]}>
-                  ₹{parseInt(compareAtPrice?.amount).toLocaleString()}
-                </Text>
-                <Text style={typography.savings}>{discountPercentage}% Off</Text>
-              </>
-            )}
           </View>
+          {compareAtPrice?.amount && discountPercentage > 0 && (
+            <View style={[styles.priceContainer, isHighlighted ? { justifyContent: 'center' } : {}]}>
+              <Text style={[typography.slashedPrice, styles.compareAtPrice, { fontSize: 11 }]}>
+                ₹{parseInt(compareAtPrice?.amount)}
+              </Text>
+              <Text style={[typography.savings, { fontSize: 11 }]}>
+                {discountPercentage}% Off
+              </Text>
+            </View>)}
         </View>
       </View>
-      <PilgrimCartButton
-        buttonText={buttonText}
-        onPress={handleButtonPress}
-      />
+      <PilgrimCartButton buttonText={buttonText} onPress={handleButtonPress} isAvailable={product?.availableForSale} />
     </Pressable>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -174,7 +248,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT_FAMILY.bold,
     color: colors.white,
     fontSize: 10,
-    fontWeight: '600',
   },
   imageContainer: {
     width: '100%',
@@ -206,7 +279,6 @@ const styles = StyleSheet.create({
   ratingText: {
     fontSize: 11,
     color: colors.dark70,
-    fontWeight: '500',
     marginRight: 4,
   },
   detailsContainer: {
@@ -214,7 +286,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.dark60,
     fontFamily: FONT_FAMILY.regular,
-    fontWeight: '400',
     padding: 12,
     paddingTop: 4,
   },
@@ -227,12 +298,16 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     flexWrap: 'wrap',
     marginTop: 4,
   },
   price: {
     marginRight: 4,
+    minWidth: 100,
+    width: '100%',
+    marginBottom: 4,
   },
   compareAtPrice: {
     marginRight: 4,

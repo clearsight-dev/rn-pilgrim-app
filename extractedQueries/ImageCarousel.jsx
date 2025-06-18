@@ -15,7 +15,13 @@ import AutoScrollBubbles from './AutoScrollBubbles';
 import ScrollBubbles from './ScrollBubbles';
 
 // Reusable image carousel component with auto-scrolling and manual interaction
-export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoScroll = false }, ref) => {
+export const Carousel = forwardRef(({ 
+  width, 
+  flatlistData, 
+  renderChildren, 
+  autoScroll = false,
+  scrollBubbleEnabled = false // New prop with default value true
+}, ref) => {
   const scrollView = useRef(null);
   const scrollBubblesRef = useRef();
   const currentIndexRef = useRef(0);
@@ -81,7 +87,7 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoS
       
       // Update the ScrollBubbles component via imperative handle
       if (scrollBubblesRef.current) {
-        scrollBubblesRef.current.setCurrentIndex(index);
+        scrollBubblesRef.current?.setCurrentIndex(index);
       }
       
       // Only set userInteracted if it's not already true
@@ -139,7 +145,7 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoS
         }}
         horizontal={true}
         pagingEnabled={true}
-        keyExtractor={(item, i) => item.id + item.url + i}
+        keyExtractor={(item, i) => i}
         getItemLayout={getItemLayout}
         initialNumToRender={3}
         onScrollToIndexFailed={(info) => {
@@ -159,35 +165,38 @@ export const Carousel = forwardRef(({ width, flatlistData, renderChildren, autoS
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
       />
-      <View
-        style={{
-          position: "absolute",
-          height: 20,
-          width: 0.5 * width,
-          bottom: 0,
-          left: 0.25 * width,
-        }}
-      >
-        {(userInteracted || !autoScroll) ? (
-          <ScrollBubbles 
-            ref={scrollBubblesRef}
-            numBubbles={flatlistData.length} 
-            currentIndex={currentIndexRef.current}
-            onBubblePress={handleBubblePress}
-          />
-        ) : (
-          <AutoScrollBubbles 
-            numBubbles={flatlistData.length} 
-            onIndexChange={handleAutoIndexChange}
-            startIndex={currentIndexRef.current}
-          />
-        )}
-      </View>
+      {/* Only render scroll bubbles if scrollBubbleEnabled is true */}
+      {scrollBubbleEnabled && (
+        <View
+          style={{
+            position: "absolute",
+            height: 20,
+            width: 0.5 * width,
+            bottom: 0,
+            left: 0.25 * width,
+          }}
+        >
+          {(userInteracted || !autoScroll) ? (
+            <ScrollBubbles 
+              ref={scrollBubblesRef}
+              numBubbles={flatlistData.length} 
+              currentIndex={currentIndexRef.current}
+              onBubblePress={handleBubblePress}
+            />
+          ) : (
+            <AutoScrollBubbles 
+              numBubbles={flatlistData.length} 
+              onIndexChange={handleAutoIndexChange}
+              startIndex={currentIndexRef.current}
+            />
+          )}
+        </View>
+      )}
     </View>
   );
 });
 
-export default function ImageCarousel({ images, width, aspectRatio = 1 }) {
+export default function ImageCarousel({ images, width, aspectRatio = 1, scrollBubbleEnabled = true }) {
   return (
     <Carousel
       flatlistData={images}
@@ -206,6 +215,7 @@ export default function ImageCarousel({ images, width, aspectRatio = 1 }) {
       }}
       width={width}
       aspectRatio={aspectRatio}
+      scrollBubbleEnabled={scrollBubbleEnabled} // Pass the prop to Carousel
     />
   );
 }

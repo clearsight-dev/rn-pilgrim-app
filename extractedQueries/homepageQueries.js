@@ -41,7 +41,7 @@ async function revalidateCollection(handle) {
     handle,  
     12, // numitems
     null, // cursor
-    'BEST_SELLING', // sortkey
+    'COLLECTION_DEFAULT', // sortkey
     false, // reverse
     [], // filters
     true // useNetworkOnly
@@ -57,7 +57,6 @@ export async function fillCaches() {
     'hair-care', 
     'pore-care', 
     'makeup',
-
     'face-care', 
     'night-care', 
     'hydration',

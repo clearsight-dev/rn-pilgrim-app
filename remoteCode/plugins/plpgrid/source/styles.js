@@ -5,17 +5,19 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: colors.white,
+    // backgroundColor: "#C5FAFF4D",
+    marginTop: 55
   },
   title: {
     fontSize: 22,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 4,
+    color: colors.dark100
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    fontFamily: FONT_FAMILY.regular,
     alignItems: 'center',
     marginBottom: 16,
   },
@@ -28,6 +30,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
+    paddingHorizontal: 16,
   },
   loading: {
     fontSize: 16,
@@ -50,10 +53,10 @@ export const styles = StyleSheet.create({
   row: {
     justifyContent: 'space-between',
     marginBottom: 16,
+    paddingHorizontal: 16,
   },
   productCard: {
     width: '48%',
-    marginRight: 0,
     marginBottom: 16,
   },
   emptyText: {

@@ -649,7 +649,7 @@ async function main() {
     await downloadFile(appConfigUrl, appConfigPath);
     console.log('appConfig downloaded');
     const bundleTrackerPath = path.resolve(__dirname, 'android/app/src/main/assets/localBundleTracker.json');
-    await writeFile(bundleTrackerPath, `{"publishedCommitId": ${publishedCommit}, "androidBundleId": ${androidBundle?.id ?? "null"}}`)
+    await writeFile(bundleTrackerPath, `{"publishedCommitId": ${publishedCommit}, "androidBundleId": ${"null"}}`)
   } else {
     console.error("Published appconfig not found! Stopping build.")
     process.exit(1);

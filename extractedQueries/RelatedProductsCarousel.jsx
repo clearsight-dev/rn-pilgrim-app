@@ -89,6 +89,7 @@ export function formatProduct(product) {
   return {
     id: product.id,
     firstVariantId: firstVariant?.id ?? null,
+    availableForSale: product.availableForSale,
     title: product.title,
     handle: product.handle,
     featuredImage: product.featuredImage,
@@ -103,6 +104,7 @@ export function formatProduct(product) {
     reviews: product?.reviews,
     productLabel1: product.productLabel1,
     productLabel2: product.productLabel2,
+    productLabel3: product.productLabel3,
     weight: firstVariant?.weight,
     weightUnit: firstVariant?.weightUnit,
     subtitle: product.subtitle,
@@ -113,7 +115,9 @@ export function formatProduct(product) {
     howToUse: product.how_to_use?.value,
     studyResults,
     questions: product.questions,
-    answers: product.answers
+    answers: product.answers,
+    productSize: product?.product_size?.value,
+    productShortTitle: product?.product_short_title?.value,
   }
 }
 
@@ -137,7 +141,7 @@ function RelatedProductsCarousel({
   return (
     <View style={[styles.container, style]}>
       {/* Title */}
-      {title && <Text style={[styles.title, typography.heading19]}>{title}</Text>}
+      {title && <Text style={[typography.heading19,styles.title ]}>{title}</Text>}
 
       {/* Horizontal Scrollable List */}
       <FlatList
@@ -168,13 +172,7 @@ function RelatedProductsCarousel({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
-    marginVertical: 16,
     paddingTop: 8,
-    paddingBottom: 16,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#F0F0F0',
   },
   title: {
     marginBottom: 16,

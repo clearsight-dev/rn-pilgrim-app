@@ -6,8 +6,8 @@ import { colors, FONT_FAMILY } from './theme';
 
 function DiscountBadge({ discount }) {
   // Badge dimensions
-  const width = 40;
-  const height = 40;
+  const width = 32;
+  const height = 31;
   const peakHeight = 4; // Height of the peaks as requested
   const numPeaks = 3;
   const halfPeakWidth = width / (2 * numPeaks);
@@ -30,6 +30,10 @@ function DiscountBadge({ discount }) {
     return path;
   };
 
+  if(!discount) {
+    return null;
+  }
+
   return (
     <View style={[styles.discountBadgeContainer, {height}]}>
       <Svg style={{position: 'absolute'}} width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
@@ -41,12 +45,7 @@ function DiscountBadge({ discount }) {
       <Text
         style={styles.discountBadgeText}
       >
-        {discount}
-      </Text>
-      <Text
-        style={styles.discountBadgeText}
-      >
-        Off
+        {discount} Off
       </Text>
     </View>
   );
@@ -98,11 +97,14 @@ function VariantCard({
   if ((variant.title || "").indexOf("(") >= 0) {
     truncatedVariantName = variant.title.slice(0, variant.title.indexOf("("));
   }
-  let discount = (1 - (parseFloat(variant?.compareAtPrice?.amount)/parseFloat(variant?.price?.amount)))*100;
+  let discount = variant?.compareAtPrice?.amount && variant?.price?.amount ? Math.round((variant?.compareAtPrice?.amount - variant?.price?.amount) / variant?.compareAtPrice?.amount * 100) : 0;
+  if (isNaN(discount)) {
+    discount = 0;
+  }
+
   if (discount > 0) {
     discount = `${discount}%`;
   }
-
   return (
     <View style={styles.variantCardContainer}>   
       {/* Main Card Content */}
@@ -111,7 +113,7 @@ function VariantCard({
         isSelected ? styles.variantCardSelected : styles.variantCardDefault
       ]}>
         {/* Discount Badge - Only shown if discount is provided */}
-        {(discount > 0) && <DiscountBadge discount={discount} />}
+        {<DiscountBadge discount={discount} />}
         
         {/* Size and Price Information */}
         <View style={styles.variantInfoContainer}>
@@ -121,9 +123,9 @@ function VariantCard({
           </View>
           
           <View style={styles.priceContainer}>
-            <Text style={styles.currentPrice}>₹{variant.price?.amount}</Text>
+            <Text style={styles.currentPrice}>₹{parseInt(variant.price?.amount)}</Text>
             {(variant.compareAtPrice?.amount !== variant.price?.amount) && (
-              <Text style={styles.originalPrice}>₹{variant.compareAtPrice?.amount}</Text>
+              <Text style={styles.originalPrice}>₹{parseInt(variant.compareAtPrice?.amount)}</Text>
             )}
           </View>
         </View>
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
   variantCardContainer: {
     position: 'relative',
     margin: 5,
-    marginTop: 28, // Space for the popular choice header
+    minHeight: 75,
     width: 153,
   },
   popularChoiceFooter: {
@@ -184,10 +186,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     height: 67,
     justifyContent: 'center',
+    borderColor: colors.dark20,
   },
   variantCardSelected: {
     borderColor: colors.primaryMain,
-    borderWidth: 1.5,
+    // borderWidth: 1.5,
   },
   variantCardDefault: {
     borderColor: colors.dark20,
@@ -206,8 +209,7 @@ const styles = StyleSheet.create({
   },
   discountBadgeText: {
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: "600",
-    fontSize: 12,
+    fontSize: 10,
     color: 'white'
   },
   variantInfoContainer: {
@@ -221,11 +223,11 @@ const styles = StyleSheet.create({
   sizeLabel: {
     fontSize: 14,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     color: colors.dark100,
   },
   sizeValue: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.regular,
     color: colors.dark100,
   },
   priceContainer: {
@@ -236,11 +238,11 @@ const styles = StyleSheet.create({
   currentPrice: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: '600',
     color: colors.dark100,
   },
   originalPrice: {
     fontSize: 14,
+    fontFamily: FONT_FAMILY.regular,
     color: colors.dark40,
     textDecorationLine: 'line-through',
   },

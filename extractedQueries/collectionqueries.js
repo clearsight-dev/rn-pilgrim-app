@@ -8,7 +8,7 @@ import { formatProduct } from './RelatedProductsCarousel';
 export async function getFilterAndProductsForCollection(
   collectionHandle, 
   filters = [], // these are filters applied before fetching products
-  sortKey = 'BEST_SELLING',
+  sortKey = 'COLLECTION_DEFAULT',
   reverse = false,
   cursor = null,
   numProducts = 5,
@@ -53,6 +53,7 @@ export async function getFilterAndProductsForCollection(
     result.hasNextPage = res?.data?.pagination?.hasNextPage ?? false;
     result.lastCursor = res?.data?.pagination?.lastCursor ?? null;
     result.title = res?.data?.collection?.title;
+    result.image = res?.data?.collection?.image;
   } catch (err) {
     console.error("Failed to fetch data for chip carousel for the collection: ", collectionHandle);
   } 
@@ -208,6 +209,13 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
     id
     handle
     title
+    image {
+      id
+      altText
+      height
+      width
+      url
+    }
     products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
       pageInfo {
         hasNextPage
@@ -232,7 +240,7 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
 `;
 
 // Function to fetch collection data using the GraphQL query with pagination support
-export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'BEST_SELLING', reverse = false, filters = [], revalidateCaches = false) {
+export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'COLLECTION_DEFAULT', reverse = false, filters = [], revalidateCaches = false) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
     throw new Error("Query runner not available");
@@ -291,6 +299,7 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
   product(handle: $handle) {
     id
     handle
+    availableForSale
     options {
       id
       name
@@ -307,9 +316,11 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
         node {
           id
           title
+          availableForSale
           image {
             id
             url
+            altText
           }
           price {
             amount
@@ -331,7 +342,23 @@ query GetOptionsForProduct($handle: String, $numVariants: Int!) {
             value
             namespace
           }
-        }
+          no_skin_tone_image_url: metafield(key: "no_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+          deep_skin_tone_image_url: metafield(key: "deep_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+          medium_skin_tone_image_url: metafield(key: "medium_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+          light_skin_tone_image_url: metafield(key: "light_skin_tone_image_url", namespace: "custom") {
+            id
+            value
+          }    
+        }  
       }
     }
   }

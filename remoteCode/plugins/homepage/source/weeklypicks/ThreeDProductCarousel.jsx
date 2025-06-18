@@ -6,24 +6,28 @@ import GradientBackground from '../../../../../extractedQueries/GradientBackgrou
 import Underline from '../../../../../extractedQueries/Underline';
 import RelatedProductCard from '../../../../../extractedQueries/RelatedProductCard';
 import { typography } from '../../../../../extractedQueries/theme';
+import {RelatedProductCardSkeleton} from '../../../../../components/skeleton/productCard'
 
 function ThreeDProductCarousel({ 
+  title,
+  subtitle,
   products = [], 
   itemWidth, 
   spacing, 
   width,
   onSelectShade,
   onSelectVariant,
+  isHighlighted = false,
   loading
 }) {
   const gradientColors = [
-    { offset: "0%", color: "#D0F3F6", opacity: 0.7 },
+    { offset: "100%", color: "#D0F3F6", opacity: 1.0 },
     { offset: "100%", color: "#83CAD1", opacity: 1.0 }
   ];
   // Create internal scrollX state
   const scrollX = useRef(new Animated.Value(0)).current;
 
-  const tabWidth = width * 0.5;
+  const tabWidth = width * 0.60;
   const tabHeight = 40;
   const tabCornerRadius = 20;
   // The right circular arc is drawn from PI/4 to PI/2 and then a tangent is taken to the 
@@ -33,7 +37,7 @@ function ThreeDProductCarousel({
   return (
     <View style={styles.mainContainer}>
       {/* Rounded Tab with Gradient Text */}
-      <View style={[styles.tabContainer, {width: tabWidth}]}>
+      {title && <View style={[styles.tabContainer, {width: tabWidth}]}>
         <Svg 
           width={tabWidth} 
           height={tabHeight}
@@ -50,27 +54,26 @@ function ThreeDProductCarousel({
               A ${tabCornerRadius} ${tabCornerRadius} 0 0 1 ${tabCornerRadius} 0
               Z
               `}
-            fill={"#83cad1"}
-            opacity={0.25}
+            fill={"#D0F3F6"}
           />
         </Svg>
         <GradientText
-          text="Weekly Picks"
+          text={title}
           fontSize={26}
           fontWeight="bold"
           width="100%"
           height={40}
           y="25"
         />
-      </View>
+      </View>}
 
       {/* Top Finds Section */}
-      <View style={styles.topFindsContainer}>
-        <Text style={[styles.topFindsText, typography.subHeading15]}>Top finds just for you</Text>
+      {subtitle && <View style={styles.topFindsContainer}>
+        <Text style={[styles.topFindsText, typography.subHeading15]}>{subtitle}</Text>
         <View style={styles.underlineContainer}>
           <Underline />
         </View>
-      </View>
+      </View>}
 
       {/* Gradient Background for Carousel */}
       <GradientBackground 
@@ -142,20 +145,16 @@ function ThreeDProductCarousel({
                 ]}
               >
                 {loading ? (
-                    <View 
-                      style={[
-                        styles.productCard,
-                        {minHeight: 400, backgroundColor: 'white'}
-                      ]}
-                    >
-                    </View>
+                    <RelatedProductCardSkeleton width={itemWidth}/>
                   ): (
                   <RelatedProductCard 
                     cardVariant={"large"}
                     product={item}
                     onSelectShade={onSelectShade}
+                    isHighlighted={isHighlighted}
                     onSelectVariant={onSelectVariant}
                     style={styles.productCard}
+                    headingStyles={styles.headingStyles}
                   />
                 )}
               </Animated.View>
@@ -170,7 +169,7 @@ function ThreeDProductCarousel({
 const styles = StyleSheet.create({
   mainContainer: {
     width: '100%',
-    marginVertical: 20,
+    marginBottom: 20,
   },
   tabContainer: {
     zIndex: 2,
@@ -178,7 +177,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   topFindsContainer: {
-    backgroundColor: '#83cad13f',
+    backgroundColor: '#D0F3F6',
     paddingHorizontal: 16,
     alignItems: 'center',
     // borderWidth: 1,
@@ -200,8 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   carouselContainer: {
-    paddingTop: 24,
-    paddingBottom: 16,
+    paddingVertical: 20,
   },
   slideContainer: {
     alignItems: 'center',
@@ -213,6 +211,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: 8
   },
+  headingStyles: {
+    textAlign: 'center',
+  }
 });
 
 export default ThreeDProductCarousel;

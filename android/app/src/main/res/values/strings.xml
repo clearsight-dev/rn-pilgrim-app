@@ -2,7 +2,7 @@
   <string name="app_name">Pilgrim</string>
   <string name="APPTILE_API_ENDPOINT">https://api.apptile.io</string>
   <string name="APPTILE_UPDATE_ENDPOINT">https://appconfigs.apptile.io</string>
-  <string name="APP_ID">6a1f4f33-744a-418c-947e-30247efdbe91</string>
+  <string name="APP_ID">83529966-6875-46fc-b09e-7a51f7242238</string>
   <string name="APPTILE_URL_SCHEME">discoverpilgrim://</string>
   <string name="APPTILE_APP_HOST">https://discoverpilgrim.com</string>
   <string name="APPTILE_APP_HOST_2">https://discoverpilgrimindia.onelink.me</string>

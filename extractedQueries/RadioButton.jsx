@@ -1,5 +1,6 @@
 import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { colors, FONT_FAMILY } from './theme';
 
 const RadioButton = forwardRef(({ 
   label, 
@@ -7,6 +8,7 @@ const RadioButton = forwardRef(({
   onChange,
   style,
   labelStyle,
+  containerStyle,
   disabled = false,
   controlsPosition = 'left' // 'left' or 'right'
 }, ref) => {
@@ -57,7 +59,7 @@ const RadioButton = forwardRef(({
 
   return (
     <TouchableOpacity 
-      style={[styles.container, style]} 
+      style={[styles.container, style, containerStyle]} 
       onPress={handlePress}
       activeOpacity={0.7}
       disabled={disabled}
@@ -109,9 +111,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(184, 184, 184, 0.3)',
   },
   label: {
+    fontFamily: FONT_FAMILY.regular,
     marginLeft: 8,
     fontSize: 16,
-    color: '#333',
+    color: colors.dark100,
     flex: 1,
   },
   labelLeft: {
