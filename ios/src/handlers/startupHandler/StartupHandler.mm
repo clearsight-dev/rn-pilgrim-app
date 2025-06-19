@@ -16,7 +16,6 @@
     // Launching apptile startup process in background thread
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @try {
-                    
             [Logger info:[NSString stringWithFormat:@"Running in: %@", [NSThread isMainThread] ? @"Main Thread" : @"Background Thread"]];
             [Logger info:@"Starting Startup Process"];
           
