@@ -3,6 +3,7 @@ package com.apptileseed.src.actions
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.apptileseed.BuildConfig
 import com.apptileseed.MainActivity
 import com.apptileseed.MainApplication
 import com.apptileseed.R
@@ -22,7 +23,6 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-
 
 object Actions {
     const val APP_CONFIG_FILE_NAME = "appConfig.json"
@@ -155,9 +155,34 @@ object Actions {
         }
     }
 
+    // Function to check for Over-The-Air updates
+    // Returns a Pair: (Boolean -> update required?, String? -> app store URL)
+    // true in Boolean means MainActivity start should be prevented
+    private suspend fun checkForOTA(appId: String, context: Context): Pair<Boolean, String?> = withContext(Dispatchers.IO) {
+        val manifest = fetchManifest(appId, context) ?: return@withContext Pair(false, null) // Return false, null URL if manifest fetch fails
+        var updateRequired = false
+        var updateUrl: String? = null
 
-    private suspend fun checkForOTA(appId: String, context: Context) = withContext(Dispatchers.IO) {
-        val manifest = fetchManifest(appId, context) ?: return@withContext
+        val latestBuildNumberAndroid = manifest.latestBuildNumberAndroid
+        if (latestBuildNumberAndroid == null) {
+            Log.d(APPTILE_LOG_TAG, "OTA Check: No latestBuildNumberAndroid in manifest.")
+            return@withContext Pair(updateRequired, updateUrl) // Return false, null URL if no Android build number
+        }
+
+        val currentBuildNumber = BuildConfig.VERSION_CODE
+
+        // *** Core Check ***
+        if (currentBuildNumber < latestBuildNumberAndroid) {
+            Log.i(APPTILE_LOG_TAG, "OTA Check: Found newer build ($latestBuildNumberAndroid > $currentBuildNumber). App restart will be prevented.")
+            // Indicate update needed, return the app store URL from manifest
+            updateRequired = true
+            updateUrl = manifest.playStorePermanentLink
+            return@withContext Pair(updateRequired, updateUrl)
+        }
+
+        Log.d(APPTILE_LOG_TAG, "OTA Check: Current build ($currentBuildNumber) is up-to-date or newer than manifest ($latestBuildNumberAndroid). Checking bundle/commit.")
+
+        // Continue with commit/bundle check ONLY if build number is sufficient
         val trackerData =
             readFileContent(File(context.filesDir, BUNDLE_TRACKER_FILE_NAME).absolutePath)
 
@@ -209,6 +234,9 @@ object Actions {
 
             }
         }
+
+        // If we reach here, it means currentBuildNumber >= latestBuildNumberAndroid and bundle checks are done (or not needed)
+        return@withContext Pair(updateRequired, updateUrl) // Indicate no build number update needed, null URL
     }
 
     private fun restartReactNativeApp(context: Context) {
@@ -257,8 +285,20 @@ object Actions {
         }
     }
 
-    suspend fun startApptileAppProcess(appId: String, context: Context) =
+    /**
+     * Orchestrates the startup process: copies initial assets if needed, checks for OTA updates,
+     * and potentially applies them.
+     *
+     * @param appId The application ID.
+     * @param context The application context.
+     * @return Pair<Boolean, String?> True if checkForOTA determined MainActivity start should be prevented, String? is the potential update URL.
+     */
+    suspend fun startApptileAppProcess(appId: String, context: Context): Pair<Boolean, String?> =
         withContext(Dispatchers.IO) {
+            // Default to no update needed, null URL
+            var updateRequired = false
+            var updateUrl = null
+            var otaResult: Pair<Boolean, String?> = Pair(updateRequired, updateUrl)
             try {
                 if (BundleTrackerPrefs.isBrokenBundle()) {
                     Log.d(
@@ -278,14 +318,19 @@ object Actions {
                         ).all { it }
                     ) {
                         Log.e(APPTILE_LOG_TAG, "Failed to copy initial assets.")
-                        return@withContext
+                        // Return false, null URL if asset copy fails
+                        return@withContext Pair(updateRequired, updateUrl)
                     }
                 }
 
-                // only process if operation above completed without error
-                checkForOTA(appId, context)
+                // Capture the result of checkForOTA
+                otaResult = checkForOTA(appId, context)
+
             } catch (e: Exception) {
                 Log.e(APPTILE_LOG_TAG, "Error starting app process: ${e.message}", e)
+                // Return false, null URL in case of error during startup process
+                otaResult = Pair(updateRequired, updateUrl)
             }
+            return@withContext otaResult // Return the Pair result
         }
 }
