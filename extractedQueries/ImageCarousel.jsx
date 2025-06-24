@@ -31,7 +31,7 @@ export const Carousel = forwardRef(({
   useImperativeHandle(ref, () => {
     return {
       scrollToIndex: (index) => {
-        if (scrollView.current && index >= 0 && index <= flatlistData.length) {
+        if (scrollView.current && index >= 0 && index < flatlistData.length) {
           scrollView.current.scrollToIndex({
             index, 
             animated: true
@@ -61,7 +61,7 @@ export const Carousel = forwardRef(({
   
   // Function to handle manual bubble press
   const handleBubblePress = useCallback((index) => {
-    if (scrollView.current && index < images?.length) {
+    if (scrollView.current && index < flatlistData?.length) {
       scrollView.current.scrollToIndex({
         index: index,
         animated: true
@@ -145,14 +145,14 @@ export const Carousel = forwardRef(({
         }}
         horizontal={true}
         pagingEnabled={true}
-        keyExtractor={(item, i) => i}
+        keyExtractor={(item, index) => `${index}`}
         getItemLayout={getItemLayout}
         initialNumToRender={3}
         onScrollToIndexFailed={(info) => {
           // Handle scroll failure - wait a bit and try again
           const wait = new Promise(resolve => setTimeout(resolve, 500));
           wait.then(() => {
-            if (scrollView.current) {
+            if (scrollView.current && info.index < flatlistData?.length) {
               scrollView.current.scrollToIndex({ 
                 index: info.index, 
                 animated: true 
@@ -200,10 +200,10 @@ export default function ImageCarousel({ images, width, aspectRatio = 1, scrollBu
   return (
     <Carousel
       flatlistData={images}
-      renderChildren={({item}, index) => {
+      renderChildren={({item}) => {
         return (
           <Image 
-            source={{uri: item.url + "-" + index}}
+            source={{uri: item.url}}
             resizeMode="contain"
             style={{
               width: width,
