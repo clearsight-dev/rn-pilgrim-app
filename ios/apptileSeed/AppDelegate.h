@@ -4,10 +4,11 @@
 #import <React/RCTImageView.h>
 #import <React/RCTImageSource.h>
 #import <React/RCTImageLoader.h>
+#import <Firebase.h>
 
 @class RCTRootView;
 
-@interface AppDelegate : RCTAppDelegate <UNUserNotificationCenterDelegate>
+@interface AppDelegate : RCTAppDelegate <FIRMessagingDelegate, UNUserNotificationCenterDelegate>
 
 @property (nonatomic, strong) RCTImageView *splash;
 @property (nonatomic, strong) NSDictionary *storedLaunchOptions;

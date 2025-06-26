@@ -520,12 +520,12 @@ function addMoengage(androidManifest, stringsObj, apptileConfig, extraModules, p
   const moengageIntegration = apptileConfig.integrations.moengage;
   upsertInStringsXML(stringsObj, 'MOENGAGE_APPID', moengageIntegration.appId);
   upsertInStringsXML(stringsObj, 'MOENGAGE_DATACENTER', moengageIntegration.datacenter);
-  deleteMessagingService(androidManifest);
-  addService(androidManifest, 
-    "com.moengage.firebase.MoEFireBaseMessagingService", 
-    {'android:exported': true}, 
-    firebaseMessagingEventIntent
-  );
+  // deleteMessagingService(androidManifest);
+  // addService(androidManifest, 
+  //   "com.moengage.firebase.MoEFireBaseMessagingService", 
+  //   {'android:exported': true}, 
+  //   firebaseMessagingEventIntent
+  // );
   addPermission(androidManifest, 'SCHEDULE_EXACT_ALARM');
   removeForceUnlinkForNativePackage('react-native-moengage', extraModules, parsedReactNativeConfig);
 }
@@ -533,7 +533,7 @@ function addMoengage(androidManifest, stringsObj, apptileConfig, extraModules, p
 function removeMoengage(androidManifest, stringsObj, extraModules, parsedReactNativeConfig) {
   removeFromStringsXML(stringsObj, 'MOENGAGE_APPID');
   removeFromStringsXML(stringsObj, 'MOENGAGE_DATACENTER');
-  deleteService(androidManifest, "com.moengage.firebase.MoEFireBaseMessagingService");
+  // deleteService(androidManifest, "com.moengage.firebase.MoEFireBaseMessagingService");
   deletePermission(androidManifest, 'SCHEDULE_EXACT_ALARM');
   addForceUnlinkForNativePackage('react-native-moengage', extraModules, parsedReactNativeConfig);
 }

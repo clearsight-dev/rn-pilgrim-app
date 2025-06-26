@@ -12,6 +12,11 @@ import androidx.work.WorkerParameters;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import com.appsflyer.AppsFlyerLib;
+import com.moengage.firebase.MoEFireBaseHelper;
+import com.moengage.pushbase.MoEPushHelper;
+
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "MyFirebaseMsgService";
@@ -22,6 +27,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: " + remoteMessage.getFrom());
+
+        // Forwarding message to moengage sdk
+        var remoteMessageData = remoteMessage.getData();
+        if (MoEPushHelper.getInstance().isFromMoEngagePlatform(remoteMessageData)){
+            MoEFireBaseHelper.getInstance().passPushPayload(getApplicationContext(), remoteMessageData);
+        }
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
@@ -81,7 +92,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String token) {
-        // TODO: Implement this method to send token to your app server.
+        // MoEngage token registration
+        try {
+            MoEFireBaseHelper.getInstance().passPushToken(getApplicationContext(),token);
+            Log.d(TAG, "MoEngage token registered");
+        } catch (Exception e) {
+            Log.e(TAG, "MoEngage registration failed", e);
+        }
+
+        // AppsFlyer uninstall tracking (optional)
+        try {
+            AppsFlyerLib.getInstance().updateServerUninstallToken(getApplicationContext(), token);
+            Log.d(TAG, "AppsFlyer token registered "+ token);
+        } catch (Exception e) {
+            Log.e(TAG, "AppsFlyer token registration failed", e);
+        }
     }
 
     public static class MyWorker extends Worker {

@@ -12,6 +12,7 @@
 
 #if ENABLE_FIREBASE_ANALYTICS
 #import <Firebase.h>
+#import <RNCPushNotificationIOS.h>
 #endif
 
 #if ENABLE_FBSDK
@@ -56,6 +57,7 @@
   
 #if ENABLE_FIREBASE_ANALYTICS
   [FIRApp configure];
+  [FIRMessaging messaging].delegate = self;
 #endif
   
 #if ENABLE_FBSDK
@@ -239,14 +241,42 @@
   return [RCTLinkingManager application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
 }
 
-#if ENABLE_MOENGAGE
-//Remote notification Registration callback methods only if MoEngageAppDelegateProxyEnabled is NO
+- (void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken
+{
+  NSLog(@"FCM registration token: %@", fcmToken);
+  NSDictionary *dataDict = [NSDictionary dictionaryWithObject:fcmToken forKey:@"token"];
+  [[NSNotificationCenter defaultCenter] postNotificationName: @"FCMToken" object:nil userInfo:dataDict];
+}
+
+
+
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken {
-  [[MoEngageSDKMessaging sharedInstance] setPushToken:deviceToken];
+  NSLog(@"✅ APNs Token received: %@", deviceToken);
+  #if ENABLE_FIREBASE_ANALYTICS
+    // Pass APNs token to Firebase
+    [FIRMessaging messaging].APNSToken = deviceToken;
+    [RNCPushNotificationIOS didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+  #endif
+    
+    // MoEngage (conditionally compile if needed)
+  #if ENABLE_MOENGAGE
+    //Remote notification Registration callback methods only if MoEngageAppDelegateProxyEnabled is NO
+    [[MoEngageSDKMessaging sharedInstance] setPushToken:deviceToken];
+  #endif
+  
+  #if ENABLE_APPSFLYER
+    [[AppsFlyerLib shared] registerUninstall:deviceToken];
+  #endif
 }
 
 -(void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+  #if ENABLE_FIREBASE_ANALYTICS
+  [RNCPushNotificationIOS didFailToRegisterForRemoteNotificationsWithError:error];
+  #endif
+  
+  #if ENABLE_MOENGAGE
   [[MoEngageSDKMessaging sharedInstance]didFailToRegisterForPush];
+  #endif
 }
 
 // UserNotifications Framework Callback
@@ -262,21 +292,27 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
 didReceiveNotificationResponse:(UNNotificationResponse *)response
          withCompletionHandler:(void (^)())completionHandler{
-
+           #if ENABLE_FIREBASE_ANALYTICS
+           [RNCPushNotificationIOS didReceiveNotificationResponse:response];
+           #endif
            //Call only if MoEngageAppDelegateProxyEnabled is NO
+            #if ENABLE_MOENGAGE
            [[MoEngageSDKMessaging sharedInstance] userNotificationCenter:center didReceive:response];
-
+            #endif
            //Custom Handling of notification if Any
            completionHandler();
 }
 
 
-// I don't the purpose of this moengage, but just keeping to close migration
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
   completionHandler(UIBackgroundFetchResultNewData);
-
-  [[MoEngageSDKMessaging sharedInstance] didReceieveNotificationInApplication:application withInfo:userInfo];
-}
+#if ENABLE_FIREBASE_ANALYTICS
+  [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 #endif
+  
+#if ENABLE_MOENGAGE
+  [[MoEngageSDKMessaging sharedInstance] didReceieveNotificationInApplication:application withInfo:userInfo];
+#endif
+}
 @end
