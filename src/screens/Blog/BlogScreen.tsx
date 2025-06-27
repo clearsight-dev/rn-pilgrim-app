@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   text: {
-    fontSize: 24,
+    fontSize: 14,
     color: colors.dark90,
     marginBottom: 16,
-    fontFamily: FONT_FAMILY.bold,
+    fontFamily: FONT_FAMILY.regular,
   },
 });
