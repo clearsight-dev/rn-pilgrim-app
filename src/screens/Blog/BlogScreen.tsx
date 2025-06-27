@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loader: {
+    marginTop: 55,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -192,6 +193,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
+    marginTop: 55
   },
   title: {
     fontSize: 24,
