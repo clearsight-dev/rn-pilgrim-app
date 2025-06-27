@@ -11,6 +11,7 @@ import faqs from "./plugins/faqs/source/widget";
 import clickpost from "./plugins/clickpost/source/widget";
 import categoryscreen from "./plugins/categoryscreen/source/widget";
 import bottomcontent from "./plugins/bottomcontent/source/widget";
+import blogscreen from "./plugins/blogscreen/source/widget";
 import ShopifyCart from "./plugins/ShopifyCart/source/widget";
 import OTPInputTextWidget from "./plugins/OTPInputTextWidget/source/widget";
 import FreeGifts from "./plugins/FreeGifts/source/widget";
@@ -21,6 +22,7 @@ return [
     FreeGifts,
     OTPInputTextWidget,
     ShopifyCart,
+    blogscreen,
     bottomcontent,
     categoryscreen,
     clickpost,
