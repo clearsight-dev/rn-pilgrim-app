@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ScrollView,
   Text,
@@ -6,17 +6,17 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
-import RenderHtml, { defaultSystemFonts } from 'react-native-render-html';
-import { fetchBlogArticle } from '../../queries/graphql/blog/blog';
-import { useWindowDimensions } from 'react-native';
-import { colors, FONT_FAMILY } from '../../../extractedQueries/theme';
+import RenderHtml, {defaultSystemFonts} from 'react-native-render-html';
+import {fetchBlogArticle} from '../../queries/graphql/blog/blog';
+import {useWindowDimensions} from 'react-native';
+import {colors, FONT_FAMILY} from '../../../extractedQueries/theme';
 import RelatedProductsCarousel, {
   formatProduct,
 } from '../../../extractedQueries/RelatedProductsCarousel';
 import ShadeSelector from '../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../extractedQueries/VariantSelector';
-import { Image } from '../../../extractedQueries/ImageComponent';
-import { useRoute } from '@react-navigation/native';
+import {Image} from '../../../extractedQueries/ImageComponent';
+import {useRoute} from '@react-navigation/native';
 
 const RTSystemFonts = [
   ...defaultSystemFonts,
@@ -33,7 +33,7 @@ const RTBaseStyle = {
 };
 
 export default function BlogArticleScreen() {
-  const { width } = useWindowDimensions();
+  const {width} = useWindowDimensions();
   const route = useRoute();
   const blogHandle = route.params?.blogHandle;
   const articleHandle = route.params?.articleHandle;
@@ -53,7 +53,7 @@ export default function BlogArticleScreen() {
 
     async function loadBlog() {
       try {
-        const { data } = await fetchBlogArticle({ blogHandle, articleHandle });
+        const {data} = await fetchBlogArticle({blogHandle, articleHandle});
         setArticle(data);
       } catch (err) {
         console.error('Failed to load article', err);
@@ -68,7 +68,7 @@ export default function BlogArticleScreen() {
   if (!blogHandle || !articleHandle) {
     return (
       <View style={styles.error}>
-        <Text>Invalid article parameters.</Text>
+        <Text style={styles.text}>Invalid article parameters.</Text>
       </View>
     );
   }
@@ -84,38 +84,37 @@ export default function BlogArticleScreen() {
   if (!article) {
     return (
       <View style={styles.error}>
-        <Text>Article not found</Text>
+        <Text style={styles.text}>Article not found</Text>
       </View>
     );
   }
 
-  const { title, excerptHtml, contentHtml, metafield, image } = article;
+  const {title, excerptHtml, contentHtml, metafield, image} = article;
   const products = metafield?.reference?.products?.nodes || [];
   const collectionTitle = metafield?.reference?.title || 'Related Products';
   const formattedProducts = products.map(formatProduct);
 
-  const onSelectShade = (product) => {
+  const onSelectShade = product => {
     setSelectedProduct(product);
     shadeBottomSheetRef.current?.show();
   };
 
-  const onSelectVariant = (product) => {
+  const onSelectVariant = product => {
     setSelectedProduct(product);
     variantBottomSheetRef.current?.show();
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff', marginTop: 55 }}>
+    <View style={{flex: 1, backgroundColor: '#fff', marginTop: 55}}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 16 }}
-        showsVerticalScrollIndicator={false}
-      >
+        contentContainerStyle={{paddingBottom: 16}}
+        showsVerticalScrollIndicator={false}>
         {/* Blog Image */}
         {image?.url && (
-          <View style={{ marginBottom: 16 }}>
+          <View style={{marginBottom: 16}}>
             <Image
-              source={{ uri: image.url }}
+              source={{uri: image.url}}
               style={{
                 width: width,
                 height: (width * image.height) / image.width,
@@ -126,7 +125,7 @@ export default function BlogArticleScreen() {
           </View>
         )}
 
-        <View style={{ flex: 1, padding: 16 }}>
+        <View style={{flex: 1, padding: 16}}>
           {/* Blog Title */}
           <Text style={styles.title}>{title}</Text>
 
@@ -136,7 +135,7 @@ export default function BlogArticleScreen() {
               contentWidth={width}
               systemFonts={RTSystemFonts}
               baseStyle={RTBaseStyle}
-              source={{ html: excerptHtml }}
+              source={{html: excerptHtml}}
             />
           )}
 
@@ -146,7 +145,7 @@ export default function BlogArticleScreen() {
               contentWidth={width}
               systemFonts={RTSystemFonts}
               baseStyle={RTBaseStyle}
-              source={{ html: contentHtml }}
+              source={{html: contentHtml}}
             />
           )}
         </View>
@@ -193,7 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
-    marginTop: 55
+    marginTop: 55,
   },
   title: {
     fontSize: 24,
@@ -209,5 +208,11 @@ const styles = StyleSheet.create({
   },
   carousel: {
     marginTop: 24,
+  },
+  text: {
+    fontSize: 24,
+    color: colors.dark90,
+    marginBottom: 16,
+    fontFamily: FONT_FAMILY.bold,
   },
 });
