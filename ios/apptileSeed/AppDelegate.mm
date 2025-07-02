@@ -85,12 +85,6 @@
   sdkConfig.consoleLogConfig = [[MoEngageConsoleLogConfig alloc] initWithIsLoggingEnabled:false loglevel:MoEngageLoggerTypeVerbose];
   [[MoEngageInitializer sharedInstance] initializeDefaultSDKConfig:sdkConfig andLaunchOptions:launchOptions];
   
-  
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(didRegisterForRemoteNotificationMoEngage:)
-                                               name:@"MoEngageRegisteredForRemoteNotification"
-                                             object:nil];
-  
 #endif
   
   // storing launch option for later use while opening react native from startup handler
@@ -105,15 +99,6 @@
   return YES;
 }
 
-- (void)didRegisterForRemoteNotificationMoEngage:(NSNotification *)notification {
-    NSData *deviceToken = notification.userInfo[@"deviceToken"];
-    if (deviceToken) {
-        NSLog(@"✅ Got device token from MoEngage: %@", deviceToken);
-        #if ENABLE_APPSFLYER
-          [[AppsFlyerLib shared] registerUninstall:deviceToken];
-        #endif
-    }
-}
 
 
 // Function to start React Native manually after startup operations
@@ -281,6 +266,9 @@
     [[MoEngageSDKMessaging sharedInstance] setPushToken:deviceToken];
   #endif
   
+  #if ENABLE_APPSFLYER
+    [[AppsFlyerLib shared] registerUninstall:deviceToken];
+  #endif
 }
 
 -(void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
