@@ -130,14 +130,14 @@ export default function BlogArticleScreen() {
           <Text style={styles.title}>{title}</Text>
 
           {/* Excerpt */}
-          {excerptHtml && (
+          {/* {excerptHtml && (
             <RenderHtml
               contentWidth={width}
               systemFonts={RTSystemFonts}
               baseStyle={RTBaseStyle}
               source={{html: excerptHtml}}
             />
-          )}
+          )} */}
 
           {/* Main Content */}
           {contentHtml && (
