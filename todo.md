@@ -16,7 +16,8 @@ remove firebase messaging folder transfer from apptile core - done
 Ios
 
 Appsflyer
-uninstall token registration 
+uninstall token registration - done
+register remote notification - off loading to moengage
 
 Moengage:
 
