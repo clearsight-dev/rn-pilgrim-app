@@ -17,7 +17,6 @@ function AboveThefoldContent({
   selectedVariant,
   setSelectedVariant,
   screenWidth,
-  scrollToSection
 }) {
   const handleVariantSelect = useCallback((variant) => {
     setSelectedVariant(variant);
@@ -93,7 +92,6 @@ function AboveThefoldContent({
         variants={variants}
         selectedVariant={selectedVariant}
         setSelectedVariant={handleVariantSelect}
-        scrollToSection={scrollToSection}
       />
     </View>
   );

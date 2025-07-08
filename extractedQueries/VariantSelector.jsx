@@ -186,7 +186,6 @@ export const ProductPreviewCard = ({ product, selectedVariant }) => {
         )}
 
         {!!product?.rating && (
-          <Pressable onPress={() => scrollToSection("ratings")}>
             <View style={styles.ratingContainer}>
               <StarRating
                 rating={product?.rating}
@@ -205,7 +204,6 @@ export const ProductPreviewCard = ({ product, selectedVariant }) => {
                 </Text>
               </View>}
             </View>
-          </Pressable>
         )}
 
         <Text style={[typography.family, styles.productPrice]}>

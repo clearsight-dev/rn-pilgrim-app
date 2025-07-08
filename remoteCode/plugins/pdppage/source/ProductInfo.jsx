@@ -109,7 +109,6 @@ function ProductInfo({
   variants,
   selectedVariant,
   setSelectedVariant,
-  scrollToSection
 }) {
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = selectedVariant?.compareAtPrice?.amount
@@ -210,7 +209,6 @@ function ProductInfo({
 
       {/* Rating - Using parsed JSON value */}
       {!!product?.rating && (
-        <Pressable onPress={() => scrollToSection("ratings")}>
           <View style={styles.ratingContainer}>
             <RatingPill
               rating={product?.rating}
@@ -240,7 +238,6 @@ function ProductInfo({
               <Text style={styles.verifiedText}>Verified reviews</Text>
             </View>}
           </View>
-        </Pressable>
       )}
 
       {/* Variant Selector */}
