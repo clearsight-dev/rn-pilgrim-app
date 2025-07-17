@@ -31,6 +31,7 @@ class MainApplication : Application(), ReactApplication {
             // Packages that cannot be autolinked yet can be added manually here, for example:
             add(RNGetValuesPackage())
             add(RNApptilePackage())
+            add(InAppReviewPackage())
         }
 
         override fun getJSMainModuleName(): String = "index"
