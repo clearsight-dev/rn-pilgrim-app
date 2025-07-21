@@ -16,8 +16,8 @@
     "service_file_path": "83529966-6875-46fc-b09e-7a51f7242238/iosFirebaseServiceFile/a26d798d-9e11-4039-9ddc-dabbef7c7572/iosFirebaseServiceFile.plist",
     "team_id": "8SQ493N52G",
     "app_name": "Pilgrim India",
-    "version_number": 142,
-    "version_semver": "11.0.15"
+    "version_number": 151,
+    "version_semver": "11.0.16"
   },
   "android": {
     "icon_path": "83529966-6875-46fc-b09e-7a51f7242238/icon/d9c3c0d0-54f4-45c2-8fd2-307d84be62ea/icon.png",
@@ -26,8 +26,8 @@
     "service_file_path": "83529966-6875-46fc-b09e-7a51f7242238/androidFirebaseServiceFile/601898c3-8042-4262-a405-0dd200a6f95b/androidFirebaseServiceFile.json",
     "expected_output": "apk&aab",
     "app_name": "Pilgrim",
-    "version_code": 4195005,
-    "version_name": "11.0.16"
+    "version_code": 4195007,
+    "version_name": "11.0.17"
   },
   "both": {
     "buildSourceGitHeadName": "origin/main",

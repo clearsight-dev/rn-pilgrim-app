@@ -233,17 +233,6 @@ export function ReactComponent({ model }) {
     },
   ];
 
-  const scrollToSection = (sectionKey) => {
-    // const sectionIndex = sections.findIndex((section) => section.key === sectionKey);
-    // if (sectionIndex !== -1) {
-    //   sectionListRef.current?.scrollToLocation({
-    //     animated: true,
-    //     sectionIndex,
-    //     itemIndex: 0,
-    //   });
-    // }
-  };
-
   // Render section headers
   const renderSectionHeader = ({ section }) =>
     null;
@@ -264,7 +253,6 @@ export function ReactComponent({ model }) {
             selectedVariant={selectedVariant}
             setSelectedVariant={setSelectedVariant}
             screenWidth={screenWidth}
-            scrollToSection={scrollToSection}
           />
         );
       case "description":
@@ -377,7 +365,7 @@ export function ReactComponent({ model }) {
         windowSize={5} // Reduce window size for better performance
         removeClippedSubviews={true} // Important for performance
       />
-      {!loading  && !_.isNil(selectedVariant?.availableForSale) && <PilgrimCartButton
+      {!loading && !_.isNil(selectedVariant?.availableForSale) && <PilgrimCartButton
         containerStyle={{
           padding: 16,
           paddingHorizontal: 24,
