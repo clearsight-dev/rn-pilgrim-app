@@ -123,7 +123,6 @@
     "ENABLE_CLEVERTAP": false,
     "ENABLE_KALVIYO": false
   },
-  "SDK_PATH": "/Users/vadivazhagan/apptile-cli-home/ReactNativeTSProjeect",
   "APP_ID": "83529966-6875-46fc-b09e-7a51f7242238",
   "APPTILE_BACKEND_URL": "https://api.apptile.io",
   "APPCONFIG_SERVER_URL": "https://appconfigs.apptile.io"

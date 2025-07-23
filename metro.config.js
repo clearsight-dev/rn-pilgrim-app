@@ -19,7 +19,6 @@ IS_EC2=${process.env.IS_EC2}
  * @type {import('metro-config').MetroConfig}
  */
 const defaultConfigs = getDefaultConfig(__dirname);
-let rootPath = path.resolve(__dirname, `../ReactNativeTSProjeect/packages`);
 
 let rawExtraModules;
 
@@ -42,7 +41,6 @@ const watchPaths = Object.keys(
   }, {})
 );
 
-console.log("sdk path: " + rootPath);
 const sourceExts = defaultConfigs.resolver.sourceExts;
 const config = {
   resolver: {

@@ -552,9 +552,9 @@ async function main() {
   const apptileConfig = JSON.parse(apptileConfigRaw);
   try {
     const success = await downloadIconAndSplash(apptileConfig);
-    if (success) {
-      await generateIconSet(path.resolve(apptileConfig.SDK_PATH, 'packages/apptile-app/devops/scripts/android/iconset-generator.sh'));
-    }
+    // if (success) {
+    //   await generateIconSet(path.resolve(apptileConfig.SDK_PATH, 'packages/apptile-app/devops/scripts/android/iconset-generator.sh'));
+    // }
   } catch(err) {
     console.error(chalk.red('could not download icon and splash'));
   }
