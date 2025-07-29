@@ -35,7 +35,8 @@ import {call, select, spawn} from 'redux-saga/effects';
 import {initCartGenerator} from '../generators';
 import {shopifyCheckout, transformPurchaseEvent} from '../checkout';
 
-import {Platform} from 'react-native';
+import {Platform, NativeModules} from 'react-native';
+const { InAppReview } = NativeModules;
 
 export interface pluginConfigType {
   cartPlatform: string;
@@ -516,6 +517,11 @@ const shopifyCartDS = wrapDatasourceModel({
                 },
               }),
             );
+          }
+
+          // need to trigger review here
+          if (Platform.OS === "android") {
+            InAppReview?.requestFlow();
           }
         });
 
