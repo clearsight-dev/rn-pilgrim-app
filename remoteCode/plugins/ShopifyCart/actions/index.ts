@@ -857,8 +857,14 @@ class CartActions {
       const isCartModifiable = this.isCartModifiable(model);
       if (!isCartModifiable) return;
 
-      const {attributes, quantity, merchandiseId, sellingPlanId, itemPrice} =
-        params;
+      const {
+        attributes,
+        quantity,
+        merchandiseId,
+        sellingPlanId,
+        itemPrice,
+        successToastText,
+      } = params;
       const lineItems = [];
 
       const currentCart = this.getCart(model);
@@ -947,6 +953,15 @@ class CartActions {
         cartObject,
         cartLineCache,
       );
+
+      if (!_.isEmpty(successToastText)) {
+        toast.show(successToastText, {
+          type: 'success',
+          placement: 'bottom',
+          duration: 2000,
+          style: {marginBottom: 80},
+        });
+      }
     } catch (err) {
       const {merchandiseId} = params;
       this.completeLoadingAndRemoveItemFromSync(
