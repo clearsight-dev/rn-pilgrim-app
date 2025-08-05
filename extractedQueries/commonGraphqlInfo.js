@@ -174,6 +174,30 @@ export const PRODUCT_CARD_INFO = `
     id
     value
   }
+  text_benefit_1_headline: metafield(key: "text_benefit_1_headline", namespace: "custom") {
+    id
+    value
+  }
+  text_benefit_1_description: metafield(key: "text_benefit_1_description", namespace: "custom") {
+    id
+    value
+  }
+  text_benefit_3_headline: metafield(key: "text_benefit_3_headline", namespace: "custom") {
+    id
+    value
+  }
+  text_benefit_2_description: metafield(key: "text_benefit_2_description", namespace: "custom") {
+    id
+    value
+  }
+  text_benefit_2_headline: metafield(key: "text_benefit_2_headline", namespace: "custom") {
+    id
+    value
+  }
+  text_benefit_3_description: metafield(key: "text_benefit_3_description", namespace: "custom") {
+    id
+    value
+  }
   ingredients_url_1: metafield(key: "ingredients1_url", namespace: "my_fields") {
     id
     value

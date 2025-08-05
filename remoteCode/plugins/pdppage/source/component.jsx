@@ -1,32 +1,33 @@
-import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, SectionList, Platform, Text, View } from "react-native";
-import { useApptileWindowDims } from "apptile-core";
-import { useRoute } from "@react-navigation/native";
+import React, {useEffect, useState, useRef} from 'react';
+import {StyleSheet, SectionList, Platform, Text, View} from 'react-native';
+import {useApptileWindowDims} from 'apptile-core';
+import {useRoute} from '@react-navigation/native';
 import {
   fetchProductData,
   fetchProductRecommendations,
-} from "../../../../extractedQueries/pdpquery";
-import AboveThefoldContent from "./AboveThefoldContent";
-import DescriptionCard from "./DescriptionCard";
-import SelectShade from './shadeSelector'
-import RecommendationsRoot from "./recommendations/RecommendationsRoot";
-import BenefitsRoot from "./keybenefits/BenefitsRoot";
-import BenefitsCard from "./keybenefits/BenefitsCard";
-import RatingsReviewsRoot from "./ratingsAndReviews/RatingsReviewsRoot";
-import PilgrimCartButton from "../../../../extractedQueries/PilgrimCartButton";
-import PilgrimCode from "../../../../extractedQueries/PilgrimCode";
-import ExternalLinks from "../../../../extractedQueries/ExternalLinks";
-import { addLineItemToCart } from "../../../../extractedQueries/selectors";
+} from '../../../../extractedQueries/pdpquery';
+import AboveThefoldContent from './AboveThefoldContent';
+import DescriptionCard from './DescriptionCard';
+import SelectShade from './shadeSelector';
+import RecommendationsRoot from './recommendations/RecommendationsRoot';
+import BenefitsRoot from './keybenefits/BenefitsRoot';
+import BenefitsCard from './keybenefits/BenefitsCard';
+import RatingsReviewsRoot from './ratingsAndReviews/RatingsReviewsRoot';
+import PilgrimCartButton from '../../../../extractedQueries/PilgrimCartButton';
+import PilgrimCode from '../../../../extractedQueries/PilgrimCode';
+import ExternalLinks from '../../../../extractedQueries/ExternalLinks';
+import {addLineItemToCart} from '../../../../extractedQueries/selectors';
 import {
   formatProduct,
   formatProductsForCarousel,
-} from "../../../../extractedQueries/RelatedProductsCarousel";
-import { fetchProductOptions } from "../../../../extractedQueries/collectionqueries";
-import FAQComponent from "./FAQComponent";
-import ImageBand from "./keybenefits/ImageBand";
-import { colors, FONT_FAMILY } from "../../../../extractedQueries/theme";
-import Accordion from "../../../../extractedQueries/Accordion";
-import _ from 'lodash-es'
+} from '../../../../extractedQueries/RelatedProductsCarousel';
+import {fetchProductOptions} from '../../../../extractedQueries/collectionqueries';
+import FAQComponent from './FAQComponent';
+import ImageBand from './keybenefits/ImageBand';
+import {colors, FONT_FAMILY} from '../../../../extractedQueries/theme';
+import Accordion from '../../../../extractedQueries/Accordion';
+import {LoveItComponent} from './loveitsection';
+import _ from 'lodash-es';
 
 async function getVariants(product, setVariants, setSelectedVariant) {
   const res = await fetchProductOptions(product.handle, product.variantsCount);
@@ -39,7 +40,7 @@ async function getVariants(product, setVariants, setSelectedVariant) {
   let processedVariants = [];
   for (let index = 0; index < option.optionValues.length; ++index) {
     const value = option.optionValues[index];
-    const variant = variants.find((it) => {
+    const variant = variants.find(it => {
       return it?.node?.selectedOptions?.[0]?.value === value.name;
     });
 
@@ -59,14 +60,14 @@ async function getProductRecommendations(productByHandle, setProductData) {
     let complementaryRecommendation = null;
     if (result.complementaryRecommendations.length > 0) {
       complementaryRecommendation = formatProduct(
-        result.complementaryRecommendations[0]
+        result.complementaryRecommendations[0],
       );
     }
 
     const relatedRecommendations = formatProductsForCarousel(
-      result.relatedRecommendations
+      result.relatedRecommendations,
     );
-    setProductData((prev) => {
+    setProductData(prev => {
       return {
         ...prev,
         relatedRecommendations,
@@ -75,22 +76,22 @@ async function getProductRecommendations(productByHandle, setProductData) {
     });
   } else {
     console.error(
-      "Could not get recommendations as product handle was not provided"
+      'Could not get recommendations as product handle was not provided',
     );
   }
 }
 
-export function ReactComponent({ model }) {
+export function ReactComponent({model}) {
   const sectionListRef = useRef();
   const route = useRoute();
   const productHandle =
-    route.params?.productHandle ?? "3-redensyl-4-anagain-hair-growth-serum";
+    route.params?.productHandle ?? '3-redensyl-4-anagain-hair-growth-serum';
   // const productHandle = model.get('productHandle');
-  const backgroundColor = model.get("backgroundColor") || "#C5FAFF4D";
+  const backgroundColor = model.get('backgroundColor') || '#C5FAFF4D';
   const cardWidthPercentage = parseFloat(
-    model.get("cardWidthPercentage") || "70"
+    model.get('cardWidthPercentage') || '70',
   );
-  const cardSpacing = parseInt(model.get("cardSpacing") || "10", 10);
+  const cardSpacing = parseInt(model.get('cardSpacing') || '10', 10);
 
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,7 +99,7 @@ export function ReactComponent({ model }) {
   const [variants, setVariants] = useState([]);
   const [selectedVariant, setSelectedVariant] = useState(null);
 
-  const { width: screenWidth, height: screenHeight } = useApptileWindowDims();
+  const {width: screenWidth, height: screenHeight} = useApptileWindowDims();
 
   useEffect(() => {
     // When this function runs react's render cycle for the entire
@@ -109,7 +110,7 @@ export function ReactComponent({ model }) {
       clearTimeout(timeout);
       const productByHandle = formatProduct(result.productByHandle);
 
-      setProductData((prev) => {
+      setProductData(prev => {
         return {
           ...prev,
           productByHandle,
@@ -130,13 +131,13 @@ export function ReactComponent({ model }) {
       try {
         if (!productHandle) {
           // TODO(gaurav): actually retry
-          console.error("[APPTILE_AGENT] No product handle.");
+          console.error('[APPTILE_AGENT] No product handle.');
           return;
         }
 
         const result = await fetchProductData(productHandle);
 
-        if (Platform.OS === "android") {
+        if (Platform.OS === 'android') {
           setTimeout(() => {
             startHeavyRendering(timeout, result);
           }, 50);
@@ -144,15 +145,15 @@ export function ReactComponent({ model }) {
           startHeavyRendering(timeout, result);
         }
       } catch (err) {
-        console.error("[APPTILE_AGENT] Error fetching product data:", err);
-        setError(err.message || "Failed to fetch product data");
+        console.error('[APPTILE_AGENT] Error fetching product data:', err);
+        setError(err.message || 'Failed to fetch product data');
         clearTimeout(timeout);
         setLoading(false);
       }
     }
 
     if (productHandle) {
-      if (Platform.OS === "android") {
+      if (Platform.OS === 'android') {
         setTimeout(() => {
           loadProductData();
         }, 100);
@@ -166,39 +167,39 @@ export function ReactComponent({ model }) {
   const sections = [
     // Actual content sections
     {
-      title: "Product Information",
-      type: "above-the-fold",
-      key: "above-the-fold",
+      title: 'Product Information',
+      type: 'above-the-fold',
+      key: 'above-the-fold',
       data: [{}],
     },
     {
-      title: "Select Shade",
-      type: "select-shade",
-      key: "select-shade",
+      title: 'Select Shade',
+      type: 'select-shade',
+      key: 'select-shade',
       data: [{}],
     },
     {
-      title: "Key Benefits",
-      type: "benefits",
-      key: "benefits",
+      title: 'Key Benefits',
+      type: 'benefits',
+      key: 'benefits',
       data: [{}],
     },
     {
-      title: "Product Description",
-      type: "description",
-      key: "description",
+      title: 'Product Description',
+      type: 'description',
+      key: 'description',
       data: productData?.productByHandle ? [{}] : [],
     },
     {
-      title: "Key ingredients",
-      type: "ingredients",
-      key: "ingredients",
+      title: 'Key ingredients',
+      type: 'ingredients',
+      key: 'ingredients',
       data: [{}],
     },
     {
-      title: "Ratings & Reviews",
-      type: "ratings",
-      key: "ratings",
+      title: 'Ratings & Reviews',
+      type: 'ratings',
+      key: 'ratings',
       data: [{}],
     },
     // {
@@ -208,42 +209,41 @@ export function ReactComponent({ model }) {
     //   data: [{}],
     // },
     {
-      title: "Pilgrim Code",
-      type: "pilgrim-code",
-      key: "pilgrim-code",
+      title: 'Pilgrim Code',
+      type: 'pilgrim-code',
+      key: 'pilgrim-code',
       data: [{}],
     },
     {
-      title: "Additional Information",
-      type: "additional-info",
-      key: "additional-info",
+      title: 'Additional Information',
+      type: 'additional-info',
+      key: 'additional-info',
       data: [{}],
     },
     {
-      title: "FAQ",
-      type: "faq",
-      key: "faq",
+      title: 'FAQ',
+      type: 'faq',
+      key: 'faq',
       data: [{}],
     },
     {
-      title: "External links",
-      type: "external-links",
-      key: "external-links",
+      title: 'External links',
+      type: 'external-links',
+      key: 'external-links',
       data: [{}],
     },
   ];
 
   // Render section headers
-  const renderSectionHeader = ({ section }) =>
-    null;
+  const renderSectionHeader = ({section}) => null;
   // <View style={styles.sectionHeader}>
   //   <Text style={styles.sectionHeaderText}>{section.title}</Text>
   // </View>
 
   // Render each section based on its type
-  const renderItem = ({ item, section }) => {
+  const renderItem = ({item, section}) => {
     switch (section.type) {
-      case "above-the-fold":
+      case 'above-the-fold':
         return (
           <AboveThefoldContent
             loading={loading}
@@ -255,14 +255,14 @@ export function ReactComponent({ model }) {
             screenWidth={screenWidth}
           />
         );
-      case "description":
+      case 'description':
         return (
           <DescriptionCard
             productData={productData?.productByHandle}
             loading={loading}
           />
         );
-      case "select-shade":
+      case 'select-shade':
         return (
           <SelectShade
             productData={productData?.productByHandle}
@@ -271,28 +271,19 @@ export function ReactComponent({ model }) {
             setSelectedVariant={setSelectedVariant}
           />
         );
-      case "benefits":
+      case 'benefits':
         return (
           <>
-            <BenefitsCard
-              title={productData?.productByHandle?.textBenefits?.title}
-              benefits={productData?.productByHandle?.textBenefits?.items}
-              style={{ marginBottom: 16 }}
-            />
-            {productData?.productByHandle?.benefitsImages?.length > 0 && (
-              <BenefitsRoot
-                loading={loading}
-                error={error}
+            {productData?.productByHandle?.benefits && (
+              <LoveItComponent
                 backgroundColor={backgroundColor}
-                cardWidthPercentage={cardWidthPercentage}
-                cardSpacing={cardSpacing}
-                images={productData?.productByHandle?.benefitsImages}
-                title="Key Benefits"
+                cardTitle="Why you’ll Love it"
+                benefits={productData.productByHandle.benefits}
               />
             )}
           </>
         );
-      case "ingredients":
+      case 'ingredients':
         return (
           <>
             {productData?.productByHandle?.ingredients?.length > 0 && (
@@ -309,33 +300,35 @@ export function ReactComponent({ model }) {
             <ImageBand />
           </>
         );
-      case "ratings":
+      case 'ratings':
         return <RatingsReviewsRoot product={productData?.productByHandle} />;
-      case "recommendations":
+      case 'recommendations':
         return (
           <RecommendationsRoot
             loading={loading}
             error={error}
             data={productData}
-            handleAddToCart={() => console.log("adding to cart")}
+            handleAddToCart={() => console.log('adding to cart')}
           />
         );
-      case "pilgrim-code":
+      case 'pilgrim-code':
         return (
-          <Accordion title={"The Pilgrim Code"}>
+          <Accordion title={'The Pilgrim Code'}>
             <PilgrimCode enableCodeText />
           </Accordion>
         );
-      case "additional-info":
+      case 'additional-info':
         return (
-          <Accordion title={"Additional Information"}>
+          <Accordion title={'Additional Information'}>
             <Text style={styles.additionalInfoTxt}>
-              Marketed in India by: Heavenly Secrets Pvt. Ltd., 74 Technopark, MIDC, Andheri (E), Mumbai, India - 400093
-              Manufactured by: Naturis Cosmetics Pvt. Ltd, 1-EPIP, SIDCO Industrial Complex, Bari Brahmana, Jammu (J&K), India - 181133
+              Marketed in India by: Heavenly Secrets Pvt. Ltd., 74 Technopark,
+              MIDC, Andheri (E), Mumbai, India - 400093 Manufactured by: Naturis
+              Cosmetics Pvt. Ltd, 1-EPIP, SIDCO Industrial Complex, Bari
+              Brahmana, Jammu (J&K), India - 181133
             </Text>
           </Accordion>
         );
-      case "faq":
+      case 'faq':
         return <FAQComponent product={productData?.productByHandle} />;
       default:
         return null;
@@ -347,12 +340,11 @@ export function ReactComponent({ model }) {
       style={{
         width: screenWidth,
         flex: 1,
-        position: "relative",
-      }}
-    >
+        position: 'relative',
+      }}>
       <SectionList
         ref={sectionListRef}
-        style={[styles.container, { height: screenHeight }]}
+        style={[styles.container, {height: screenHeight}]}
         contentContainerStyle={styles.contentContainer}
         sections={sections}
         renderItem={renderItem}
@@ -365,20 +357,22 @@ export function ReactComponent({ model }) {
         windowSize={5} // Reduce window size for better performance
         removeClippedSubviews={true} // Important for performance
       />
-      {!loading && !_.isNil(selectedVariant?.availableForSale) && <PilgrimCartButton
-        containerStyle={{
-          padding: 16,
-          paddingHorizontal: 24,
-          position: "absolute",
-          bottom: 0,
-          backgroundColor: "white",
-          width: "100%",
-        }}
-        buttonText={"Add to Cart"}
-        variant="large"
-        isAvailable={selectedVariant?.availableForSale}
-        onPress={() => addLineItemToCart(selectedVariant.id)}
-      />}
+      {!loading && !_.isNil(selectedVariant?.availableForSale) && (
+        <PilgrimCartButton
+          containerStyle={{
+            padding: 16,
+            paddingHorizontal: 24,
+            position: 'absolute',
+            bottom: 0,
+            backgroundColor: 'white',
+            width: '100%',
+          }}
+          buttonText={'Add to Cart'}
+          variant="large"
+          isAvailable={selectedVariant?.availableForSale}
+          onPress={() => addLineItemToCart(selectedVariant.id)}
+        />
+      )}
     </View>
   );
 }
@@ -402,7 +396,7 @@ const styles = StyleSheet.create({
   sectionHeaderText: {
     fontSize: 16,
     fontFamily: FONT_FAMILY.bold,
-    fontWeight: "600",
+    fontWeight: '600',
     color: colors.dark90,
   },
   dummySection: {
@@ -414,27 +408,26 @@ const styles = StyleSheet.create({
   dummyText: {
     fontSize: 14,
     color: colors.dark70,
-    textAlign: "center",
+    textAlign: 'center',
   },
   additionalInfoTxt: {
     fontFamily: FONT_FAMILY.regular,
     fontSize: 14,
-    color: "#313131",
-
-  }
+    color: '#313131',
+  },
 });
 
 export const WidgetConfig = {
-  productHandle: "",
+  productHandle: '',
 };
 
 export const WidgetEditors = {
   basic: [
     {
-      type: "codeInput",
-      name: "productHandle",
+      type: 'codeInput',
+      name: 'productHandle',
       props: {
-        label: "Product Handle",
+        label: 'Product Handle',
       },
     },
   ],
@@ -443,19 +436,19 @@ export const WidgetEditors = {
 export const PropertySettings = {};
 
 export const WrapperTileConfig = {
-  name: "Product Detail Page",
+  name: 'Product Detail Page',
   defaultProps: {
     backgroundColor: {
-      label: "Background Color",
-      defaultValue: "#C5FAFF4D",
+      label: 'Background Color',
+      defaultValue: '#C5FAFF4D',
     },
     cardWidthPercentage: {
-      label: "Card Width (% of screen)",
-      defaultValue: "70",
+      label: 'Card Width (% of screen)',
+      defaultValue: '70',
     },
     cardSpacing: {
-      label: "Spacing Between Cards",
-      defaultValue: "20",
+      label: 'Spacing Between Cards',
+      defaultValue: '20',
     },
   },
 };
