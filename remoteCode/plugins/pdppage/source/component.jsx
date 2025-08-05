@@ -274,12 +274,14 @@ export function ReactComponent({model}) {
       case 'benefits':
         return (
           <>
-            {productData?.productByHandle?.benefits && (
+            {productData?.productByHandle?.benefits?.length ? (
               <LoveItComponent
                 backgroundColor={backgroundColor}
                 cardTitle="Why you’ll Love it"
                 benefits={productData.productByHandle.benefits}
               />
+            ) : (
+              <View />
             )}
           </>
         );
