@@ -35,7 +35,8 @@ const AccordionItem = ({open, onPress, title, description, idx}) => {
         onPress={onPress}
         accessibilityRole="button"
         accessibilityState={{expanded: open}}>
-        <View style={{display: 'flex', flexDirection: 'row'}}>
+        <View
+          style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
           <StarSvg />
           <Text style={styles.cardTitle}>{title}</Text>
         </View>
@@ -135,6 +136,7 @@ const styles = StyleSheet.create({
   cardBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 10,
     paddingLeft: 12,
     paddingRight: 20,
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
     marginLeft: 10,
     color: '#313131',
