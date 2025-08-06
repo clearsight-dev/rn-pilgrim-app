@@ -4,7 +4,8 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
-  Platform
+  Platform,
+  RefreshControl,
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { ProductCountSkeleton, ProductGridSkeleton } from './Skeletons';
@@ -36,6 +37,7 @@ export function ReactComponent({ model }) {
 
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [currentCursor, setCurrentCursor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -95,6 +97,43 @@ export function ReactComponent({ model }) {
     // Refresh the total count when sort option changes
     fetchTotalProductsCount(collectionHandle);
   }, [collectionHandle]);
+
+  // Handle pull to refresh
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    // Reset pagination
+    setProducts([]);
+    setCurrentCursor(null);
+    fetchedCursors.current.clear();
+
+    // Refresh data based on current state
+    if (appliedFilters.length > 0) {
+      // If filters are applied, refresh with filters
+      fetchDataWithFilters(
+        collectionHandle,
+        null,
+        false,
+        sortOption,
+        sortReverse,
+        appliedFilters,
+        filterData
+      );
+    } else {
+      // Otherwise, refresh with current sort option
+      fetchData(collectionHandle, null, false, sortOption, sortReverse);
+    }
+
+    // Refresh counts
+    if (appliedFilters.length === 0) {
+      fetchTotalProductsCount(collectionHandle);
+    } else {
+      const shopifyFilters = getShopifyFilters(appliedFilters, filterData);
+      fetchFilteredProductsCount(collectionHandle, shopifyFilters);
+    }
+
+    setRefreshing(false);
+  }, [collectionHandle, appliedFilters, sortOption, sortReverse, filterData]);
 
   function fetchData(
     collectionHandle,
@@ -459,6 +498,14 @@ export function ReactComponent({ model }) {
         ListHeaderComponent={renderListHeader}
         ListEmptyComponent={
           <Text style={[typography.family, styles.emptyText]}>No products found</Text>
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[colors.secondaryMain]} // Android
+            tintColor={colors.secondaryMain} // iOS
+          />
         }
       />
 

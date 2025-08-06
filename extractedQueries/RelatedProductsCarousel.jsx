@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
 import RelatedProductCard from './RelatedProductCard';
-import { typography } from './theme';
+import {typography} from './theme';
 
 export function formatProduct(product) {
   const firstVariant = product.variants?.edges?.[0]?.node;
@@ -19,17 +19,17 @@ export function formatProduct(product) {
       for (let i = 0; i < offerNodes.length; ++i) {
         const fields = offerNodes[i].fields;
         const offer = fields.reduce((accum, item) => {
-          if (item.key.startsWith("offer_code_")) {
+          if (item.key.startsWith('offer_code_')) {
             accum.code = item.value;
-          } else if (item.key.startsWith("offer_description_")) {
+          } else if (item.key.startsWith('offer_description_')) {
             accum.description = item.value;
-          } else if (item.key.startsWith("offer_headin_")) {
+          } else if (item.key.startsWith('offer_headin_')) {
             accum.title = item.value;
           }
           return accum;
         }, {});
 
-        offers.push(offer)
+        offers.push(offer);
       }
     }
   }
@@ -42,7 +42,7 @@ export function formatProduct(product) {
   if (product.benefits_url_1?.value) {
     benefitsImages.push({imageUrl: product.benefits_url_1?.value});
   }
-  
+
   if (product.benefits_url_2?.value) {
     benefitsImages.push({imageUrl: product.benefits_url_2?.value});
   }
@@ -51,13 +51,44 @@ export function formatProduct(product) {
     benefitsImages.push({imageUrl: product.benefits_url_3?.value});
   }
 
-  const textBenefits = {title: "", items: []};
+  const textBenefits = {title: '', items: []};
   if (product.text_benefits_title?.value) {
     textBenefits.title = product.text_benefits_title?.value;
   }
 
   if (product.text_benefits_body?.value) {
-    textBenefits.items = (product.text_benefits_body?.value ?? "").split("•");
+    textBenefits.items = (product.text_benefits_body?.value ?? '').split('•');
+  }
+
+  const benefits = [];
+  if (
+    product?.text_benefit_1_headline?.value &&
+    product?.text_benefit_1_description?.value
+  ) {
+    benefits.push({
+      title: product?.text_benefit_1_headline?.value,
+      description: product?.text_benefit_1_description?.value,
+    });
+  }
+
+  if (
+    product?.text_benefit_2_headline?.value &&
+    product?.text_benefit_2_description?.value
+  ) {
+    benefits.push({
+      title: product?.text_benefit_2_headline?.value,
+      description: product?.text_benefit_2_description?.value,
+    });
+  }
+
+  if (
+    product?.text_benefit_3_headline?.value &&
+    product?.text_benefit_3_description?.value
+  ) {
+    benefits.push({
+      title: product?.text_benefit_3_headline?.value,
+      description: product?.text_benefit_3_description?.value,
+    });
   }
 
   const ingredients = [];
@@ -111,6 +142,7 @@ export function formatProduct(product) {
     offers,
     benefitsImages,
     textBenefits,
+    benefits,
     ingredients,
     howToUse: product.how_to_use?.value,
     studyResults,
@@ -118,21 +150,25 @@ export function formatProduct(product) {
     answers: product.answers,
     productSize: product?.product_size?.value,
     productShortTitle: product?.product_short_title?.value,
-  }
+  };
 }
 
 export function formatProductsForCarousel(products) {
   if (!products || !Array.isArray(products)) return [];
   return products.map(product => formatProduct(product));
-};
+}
 
 function RelatedProductsCarousel({
   title = 'Customers also liked',
   products = [],
   style,
   // initialProductsToLoad = 2, // Default to loading 2 products initially
-  onSelectShade = () => {console.log("Handler for select shade not provided")},
-  onSelectVariant = () => {console.log("Handler for select variant not provided")},
+  onSelectShade = () => {
+    console.log('Handler for select shade not provided');
+  },
+  onSelectVariant = () => {
+    console.log('Handler for select variant not provided');
+  },
 }) {
   if (!products || products.length === 0) {
     return null;
@@ -141,7 +177,9 @@ function RelatedProductsCarousel({
   return (
     <View style={[styles.container, style]}>
       {/* Title */}
-      {title && <Text style={[typography.heading19,styles.title ]}>{title}</Text>}
+      {title && (
+        <Text style={[typography.heading19, styles.title]}>{title}</Text>
+      )}
 
       {/* Horizontal Scrollable List */}
       <FlatList
@@ -168,7 +206,7 @@ function RelatedProductsCarousel({
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
