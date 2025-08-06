@@ -33,6 +33,12 @@ export const imageSwatches = {
     'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/fiesta-queen_1.jpg?v=1736241677',
   'midnight soiree':
     'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/midnight-soiree_1.jpg?v=1736241677',
+  'soft elegance 01':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/soft-elegance_1.png?v=1754391109',
+  'sultry romance':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/sultry-romance_2.png?v=1754391111',
+  'bold charme':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/bold-charme_3.png?v=1754391109',
 };
 
 export const colorSwatches = {
