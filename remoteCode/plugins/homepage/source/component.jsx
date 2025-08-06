@@ -102,10 +102,28 @@ export function transformPageData(pageData) {
     o => ['app_banner_carousel_2'].includes(o?.key) && o?.namespace === 'custom',
   );
 
+  const slide_3_content = _.find(
+    metafields,
+    o => ['slide_3_content'].includes(o?.key) && o?.namespace === 'custom',
+  );
+
+  const slide_4_content = _.find(
+    metafields,
+    o => ['slide_4_content'].includes(o?.key) && o?.namespace === 'custom',
+  );
+
+  const slide_5_content = _.find(
+    metafields,
+    o => ['slide_5_content'].includes(o?.key) && o?.namespace === 'custom',
+  );
+
   return {
     bannerContents: {
       banner_contents: _.get(bannerContentsMetafield, 'references.nodes', []),
-      app_banner_carousel_2: _.get(appBannerCarousel2Metafield, 'references.nodes', [])
+      app_banner_carousel_2: _.get(appBannerCarousel2Metafield, 'references.nodes', []),
+      slide_3_content: _.get(slide_3_content, 'references.nodes', []),
+      slide_4_content: _.get(slide_4_content, 'references.nodes', []),
+      slide_5_content: _.get(slide_5_content, 'references.nodes', [])
     },
   };
 }
@@ -364,6 +382,18 @@ export function ReactComponent({ model }) {
         },
         {
           key: 'app_banner_carousel_2',
+          namespace: 'custom',
+        },
+        {
+          key: 'slide_3_content',
+          namespace: 'custom',
+        },
+        {
+          key: 'slide_4_content',
+          namespace: 'custom',
+        },
+        {
+          key: 'slide_5_content',
           namespace: 'custom',
         },
       ],
