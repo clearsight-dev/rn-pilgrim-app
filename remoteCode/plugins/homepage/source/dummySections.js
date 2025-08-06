@@ -2,37 +2,20 @@ export const dummy = [
   {
     type: 'metafield-carousel',
     data: [{}],
-  },
-  {
-    type: 'highlighted-collections',
-    data: [{}],
-    config: {
-      title: 'Weekly Picks',
-      subtitle: 'Shop the best of the week',
-      collection: 'weekly-picks',
-    },
+    config: {bannerKey: 'banner_contents', styles: {aspectRatio: 1.3}},
   },
   {
     type: 'quick-collections',
     data: [{}],
     config: {
       title: '',
-      layout: {
-        columns: 4,
-      },
+      layout: {columns: 4},
       style: {},
       items: [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/6e5fe50e-b4a1-4dd1-911f-99d2a35e59d3/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/6e5fe50e-b4a1-4dd1-911f-99d2a35e59d3/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/6e5fe50e-b4a1-4dd1-911f-99d2a35e59d3/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/6e5fe50e-b4a1-4dd1-911f-99d2a35e59d3/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/6e5fe50e-b4a1-4dd1-911f-99d2a35e59d3/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/6e5fe50e-b4a1-4dd1-911f-99d2a35e59d3/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Hair-Care-Rashmika-400x560_6fd816d0-e889-4d02-ad8b-8caad17961f1.png?v=1742470624',
           },
           title: 'Hair Care',
           collection: 'hair-care',
@@ -40,14 +23,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5cd3fe25-931e-4c6b-815b-e5df7e7154ee/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5cd3fe25-931e-4c6b-815b-e5df7e7154ee/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5cd3fe25-931e-4c6b-815b-e5df7e7154ee/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5cd3fe25-931e-4c6b-815b-e5df7e7154ee/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5cd3fe25-931e-4c6b-815b-e5df7e7154ee/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5cd3fe25-931e-4c6b-815b-e5df7e7154ee/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Skin-Care-400x560_b94a6807-7625-463a-b593-0537e8dcfb57.png?v=1742470624',
           },
           title: 'Face Care',
           collection: 'face-care',
@@ -55,29 +31,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/4eed35e2-5084-4bd6-a5e8-95dcddefa770/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/4eed35e2-5084-4bd6-a5e8-95dcddefa770/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/4eed35e2-5084-4bd6-a5e8-95dcddefa770/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/4eed35e2-5084-4bd6-a5e8-95dcddefa770/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/4eed35e2-5084-4bd6-a5e8-95dcddefa770/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/4eed35e2-5084-4bd6-a5e8-95dcddefa770/original.png',
-            ],
-          },
-          title: 'Makeup',
-          collection: 'makeup',
-        },
-        {
-          image: {
-            value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8c5ea5c1-3405-4660-a8c0-355e2d8caa7e/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8c5ea5c1-3405-4660-a8c0-355e2d8caa7e/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8c5ea5c1-3405-4660-a8c0-355e2d8caa7e/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8c5ea5c1-3405-4660-a8c0-355e2d8caa7e/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8c5ea5c1-3405-4660-a8c0-355e2d8caa7e/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8c5ea5c1-3405-4660-a8c0-355e2d8caa7e/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Body-Care-400x560_bc79e780-c17e-483c-bf22-a88a0e4af8fe.png?v=1742470624',
           },
           title: 'Body Lotion',
           collection: 'body-lotion',
@@ -85,14 +39,15 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/18b8c070-8a93-467c-ae3a-ddbbd3e39d7b/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/18b8c070-8a93-467c-ae3a-ddbbd3e39d7b/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/18b8c070-8a93-467c-ae3a-ddbbd3e39d7b/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/18b8c070-8a93-467c-ae3a-ddbbd3e39d7b/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/18b8c070-8a93-467c-ae3a-ddbbd3e39d7b/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/18b8c070-8a93-467c-ae3a-ddbbd3e39d7b/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Makeup-400x560_1d74dd34-33c7-4bc1-8fa7-6f2b122ba5b5.png?v=1742470624',
+          },
+          title: 'Makeup',
+          collection: 'makeup',
+        },
+        {
+          image: {
+            value:
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Fragrances-400x560_c713a992-65cd-4e09-8f15-a9c1ba43d8b7.png?v=1754038821',
           },
           title: 'Fragrances',
           collection: 'fragrances',
@@ -100,49 +55,69 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9ad82d82-1747-4224-b737-e133dd2f2e68/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9ad82d82-1747-4224-b737-e133dd2f2e68/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9ad82d82-1747-4224-b737-e133dd2f2e68/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9ad82d82-1747-4224-b737-e133dd2f2e68/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9ad82d82-1747-4224-b737-e133dd2f2e68/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9ad82d82-1747-4224-b737-e133dd2f2e68/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Monsoon-Essentials-400x560.png?v=1753865511',
           },
-          title: 'Lip Care',
-          collection: 'lip-care',
+          title: 'Monsoon Essentials',
+          collection: 'monsoon-essentials-1',
         },
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e469f3b5-047f-476f-9ce1-8c265bfb124d/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e469f3b5-047f-476f-9ce1-8c265bfb124d/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e469f3b5-047f-476f-9ce1-8c265bfb124d/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e469f3b5-047f-476f-9ce1-8c265bfb124d/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e469f3b5-047f-476f-9ce1-8c265bfb124d/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e469f3b5-047f-476f-9ce1-8c265bfb124d/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/New-Launches-400x560.png?v=1753865509',
+          },
+          title: 'New Arrivals',
+          collection: 'new-launch',
+        },
+        {
+          image: {
+            value:
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Bestsellers-400x560_3ea0d76b-6f6a-450d-864c-474428cf12ee.png?v=1753865509',
           },
           title: 'Bestsellers',
           collection: 'bestsellers',
         },
-        {
-          image: {
-            value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c06d5604-2609-4860-be16-eae43bd8d455/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c06d5604-2609-4860-be16-eae43bd8d455/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c06d5604-2609-4860-be16-eae43bd8d455/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c06d5604-2609-4860-be16-eae43bd8d455/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c06d5604-2609-4860-be16-eae43bd8d455/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c06d5604-2609-4860-be16-eae43bd8d455/original.png',
-            ],
-          },
-          title: 'New Launch',
-          collection: 'new-launch',
-        },
       ],
+    },
+  },
+  {
+    type: 'metafield-carousel',
+    data: [{}],
+    config: {
+      bannerKey: 'app_banner_carousel_2',
+      styles: {aspectRatio: 2.15, container: {marginBottom: 16}},
+    },
+  },
+  {
+    type: 'metafield-carousel',
+    data: [{}],
+    config: {
+      bannerKey: 'slide_3_content',
+      styles: {aspectRatio: 2.15, container: {marginBottom: 16}},
+    },
+  },
+  {
+    type: 'metafield-carousel',
+    data: [{}],
+    config: {
+      bannerKey: 'slide_4_content',
+      styles: {aspectRatio: 2.15, container: {marginBottom: 16}},
+    },
+  },
+  {
+    type: 'metafield-carousel',
+    data: [{}],
+    config: {
+      bannerKey: 'slide_5_content',
+      styles: {aspectRatio: 2.15, container: {marginBottom: 16}},
+    },
+  },
+  {
+    type: 'chip-collections',
+    data: [{}],
+    config: {
+      title: 'In The Spotlight',
+      subtitle: 'Unmissable Favorites You’ll Adore',
+      collection: 'bestsellers',
     },
   },
   {
@@ -170,18 +145,16 @@ export const dummy = [
       title: '',
       items: [
         {
-          collection: 'sunscreen',
-          product: '',
+          collection: '',
+          product: 'dream-matte-foundation-stick',
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/1b6c6650-5e11-43ec-904c-c0f5d7342eba/original.gif',
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/GROUPSHOT_1120X876_13afa3b5-d139-4a55-85ad-10a8dadcf8aa.jpg?v=1754038821',
           },
         },
       ],
       layout: {},
-      styles: {
-        aspectRatio: 1.3,
-      },
+      styles: {aspectRatio: 1.3},
     },
   },
   {
@@ -189,22 +162,13 @@ export const dummy = [
     data: [{}],
     config: {
       title: 'Shop by category',
-      layout: {
-        columns: 4,
-      },
+      layout: {columns: 3},
       style: {},
       items: [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e003141d-7f78-457b-a10f-ce398d962e3f/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e003141d-7f78-457b-a10f-ce398d962e3f/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e003141d-7f78-457b-a10f-ce398d962e3f/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e003141d-7f78-457b-a10f-ce398d962e3f/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e003141d-7f78-457b-a10f-ce398d962e3f/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/e003141d-7f78-457b-a10f-ce398d962e3f/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Hair-Serums-248x-332_362f5706-4f89-4b27-b58e-ed14c9048187.png?v=1753865511',
           },
           title: 'Hair Serums',
           collection: 'hair-serums',
@@ -212,14 +176,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8aa3b98c-4fa1-49ea-8245-7bbee0c623eb/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8aa3b98c-4fa1-49ea-8245-7bbee0c623eb/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8aa3b98c-4fa1-49ea-8245-7bbee0c623eb/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8aa3b98c-4fa1-49ea-8245-7bbee0c623eb/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8aa3b98c-4fa1-49ea-8245-7bbee0c623eb/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/8aa3b98c-4fa1-49ea-8245-7bbee0c623eb/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Shampoos-_-Conditioners--248--332.png-2_820f6a23-f925-4f6f-8c04-ccdcf8a08d23.png?v=1753865511',
           },
           title: 'Shampoos & Conditioners',
           collection: 'shampoos-conditioners',
@@ -227,14 +184,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/114cdc59-6f94-4edc-b397-74ceeec0cddb/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/114cdc59-6f94-4edc-b397-74ceeec0cddb/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/114cdc59-6f94-4edc-b397-74ceeec0cddb/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/114cdc59-6f94-4edc-b397-74ceeec0cddb/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/114cdc59-6f94-4edc-b397-74ceeec0cddb/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/114cdc59-6f94-4edc-b397-74ceeec0cddb/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Hair-Masks-248x332_4d23c1f3-c8c8-411a-bacc-5ec5dbeb7d3e.png?v=1753865511',
           },
           title: 'Hair Masks',
           collection: 'hair-masks',
@@ -242,14 +192,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9eb28c96-601d-42fc-9bdc-1ac611b93f7b/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9eb28c96-601d-42fc-9bdc-1ac611b93f7b/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9eb28c96-601d-42fc-9bdc-1ac611b93f7b/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9eb28c96-601d-42fc-9bdc-1ac611b93f7b/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9eb28c96-601d-42fc-9bdc-1ac611b93f7b/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/9eb28c96-601d-42fc-9bdc-1ac611b93f7b/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Sunscreens-W-248-H-332_35f27ca3-e0e6-467d-b9d4-94b6dbbb6880.png?v=1753865513',
           },
           title: 'Sunscreen',
           collection: 'sunscreen',
@@ -257,14 +200,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c608853f-a205-4b0d-a8cc-ada2c829f938/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c608853f-a205-4b0d-a8cc-ada2c829f938/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c608853f-a205-4b0d-a8cc-ada2c829f938/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c608853f-a205-4b0d-a8cc-ada2c829f938/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c608853f-a205-4b0d-a8cc-ada2c829f938/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/c608853f-a205-4b0d-a8cc-ada2c829f938/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Moisturizer-W-248-H-332.png?v=1753865513',
           },
           title: 'Face Creams & Moisturisers',
           collection: 'day-creams',
@@ -272,14 +208,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/f8eafee6-6d46-49fb-8319-dc47cb20a2bb/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/f8eafee6-6d46-49fb-8319-dc47cb20a2bb/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/f8eafee6-6d46-49fb-8319-dc47cb20a2bb/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/f8eafee6-6d46-49fb-8319-dc47cb20a2bb/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/f8eafee6-6d46-49fb-8319-dc47cb20a2bb/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/f8eafee6-6d46-49fb-8319-dc47cb20a2bb/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Face-Serums-W-248-H-332_e1048006-f32a-4cbb-ad73-c44a72ea3b7c.png?v=1753865513',
           },
           title: 'Face Serums',
           collection: 'face-serums',
@@ -287,59 +216,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/1fe966ae-4adc-48af-bbd3-404341340bc6/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/1fe966ae-4adc-48af-bbd3-404341340bc6/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/1fe966ae-4adc-48af-bbd3-404341340bc6/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/1fe966ae-4adc-48af-bbd3-404341340bc6/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/1fe966ae-4adc-48af-bbd3-404341340bc6/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/1fe966ae-4adc-48af-bbd3-404341340bc6/original.png',
-            ],
-          },
-          title: 'Face Washes',
-          collection: 'face-washes',
-        },
-        {
-          image: {
-            value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2172789f-bd65-421e-bba9-3e1d2c39e3d9/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2172789f-bd65-421e-bba9-3e1d2c39e3d9/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2172789f-bd65-421e-bba9-3e1d2c39e3d9/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2172789f-bd65-421e-bba9-3e1d2c39e3d9/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2172789f-bd65-421e-bba9-3e1d2c39e3d9/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2172789f-bd65-421e-bba9-3e1d2c39e3d9/original.png',
-            ],
-          },
-          title: 'Fragrances',
-          collection: 'fragrances',
-        },
-        {
-          image: {
-            value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/99b35f7a-4bef-4e9d-bbeb-95df7c1f4b00/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/99b35f7a-4bef-4e9d-bbeb-95df7c1f4b00/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/99b35f7a-4bef-4e9d-bbeb-95df7c1f4b00/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/99b35f7a-4bef-4e9d-bbeb-95df7c1f4b00/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/99b35f7a-4bef-4e9d-bbeb-95df7c1f4b00/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/99b35f7a-4bef-4e9d-bbeb-95df7c1f4b00/original.png',
-            ],
-          },
-          title: 'Makeup',
-          collection: 'makeup',
-        },
-        {
-          image: {
-            value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/87f08b25-86ee-4043-9c65-d032a394f88a/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/87f08b25-86ee-4043-9c65-d032a394f88a/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/87f08b25-86ee-4043-9c65-d032a394f88a/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/87f08b25-86ee-4043-9c65-d032a394f88a/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/87f08b25-86ee-4043-9c65-d032a394f88a/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/87f08b25-86ee-4043-9c65-d032a394f88a/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Face-W-248-H-332_60a74ce5-7dfd-415c-b632-647109cfa7cc.png?v=1753872716',
           },
           title: 'Face',
           collection: 'face',
@@ -347,14 +224,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/ef894d11-cedf-4894-8b2b-1fd349be33d5/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/ef894d11-cedf-4894-8b2b-1fd349be33d5/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/ef894d11-cedf-4894-8b2b-1fd349be33d5/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/ef894d11-cedf-4894-8b2b-1fd349be33d5/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/ef894d11-cedf-4894-8b2b-1fd349be33d5/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/ef894d11-cedf-4894-8b2b-1fd349be33d5/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Eyes-W-248-H-332_2c5a4653-c1d6-484e-9ef4-2d5f81585810.png?v=1753872714',
           },
           title: 'Eyes',
           collection: 'eyes',
@@ -362,14 +232,7 @@ export const dummy = [
         {
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5be23954-eac4-4689-99b6-b7cd72c7514c/original.png',
-            images: [
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5be23954-eac4-4689-99b6-b7cd72c7514c/original-480x480.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5be23954-eac4-4689-99b6-b7cd72c7514c/original-720x720.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5be23954-eac4-4689-99b6-b7cd72c7514c/original-1024x1024.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5be23954-eac4-4689-99b6-b7cd72c7514c/original-1600x1600.png',
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/5be23954-eac4-4689-99b6-b7cd72c7514c/original.png',
-            ],
+              'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/Lips-W-248-H-332_cc59fdff-af59-4287-a565-a94effa85525.png?v=1753865513',
           },
           title: 'Lips',
           collection: 'lips',
@@ -492,11 +355,7 @@ export const dummy = [
         },
       ],
       layout: {},
-      styles: {
-        itemWidth: 90,
-        aspectRatio: 1,
-        margin: 10
-      },
+      styles: {itemWidth: 90, aspectRatio: 1, margin: 10},
     },
   },
   {
@@ -660,13 +519,8 @@ export const dummy = [
           },
         },
       ],
-      layout: {
-      },
-      styles: {
-        itemWidth: 90,
-        aspectRatio: 1,
-        margin: 10
-      },
+      layout: {},
+      styles: {itemWidth: 90, aspectRatio: 1, margin: 10},
     },
   },
   {
@@ -674,12 +528,8 @@ export const dummy = [
     data: [{}],
     config: {
       title: 'Kits to solve your problems',
-      layout: {
-        columns: 2,
-      },
-      style: {
-        aspectRatio: 2.5,
-      },
+      layout: {columns: 2},
+      style: {aspectRatio: 2.5},
       items: [
         {
           image: {
@@ -731,30 +581,30 @@ export const dummy = [
     data: [{}],
     config: {
       title: 'Celeb Picks',
-      subtitle: `Essentials you Can't Miss!`,
+      subtitle: 'Essentials you Can"t Miss!',
       items: [
         {
-          title: `Manisha’s Picks`,
+          title: "Manisha's Picks",
           collection: 'manishas-curation',
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/69c41b69-3b84-41b6-9693-e1b4e34270b0/original.png',
+              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/df677c0b-536d-468a-b854-e6a513a491f1/original.png',
           },
         },
         {
-          title: `Jennifer’s Favourite`,
+          title: "Jennifer's Favourite",
           collection: 'jennifers-fav',
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2aff2d19-dad1-41aa-bf74-9f78ab10f783/original.png',
+              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/2ae45bfc-b0ba-45ef-89dd-5e86966738ff/original.png',
           },
         },
         {
-          title: `Rashmika’s Favourite`,
+          title: "Rashmika's Favourite",
           collection: 'rashmikas-fav',
           image: {
             value:
-              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/dd4c14b4-28b8-415a-8ad3-ced6a7fab795/original.png',
+              'https://cdn.apptile.io/83529966-6875-46fc-b09e-7a51f7242238/256ee005-9d97-454b-93a1-d15b95ca80f9/original.png',
           },
         },
       ],
@@ -798,11 +648,7 @@ export const dummy = [
         },
       ],
       layout: {},
-      styles: {
-        itemWidth: 90,
-        aspectRatio: 1,
-        margin: 5
-      },
+      styles: {itemWidth: 90, aspectRatio: 1, margin: 5},
     },
   },
 ];
