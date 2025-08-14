@@ -8,7 +8,7 @@ function HeadingText({pointsToNextRule, nextRuleName, ruleType}) {
       {!isNaN(pointsToNextRule) && pointsToNextRule > 0 ? (
         <Text style={styles.headingText}>
           Add {isQuantityBased ? '' : '₹'}{' '}
-          <Text style={styles.headingBoldText}>{pointsToNextRule}</Text> more
+          <Text style={styles.headingBoldText}>{pointsToNextRule}</Text> more{' '}
           {isQuantityBased ? 'eligible product/s' : ''} to avail{' '}
           <Text style={styles.headingBoldText}>{nextRuleName}</Text>
         </Text>
