@@ -3,16 +3,59 @@ import {View, StyleSheet} from 'react-native';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import HeadingText from './HeadingText';
 import Rule from './Rule';
+import {checkValidCollection} from './utils/checkValidCollection';
+import {calculateItemTotalPrice} from './utils/calculatePrice';
+import _ from 'lodash';
 
 const CartUpsellProgress = ({rules, cartLineItems}) => {
-  const {finalProcessedRules} = useMemo(() => {
+  const {finalProcessedRules, pointsToNextRule} = useMemo(() => {
     if (!rules?.length) {
       return {
+        pointsToNextRule: 0,
         finalProcessedRules: [],
       };
     }
-    // Current milestone (this should come from props or state in real implementation)
-    const currentMilestone = cartLineItems.length;
+    let currentMilestone = 0;
+    const ruleType = rules[0]?.rule_type;
+    let applicableCollectionIds = [];
+    rules.forEach(r =>
+      r?.collections.forEach(c => applicableCollectionIds.push(c.id)),
+    );
+
+    applicableCollectionIds = _.uniq(applicableCollectionIds);
+
+    switch (ruleType) {
+      case 'Quantity Based':
+        cartLineItems.map(item => {
+          const productCollectionIds = item.variant.product.collections.map(
+            c => c.id,
+          );
+          const validCartItem = checkValidCollection(
+            productCollectionIds,
+            applicableCollectionIds,
+          );
+          if (validCartItem) {
+            currentMilestone += item.quantity;
+          }
+        });
+        break;
+      case 'Value Based':
+        cartLineItems.map(item => {
+          const productCollectionIds = item.variant.product.collections.map(
+            c => c.id,
+          );
+          const validCartItem = checkValidCollection(
+            productCollectionIds,
+            applicableCollectionIds,
+          );
+          if (validCartItem) {
+            currentMilestone += calculateItemTotalPrice(item);
+          }
+        });
+        break;
+      default:
+        break;
+    }
 
     /**
      * Process all rules with mathematical calculations
@@ -81,15 +124,18 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
      * Update processed rules to mark the next milestone
      * - Mark current rule as "next" only if it matches the immediate next milestone
      */
-    const finalProcessedRules = processedRules.map(rule => ({
+    const updatedRules = processedRules.map(rule => ({
       ...rule,
       isNext:
         !rule.isAchieved &&
         rule.discount_milestone === nextUnachievedRule?.discount_milestone,
     }));
 
+    const points = nextUnachievedRule?.discount_milestone - currentMilestone;
+
     return {
-      finalProcessedRules,
+      finalProcessedRules: updatedRules,
+      pointsToNextRule: points,
     };
   }, [rules, cartLineItems]);
 
@@ -104,11 +150,25 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
         {offset: '65%', color: '#E7F2F3'},
       ]}
       style={styles.gradient}>
-      <HeadingText />
-      <View style={styles.ruleContainer}>
-        {finalProcessedRules.map((rule, index) => (
-          <Rule key={index} rule={rule} index={index} />
-        ))}
+      <View>
+        <HeadingText
+          pointsToNextRule={pointsToNextRule}
+          nextRuleName={
+            finalProcessedRules.find(rule => rule.isNext)?.rule_name ||
+            finalProcessedRules[finalProcessedRules.length - 1]?.rule_name
+          }
+          ruleType={
+            finalProcessedRules.find(rule => rule.isNext)?.rule_type ||
+            finalProcessedRules[finalProcessedRules.length - 1]?.rule_type
+          }
+        />
+        {!isNaN(pointsToNextRule) && pointsToNextRule >= 0 && (
+          <View style={styles.ruleContainer}>
+            {finalProcessedRules.map((rule, index) => (
+              <Rule key={index} rule={rule} />
+            ))}
+          </View>
+        )}
       </View>
     </GradientBackground>
   );

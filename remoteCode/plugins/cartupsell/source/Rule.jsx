@@ -4,12 +4,9 @@ import Progress from './Progress';
 import Milestone from './Milestone';
 
 function Rule(props) {
-  const {rule, index} = props;
+  const {rule} = props;
   const {totalSegments, filledSegments, isAchieved, isNext} = rule;
 
-  console.log(
-    `Rule ${index} - Segments: ${filledSegments}/${totalSegments}, Achieved: ${isAchieved}, Next: ${isNext}`,
-  );
   return (
     <View style={styles.container}>
       <Progress totalSegments={totalSegments} filledSegments={filledSegments} />
