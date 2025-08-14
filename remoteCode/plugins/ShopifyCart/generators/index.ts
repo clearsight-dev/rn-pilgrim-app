@@ -3,11 +3,12 @@ import {call, put, spawn, select, delay} from 'redux-saga/effects';
 import {modelUpdateAction, LocalStorage, triggerAction} from 'apptile-core';
 
 import {CART_KEY_FOR_LOCAL_STORAGE_KEY, CART_OBJECT_KEY} from '../constants';
-import {GET_METAOBJECT} from '../metaobjects';
+import {GET_METAOBJECT, GET_METAOBJECTS_BY_HANDLE} from '../metaobjects';
 
 // ![One ds should not import another ds file here importing for temporary solution for pilgrim's use case]
 import {ConfigSchema} from '../../FreeGifts/validators';
 import {transformMetaObjectToFreeGiftConfig} from '../../FreeGifts/transformers';
+import {TransformCartUpsellConfig} from '../../CartUpsellDS/transformers';
 
 export function* initCartGenerator(
   pluginDsConfig,
@@ -21,6 +22,13 @@ export function* initCartGenerator(
   // Initialize free gift configuration
   const freeGiftConfig = yield call(
     initializeFreeGiftConfig,
+    pluginDsConfig,
+    queryRunner,
+  );
+
+  // Initialize cart upsell configuration
+  const cartUpsellConfig = yield call(
+    initializeCartUpsellConfig,
     pluginDsConfig,
     queryRunner,
   );
@@ -57,6 +65,10 @@ export function* initCartGenerator(
           'config',
         ],
         newValue: freeGiftConfig,
+      },
+      {
+        selector: ['cartUpsellDatasource', 'config'],
+        newValue: cartUpsellConfig,
       },
     ]),
   );
@@ -100,6 +112,38 @@ function* initializeFreeGiftConfig(pluginDsConfig, queryRunner) {
       : {isEnabled: false};
   } catch (err) {
     console.error('Free Gift Config Initialization failed', err);
+    return {isEnabled: false};
+  }
+}
+
+function* initializeCartUpsellConfig(pluginDsConfig, queryRunner) {
+  const cartUpsellMetaObjectHandle = pluginDsConfig.getIn([
+    'config',
+    'cartUpsellMetaObjectHandle',
+  ]);
+
+  if (_.isEmpty(cartUpsellMetaObjectHandle)) {
+    return {isEnabled: false};
+  }
+
+  try {
+    const queryResponse = yield call(
+      queryRunner.runQuery,
+      'query',
+      GET_METAOBJECTS_BY_HANDLE,
+      {handle: cartUpsellMetaObjectHandle},
+      {},
+    );
+    const configMetaObjects = queryResponse?.data?.metaobjects?.edges || [];
+    if (!configMetaObjects.length) {
+      return {isEnabled: false};
+    }
+
+    const transformedCartUpsellConfig =
+      TransformCartUpsellConfig(configMetaObjects);
+    return transformedCartUpsellConfig;
+  } catch (err) {
+    console.error('Cart Upsell Config Initialization failed', err);
     return {isEnabled: false};
   }
 }

@@ -36,7 +36,7 @@ import {initCartGenerator} from '../generators';
 import {shopifyCheckout, transformPurchaseEvent} from '../checkout';
 
 import {Platform, NativeModules} from 'react-native';
-const { InAppReview } = NativeModules;
+const {InAppReview} = NativeModules;
 
 export interface pluginConfigType {
   cartPlatform: string;
@@ -46,6 +46,7 @@ export interface pluginConfigType {
   enabledCartLineCache: boolean;
   freeGiftDatasourceId: string;
   freeGiftMetaobjectId: string;
+  cartUpsellMetaObjectHandle: string;
   orderLimiterDatasourceId: string;
   syncingLineItems: any;
   currentCart: string;
@@ -374,6 +375,13 @@ export const editors: any = {
     },
     {
       type: 'codeInput',
+      name: 'cartUpsellMetaObjectHandle',
+      props: {
+        label: 'Cart Upsell metaobject handle',
+      },
+    },
+    {
+      type: 'codeInput',
       name: 'orderLimiterDatasourceId',
       props: {
         label: 'OrderLimiter Datasource ID',
@@ -394,6 +402,7 @@ const shopifyCartDS = wrapDatasourceModel({
     enabledCartLineCache: false,
     freeGiftDatasourceId: '',
     freeGiftMetaobjectId: '',
+    cartUpsellMetaObjectHandle: '',
     orderLimiterDatasourceId: '',
     currentCart: '',
     addCartLineItem: 'action',
@@ -520,7 +529,7 @@ const shopifyCartDS = wrapDatasourceModel({
           }
 
           // need to trigger review here
-          if (Platform.OS === "android") {
+          if (Platform.OS === 'android') {
             InAppReview?.requestFlow();
           }
         });
