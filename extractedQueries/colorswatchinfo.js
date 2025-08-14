@@ -357,4 +357,46 @@ export const colorSwatches = {
   'deep mocha 725': {
     colorHex: '#ab6e50',
   },
+  'nude l gance 01': {
+    colorHex: '#B66C6D',
+  },
+  'rose allure 02': {
+    colorHex: '#A85566',
+  },
+  'truffle myst re 03': {
+    colorHex: '#BC625E',
+  },
+  'caramel b b 04': {
+    colorHex: '#A94545',
+  },
+  'chic mocha 05': {
+    colorHex: '#A4493D',
+  },
+  'ruby kiss 11': {
+    colorHex: '#971B2F',
+  },
+  'french red 12': {
+    colorHex: '#93272C',
+  },
+  'rouge crush 13': {
+    colorHex: '#B83A4B',
+  },
+  'wine s duction 14': {
+    colorHex: '#890C58',
+  },
+  'berry d sir 15': {
+    colorHex: '#9C6169',
+  },
+  'belle pink 21': {
+    colorHex: '#CE0F69',
+  },
+  'pink amour 22': {
+    colorHex: '#B46B7A',
+  },
+  'mauve affaire 23': {
+    colorHex: '#8B5B6B',
+  },
+  'chocolat ch rie 31': {
+    colorHex: '#9A3324',
+  },
 };
