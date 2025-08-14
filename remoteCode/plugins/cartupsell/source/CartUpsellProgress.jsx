@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   ruleContainer: {
-    width: '100%',
     marginTop: 16,
     marginRight: 18,
     display: 'flex',

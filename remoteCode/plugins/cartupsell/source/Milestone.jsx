@@ -43,7 +43,7 @@ function Milestone(props) {
         <Text
           style={[
             styles.milestoneText,
-            {color: isAchieved ? '#00726C' : '#373737'},
+            {color: isAchieved ? '#00726C' : '#3f3f3f'},
           ]}>
           {rule.rule_name}
         </Text>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     height: 70,
-    marginLeft: 80,
+    marginLeft: 60,
   },
   milestoneTextContainer: {
     width: 80,
@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#373737',
   },
 });
 

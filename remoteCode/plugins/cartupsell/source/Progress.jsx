@@ -13,7 +13,7 @@ function Progress(props) {
 
 const styles = StyleSheet.create({
   container: {
-    width: 80,
+    width: 60,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
