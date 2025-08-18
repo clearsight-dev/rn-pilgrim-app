@@ -19,7 +19,7 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
     const ruleType = rules[0]?.rule_type;
     let applicableCollectionIds = [];
     rules.forEach(r =>
-      r?.collections.forEach(c => applicableCollectionIds.push(c.id)),
+      r?.collections?.forEach(c => applicableCollectionIds.push(c.id)),
     );
 
     applicableCollectionIds = _.uniq(applicableCollectionIds);
