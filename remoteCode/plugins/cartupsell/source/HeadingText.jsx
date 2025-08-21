@@ -13,10 +13,7 @@ function HeadingText({pointsToNextRule, nextRuleName, ruleType}) {
           <Text style={styles.headingBoldText}>{nextRuleName}</Text>
         </Text>
       ) : (
-        <Text style={styles.headingText}>
-          You have availed{' '}
-          <Text style={styles.headingBoldText}>{nextRuleName}</Text>
-        </Text>
+        <Text style={styles.headingText}>You have availed the best deal !</Text>
       )}
     </View>
   );

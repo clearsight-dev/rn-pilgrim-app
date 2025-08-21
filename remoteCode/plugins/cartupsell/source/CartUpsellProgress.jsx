@@ -162,13 +162,11 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
             finalProcessedRules[finalProcessedRules.length - 1]?.rule_type
           }
         />
-        {!isNaN(pointsToNextRule) && pointsToNextRule >= 0 && (
-          <View style={styles.ruleContainer}>
-            {finalProcessedRules.map((rule, index) => (
-              <Rule key={index} rule={rule} />
-            ))}
-          </View>
-        )}
+        <View style={styles.ruleContainer}>
+          {finalProcessedRules.map((rule, index) => (
+            <Rule key={index} rule={rule} />
+          ))}
+        </View>
       </View>
     </GradientBackground>
   );
