@@ -164,7 +164,7 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
         />
         <View style={styles.ruleContainer}>
           {finalProcessedRules.map((rule, index) => (
-            <Rule key={index} rule={rule} />
+            <Rule key={index} rule={rule} rules={finalProcessedRules} />
           ))}
         </View>
       </View>
@@ -174,14 +174,12 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
 
 const styles = StyleSheet.create({
   gradient: {
-    alignItems: 'center',
     paddingVertical: 18,
-    paddingHorizontal: 18,
+    paddingLeft: 18,
     borderRadius: 8,
   },
   ruleContainer: {
     marginTop: 16,
-    marginRight: 18,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',

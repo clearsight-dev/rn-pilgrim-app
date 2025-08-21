@@ -35,9 +35,10 @@ const outlinedMilestone = (isNext = false) => (
 );
 
 function Milestone(props) {
-  const {rule, isAchieved, isNext} = props;
+  const {rule, isAchieved, isNext, rules} = props;
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, {marginLeft: rules?.length > 1 ? 60 : 180}]}>
       {isAchieved ? filledMilestone : outlinedMilestone(isNext)}
       <View style={styles.milestoneTextContainer}>
         <Text
@@ -59,7 +60,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     height: 70,
-    marginLeft: 60,
   },
   milestoneTextContainer: {
     width: 80,

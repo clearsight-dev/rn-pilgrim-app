@@ -4,13 +4,22 @@ import Progress from './Progress';
 import Milestone from './Milestone';
 
 function Rule(props) {
-  const {rule} = props;
+  const {rule, rules} = props;
   const {totalSegments, filledSegments, isAchieved, isNext} = rule;
 
   return (
     <View style={styles.container}>
-      <Progress totalSegments={totalSegments} filledSegments={filledSegments} />
-      <Milestone rule={rule} isAchieved={isAchieved} isNext={isNext} />
+      <Progress
+        totalSegments={totalSegments}
+        filledSegments={filledSegments}
+        rules={rules}
+      />
+      <Milestone
+        rule={rule}
+        isAchieved={isAchieved}
+        isNext={isNext}
+        rules={rules}
+      />
     </View>
   );
 }

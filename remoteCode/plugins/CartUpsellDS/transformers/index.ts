@@ -36,6 +36,11 @@ export const TransformCartUpsellConfig = (data: any) => {
     if (f.key === 'rules') {
       const rules = f.references?.nodes?.map(r => transformCartUpsellRule(r));
       transformedConfig['rules'] = rules;
+    } else if (f.key === 'available_coupons') {
+      const availableCoupons = f.references?.nodes?.map(c =>
+        transformCartUpsellRule(c),
+      );
+      transformedConfig['available_coupons'] = availableCoupons;
     } else {
       transformedConfig[f.key] = f.value;
     }

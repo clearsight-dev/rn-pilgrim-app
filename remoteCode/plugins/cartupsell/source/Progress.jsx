@@ -1,10 +1,11 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 
 function Progress(props) {
-  const {totalSegments, filledSegments} = props;
+  const {totalSegments, filledSegments, rules} = props;
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {width: rules?.length > 1 ? 60 : 180}]}>
       <View style={[styles.filled, {flex: filledSegments}]} />
       <View style={[styles.unfilled, {flex: totalSegments - filledSegments}]} />
     </View>
@@ -13,7 +14,6 @@ function Progress(props) {
 
 const styles = StyleSheet.create({
   container: {
-    width: 60,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
