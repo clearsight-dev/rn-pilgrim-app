@@ -4,7 +4,7 @@ import Progress from './Progress';
 import Milestone from './Milestone';
 
 function Rule(props) {
-  const {rule, rules} = props;
+  const {rule, rules, index} = props;
   const {totalSegments, filledSegments, isAchieved, isNext} = rule;
 
   return (
@@ -20,6 +20,7 @@ function Rule(props) {
         isNext={isNext}
         rules={rules}
       />
+      {index === rules.length - 1 && <View style={{width: 30}} />}
     </View>
   );
 }

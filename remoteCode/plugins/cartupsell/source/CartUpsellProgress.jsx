@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, FlatList} from 'react-native';
 import GradientBackground from '../../../../extractedQueries/GradientBackground';
 import HeadingText from './HeadingText';
 import Rule from './Rule';
@@ -150,7 +150,7 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
         {offset: '65%', color: '#E7F2F3'},
       ]}
       style={styles.gradient}>
-      <View>
+      <View style={{width: '100%', paddingRight: 18}}>
         <HeadingText
           pointsToNextRule={pointsToNextRule}
           nextRuleName={
@@ -163,9 +163,19 @@ const CartUpsellProgress = ({rules, cartLineItems}) => {
           }
         />
         <View style={styles.ruleContainer}>
-          {finalProcessedRules.map((rule, index) => (
-            <Rule key={index} rule={rule} rules={finalProcessedRules} />
-          ))}
+          <FlatList
+            horizontal={true}
+            data={finalProcessedRules}
+            renderItem={({item, index}) => (
+              <Rule
+                key={index}
+                rule={item}
+                rules={finalProcessedRules}
+                index={index}
+              />
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
         </View>
       </View>
     </GradientBackground>
@@ -179,11 +189,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   ruleContainer: {
+    width: '100%',
     marginTop: 16,
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
   },
 });
 

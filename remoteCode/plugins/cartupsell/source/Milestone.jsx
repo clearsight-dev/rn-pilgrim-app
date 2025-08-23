@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   milestoneTextContainer: {
     width: 80,
-    height: 100,
+    height: 150,
     position: 'absolute',
     top: 40,
     left: -20,
