@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     position: 'relative',
     alignItems: 'center',
-    height: 70,
+    height: 90,
   },
   milestoneTextContainer: {
     width: 80,
