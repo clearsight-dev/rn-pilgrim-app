@@ -206,7 +206,7 @@ function PilgrimCartButton({
               textStyle
             ]}
           >
-            Out of Stock
+            Coming Soon
           </Text>
         </View>
       );
