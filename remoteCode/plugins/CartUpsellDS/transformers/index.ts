@@ -41,6 +41,11 @@ export const TransformCartUpsellConfig = (data: any) => {
         transformCartUpsellRule(c),
       );
       transformedConfig['available_coupons'] = availableCoupons;
+    } else if (f.key === 'footer_milestones') {
+      const footerMilestones = f.references?.nodes?.map(c =>
+        transformCartUpsellRule(c),
+      );
+      transformedConfig['footer_milestones'] = footerMilestones;
     } else {
       transformedConfig[f.key] = f.value;
     }
