@@ -1,19 +1,19 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
-import { Image } from "../../../../extractedQueries/ImageComponent";
-import { Icon } from "apptile-core";
-import RatingPill from "../../../../extractedQueries/RatingPill";
-import OfferCard from "./OfferCard";
-import VariantCard from "../../../../extractedQueries/VariantCard";
-import { normalizeOption } from "../../../../extractedQueries/ShadeSelector";
-import { isValidColor } from "../../../../extractedQueries/RelatedProductCard";
-import _ from "lodash-es";
+import React from 'react';
+import {View, Text, StyleSheet, ScrollView, Pressable} from 'react-native';
+import {Image} from '../../../../extractedQueries/ImageComponent';
+import {Icon} from 'apptile-core';
+import RatingPill from '../../../../extractedQueries/RatingPill';
+import OfferCard from './OfferCard';
+import VariantCard from '../../../../extractedQueries/VariantCard';
+import {normalizeOption} from '../../../../extractedQueries/ShadeSelector';
+import {isValidColor} from '../../../../extractedQueries/RelatedProductCard';
+import _ from 'lodash-es';
 
 import {
   colors,
   FONT_FAMILY,
   typography,
-} from "../../../../extractedQueries/theme";
+} from '../../../../extractedQueries/theme';
 
 // Enhanced variant selector component using the new VariantCard
 export function InlineVariantSelector({
@@ -21,30 +21,27 @@ export function InlineVariantSelector({
   selectedVariant,
   setSelectedVariant,
 }) {
-  const optionName = variants?.[0]?.selectedOptions?.[0]?.name ?? "Size";
+  const optionName = variants?.[0]?.selectedOptions?.[0]?.name ?? 'Size';
   let renderedVariantOptions;
-  if (optionName.toLowerCase() === "color") {
+  if (optionName.toLowerCase() === 'color') {
     renderedVariantOptions = variants.map((variant, index) => {
-      const { colorHex, imageUrl } = normalizeOption(variant.title);
+      const {colorHex, imageUrl} = normalizeOption(variant.title);
       const isSelected = selectedVariant?.id === variant.id;
       return (
         <Pressable
           key={`variant-${index}`}
           onPress={() => setSelectedVariant(variant)}
-          activeOpacity={0.7}
-        >
+          activeOpacity={0.7}>
           {colorHex ? (
-            <View style={[styles.shadeTablet, { backgroundColor: colorHex }]} />
+            <View style={[styles.shadeTablet, {backgroundColor: colorHex}]} />
           ) : imageUrl ? (
             <Image
-              source={{ uri: imageUrl }}
+              source={{uri: imageUrl}}
               style={styles.shadeImage}
               resizeMode="contain"
             />
           ) : (
-            <View
-              style={[styles.shadeTablet, { backgroundColor: "#CCCCCC" }]}
-            />
+            <View style={[styles.shadeTablet, {backgroundColor: '#CCCCCC'}]} />
           )}
           {isSelected && (
             <View style={styles.checkmarkContainer}>
@@ -61,8 +58,7 @@ export function InlineVariantSelector({
         <Pressable
           key={`variant-${index}`}
           onPress={() => setSelectedVariant(variant)}
-          activeOpacity={0.7}
-        >
+          activeOpacity={0.7}>
           <VariantCard
             variant={variant}
             optionName={optionName}
@@ -79,15 +75,13 @@ export function InlineVariantSelector({
       {selectedVariant?.title && (
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "center",
+            flexDirection: 'row',
+            alignItems: 'center',
             marginBottom: 12,
-          }}
-        >
+          }}>
           <Text
-            style={[styles.variantTitle, { fontFamily: FONT_FAMILY.regular }]}
-          >
-            {optionName}:{" "}
+            style={[styles.variantTitle, {fontFamily: FONT_FAMILY.regular}]}>
+            {optionName}:{' '}
           </Text>
           <Text style={styles.variantTitle}>{selectedVariant.title}</Text>
         </View>
@@ -95,8 +89,7 @@ export function InlineVariantSelector({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.variantOptionsContainer}
-      >
+        contentContainerStyle={styles.variantOptionsContainer}>
         {renderedVariantOptions}
       </ScrollView>
     </View>
@@ -113,26 +106,37 @@ function ProductInfo({
   // Calculate discount percentage if compareAtPrice exists
   let discountPercentage = selectedVariant?.compareAtPrice?.amount
     ? Math.round(
-      ((selectedVariant?.compareAtPrice.amount -
-        selectedVariant?.price.amount) /
-        selectedVariant?.compareAtPrice.amount) *
-      100
-    )
+        ((selectedVariant?.compareAtPrice.amount -
+          selectedVariant?.price.amount) /
+          selectedVariant?.compareAtPrice.amount) *
+          100,
+      )
     : 0;
   if (isNaN(discountPercentage)) {
     discountPercentage = 0;
   }
 
-
-  const productLabel1Text = product?.productLabel1?.value?.split("|")[0]?.trim();
-  const productLabel1Color = product?.productLabel1?.value?.split("|")[1]?.trim();
+  const productLabel1Text = product?.productLabel1?.value
+    ?.split('|')[0]
+    ?.trim();
+  const productLabel1Color = product?.productLabel1?.value
+    ?.split('|')[1]
+    ?.trim();
 
   return (
     <View style={styles.productInfoContainer}>
       {/* Bestseller tag */}
       {productLabel1Text && (
         <View style={styles.bestsellerContainer}>
-          <Text style={[styles.bestsellerText, { color: isValidColor(productLabel1Color) ? productLabel1Color : colors.accentCoral }]}>
+          <Text
+            style={[
+              styles.bestsellerText,
+              {
+                color: isValidColor(productLabel1Color)
+                  ? productLabel1Color
+                  : colors.accentCoral,
+              },
+            ]}>
             {productLabel1Text.toUpperCase()}
           </Text>
         </View>
@@ -151,8 +155,8 @@ function ProductInfo({
       {/* Price - VERTICALLY ARRANGED */}
       {selectedVariant?.price?.amount && (
         <View style={styles.priceContainer}>
-          <View style={[{ flexDirection: "row", alignItems: "baseline" }]}>
-            <View style={[styles.priceRow, { marginRight: 4 }]}>
+          <View style={[{flexDirection: 'row', alignItems: 'baseline'}]}>
+            <View style={[styles.priceRow, {marginRight: 4}]}>
               <Text style={styles.priceSymbol}>₹</Text>
               <Text style={styles.price}>
                 {parseInt(selectedVariant?.price?.amount)}
@@ -166,12 +170,11 @@ function ProductInfo({
                     style={[
                       typography.slashedPrice,
                       styles.compareAtPrice,
-                      { fontSize: 11, marginRight: 4 },
-                    ]}
-                  >
+                      {fontSize: 11, marginRight: 4},
+                    ]}>
                     ₹{parseInt(selectedVariant?.compareAtPrice?.amount)}
                   </Text>
-                  <Text style={[typography.savings, { fontSize: 11 }]}>
+                  <Text style={[typography.savings, {fontSize: 11}]}>
                     {discountPercentage}% Off
                   </Text>
                 </>
@@ -182,25 +185,24 @@ function ProductInfo({
       )}
 
       {/* Pilgrim miles */}
-      {selectedVariant?.price?.amount && (
+      {selectedVariant?.price?.amount && false && (
         <View style={styles.milesContainer}>
           <Icon
-            iconType={"Ionicons"}
-            name={"sparkles-sharp"}
+            iconType={'Ionicons'}
+            name={'sparkles-sharp'}
             style={{
               marginRight: 8,
               fontSize: 20,
-              color: "#00726C",
+              color: '#00726C',
             }}
           />
           <Text style={styles.milesText}>Earn up to </Text>
           <Text
             style={[
               styles.milesText,
-              { fontFamily: FONT_FAMILY.bold, color: "#00726C" },
-            ]}
-          >
-            ₹{Math.floor(parseInt(selectedVariant?.price?.amount) * 0.05)}{" "}
+              {fontFamily: FONT_FAMILY.bold, color: '#00726C'},
+            ]}>
+            ₹{Math.floor(parseInt(selectedVariant?.price?.amount) * 0.05)}{' '}
             PilgrimMILES
           </Text>
           <Text style={styles.milesText}> on this product</Text>
@@ -209,35 +211,36 @@ function ProductInfo({
 
       {/* Rating - Using parsed JSON value */}
       {!!product?.rating && (
-          <View style={styles.ratingContainer}>
-            <RatingPill
-              rating={product?.rating}
-              size={16}
-              backgroundColor={colors.primaryDark}
-            />
-            {product?.reviews?.value && <View style={styles.reviewCount}>
+        <View style={styles.ratingContainer}>
+          <RatingPill
+            rating={product?.rating}
+            size={16}
+            backgroundColor={colors.primaryDark}
+          />
+          {product?.reviews?.value && (
+            <View style={styles.reviewCount}>
               <Text
                 style={{
                   marginRight: 5,
                   fontFamily: FONT_FAMILY.regular,
                   fontSize: 14,
-                  color: "#1A1A1A",
-                }}
-              >
+                  color: '#1A1A1A',
+                }}>
                 {product?.reviews?.value}
               </Text>
               <Icon
-                iconType={"Material Icon"}
-                name={"check-decagram"}
+                iconType={'Material Icon'}
+                name={'check-decagram'}
                 style={{
                   marginRight: 2,
                   fontSize: 20,
-                  color: "#00AEEF",
+                  color: '#00AEEF',
                 }}
               />
               <Text style={styles.verifiedText}>Verified reviews</Text>
-            </View>}
-          </View>
+            </View>
+          )}
+        </View>
       )}
 
       {/* Variant Selector */}
@@ -258,8 +261,7 @@ function ProductInfo({
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.offersScrollView}
-            contentContainerStyle={styles.offersScrollContent}
-          >
+            contentContainerStyle={styles.offersScrollContent}>
             {offers.map((offer, index) => (
               <OfferCard
                 key={`offer-${index}`}
@@ -291,52 +293,52 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontFamily: FONT_FAMILY.bold,
     letterSpacing: -0.2,
-    color: "#2A2A2A",
+    color: '#2A2A2A',
   },
   productSubtitle: {
     fontSize: 16,
-    color: "#767676",
+    color: '#767676',
     fontFamily: FONT_FAMILY.regular,
     marginBottom: 16,
   },
   priceContainer: {
-    flexDirection: "column",
+    flexDirection: 'column',
     marginBottom: 16,
   },
   priceRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
+    flexDirection: 'row',
+    alignItems: 'baseline',
   },
   priceSymbol: {
     fontSize: 20,
-    color: "#1A1A1A",
+    color: '#1A1A1A',
     fontFamily: FONT_FAMILY.bold,
   },
   price: {
     fontSize: 20,
     fontFamily: FONT_FAMILY.bold,
-    color: "#1A1A1A",
+    color: '#1A1A1A',
   },
   taxInfo: {
-    color: "#8C8C8C",
+    color: '#8C8C8C',
     fontFamily: FONT_FAMILY.regular,
   },
   ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   reviewCount: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginLeft: 8,
-    alignItems: "center",
+    alignItems: 'center',
   },
   verifiedText: {
     fontSize: 12,
     fontFamily: FONT_FAMILY.regular,
     fontSize: 14,
-    color: "#1A1A1A",
-    textDecorationLine: "underline",
+    color: '#1A1A1A',
+    textDecorationLine: 'underline',
   },
   isSelectedBox: {
     borderWidth: 2,
@@ -351,19 +353,19 @@ const styles = StyleSheet.create({
   variantTitle: {
     fontSize: 18,
     fontFamily: FONT_FAMILY.bold,
-    color: "#333",
+    color: '#333',
   },
   variantOptionsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   // Offers section styles
   offersSection: {},
   offersSectionTitle: {
     fontSize: 19,
     fontFamily: FONT_FAMILY.bold,
-    color: "#1A1A1A",
+    color: '#1A1A1A',
     marginBottom: 12,
   },
   offersScrollView: {
@@ -385,29 +387,29 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   checkmarkContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     // backgroundColor: 'rgba(0, 0, 0, 0.3)',
     borderRadius: 4,
   },
   milesContainer: {
-    backgroundColor: "#E6F7F9",
+    backgroundColor: '#E6F7F9',
     marginBottom: 16,
     padding: 12,
     borderRadius: 6,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   milesText: {
     fontSize: 14,
     fontFamily: FONT_FAMILY.medium,
-    color: "#313131",
+    color: '#313131',
   },
 });
 
