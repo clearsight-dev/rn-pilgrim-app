@@ -13,6 +13,7 @@ import categoryscreen from "./plugins/categoryscreen/source/widget";
 import cartupsell from "./plugins/cartupsell/source/widget";
 import bottomcontent from "./plugins/bottomcontent/source/widget";
 import blogscreen from "./plugins/blogscreen/source/widget";
+import availablecoupons from "./plugins/availablecoupons/source/widget";
 import ShopifyCart from "./plugins/ShopifyCart/source/widget";
 import OTPInputTextWidget from "./plugins/OTPInputTextWidget/source/widget";
 import FreeGifts from "./plugins/FreeGifts/source/widget";
@@ -25,6 +26,7 @@ return [
     FreeGifts,
     OTPInputTextWidget,
     ShopifyCart,
+    availablecoupons,
     blogscreen,
     bottomcontent,
     cartupsell,
