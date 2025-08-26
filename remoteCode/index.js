@@ -11,6 +11,7 @@ import faqs from "./plugins/faqs/source/widget";
 import clickpost from "./plugins/clickpost/source/widget";
 import categoryscreen from "./plugins/categoryscreen/source/widget";
 import cartupsell from "./plugins/cartupsell/source/widget";
+import cartfootermilestone from "./plugins/cartfootermilestone/source/widget";
 import bottomcontent from "./plugins/bottomcontent/source/widget";
 import blogscreen from "./plugins/blogscreen/source/widget";
 import availablecoupons from "./plugins/availablecoupons/source/widget";
@@ -29,6 +30,7 @@ return [
     availablecoupons,
     blogscreen,
     bottomcontent,
+    cartfootermilestone,
     cartupsell,
     categoryscreen,
     clickpost,
