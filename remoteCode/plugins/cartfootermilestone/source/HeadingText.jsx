@@ -40,8 +40,7 @@ function HeadingText({pointsToNextRule, nextRuleName, ruleType}) {
 const styles = StyleSheet.create({
   headingContainer: {
     width: '100%',
-    paddingHorizontal: 20,
-    paddingStart: 10,
+    paddingEnd: 20,
   },
   headingText: {
     textAlign: 'center',

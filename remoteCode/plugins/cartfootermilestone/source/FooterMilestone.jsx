@@ -140,7 +140,9 @@ function FooterMilestone({rules, cartLineItems}) {
 
   return (
     <View style={styles.container}>
-      <Lightning />
+      <View style={styles.iconContainer}>
+        <Lightning />
+      </View>
       <HeadingText
         pointsToNextRule={pointsToNextRule}
         nextRuleName={
@@ -163,6 +165,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  iconContainer: {
+    width: 24,
+    height: 24,
   },
 });
 
