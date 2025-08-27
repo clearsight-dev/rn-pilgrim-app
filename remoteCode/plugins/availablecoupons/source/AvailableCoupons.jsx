@@ -136,7 +136,6 @@ const AvailableCoupons = ({rules, currentCart, syncingCartStatus}) => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    display: 'none',
   },
   title: {
     fontSize: 14,
