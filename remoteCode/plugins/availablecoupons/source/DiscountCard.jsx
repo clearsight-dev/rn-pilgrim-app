@@ -1,12 +1,56 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useMemo} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import LoadingSVG from './icons/LoadingSVG';
 
-export default function DiscountCard({rule, onApply, syncingCartStatus}) {
+export default function DiscountCard({
+  rule,
+  onApply,
+  syncingCartStatus,
+  currentCart,
+}) {
   const handleApplyClick = () => {
     onApply(rule.discount_code);
   };
+
+  const {ruleTitle} = useMemo(() => {
+    if (rule.isApplied) {
+      const saved = currentCart?.checkoutChargeAmount
+        ? currentCart.checkoutChargeAmount - currentCart?.totalAmount
+        : 0;
+      if (saved > 0) {
+        return {
+          ruleTitle: (
+            <Text style={styles.titleText}>
+              Saved ₹{' '}
+              <Text style={styles.titleTextBold}>{saved.toFixed(0)}</Text> with{' '}
+              <Text style={styles.titleTextBold}>{rule.rule_name}</Text>
+            </Text>
+          ),
+        };
+      }
+      return {
+        ruleTitle: (
+          <Text style={[styles.titleText, styles.titleTextBold]}>
+            {rule.rule_name}
+          </Text>
+        ),
+      };
+    }
+
+    return {
+      ruleTitle: (
+        <Text style={[styles.titleText, styles.titleTextBold]}>
+          {rule.rule_name}
+        </Text>
+      ),
+    };
+  }, [
+    currentCart.checkoutChargeAmount,
+    currentCart?.totalAmount,
+    rule.isApplied,
+    rule.rule_name,
+  ]);
 
   return (
     <View
@@ -24,7 +68,7 @@ export default function DiscountCard({rule, onApply, syncingCartStatus}) {
             }}
             style={styles.ruleImage}
           />
-          <Text style={styles.titleText}>{rule.rule_name}</Text>
+          {ruleTitle}
         </View>
         <View style={styles.ruleDescriptionContainer}>
           <Text style={styles.descriptionText}>
@@ -100,8 +144,12 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 13,
-    fontWeight: '600',
     color: '#000',
+    flexWrap: 'wrap',
+    maxWidth: 180,
+  },
+  titleTextBold: {
+    fontWeight: '700',
   },
   ruleDescriptionContainer: {
     marginTop: 4,

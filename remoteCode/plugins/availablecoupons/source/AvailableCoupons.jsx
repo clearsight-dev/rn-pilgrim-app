@@ -122,6 +122,7 @@ const AvailableCoupons = ({rules, currentCart, syncingCartStatus}) => {
           <DiscountCard
             key={item.id}
             rule={item}
+            currentCart={currentCart}
             onApply={applyCoupon}
             syncingCartStatus={syncingCartStatus}
           />
