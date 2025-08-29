@@ -111,7 +111,7 @@ export async function fetchCollectionCarouselData(collectionHandle) {
         handle: collectionHandle,
       },
       {
-        cachePolicy: 'cache-first',
+        cachePolicy: 'network-only',
       },
     );
 
@@ -187,7 +187,7 @@ export async function fetchCollectionCarouselData(collectionHandle) {
             filters: filters,
           },
           {
-            cachePolicy: 'cache-first',
+            cachePolicy: 'network-only',
           },
         );
 
@@ -284,7 +284,7 @@ export async function fetchCollectionData(
       filters: filters,
     },
     {
-      cachePolicy: revalidateCaches ? 'network-only' : 'cache-first',
+      cachePolicy: revalidateCaches ? 'network-only' : 'network-only',
     },
   );
 
@@ -421,7 +421,7 @@ export async function fetchProductOptions(handle, numVariants) {
       numVariants,
     },
     {
-      cachePolicy: 'cache-first',
+      cachePolicy: 'network-only',
     },
   );
 
@@ -459,7 +459,7 @@ export const fetchVariantBySelectedOptions = async (
         selectedOptions: selectedOptions,
       },
       {
-        cachePolicy: 'cache-first',
+        cachePolicy: 'network-only',
       },
     );
 
@@ -514,7 +514,7 @@ export async function fetchFilteredProductsCount(
         first: 100, // Fetch up to 100 products to get an accurate count
       },
       {
-        cachePolicy: 'cache-first',
+        cachePolicy: 'network-only',
       },
     );
 
