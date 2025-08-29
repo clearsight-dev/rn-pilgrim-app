@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#000',
     flexWrap: 'wrap',
-    maxWidth: 180,
+    maxWidth: 130,
   },
   titleTextBold: {
     fontWeight: '700',
