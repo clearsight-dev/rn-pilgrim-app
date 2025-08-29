@@ -65,7 +65,7 @@ export async function fetchSearchSuggestions({
     GET_SEARCH_SUGGESTIONS,
     variables,
     {
-      cachePolicy: revalidateCaches ? "network-only" : "cache-first",
+      cachePolicy: revalidateCaches ? "network-only" : "network-only",
     }
   );
 

@@ -1,28 +1,29 @@
 import gql from 'graphql-tag';
-import { PRODUCT_CARD_INFO } from './commonGraphqlInfo';
-import { cheaplyGetShopifyQueryRunner } from './selectors';
-import { VARIANT_INFO } from './commonGraphqlInfo';
-import { PRODUCT_QUERY } from './pdpquery';
-import { formatProduct } from './RelatedProductsCarousel';
+import {PRODUCT_CARD_INFO} from './commonGraphqlInfo';
+import {cheaplyGetShopifyQueryRunner} from './selectors';
+import {VARIANT_INFO} from './commonGraphqlInfo';
+import {PRODUCT_QUERY} from './pdpquery';
+import {formatProduct} from './RelatedProductsCarousel';
 
 export async function getFilterAndProductsForCollection(
-  collectionHandle, 
+  collectionHandle,
   filters = [], // these are filters applied before fetching products
   sortKey = 'COLLECTION_DEFAULT',
   reverse = false,
   cursor = null,
   numProducts = 5,
+  revalidateCaches = false,
 ) {
   const result = {
-    title: "",
+    title: '',
     products: [],
-    filters: [], // these are the entire set of filters that the ui can send back and are obtained 
-                 // from the collection query response, regardless of what filters were 
-                 // applied in the query
+    filters: [], // these are the entire set of filters that the ui can send back and are obtained
+    // from the collection query response, regardless of what filters were
+    // applied in the query
     unflattenedFilters: [],
     hasNextPage: false,
-    lastCursor: null
-  }; 
+    lastCursor: null,
+  };
 
   try {
     const res = await fetchCollectionData(
@@ -31,19 +32,22 @@ export async function getFilterAndProductsForCollection(
       cursor,
       sortKey,
       reverse,
-      filters
+      filters,
+      revalidateCaches,
     );
 
     if (res?.data?.collection?.products?.edges) {
       for (let i = 0; i < res.data.collection.products.edges.length; ++i) {
         const edge = res.data.collection.products.edges[i];
-        
+
         result.products.push(formatProduct(edge.node));
       }
     }
 
     if (res?.data?.collection?.products?.filters) {
-      const nonPriceFilters = res.data.collection.products.filters.filter(it => it.id !== "filter.v.price");
+      const nonPriceFilters = res.data.collection.products.filters.filter(
+        it => it.id !== 'filter.v.price',
+      );
       result.unflattenedFilters = nonPriceFilters;
       const applicableFilters = nonPriceFilters.flatMap(filterCategory => {
         return filterCategory.values;
@@ -55,8 +59,11 @@ export async function getFilterAndProductsForCollection(
     result.title = res?.data?.collection?.title;
     result.image = res?.data?.collection?.image;
   } catch (err) {
-    console.error("Failed to fetch data for chip carousel for the collection: ", collectionHandle);
-  } 
+    console.error(
+      'Failed to fetch data for chip carousel for the collection: ',
+      collectionHandle,
+    );
+  }
 
   return result;
 }
@@ -65,9 +72,9 @@ export async function getFilterAndProductsForCollection(
 export async function fetchCollectionCarouselData(collectionHandle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
-    throw new Error("Query runner not available");
+    throw new Error('Query runner not available');
   }
-  
+
   // Query to fetch collection data with filters
   const COLLECTION_FILTERS_QUERY = gql`
     query CollectionFilters($handle: String) {
@@ -94,49 +101,55 @@ export async function fetchCollectionCarouselData(collectionHandle) {
       }
     }
   `;
-  
+
   try {
     // First, fetch the collection data with filters
     const collectionData = await queryRunner.runQuery(
       'query',
       COLLECTION_FILTERS_QUERY,
       {
-        handle: collectionHandle
+        handle: collectionHandle,
       },
       {
-        cachePolicy: 'cache-first'
-      }
+        cachePolicy: 'network-only',
+      },
     );
-    
+
     // Extract the filters from the response
     const filters = collectionData.data.collection?.products?.filters || [];
-    
+
     // Find the category filter (for tabs)
-    const categoryFilter = filters.find(filter => 
-      filter.label && filter.label.toLowerCase().includes('category') && 
-      !filter.label.toLowerCase().includes('subcategory')
+    const categoryFilter = filters.find(
+      filter =>
+        filter.label &&
+        filter.label.toLowerCase().includes('category') &&
+        !filter.label.toLowerCase().includes('subcategory'),
     );
-    
+
     // Find the subcategory filter (for category cards)
-    const subcategoryFilter = filters.find(filter => 
-      filter.label && filter.label.toLowerCase().includes('subcategory')
+    const subcategoryFilter = filters.find(
+      filter =>
+        filter.label && filter.label.toLowerCase().includes('subcategory'),
     );
-    
+
     // If no subcategory filter found, return basic collection data
     if (!subcategoryFilter) {
       return {
         collection: collectionData.data.collection,
         tabs: categoryFilter ? categoryFilter.values.map(v => v.label) : [],
-        categories: []
+        categories: [],
       };
     }
-    
+
     // For each subcategory, fetch the first product's image
     const subcategoryProducts = await Promise.all(
-      subcategoryFilter.values.map(async (subcategory) => {
+      subcategoryFilter.values.map(async subcategory => {
         // Query to fetch the first product in this subcategory
         const SUBCATEGORY_PRODUCT_QUERY = gql`
-          query SubcategoryProduct($handle: String, $filters: [ProductFilter!]) {
+          query SubcategoryProduct(
+            $handle: String
+            $filters: [ProductFilter!]
+          ) {
             collection(handle: $handle) {
               id
               products(first: 1, filters: $filters) {
@@ -153,55 +166,55 @@ export async function fetchCollectionCarouselData(collectionHandle) {
             }
           }
         `;
-        
+
         // Create filter for this subcategory
         const filters = [
           {
             productMetafield: {
-              key: "l2_subcategory",
-              namespace: "custom",
-              value: subcategory.label
-            }
-          }
+              key: 'l2_subcategory',
+              namespace: 'custom',
+              value: subcategory.label,
+            },
+          },
         ];
-        
+
         // Fetch the first product in this subcategory
         const productData = await queryRunner.runQuery(
           'query',
           SUBCATEGORY_PRODUCT_QUERY,
           {
             handle: collectionHandle,
-            filters: filters
+            filters: filters,
           },
           {
-            cachePolicy: 'cache-first'
-          }
+            cachePolicy: 'network-only',
+          },
         );
-        
+
         // Get the product image URL
         const product = productData.data.collection?.products?.nodes?.[0];
         const imageUrl = product?.featuredImage?.url || '';
-        
+
         // Return the subcategory with its image
         return {
           id: subcategory.id,
           title: subcategory.label,
-          image: imageUrl
+          image: imageUrl,
         };
-      })
+      }),
     );
-    
+
     // Return the formatted collection data
     return {
       collection: collectionData.data.collection,
       tabs: categoryFilter ? categoryFilter.values.map(v => v.label) : [],
-      categories: subcategoryProducts
+      categories: subcategoryProducts,
     };
   } catch (error) {
     console.error('Error fetching collection carousel data:', error);
     throw error;
   }
-};
+}
 
 export const COLLECTION_PRODUCTS_QUERY = gql`
 query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys, $reverse: Boolean, $filters: [ProductFilter!]) {
@@ -240,12 +253,25 @@ query CollectionProducts($handle: String, $first: Int!, $after: String, $sortKey
 `;
 
 // Function to fetch collection data using the GraphQL query with pagination support
-export async function fetchCollectionData(collectionHandle, first = 50, afterCursor = null, sortKey = 'COLLECTION_DEFAULT', reverse = false, filters = [], revalidateCaches = false) {
+export async function fetchCollectionData(
+  collectionHandle,
+  first = 50,
+  afterCursor = null,
+  sortKey = 'COLLECTION_DEFAULT',
+  reverse = false,
+  filters = [],
+  revalidateCaches = false,
+) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
-    throw new Error("Query runner not available");
+    throw new Error('Query runner not available');
   }
-  
+
+  console.log('Fetching collection data with params:', {
+    collectionHandle,
+    revalidateCaches,
+  });
+
   const data = await queryRunner.runQuery(
     'query',
     COLLECTION_PRODUCTS_QUERY,
@@ -255,32 +281,33 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
       after: afterCursor,
       sortKey: sortKey,
       reverse: reverse,
-      filters: filters
+      filters: filters,
     },
     {
-      cachePolicy: revalidateCaches ? 'network-only' : 'cache-first'
-    }
+      cachePolicy: revalidateCaches ? 'network-only' : 'network-only',
+    },
   );
-  
+
   // Extract pagination information
   const products = data.data.collection?.products?.edges || [];
   const pageInfo = data.data.collection?.products?.pageInfo || {};
-  
+
   // Get first and last cursor for pagination
   const firstCursor = products.length > 0 ? products[0].cursor : null;
-  const lastCursor = products.length > 0 ? products[products.length - 1].cursor : null;
+  const lastCursor =
+    products.length > 0 ? products[products.length - 1].cursor : null;
 
   for (let i = 0; i < products.length; ++i) {
     const product = products[i].node;
     queryRunner.writeQuery({
       query: PRODUCT_QUERY,
-      variables: { productHandle: product.handle },
+      variables: {productHandle: product.handle},
       data: {
-        product
-      }
-    })
+        product,
+      },
+    });
   }
-  
+
   return {
     data: {
       collection: data.data.collection,
@@ -288,87 +315,102 @@ export async function fetchCollectionData(collectionHandle, first = 50, afterCur
         hasNextPage: pageInfo.hasNextPage,
         hasPreviousPage: pageInfo.hasPreviousPage,
         firstCursor,
-        lastCursor
-      }
-    }
+        lastCursor,
+      },
+    },
   };
 }
 
 export const OPTIONS_QUERY = gql`
-query GetOptionsForProduct($handle: String, $numVariants: Int!) {
-  product(handle: $handle) {
-    id
-    handle
-    availableForSale
-    options {
+  query GetOptionsForProduct($handle: String, $numVariants: Int!) {
+    product(handle: $handle) {
       id
-      name
-      optionValues {
+      handle
+      availableForSale
+      options {
         id
         name
-        swatch {
-          color
+        optionValues {
+          id
+          name
+          swatch {
+            color
+          }
+        }
+      }
+      variants(first: $numVariants) {
+        edges {
+          node {
+            id
+            title
+            availableForSale
+            image {
+              id
+              url
+              altText
+            }
+            price {
+              amount
+              currencyCode
+            }
+            compareAtPrice {
+              amount
+              currencyCode
+            }
+            weight
+            weightUnit
+            selectedOptions {
+              name
+              value
+            }
+            variantSubtitle: metafield(
+              key: "variant_subtitle"
+              namespace: "custom"
+            ) {
+              id
+              key
+              value
+              namespace
+            }
+            no_skin_tone_image_url: metafield(
+              key: "no_skin_tone_image_url"
+              namespace: "custom"
+            ) {
+              id
+              value
+            }
+            deep_skin_tone_image_url: metafield(
+              key: "deep_skin_tone_image_url"
+              namespace: "custom"
+            ) {
+              id
+              value
+            }
+            medium_skin_tone_image_url: metafield(
+              key: "medium_skin_tone_image_url"
+              namespace: "custom"
+            ) {
+              id
+              value
+            }
+            light_skin_tone_image_url: metafield(
+              key: "light_skin_tone_image_url"
+              namespace: "custom"
+            ) {
+              id
+              value
+            }
+          }
         }
       }
     }
-    variants(first: $numVariants) {
-      edges {
-        node {
-          id
-          title
-          availableForSale
-          image {
-            id
-            url
-            altText
-          }
-          price {
-            amount
-            currencyCode
-          }
-          compareAtPrice {
-            amount
-            currencyCode
-          }
-          weight
-          weightUnit
-          selectedOptions {
-            name
-            value
-          }
-          variantSubtitle: metafield(key: "variant_subtitle", namespace: "custom") {
-            id
-            key
-            value
-            namespace
-          }
-          no_skin_tone_image_url: metafield(key: "no_skin_tone_image_url", namespace: "custom") {
-            id
-            value
-          }    
-          deep_skin_tone_image_url: metafield(key: "deep_skin_tone_image_url", namespace: "custom") {
-            id
-            value
-          }    
-          medium_skin_tone_image_url: metafield(key: "medium_skin_tone_image_url", namespace: "custom") {
-            id
-            value
-          }    
-          light_skin_tone_image_url: metafield(key: "light_skin_tone_image_url", namespace: "custom") {
-            id
-            value
-          }    
-        }  
-      }
-    }
   }
-}
 `;
 
 export async function fetchProductOptions(handle, numVariants) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
-    throw new Error("Query runner not available");
+    throw new Error('Query runner not available');
   }
 
   const res = await queryRunner.runQuery(
@@ -376,26 +418,29 @@ export async function fetchProductOptions(handle, numVariants) {
     OPTIONS_QUERY,
     {
       handle,
-      numVariants
+      numVariants,
     },
     {
-      cachePolicy: 'cache-first'
-    }
+      cachePolicy: 'network-only',
+    },
   );
-  
+
   return {
     options: res.data.product?.options,
-    variants: res.data.product?.variants?.edges ?? []
+    variants: res.data.product?.variants?.edges ?? [],
   };
 }
 
 // Function to fetch product variant by selected options
-export const fetchVariantBySelectedOptions = async (productHandle, selectedOptions) => {
+export const fetchVariantBySelectedOptions = async (
+  productHandle,
+  selectedOptions,
+) => {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
-    throw new Error("Query runner not available");
+    throw new Error('Query runner not available');
   }
-  
+
   const VARIANT_BY_SELECTED_OPTIONS_QUERY = gql`
     query VariantBySelectedOptions($handle: String, $selectedOptions: [SelectedOptionInput!]!) {
       product(handle: $handle) {
@@ -404,24 +449,24 @@ export const fetchVariantBySelectedOptions = async (productHandle, selectedOptio
       }
     }
   `;
-  
+
   try {
     const res = await queryRunner.runQuery(
       'query',
       VARIANT_BY_SELECTED_OPTIONS_QUERY,
       {
         handle: productHandle,
-        selectedOptions: selectedOptions
+        selectedOptions: selectedOptions,
       },
       {
-        cachePolicy: 'cache-first'
-      }
+        cachePolicy: 'network-only',
+      },
     );
-    
+
     return {
       data: {
-        variant: res.data.product?.variantBySelectedOptions
-      }
+        variant: res.data.product?.variantBySelectedOptions,
+      },
     };
   } catch (error) {
     console.error('Error fetching variant by selected options:', error);
@@ -430,15 +475,22 @@ export const fetchVariantBySelectedOptions = async (productHandle, selectedOptio
 };
 
 // Function to fetch only the count of products matching specific filters
-export async function fetchFilteredProductsCount(collectionHandle, filters = []) {
+export async function fetchFilteredProductsCount(
+  collectionHandle,
+  filters = [],
+) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
-    throw new Error("Query runner not available");
+    throw new Error('Query runner not available');
   }
-  
+
   // Query to fetch only handles for counting
   const FILTERED_PRODUCTS_COUNT_QUERY = gql`
-    query FilteredProductsCount($handle: String, $filters: [ProductFilter!], $first: Int!) {
+    query FilteredProductsCount(
+      $handle: String
+      $filters: [ProductFilter!]
+      $first: Int!
+    ) {
       collection(handle: $handle) {
         id
         products(filters: $filters, first: $first) {
@@ -451,7 +503,7 @@ export async function fetchFilteredProductsCount(collectionHandle, filters = [])
       }
     }
   `;
-  
+
   try {
     const data = await queryRunner.runQuery(
       'query',
@@ -459,26 +511,26 @@ export async function fetchFilteredProductsCount(collectionHandle, filters = [])
       {
         handle: collectionHandle,
         filters: filters,
-        first: 100 // Fetch up to 100 products to get an accurate count
+        first: 100, // Fetch up to 100 products to get an accurate count
       },
       {
-        cachePolicy: 'cache-first'
-      }
+        cachePolicy: 'network-only',
+      },
     );
-    
+
     // Get the count of products
     const products = data.data.collection?.products?.edges || [];
     const count = products.length;
-    
+
     return {
       count: count,
-      isMaxCount: count === 100 // If we got 100 products, there might be more
+      isMaxCount: count === 100, // If we got 100 products, there might be more
     };
   } catch (error) {
     console.error('Error fetching filtered products count:', error);
     return {
       count: 0,
-      isMaxCount: false
+      isMaxCount: false,
     };
   }
 }

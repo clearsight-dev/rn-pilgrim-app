@@ -83,7 +83,7 @@ export async function fetchSearchProducts({
     SEARCH_PRODUCTS_QUERY,
     variables,
     {
-      cachePolicy: revalidateCaches ? 'network-only' : 'cache-first',
+      cachePolicy: revalidateCaches ? 'network-only' : 'network-only',
     }
   );
 

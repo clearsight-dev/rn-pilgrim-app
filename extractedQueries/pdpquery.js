@@ -44,7 +44,7 @@ export async function fetchProductDescriptionHtml(productHandle) {
       productHandle
     },
     {
-      cachePolicy: 'cache-first'
+      cachePolicy: 'network-only'
     }
   )
 
@@ -68,7 +68,7 @@ export async function fetchProductData(productHandle) {
       productHandle: productHandle,
     },
     {
-      cachePolicy: 'cache-first'
+      cachePolicy: 'network-only'
     }
   );
   
@@ -92,7 +92,7 @@ export async function fetchProductRecommendations(productHandle) {
       productHandle: productHandle,
     },
     {
-      cachePolicy: 'cache-first'
+      cachePolicy: 'network-only'
     }
   );
 

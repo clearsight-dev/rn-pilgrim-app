@@ -399,4 +399,22 @@ export const colorSwatches = {
   'chocolat ch rie 31': {
     colorHex: '#9A3324',
   },
+  'raspberry cr pe 01': {
+    colorHex: '#ed847e',
+  },
+  'ros souffl 02': {
+    colorHex: '#e25858',
+  },
+  'french croissant 03': {
+    colorHex: '#df796c',
+  },
+  'macaron crush 04': {
+    colorHex: '#d37166',
+  },
+  'strawberry mouss 05': {
+    colorHex: '#cc7d86',
+  },
+  'sunkiss gold 01': {
+    colorHex: '#d6a38e',
+  },
 };

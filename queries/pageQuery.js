@@ -224,7 +224,7 @@ export async function fetchPageData(pageHandle, pageMetafields, revalidateCaches
         pageMetafields: pageMetafields
       },
       {
-        cachePolicy: revalidateCaches ? 'network-only' : 'cache-first'
+        cachePolicy: revalidateCaches ? 'network-only' : 'network-only'
       }
     );
     

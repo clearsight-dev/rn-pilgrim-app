@@ -1,50 +1,50 @@
-import { PRODUCT_QUERY } from "./pdpquery"; 
-import { fetchCollectionData, OPTIONS_QUERY } from "./collectionqueries";
-import { COLLECTION_PRODUCTS_QUERY } from "./collectionqueries";
-import { cheaplyGetShopifyQueryRunner } from "./selectors";
+import {PRODUCT_QUERY} from './pdpquery';
+import {fetchCollectionData, OPTIONS_QUERY} from './collectionqueries';
+import {COLLECTION_PRODUCTS_QUERY} from './collectionqueries';
+import {cheaplyGetShopifyQueryRunner} from './selectors';
 
 async function revalidateProduct(productHandle, numVariants = 5) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
-    console.error("Failed to revalidate caches for product!");
+    console.error('Failed to revalidate caches for product!');
   }
 
   queryRunner.runQuery(
     'query',
     PRODUCT_QUERY,
     {
-      productHandle
+      productHandle,
     },
     {
-      cachePolicy: 'network-only'
-    }
+      cachePolicy: 'network-only',
+    },
   );
   queryRunner.runQuery(
     'query',
     OPTIONS_QUERY,
     {
       handle: productHandle,
-      numVariants
+      numVariants,
     },
     {
-      cachePolicy: 'network-only'
-    }
-  )
+      cachePolicy: 'network-only',
+    },
+  );
 }
 
 async function revalidateCollection(handle) {
   const queryRunner = await cheaplyGetShopifyQueryRunner();
   if (!queryRunner) {
-    console.error("Failed to revalidate caches for product!");
+    console.error('Failed to revalidate caches for product!');
   }
   return fetchCollectionData(
-    handle,  
+    handle,
     12, // numitems
     null, // cursor
     'COLLECTION_DEFAULT', // sortkey
     false, // reverse
     [], // filters
-    true // useNetworkOnly
+    true, // useNetworkOnly
   );
 }
 
@@ -54,11 +54,11 @@ export async function fillCaches() {
   const collections = [
     'bestsellers',
     'new-launch',
-    'hair-care', 
-    'pore-care', 
+    'hair-care',
+    'pore-care',
     'makeup',
-    'face-care', 
-    'night-care', 
+    'face-care',
+    'night-care',
     'hydration',
     'night-care',
     'hair-spa',
@@ -67,11 +67,11 @@ export async function fillCaches() {
   for (let i = 0; i < collections.length; ++i) {
     revalidateCollection(collections[i]);
     if (i % 5 === 0) {
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         setTimeout(() => {
           resolve({});
-        }, 1000)
-      })
+        }, 1000);
+      });
     }
   }
 }

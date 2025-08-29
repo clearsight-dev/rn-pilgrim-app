@@ -1444,6 +1444,32 @@ class CartActions {
         appModel,
       );
 
+      if (!discountCodes?.length) {
+        toast.show('Discount removed', {
+          type: 'success',
+          placement: 'bottom',
+          duration: 1000,
+          style: {marginBottom: 80},
+        });
+      } else {
+        const discountCode = transformedData?.discountCodes[0];
+        if (discountCode?.applicable) {
+          toast.show('Discount Applied', {
+            type: 'success',
+            placement: 'bottom',
+            duration: 1000,
+            style: {marginBottom: 80},
+          });
+        } else {
+          toast.show('Invalid Discount', {
+            type: 'error',
+            placement: 'bottom',
+            duration: 1000,
+            style: {marginBottom: 80},
+          });
+        }
+      }
+
       cartObject = transformedData;
 
       this.finalizeModelUpdates(dispatch, selector, model, cartObject);

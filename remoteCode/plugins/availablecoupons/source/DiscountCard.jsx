@@ -1,12 +1,58 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useMemo, useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import LoadingSVG from './icons/LoadingSVG';
 
-export default function DiscountCard({rule, onApply, syncingCartStatus}) {
-  const handleApplyClick = () => {
+export default function DiscountCard({rule, onApply, currentCart}) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleApplyClick = async () => {
+    setIsLoading(true);
     onApply(rule.discount_code);
+
+    // Show loader for 1 second
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
   };
+
+  const {ruleTitle} = useMemo(() => {
+    if (rule.isApplied) {
+      const saved = currentCart?.checkoutChargeAmount
+        ? currentCart.checkoutChargeAmount - currentCart?.totalAmount
+        : 0;
+      if (saved > 0) {
+        return {
+          ruleTitle: (
+            <Text style={styles.titleText}>
+              Saved ₹{' '}
+              <Text style={styles.titleTextBold}>{saved.toFixed(0)}</Text> with{' '}
+              <Text style={styles.titleTextBold}>{rule.rule_name}</Text>
+            </Text>
+          ),
+        };
+      }
+      return {
+        ruleTitle: (
+          <Text style={[styles.titleText, styles.titleTextBold]}>
+            {rule.rule_name}
+          </Text>
+        ),
+      };
+    }
+
+    return {
+      ruleTitle: (
+        <Text style={[styles.titleText, styles.titleTextBold]}>
+          {rule.rule_name}
+        </Text>
+      ),
+    };
+  }, [
+    currentCart.checkoutChargeAmount,
+    currentCart?.totalAmount,
+    rule.isApplied,
+    rule.rule_name,
+  ]);
 
   return (
     <View
@@ -24,7 +70,7 @@ export default function DiscountCard({rule, onApply, syncingCartStatus}) {
             }}
             style={styles.ruleImage}
           />
-          <Text style={styles.titleText}>{rule.rule_name}</Text>
+          {ruleTitle}
         </View>
         <View style={styles.ruleDescriptionContainer}>
           <Text style={styles.descriptionText}>
@@ -42,7 +88,7 @@ export default function DiscountCard({rule, onApply, syncingCartStatus}) {
             borderColor: rule.isAcheived ? '#00726C' : '#a2a2a2ff',
           },
         ]}>
-        {syncingCartStatus ? (
+        {isLoading ? (
           <View style={styles.loading}>
             <LoadingSVG />
           </View>
@@ -82,6 +128,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 8,
   },
   ruleContentContainer: {
     display: 'flex',
@@ -100,8 +148,12 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: 13,
-    fontWeight: '600',
     color: '#000',
+    flexWrap: 'wrap',
+    maxWidth: 130,
+  },
+  titleTextBold: {
+    fontWeight: '700',
   },
   ruleDescriptionContainer: {
     marginTop: 4,
