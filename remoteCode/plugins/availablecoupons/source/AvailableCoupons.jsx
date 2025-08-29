@@ -31,8 +31,9 @@ const AvailableCoupons = ({
 
     const {lines, discountCodes} = currentCart;
     const appliedDiscounts =
-      discountCodes?.filter(code => code.applicable)?.map(code => code.code) ||
-      [];
+      discountCodes
+        ?.filter(code => code.applicable)
+        ?.map(code => code.code?.toLowerCase()) || [];
 
     const totalCartValue =
       lines?.reduce((total, item) => {
@@ -59,13 +60,17 @@ const AvailableCoupons = ({
           return {
             ...r,
             isAcheived: totalQuantity >= r.discount_milestone,
-            isApplied: appliedDiscounts.includes(r.discount_code),
+            isApplied: appliedDiscounts.includes(
+              r.discount_code?.toLowerCase(),
+            ),
           };
         case 'Value Based':
           return {
             ...r,
             isAcheived: totalCartValue >= r.discount_milestone,
-            isApplied: appliedDiscounts.includes(r.discount_code),
+            isApplied: appliedDiscounts.includes(
+              r.discount_code?.toLowerCase(),
+            ),
           };
       }
       return {
@@ -88,6 +93,7 @@ const AvailableCoupons = ({
   const navigation = useNavigation();
 
   function applyCoupon(couponCode) {
+    couponCode = couponCode?.toLowerCase();
     const state = store.getState();
     const shopifyCartDSModel = datasourceTypeModelSel(state, 'shopifyCart');
     const updateCartDiscounts = shopifyCartDSModel?.get('updateCartDiscounts');
@@ -96,11 +102,11 @@ const AvailableCoupons = ({
     const appModel = selectAppModel(state);
     let discountCodes =
       currentCart?.discountCodes?.map(code => code.code) || [];
-    const discountCodeIndex = discountCodes.indexOf(couponCode);
-    if (discountCodeIndex !== -1) {
-      discountCodes.splice(discountCodeIndex, 1);
+
+    if (discountCodes.includes(couponCode)) {
+      discountCodes = [];
     } else {
-      discountCodes.push(couponCode);
+      discountCodes = [couponCode];
     }
 
     if (updateCartDiscounts) {

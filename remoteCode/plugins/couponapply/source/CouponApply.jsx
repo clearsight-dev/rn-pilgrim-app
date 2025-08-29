@@ -1,80 +1,152 @@
 import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Keyboard,
+} from 'react-native';
+import LoadingSVG from './icons/LoadingSVG';
+import {
+  datasourceTypeModelSel,
+  selectAppConfig,
+  selectAppModel,
+  globalPluginsSelector,
+  store,
+} from 'apptile-core';
 
-function CouponApply() {
+function CouponApply({currentCart}) {
   const [couponCode, setCouponCode] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleApplyCoupon = () => {
-    if (couponCode.trim()) {
-      // Handle coupon application logic here
-      console.log('Applying coupon:', couponCode);
-      // You can add API call or validation logic here
+  function applyCoupon(cCode) {
+    cCode = cCode?.toLowerCase();
+    const state = store.getState();
+    const shopifyCartDSModel = datasourceTypeModelSel(state, 'shopifyCart');
+    const updateCartDiscounts = shopifyCartDSModel?.get('updateCartDiscounts');
+    const globalPluginConfigs = globalPluginsSelector(state);
+    const appConfig = selectAppConfig(state);
+    const appModel = selectAppModel(state);
+    let discountCodes =
+      currentCart?.discountCodes?.map(code => code.code) || [];
+    const discountCodeIndex = discountCodes.indexOf(cCode);
+    if (discountCodeIndex !== -1) {
+      discountCodes.splice(discountCodeIndex, 1);
+    } else {
+      discountCodes.push(cCode);
+    }
+
+    if (updateCartDiscounts) {
+      return updateCartDiscounts(
+        store.dispatch,
+        globalPluginConfigs.get('shopifyCart'),
+        shopifyCartDSModel,
+        ['shopifyCart'],
+        {
+          discountCodes,
+        },
+        appConfig,
+        appModel,
+      );
+    } else {
+      console.error(
+        'Could not apply discount because model did not return updateDiscounts function',
+      );
+    }
+  }
+
+  const handleApplyCouponClicked = () => {
+    if (couponCode?.trim()) {
+      Keyboard.dismiss();
+      setIsLoading(true);
+
+      applyCoupon(couponCode);
+
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
     }
   };
 
-  const handleInputChange = e => {
-    setCouponCode(e.target.value);
-  };
-
-  const handleKeyPress = e => {
-    if (e.key === 'Enter') {
-      handleApplyCoupon();
-    }
+  const handleInputChange = text => {
+    setCouponCode(text);
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.inputContainer}>
-        <input
-          type="text"
-          placeholder="Enter Coupon Code"
-          value={couponCode}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <TextInput
           style={styles.input}
+          onChangeText={handleInputChange}
+          value={couponCode}
+          placeholder="Enter Coupon Code"
         />
-        <button
-          onClick={handleApplyCoupon}
+        <Pressable
           style={styles.applyButton}
-          disabled={!couponCode.trim()}>
-          APPLY
-        </button>
-      </div>
-    </div>
+          onPress={handleApplyCouponClicked}
+          disabled={isLoading}>
+          {isLoading ? (
+            <View style={styles.loading}>
+              <LoadingSVG />
+            </View>
+          ) : (
+            <Text
+              style={[
+                styles.applyButtonText,
+                couponCode?.trim() && styles.applyButtonTextActive,
+              ]}>
+              APPLY
+            </Text>
+          )}
+        </Pressable>
+      </View>
+    </View>
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
-    padding: '20px',
-    maxWidth: '400px',
-    margin: '0 auto',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inputContainer: {
+    width: 320,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#a2a2a2ff',
+    borderRadius: 8,
     display: 'flex',
-    border: '2px solid #e0e0e0',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    backgroundColor: '#fff',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
-    flex: 1,
-    padding: '12px 16px',
-    border: 'none',
-    outline: 'none',
-    fontSize: '16px',
-    backgroundColor: 'transparent',
-    color: '#333',
+    width: 220,
+    color: '#3c3c3c',
   },
   applyButton: {
-    padding: '12px 20px',
-    backgroundColor: '#f5f5f5',
-    border: 'none',
-    fontSize: '14px',
-    fontWeight: '600',
-    color: '#666',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginLeft: 10,
   },
-};
+  applyButtonText: {
+    color: '#a2a2a2ff',
+    fontWeight: 'bold',
+  },
+  applyButtonTextActive: {
+    color: '#00726C',
+  },
+  loading: {
+    height: 16,
+    width: 16,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default CouponApply;

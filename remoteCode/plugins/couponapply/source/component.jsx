@@ -7,7 +7,7 @@ export function ReactComponent({model}) {
 
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <CouponApply />
+      <CouponApply currentCart={currentCart} />
     </View>
   );
 }

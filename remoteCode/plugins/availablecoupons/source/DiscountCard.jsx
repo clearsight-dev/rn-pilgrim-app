@@ -1,16 +1,18 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import LoadingSVG from './icons/LoadingSVG';
 
-export default function DiscountCard({
-  rule,
-  onApply,
-  syncingCartStatus,
-  currentCart,
-}) {
-  const handleApplyClick = () => {
+export default function DiscountCard({rule, onApply, currentCart}) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleApplyClick = async () => {
+    setIsLoading(true);
     onApply(rule.discount_code);
+
+    // Show loader for 1 second
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
   };
 
   const {ruleTitle} = useMemo(() => {
@@ -86,7 +88,7 @@ export default function DiscountCard({
             borderColor: rule.isAcheived ? '#00726C' : '#a2a2a2ff',
           },
         ]}>
-        {syncingCartStatus ? (
+        {isLoading ? (
           <View style={styles.loading}>
             <LoadingSVG />
           </View>
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginVertical: 8,
   },
   ruleContentContainer: {
