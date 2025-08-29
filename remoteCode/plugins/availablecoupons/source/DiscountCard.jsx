@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    marginVertical: 8,
   },
   ruleContentContainer: {
     display: 'flex',

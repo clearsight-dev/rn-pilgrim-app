@@ -11,8 +11,17 @@ import {
   store,
 } from 'apptile-core';
 import DiscountCard from './DiscountCard';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import ArrowRight from './icons/ArrowRight';
+import {useNavigation} from '@react-navigation/native';
 
-const AvailableCoupons = ({rules, currentCart, syncingCartStatus}) => {
+const AvailableCoupons = ({
+  rules,
+  currentCart,
+  syncingCartStatus,
+  alignment,
+  hideExcessFields,
+}) => {
   const {finalProcessedRules} = useMemo(() => {
     if (!rules?.length) {
       return {
@@ -76,6 +85,7 @@ const AvailableCoupons = ({rules, currentCart, syncingCartStatus}) => {
       finalProcessedRules: processedRules,
     };
   }, [rules, currentCart]);
+  const navigation = useNavigation();
 
   function applyCoupon(couponCode) {
     const state = store.getState();
@@ -112,12 +122,18 @@ const AvailableCoupons = ({rules, currentCart, syncingCartStatus}) => {
     }
   }
 
+  function handleViewAllClicked() {
+    navigation.navigate('CouponPage');
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Available Coupons</Text>
+      {hideExcessFields === 'false' && (
+        <Text style={styles.title}>Available Coupons</Text>
+      )}
       <FlatList
         data={finalProcessedRules}
-        horizontal={true}
+        horizontal={alignment === 'horizontal' ? true : false}
         renderItem={({item}) => (
           <DiscountCard
             key={item.id}
@@ -129,6 +145,14 @@ const AvailableCoupons = ({rules, currentCart, syncingCartStatus}) => {
         )}
         keyExtractor={item => item.id}
       />
+      {hideExcessFields === 'false' && (
+        <TouchableOpacity
+          style={styles.viewAllContainer}
+          onPress={handleViewAllClicked}>
+          <Text style={styles.viewAllText}>View All Coupons</Text>
+          <ArrowRight />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -142,6 +166,20 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginLeft: 12,
     color: '#000',
+  },
+  viewAllContainer: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 8,
+    marginTop: 8,
+  },
+  viewAllText: {
+    fontSize: 14,
+    color: '#00726C',
+    marginRight: 4,
   },
 });
 
