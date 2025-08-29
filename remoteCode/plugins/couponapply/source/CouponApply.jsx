@@ -30,11 +30,11 @@ function CouponApply({currentCart}) {
     const appModel = selectAppModel(state);
     let discountCodes =
       currentCart?.discountCodes?.map(code => code.code) || [];
-    const discountCodeIndex = discountCodes.indexOf(cCode);
-    if (discountCodeIndex !== -1) {
-      discountCodes.splice(discountCodeIndex, 1);
+
+    if (discountCodes.includes(cCode)) {
+      discountCodes = [];
     } else {
-      discountCodes.push(cCode);
+      discountCodes = [cCode];
     }
 
     if (updateCartDiscounts) {
