@@ -88,7 +88,7 @@ export async function fetchMenu({
   const variables = { handle };
 
   const response = await queryRunner.runQuery("query", GET_MENU, variables, {
-    cachePolicy: revalidateCaches ? "network-only" : "cache-first",
+    cachePolicy: revalidateCaches ? "network-only" : "network-only",
   });
 
   const menu = response?.data?.menu || null;

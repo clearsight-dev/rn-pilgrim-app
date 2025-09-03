@@ -8,24 +8,34 @@ import pilgrimotplogin from "./plugins/pilgrimotplogin/source/widget";
 import pdppage from "./plugins/pdppage/source/widget";
 import homepage from "./plugins/homepage/source/widget";
 import faqs from "./plugins/faqs/source/widget";
+import couponapply from "./plugins/couponapply/source/widget";
 import clickpost from "./plugins/clickpost/source/widget";
 import categoryscreen from "./plugins/categoryscreen/source/widget";
+import cartupsell from "./plugins/cartupsell/source/widget";
+import cartfootermilestone from "./plugins/cartfootermilestone/source/widget";
 import bottomcontent from "./plugins/bottomcontent/source/widget";
 import blogscreen from "./plugins/blogscreen/source/widget";
+import availablecoupons from "./plugins/availablecoupons/source/widget";
 import ShopifyCart from "./plugins/ShopifyCart/source/widget";
 import OTPInputTextWidget from "./plugins/OTPInputTextWidget/source/widget";
 import FreeGifts from "./plugins/FreeGifts/source/widget";
 import DynamicImage from "./plugins/DynamicImage/source/widget";
+import CartUpsellDS from "./plugins/CartUpsellDS/source/widget";
 export function initPlugins() {
 return [
+    CartUpsellDS,
     DynamicImage,
     FreeGifts,
     OTPInputTextWidget,
     ShopifyCart,
+    availablecoupons,
     blogscreen,
     bottomcontent,
+    cartfootermilestone,
+    cartupsell,
     categoryscreen,
     clickpost,
+    couponapply,
     faqs,
     homepage,
     pdppage,

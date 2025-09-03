@@ -1,28 +1,32 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, {useEffect, useState, useCallback, useRef} from 'react';
 import {
   View,
   Text,
   FlatList,
   ActivityIndicator,
-  Platform
+  Platform,
+  RefreshControl,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { ProductCountSkeleton, ProductGridSkeleton } from './Skeletons';
-import { fetchFilteredProductsCount, getFilterAndProductsForCollection } from '../../../../extractedQueries/collectionqueries';
+import {useRoute} from '@react-navigation/native';
+import {ProductCountSkeleton, ProductGridSkeleton} from './Skeletons';
+import {
+  fetchFilteredProductsCount,
+  getFilterAndProductsForCollection,
+} from '../../../../extractedQueries/collectionqueries';
 import RelatedProductCard from '../../../../extractedQueries/RelatedProductCard';
 import ShadeSelector from '../../../../extractedQueries/ShadeSelector';
 import VariantSelector from '../../../../extractedQueries/VariantSelector';
-import { Image } from "../../../../extractedQueries/ImageComponent"
-import { CollectionHeaderSkeleton } from '../../../../components/skeleton/collectionHeaderSkeleton';
-import { RelatedProductCardSkeleton } from '../../../../components/skeleton/productCard'
+import {Image} from '../../../../extractedQueries/ImageComponent';
+import {CollectionHeaderSkeleton} from '../../../../components/skeleton/collectionHeaderSkeleton';
+import {RelatedProductCardSkeleton} from '../../../../components/skeleton/productCard';
 import Header from '../../../../extractedQueries/CollectionFilterChips';
-import Footer, { getShopifyFilters } from './Footer';
+import Footer, {getShopifyFilters} from './Footer';
 import styles from './styles';
-import { colors, typography } from '../../../../extractedQueries/theme';
-import CountdownTimer from '../../homepage/source/CountdownTimer'
-import { isPlainObject } from 'lodash-es';
+import {colors, typography} from '../../../../extractedQueries/theme';
+import CountdownTimer from '../../homepage/source/CountdownTimer';
+import {isPlainObject} from 'lodash-es';
 
-export function ReactComponent({ model }) {
+export function ReactComponent({model}) {
   const route = useRoute();
   const collectionHandle = route.params?.collectionHandle ?? 'bestsellers';
   const selectedCategory = route.params?.category;
@@ -36,6 +40,7 @@ export function ReactComponent({ model }) {
 
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const [currentCursor, setCurrentCursor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -43,65 +48,125 @@ export function ReactComponent({ model }) {
   const [image, setImage] = useState(null);
   const [sortOption, setSortOption] = useState('COLLECTION_DEFAULT');
   const [sortReverse, setSortReverse] = useState(false);
-  const [filterData, setFilterData] = useState({ filters: [], unflattenedFilters: [] });
+  const [filterData, setFilterData] = useState({
+    filters: [],
+    unflattenedFilters: [],
+  });
   const [appliedFilters, setAppliedFilters] = useState([]); // Track applied filters separately
   const [filteredProductsCount, setFilteredProductsCount] = useState(0);
   const [isLoadingFilteredCount, setIsLoadingFilteredCount] = useState(false);
   const [isMaxFilteredCount, setIsMaxFilteredCount] = useState(false);
-  const [totalProductsCount, setTotalProductsCount] = useState({ isMaxCount: false, count: 0 });
+  const [totalProductsCount, setTotalProductsCount] = useState({
+    isMaxCount: false,
+    count: 0,
+  });
   const [isLoadingTotalCount, setIsLoadingTotalCount] = useState(false);
   const flatListRef = useRef(null);
   const fetchedCursors = useRef(new Set());
 
   // this is only for sale on may 23 to 27th
-  const timerWidgetConfig = isPlainObject(model.get('timerWidgetConfig')) ? model.get('timerWidgetConfig') : {};
-  const timerCollectionHandles = Array.isArray(model.get('timerCollectionHandles')) ? model.get('timerCollectionHandles') : [];
+  const timerWidgetConfig = isPlainObject(model.get('timerWidgetConfig'))
+    ? model.get('timerWidgetConfig')
+    : {};
+  const timerCollectionHandles = Array.isArray(
+    model.get('timerCollectionHandles'),
+  )
+    ? model.get('timerCollectionHandles')
+    : [];
 
-
-  const onSelectShade = (product) => {
+  const onSelectShade = product => {
     setSelectedProduct(product);
     shadeBottomSheetRef.current?.show();
   };
 
   // Handle Choose Variant button click
-  const onSelectVariant = (product) => {
+  const onSelectVariant = product => {
     setSelectedProduct(product);
     variantBottomSheetRef.current?.show();
   };
 
   // Sort options
   const sortOptions = [
-    { label: 'Bestselling', value: 'BEST_SELLING', reverse: false },
-    { label: 'Price: Low to High', value: 'PRICE', reverse: false },
-    { label: 'Price: High to Low', value: 'PRICE', reverse: true },
-    { label: 'What\'s new', value: 'CREATED', reverse: false }
+    {label: 'Bestselling', value: 'BEST_SELLING', reverse: false},
+    {label: 'Price: Low to High', value: 'PRICE', reverse: false},
+    {label: 'Price: High to Low', value: 'PRICE', reverse: true},
+    {label: "What's new", value: 'CREATED', reverse: false},
   ];
 
-  const handleSortOptionSelect = useCallback((option) => {
-    setSortOption(option.value);
-    setSortReverse(option.reverse);
+  const handleSortOptionSelect = useCallback(
+    option => {
+      setSortOption(option.value);
+      setSortReverse(option.reverse);
 
-    // Hide the sort bottom sheet
-    if (footerRef.current) {
-      footerRef.current.hideSortBottomSheet();
-    }
+      // Hide the sort bottom sheet
+      if (footerRef.current) {
+        footerRef.current.hideSortBottomSheet();
+      }
 
-    // Reload products with new sort option
+      // Reload products with new sort option
+      setProducts([]);
+      setCurrentCursor(null);
+      fetchedCursors.current.clear();
+      fetchData(
+        collectionHandle,
+        null,
+        false,
+        option.value,
+        option.reverse,
+        false,
+      );
+
+      // Refresh the total count when sort option changes
+      fetchTotalProductsCount(collectionHandle);
+    },
+    [collectionHandle],
+  );
+
+  // Handle pull to refresh
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    // Reset pagination
     setProducts([]);
     setCurrentCursor(null);
     fetchedCursors.current.clear();
-    fetchData(collectionHandle, null, false, option.value, option.reverse);
 
-    // Refresh the total count when sort option changes
-    fetchTotalProductsCount(collectionHandle);
-  }, [collectionHandle]);
+    // Refresh data based on current state
+    if (appliedFilters.length > 0) {
+      // If filters are applied, refresh with filters
+      fetchDataWithFilters(
+        collectionHandle,
+        null,
+        false,
+        sortOption,
+        sortReverse,
+        appliedFilters,
+        filterData,
+        true,
+      );
+    } else {
+      // Otherwise, refresh with current sort option
+      fetchData(collectionHandle, null, false, sortOption, sortReverse, true);
+    }
+
+    // Refresh counts
+    if (appliedFilters.length === 0) {
+      fetchTotalProductsCount(collectionHandle);
+    } else {
+      const shopifyFilters = getShopifyFilters(appliedFilters, filterData);
+      fetchFilteredProductsCount(collectionHandle, shopifyFilters);
+    }
+
+    setRefreshing(false);
+  }, [collectionHandle, appliedFilters, sortOption, sortReverse, filterData]);
 
   function fetchData(
     collectionHandle,
     cursor = null,
     isLoadingMore = false,
     sortKey = sortOption,
-    reverse = sortReverse
+    reverse = sortReverse,
+    revalidateCaches = false,
   ) {
     const timeout = setTimeout(() => {
       if (isLoadingMore) {
@@ -111,13 +176,14 @@ export function ReactComponent({ model }) {
       }
     }, 100);
 
-    getFilterAndProductsForCollection(collectionHandle,
+    getFilterAndProductsForCollection(
+      collectionHandle,
       [],
       sortKey,
       reverse,
       cursor,
       isLoadingMore ? 20 : 12,
-      cursor
+      revalidateCaches,
     )
       .then(res => {
         clearTimeout(timeout);
@@ -132,7 +198,7 @@ export function ReactComponent({ model }) {
         setImage(res.image);
         setFilterData({
           filters: res.filters,
-          unflattenedFilters: res.unflattenedFilters
+          unflattenedFilters: res.unflattenedFilters,
         });
       })
       .catch(err => {
@@ -159,10 +225,13 @@ export function ReactComponent({ model }) {
     setIsLoadingFilteredCount(true);
 
     try {
-      console.log("[AGENT] Fetching filtered count with filters:", filters);
+      console.log('[AGENT] Fetching filtered count with filters:', filters);
 
-      const result = await fetchFilteredProductsCount(collectionHandle, filters);
-      console.log("[AGENT] Filtered count result:", result);
+      const result = await fetchFilteredProductsCount(
+        collectionHandle,
+        filters,
+      );
+      console.log('[AGENT] Filtered count result:', result);
 
       setFilteredProductsCount(result.count);
       setIsMaxFilteredCount(result.isMaxCount);
@@ -177,7 +246,7 @@ export function ReactComponent({ model }) {
   async function fetchTotalProductsCount(collectionHandle) {
     const timeout = setTimeout(() => {
       setIsLoadingTotalCount(true);
-    }, 100)
+    }, 100);
 
     try {
       // Fetch count with no filters
@@ -193,41 +262,53 @@ export function ReactComponent({ model }) {
   }
 
   // Function to apply filters
-  const applyFilters = useCallback((filterIds) => {
-    // Hide the filter bottom sheet
-    if (footerRef.current) {
-      footerRef.current.hideFilterBottomSheet();
-    }
+  const applyFilters = useCallback(
+    filterIds => {
+      // Hide the filter bottom sheet
+      if (footerRef.current) {
+        footerRef.current.hideFilterBottomSheet();
+      }
 
-    // Set applied filters to the new selected filters
-    setAppliedFilters(filterIds);
+      // Set applied filters to the new selected filters
+      setAppliedFilters(filterIds);
 
-    // Reload products with selected filters
-    setProducts([]);
-    setCurrentCursor(null);
-    fetchedCursors.current.clear();
+      // Reload products with selected filters
+      setProducts([]);
+      setCurrentCursor(null);
+      fetchedCursors.current.clear();
 
-    // Fetch data with filters
-    fetchDataWithFilters(collectionHandle, null, false, sortOption, sortReverse, filterIds, filterData);
+      // Fetch data with filters
+      fetchDataWithFilters(
+        collectionHandle,
+        null,
+        false,
+        sortOption,
+        sortReverse,
+        filterIds,
+        filterData,
+      );
 
-    const shopifyFilters = getShopifyFilters(filterIds, filterData);
-    // If no filters are applied, refresh the total count
-    if (filterIds.length === 0) {
-      fetchTotalProductsCount(collectionHandle);
-    } else {
-      fetchFilteredProductsCount(collectionHandle, shopifyFilters);
-    }
-  }, [collectionHandle, filterData, sortOption, sortReverse]);
+      const shopifyFilters = getShopifyFilters(filterIds, filterData);
+      // If no filters are applied, refresh the total count
+      if (filterIds.length === 0) {
+        fetchTotalProductsCount(collectionHandle);
+      } else {
+        fetchFilteredProductsCount(collectionHandle, shopifyFilters);
+      }
+    },
+    [collectionHandle, filterData, sortOption, sortReverse],
+  );
 
   // Function to fetch data with filters
   function fetchDataWithFilters(
     collectionHandle,
     cursor = null,
     isLoadingMore = false,
-    sortKey = "COLLECTION_DEFAULT",
+    sortKey = 'COLLECTION_DEFAULT',
     reverse = false,
     filterIds = [],
-    filterData
+    filterData,
+    revalidateCaches = false,
   ) {
     if (isLoadingMore) {
       setLoadingMore(true);
@@ -255,8 +336,9 @@ export function ReactComponent({ model }) {
       reverse,
       cursor,
       isLoadingMore ? 20 : 12,
+      revalidateCaches,
     )
-      .then((res) => {
+      .then(res => {
         setProducts(prev => {
           if (isLoadingMore) {
             return prev.concat(res.products);
@@ -268,37 +350,59 @@ export function ReactComponent({ model }) {
         setCurrentCursor(res.lastCursor);
       })
       .catch(err => {
-        console.error("Failed to fetch data for the applied filters: ", collectionHandle, err);
+        console.error(
+          'Failed to fetch data for the applied filters: ',
+          collectionHandle,
+          err,
+        );
       })
       .finally(() => {
         setLoading(false);
         setLoadingMore(false);
-      })
+      });
   }
 
   useEffect(() => {
     fetchedCursors.current.clear();
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       setTimeout(() => {
         fetchTotalProductsCount(collectionHandle);
-        fetchData(collectionHandle, null, false, "COLLECTION_DEFAULT", false);
+        fetchData(
+          collectionHandle,
+          null,
+          false,
+          'COLLECTION_DEFAULT',
+          false,
+          false,
+        );
       }, 50);
     } else {
       fetchTotalProductsCount(collectionHandle);
-      fetchData(collectionHandle, null, false, "COLLECTION_DEFAULT", false);
+      fetchData(
+        collectionHandle,
+        null,
+        false,
+        'COLLECTION_DEFAULT',
+        false,
+        false,
+      );
     }
   }, [collectionHandle]);
 
   // Handle loading more products when reaching the end of the list
-  const handleLoadMore = (collectionHandle) => {
+  const handleLoadMore = collectionHandle => {
     if (hasNextPage && !loadingMore && !loading && currentCursor) {
       //!Fix me: Check if the current cursor has already been fetched <== this is not a good way to do this, but it works for now
       if (fetchedCursors.current.has(currentCursor)) {
-        console.log('[SKIPPED] Already fetched cursor:', currentCursor, fetchedCursors.current);
+        console.log(
+          '[SKIPPED] Already fetched cursor:',
+          currentCursor,
+          fetchedCursors.current,
+        );
         return;
       }
 
-      fetchedCursors.current.add(currentCursor)
+      fetchedCursors.current.add(currentCursor);
 
       if (appliedFilters.length > 0) {
         // If filters are applied, use fetchDataWithFilters
@@ -309,19 +413,27 @@ export function ReactComponent({ model }) {
           sortOption,
           sortReverse,
           appliedFilters,
-          filterData
+          filterData,
+          false,
         );
       } else {
         // Otherwise, use the regular fetchData
-        fetchData(collectionHandle, currentCursor, true, sortOption, sortReverse);
+        fetchData(
+          collectionHandle,
+          currentCursor,
+          true,
+          sortOption,
+          sortReverse,
+          false,
+        );
       }
     }
   };
 
   // Render a product item in the grid
-  const renderProductItem = ({ item, index }) => {
+  const renderProductItem = ({item, index}) => {
     if (loading) {
-      return <RelatedProductCardSkeleton />
+      return <RelatedProductCardSkeleton />;
     }
 
     return (
@@ -330,7 +442,8 @@ export function ReactComponent({ model }) {
         style={styles.productCard}
         onSelectShade={onSelectShade}
         onSelectVariant={onSelectVariant}
-      />)
+      />
+    );
   };
 
   // Render footer with loading indicator when loading more products
@@ -340,7 +453,9 @@ export function ReactComponent({ model }) {
     return (
       <View style={styles.footerContainer}>
         <ActivityIndicator size="small" color={colors.secondaryMain} />
-        <Text style={[typography.family, styles.loadingMoreText]}>Loading more products...</Text>
+        <Text style={[typography.family, styles.loadingMoreText]}>
+          Loading more products...
+        </Text>
       </View>
     );
   };
@@ -352,13 +467,13 @@ export function ReactComponent({ model }) {
       <>
         {image?.url && image?.width && image?.height && (
           <Image
-            source={{ uri: image.url }}
+            source={{uri: image.url}}
             style={{
               aspectRatio: image.width / image.height,
             }}
           />
         )}
-        <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 0 }}>
+        <View style={{paddingHorizontal: 16, paddingTop: 12, paddingBottom: 0}}>
           <Text style={[styles.title]}>{collectionTitle}</Text>
           <View style={styles.headerContainer}>
             {appliedFilters.length > 0 ? (
@@ -366,17 +481,19 @@ export function ReactComponent({ model }) {
                 <ProductCountSkeleton />
               ) : (
                 <Text style={[typography.family, styles.productsCount]}>
-                  {isMaxFilteredCount ? '90+ Products' : `${filteredProductsCount} Products`}
+                  {isMaxFilteredCount
+                    ? '90+ Products'
+                    : `${filteredProductsCount} Products`}
                 </Text>
               )
+            ) : isLoadingTotalCount ? (
+              <ProductCountSkeleton />
             ) : (
-              isLoadingTotalCount ? (
-                <ProductCountSkeleton />
-              ) : (
-                <Text style={[typography.family, styles.productsCount]}>
-                  {totalProductsCount.isMaxCount ? '90+ Products' : `${totalProductsCount.count} Products`}
-                </Text>
-              )
+              <Text style={[typography.family, styles.productsCount]}>
+                {totalProductsCount.isMaxCount
+                  ? '90+ Products'
+                  : `${totalProductsCount.count} Products`}
+              </Text>
             )}
           </View>
         </View>
@@ -387,32 +504,39 @@ export function ReactComponent({ model }) {
     );
   };
 
+  const onFilterSelect = useCallback(
+    filter => {
+      const newSelectedFilters = appliedFilters.concat(filter);
+      fetchDataWithFilters(
+        collectionHandle,
+        null,
+        false,
+        sortOption,
+        sortReverse,
+        newSelectedFilters,
+        filterData,
+        false,
+      );
+    },
+    [collectionHandle, sortReverse, sortOption, appliedFilters, filterData],
+  );
 
-  const onFilterSelect = useCallback((filter) => {
-    const newSelectedFilters = appliedFilters.concat(filter);
-    fetchDataWithFilters(
-      collectionHandle,
-      null,
-      false,
-      sortOption,
-      sortReverse,
-      newSelectedFilters,
-      filterData
-    );
-  }, [collectionHandle, sortReverse, sortOption, appliedFilters, filterData]);
-
-  const onFilterRemove = useCallback((filter) => {
-    const newSelectedFilters = appliedFilters.filter(id => id !== filter);
-    fetchDataWithFilters(
-      collectionHandle,
-      null,
-      false,
-      sortOption,
-      sortReverse,
-      newSelectedFilters,
-      filterData
-    );
-  }, [collectionHandle, sortReverse, sortOption, appliedFilters, filterData]);
+  const onFilterRemove = useCallback(
+    filter => {
+      const newSelectedFilters = appliedFilters.filter(id => id !== filter);
+      fetchDataWithFilters(
+        collectionHandle,
+        null,
+        false,
+        sortOption,
+        sortReverse,
+        newSelectedFilters,
+        filterData,
+        false,
+      );
+    },
+    [collectionHandle, sortReverse, sortOption, appliedFilters, filterData],
+  );
 
   const onClearAllFilters = useCallback(() => {
     fetchDataWithFilters(
@@ -422,16 +546,19 @@ export function ReactComponent({ model }) {
       sortOption,
       sortReverse,
       [],
-      filterData
+      filterData,
+      false,
     );
   }, [collectionHandle, sortOption, sortReverse]);
 
-  const dummyData = Array(12).fill().map((_, index) => ({
-    id: `dummy-${index}`,
-  }));
+  const dummyData = Array(12)
+    .fill()
+    .map((_, index) => ({
+      id: `dummy-${index}`,
+    }));
 
   return (
-    <View style={[styles.container, { padding: 0 }]}>
+    <View style={[styles.container, {padding: 0}]}>
       {/* Filter chips header */}
       {/* <Header 
         filterData={filterData.filters}
@@ -445,7 +572,7 @@ export function ReactComponent({ model }) {
         ref={flatListRef}
         data={loading ? dummyData : products}
         renderItem={renderProductItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         numColumns={2}
         initialNumToRender={4}
         maxToRenderPerBatch={6}
@@ -458,23 +585,35 @@ export function ReactComponent({ model }) {
         ListFooterComponent={renderFooter}
         ListHeaderComponent={renderListHeader}
         ListEmptyComponent={
-          <Text style={[typography.family, styles.emptyText]}>No products found</Text>
+          <Text style={[typography.family, styles.emptyText]}>
+            No products found
+          </Text>
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[colors.secondaryMain]} // Android
+            tintColor={colors.secondaryMain} // iOS
+          />
         }
       />
 
-      {!loading && <Footer
-        ref={footerRef}
-        sortOptions={sortOptions}
-        collectionHandle={collectionHandle}
-        handleSortOptionSelect={handleSortOptionSelect}
-        sortOption={sortOption}
-        sortReverse={sortReverse}
-        filterData={filterData}
-        applyFilters={applyFilters}
-        totalProductsCount={totalProductsCount.count}
-        isMaxTotalCount={totalProductsCount.isMaxCount}
-        appliedFilters={appliedFilters}
-      />}
+      {!loading && (
+        <Footer
+          ref={footerRef}
+          sortOptions={sortOptions}
+          collectionHandle={collectionHandle}
+          handleSortOptionSelect={handleSortOptionSelect}
+          sortOption={sortOption}
+          sortReverse={sortReverse}
+          filterData={filterData}
+          applyFilters={applyFilters}
+          totalProductsCount={totalProductsCount.count}
+          isMaxTotalCount={totalProductsCount.isMaxCount}
+          appliedFilters={appliedFilters}
+        />
+      )}
       {/* Shade Selector Modal */}
       <ShadeSelector
         bottomSheetRef={shadeBottomSheetRef}
@@ -494,7 +633,7 @@ export function ReactComponent({ model }) {
 
 export const WidgetConfig = {
   timerWidgetConfig: '{{{}}}',
-  timerCollectionHandles: '{{[]}}'
+  timerCollectionHandles: '{{[]}}',
 };
 
 export const WidgetEditors = {
@@ -503,16 +642,16 @@ export const WidgetEditors = {
       type: 'codeInput',
       name: 'timerWidgetConfig',
       props: {
-        label: 'Timer Widget Config'
-      }
+        label: 'Timer Widget Config',
+      },
     },
     {
       type: 'codeInput',
       name: 'timerCollectionHandles',
       props: {
-        label: 'Timer Collection Handles'
-      }
-    }
+        label: 'Timer Collection Handles',
+      },
+    },
   ],
 };
 
@@ -520,6 +659,5 @@ export const PropertySettings = {};
 
 export const WrapperTileConfig = {
   name: 'Collection Products Grid',
-  defaultProps: {
-  },
+  defaultProps: {},
 };

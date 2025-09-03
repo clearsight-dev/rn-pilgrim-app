@@ -46,6 +46,7 @@ export interface pluginConfigType {
   enabledCartLineCache: boolean;
   freeGiftDatasourceId: string;
   freeGiftMetaobjectId: string;
+  cartUpsellMetaObjectHandle: string;
   orderLimiterDatasourceId: string;
   syncingLineItems: any;
   currentCart: string;
@@ -374,6 +375,13 @@ export const editors: any = {
     },
     {
       type: 'codeInput',
+      name: 'cartUpsellMetaObjectHandle',
+      props: {
+        label: 'Cart Upsell metaobject handle',
+      },
+    },
+    {
+      type: 'codeInput',
       name: 'orderLimiterDatasourceId',
       props: {
         label: 'OrderLimiter Datasource ID',
@@ -394,6 +402,7 @@ const shopifyCartDS = wrapDatasourceModel({
     enabledCartLineCache: false,
     freeGiftDatasourceId: '',
     freeGiftMetaobjectId: '',
+    cartUpsellMetaObjectHandle: '',
     orderLimiterDatasourceId: '',
     currentCart: '',
     addCartLineItem: 'action',

@@ -182,13 +182,15 @@ android {
     }
 }
 
-// "I'm not sure where androidx.browser is being used, but it's breaking the build, so I'm constraining it to the supported version for the current setup."
+// Not sure where androidx.browser is being used, but it's breaking the build — constraining it to a supported version for compatibility.
+// Firework SDK is blocking the release, but since it's not used in Pilgrim, constraining it to a compatible version as well.
+
 configurations.configureEach {
     resolutionStrategy {
         force 'androidx.browser:browser:1.5.0'
+        force 'com.google.ads.interactivemedia.v3:interactivemedia:3.33.0'
     }
 }
-
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin

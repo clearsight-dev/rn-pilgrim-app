@@ -857,8 +857,14 @@ class CartActions {
       const isCartModifiable = this.isCartModifiable(model);
       if (!isCartModifiable) return;
 
-      const {attributes, quantity, merchandiseId, sellingPlanId, itemPrice} =
-        params;
+      const {
+        attributes,
+        quantity,
+        merchandiseId,
+        sellingPlanId,
+        itemPrice,
+        successToastText,
+      } = params;
       const lineItems = [];
 
       const currentCart = this.getCart(model);
@@ -947,6 +953,15 @@ class CartActions {
         cartObject,
         cartLineCache,
       );
+
+      if (!_.isEmpty(successToastText)) {
+        toast.show(successToastText, {
+          type: 'success',
+          placement: 'bottom',
+          duration: 2000,
+          style: {marginBottom: 80},
+        });
+      }
     } catch (err) {
       const {merchandiseId} = params;
       this.completeLoadingAndRemoveItemFromSync(
@@ -1428,6 +1443,32 @@ class CartActions {
         appConfig,
         appModel,
       );
+
+      if (!discountCodes?.length) {
+        toast.show('Discount removed', {
+          type: 'success',
+          placement: 'bottom',
+          duration: 1000,
+          style: {marginBottom: 80},
+        });
+      } else {
+        const discountCode = transformedData?.discountCodes[0];
+        if (discountCode?.applicable) {
+          toast.show('Discount Applied', {
+            type: 'success',
+            placement: 'bottom',
+            duration: 1000,
+            style: {marginBottom: 80},
+          });
+        } else {
+          toast.show('Invalid Discount', {
+            type: 'error',
+            placement: 'bottom',
+            duration: 1000,
+            style: {marginBottom: 80},
+          });
+        }
+      }
 
       cartObject = transformedData;
 

@@ -84,7 +84,7 @@ fragment CartLine on CartLine {
                 handle
                 vendor
                 totalInventory
-                collections(first: 100) {
+                collections(first: 250) {
                   nodes {
                     id
                     title

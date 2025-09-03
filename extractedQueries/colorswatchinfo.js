@@ -29,298 +29,392 @@ export const imageSwatches = {
     'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/07-My-Habibil-80x80.png?v=1735884800',
   'her highness 08':
     'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/08-Her-Highness-80x80.png?v=1735884800',
- 'fiesta queen':  'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/fiesta-queen_1.jpg?v=1736241677',
-   'midnight soiree':'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/midnight-soiree_1.jpg?v=1736241677'   
+  'fiesta queen':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/fiesta-queen_1.jpg?v=1736241677',
+  'midnight soiree':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/midnight-soiree_1.jpg?v=1736241677',
+  'soft eleganc 01':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/soft-elegance_1.png?v=1754391109',
+  'sultry romanc 02':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/sultry-romance_2.png?v=1754391111',
+  'bold charm 03':
+    'https://cdn.shopify.com/s/files/1/0620/1629/1045/files/bold-charme_3.png?v=1754391109',
 };
 
 export const colorSwatches = {
-  "the red stiletto": {
-    "colorHex": "#AD1025"
+  'the red stiletto': {
+    colorHex: '#AD1025',
   },
-  "berry tease": {
-    "colorHex": "#903D47"
+  'berry tease': {
+    colorHex: '#903D47',
   },
-  "bossy brown": {
-    "colorHex": "#642327"
+  'bossy brown': {
+    colorHex: '#642327',
   },
-  "nude obsessed": {
-    "colorHex": "#9E463C"
+  'nude obsessed': {
+    colorHex: '#9E463C',
   },
-  "wine spill": {
-    "colorHex": "#AC3F5F"
+  'wine spill': {
+    colorHex: '#AC3F5F',
   },
-  "mauve desire": {
-    "colorHex": "#AF516C"
+  'mauve desire': {
+    colorHex: '#AF516C',
   },
-  "pink kisses": {
-    "colorHex": "#B24A5B"
+  'pink kisses': {
+    colorHex: '#B24A5B',
   },
-  "flirty rose": {
-    "colorHex": "#C05359"
+  'flirty rose': {
+    colorHex: '#C05359',
   },
-  "saucy coral": {
-    "colorHex": "#BF4D4C"
+  'saucy coral': {
+    colorHex: '#BF4D4C',
   },
-  "blushin nude": {
-    "colorHex": "#8F3433"
+  'blushin nude': {
+    colorHex: '#8F3433',
   },
-  "kinky pink": {
-    "colorHex": "#B1203F"
+  'kinky pink': {
+    colorHex: '#B1203F',
   },
-  "pink climax": {
-    "colorHex": "#A00628"
+  'pink climax': {
+    colorHex: '#A00628',
   },
-  "purple lust": {
-    "colorHex": "#65327D"
+  'purple lust': {
+    colorHex: '#65327D',
   },
-  "almond glow": {
-    "colorHex": "#d18a5e"
+  'almond glow': {
+    colorHex: '#d18a5e',
   },
-  "beige glow": {
-    "colorHex": "#ecb78b"
+  'beige glow': {
+    colorHex: '#ecb78b',
   },
-  "honey glow": {
-    "colorHex": "#e0a56d"
+  'honey glow': {
+    colorHex: '#e0a56d',
   },
-  "classic nude": {
-    "colorHex": "#fccfb2"
+  'classic nude': {
+    colorHex: '#fccfb2',
   },
-  "golden beige": {
-    "colorHex": "#f2c4a2"
+  'golden beige': {
+    colorHex: '#f2c4a2',
   },
-  "pure ivory": {
-    "colorHex": "#fcd3bd"
+  'pure ivory': {
+    colorHex: '#fcd3bd',
   },
-  "rich caramel": {
-    "colorHex": "#db9f7d"
+  'rich caramel': {
+    colorHex: '#db9f7d',
   },
-  "warm sand": {
-    "colorHex": "#e6af90"
+  'warm sand': {
+    colorHex: '#e6af90',
   },
-  "brown trend": {
-    "colorHex": "#7f3c36"
+  'brown trend': {
+    colorHex: '#7f3c36',
   },
-  "coral story": {
-    "colorHex": "#d96861"
+  'coral story': {
+    colorHex: '#d96861',
   },
-  "pink filter": {
-    "colorHex": "#bd1553"
+  'pink filter': {
+    colorHex: '#bd1553',
   },
-  "black scandal": {
-    "colorHex": "#000000"
+  'black scandal': {
+    colorHex: '#000000',
   },
-  "blue rebel": {
-    "colorHex": "#003b7f"
+  'blue rebel': {
+    colorHex: '#003b7f',
   },
-  "boldy bronze": {
-    "colorHex": "#ce7c45"
+  'boldy bronze': {
+    colorHex: '#ce7c45',
   },
-  "green envy": {
-    "colorHex": "#063e2f"
+  'green envy': {
+    colorHex: '#063e2f',
   },
-  "natural almond": {
-    "colorHex": "#ebb18b"
+  'natural almond': {
+    colorHex: '#ebb18b',
   },
-  "waem sand": {
-    "colorHex": "#e1ae8b"
+  'waem sand': {
+    colorHex: '#e1ae8b',
   },
-  "the brown trend": {
-    "colorHex": "#612F22"
+  'the brown trend': {
+    colorHex: '#612F22',
   },
- "the red stiletto 01": {
-    "colorHex": "#AD1025"
+  'the red stiletto 01': {
+    colorHex: '#AD1025',
   },
-  "berry tease 02": {
-    "colorHex": "#903D47"
+  'berry tease 02': {
+    colorHex: '#903D47',
   },
-  "bossy brown 03": {
-    "colorHex": "#642327"
+  'bossy brown 03': {
+    colorHex: '#642327',
   },
-  "nude obsessed 04": {
-    "colorHex": "#9E463C"
+  'nude obsessed 04': {
+    colorHex: '#9E463C',
   },
-  "wine spill 05": {
-    "colorHex": "#AC3F5F"
+  'wine spill 05': {
+    colorHex: '#AC3F5F',
   },
-  "mauve desire 06": {
-    "colorHex": "#AF516C"
+  'mauve desire 06': {
+    colorHex: '#AF516C',
   },
-  "pink kisses 07": {
-    "colorHex": "#B24A5B"
+  'pink kisses 07': {
+    colorHex: '#B24A5B',
   },
-  "flirty rose 08": {
-    "colorHex": "#C05359"
+  'flirty rose 08': {
+    colorHex: '#C05359',
   },
-  "saucy coral 09": {
-    "colorHex": "#BF4D4C"
+  'saucy coral 09': {
+    colorHex: '#BF4D4C',
   },
-  "blushin nude 10": {
-    "colorHex": "#8F3433"
+  'blushin nude 10': {
+    colorHex: '#8F3433',
   },
-  "kinky pink 11": {
-    "colorHex": "#B1203F"
+  'kinky pink 11': {
+    colorHex: '#B1203F',
   },
-  "pink climax 12": {
-    "colorHex": "#A00628"
+  'pink climax 12': {
+    colorHex: '#A00628',
   },
-  "purple lust 13": {
-    "colorHex": "#65327D"
+  'purple lust 13': {
+    colorHex: '#65327D',
   },
-  "pink filter 01": {
-    "colorHex": "#bd1553"
+  'pink filter 01': {
+    colorHex: '#bd1553',
   },
-  "coral story 02": {
-    "colorHex": "#d96861"
+  'coral story 02': {
+    colorHex: '#d96861',
   },
-  "the brown trend 03": {
-    "colorHex": "#7f3c36"
+  'the brown trend 03': {
+    colorHex: '#7f3c36',
   },
-  "beige glow 01": {
-    "colorHex": "#ecb78b"
+  'beige glow 01': {
+    colorHex: '#ecb78b',
   },
-  "honey glow 03": {
-    "colorHex": "#e0a56d"
+  'honey glow 03': {
+    colorHex: '#e0a56d',
   },
-  "almond glow 05": {
-    "colorHex": "#d18a5e"
+  'almond glow 05': {
+    colorHex: '#d18a5e',
   },
-  "pure ivory 110": {
-    "colorHex": "#f3cbc3"
+  'pure ivory 110': {
+    colorHex: '#f3cbc3',
   },
-  "classic nude 123": {
-    "colorHex": "#e5b88f"
+  'classic nude 123': {
+    colorHex: '#e5b88f',
   },
-  "golden beige 215": {
-    "colorHex": "#ebbe95"
+  'golden beige 215': {
+    colorHex: '#ebbe95',
   },
-  "warm sand 223": {
-    "colorHex": "#e1ae8b"
+  'warm sand 223': {
+    colorHex: '#e1ae8b',
   },
-  "rich caramel 325": {
-    "colorHex": "#ca9572"
+  'rich caramel 325': {
+    colorHex: '#ca9572',
   },
-  "natural almond 225": {
-    "colorHex": "#ebb18b"
+  'natural almond 225': {
+    colorHex: '#ebb18b',
   },
-  "boldly bronze 21": {
-    "colorHex": "#ce7c45"
+  'boldly bronze 21': {
+    colorHex: '#ce7c45',
   },
-  "blue rebel 22": {
-    "colorHex": "#003b7f"
+  'blue rebel 22': {
+    colorHex: '#003b7f',
   },
-  "green envy 23": {
-    "colorHex": "#063e2f"
-  }, "coral envy 01": {
-    "colorHex": "#d07078"
+  'green envy 23': {
+    colorHex: '#063e2f',
   },
-  "caramel guilt 02": {
-    "colorHex": "#c3715c"
+  'coral envy 01': {
+    colorHex: '#d07078',
   },
-  "cupids pink 03": {
-    "colorHex": "#e8879a"
+  'caramel guilt 02': {
+    colorHex: '#c3715c',
   },
-  "mocha bliss 04": {
-    "colorHex": "#b27078"
+  'cupids pink 03': {
+    colorHex: '#e8879a',
   },
-  "nude mystery 05": {
-    "colorHex": "#cd353c"
+  'mocha bliss 04': {
+    colorHex: '#b27078',
   },
-  "coco caress 06": {
-    "colorHex": "#a5493e"
+  'nude mystery 05': {
+    colorHex: '#cd353c',
   },
-  "pink passion 11": {
-    "colorHex": "#ee82a4"
+  'coco caress 06': {
+    colorHex: '#a5493e',
   },
-  "pink hotness 12": {
-    "colorHex": "#c84772"
+  'pink passion 11': {
+    colorHex: '#ee82a4',
   },
-  "forbidden pink 13": {
-    "colorHex": "#c4197f"
+  'pink hotness 12': {
+    colorHex: '#c84772',
   },
-  "pink romance 14": {
-    "colorHex": "#e16287"
+  'forbidden pink 13': {
+    colorHex: '#c4197f',
   },
-  "flamin red 21": {
-    "colorHex": "#c12026"
+  'pink romance 14': {
+    colorHex: '#e16287',
   },
-  "untamed red 22": {
-    "colorHex": "#c22026"
+  'flamin red 21': {
+    colorHex: '#c12026',
   },
-  "maroon affair 23": {
-    "colorHex": "#94202c"
+  'untamed red 22': {
+    colorHex: '#c22026',
   },
-  "burgundy blaze 24": {
-    "colorHex": "#6e3534"
+  'maroon affair 23': {
+    colorHex: '#94202c',
   },
-  "ruby revolt 25": {
-    "colorHex": "#cd353c"
+  'burgundy blaze 24': {
+    colorHex: '#6e3534',
   },
-  "sultry wine 26": {
-    "colorHex": "#8f2d49"
+  'ruby revolt 25': {
+    colorHex: '#cd353c',
   },
-  "nude kiss 31": {
-    "colorHex": "#b76e6f"
+  'sultry wine 26': {
+    colorHex: '#8f2d49',
   },
-  "chocolate tease 32": {
-    "colorHex": "#944d2e"
+  'nude kiss 31': {
+    colorHex: '#b76e6f',
   },
-  "cinnamon lust 33": {
-    "colorHex": "#872733"
+  'chocolate tease 32': {
+    colorHex: '#944d2e',
   },
-  "alpha brown 34": {
-    "colorHex": "#683632"
+  'cinnamon lust 33': {
+    colorHex: '#872733',
   },
-   "sizzlin magenta 14": {
-    "colorHex": "#872579"
+  'alpha brown 34': {
+    colorHex: '#683632',
   },
-  "red revenge 16": {
-    "colorHex": "#9b2b31"
+  'sizzlin magenta 14': {
+    colorHex: '#872579',
   },
-  "wine trap 17": {
-    "colorHex": "#692c43"
+  'red revenge 16': {
+    colorHex: '#9b2b31',
   },
-  "dark seduction 18": {
-    "colorHex": "#411f1f"
+  'wine trap 17': {
+    colorHex: '#692c43',
   },
-  "ruby fling 19": {
-    "colorHex": "#7f1c21"
+  'dark seduction 18': {
+    colorHex: '#411f1f',
   },
-  "brown mischief 20": {
-    "colorHex": "#7f3813"
+  'ruby fling 19': {
+    colorHex: '#7f1c21',
   },
-  "rosy darlin 21": {
-    "colorHex": "#b96e7c"
+  'brown mischief 20': {
+    colorHex: '#7f3813',
   },
-  "mocha muse 22": {
-    "colorHex": "#af6453"
+  'rosy darlin 21': {
+    colorHex: '#b96e7c',
   },
-  "pink cuff 23": {
-    "colorHex": "#b55c5e"
+  'mocha muse 22': {
+    colorHex: '#af6453',
   },
-  "nude feud 24": {
-    "colorHex": "#ae6d4e"
+  'pink cuff 23': {
+    colorHex: '#b55c5e',
   },
-  "siren red 25": {
-    "colorHex": "#c62529"
+  'nude feud 24': {
+    colorHex: '#ae6d4e',
   },
-  "sexy scarlet 26": {
-    "colorHex": "#8d3739"
-  },  "ivory 05": {
-    "colorHex": "#f3cbc3"
+  'siren red 25': {
+    colorHex: '#c62529',
   },
-  "sand 10": {
-    "colorHex": "#e1ae8b"
+  'sexy scarlet 26': {
+    colorHex: '#8d3739',
   },
-  "beige 15": {
-    "colorHex": "#ecb78b"
+  'ivory 05': {
+    colorHex: '#f3cbc3',
   },
-  "almond 25": {
-    "colorHex": "#ebb18b"
-  },  "warm mocha 335": {
-    "colorHex": "#bf7d59"
-  },"translucent": {
-    "colorHex": "#ffffff"
-  },"banana": {
-    "colorHex": "#eedaaf"
-  }
+  'sand 10': {
+    colorHex: '#e1ae8b',
+  },
+  'beige 15': {
+    colorHex: '#ecb78b',
+  },
+  'almond 25': {
+    colorHex: '#ebb18b',
+  },
+  'warm mocha 335': {
+    colorHex: '#bf7d59',
+  },
+  translucent: {
+    colorHex: '#ffffff',
+  },
+  banana: {
+    colorHex: '#eedaaf',
+  },
+  'light vanilla 120': {
+    colorHex: '#d5a286',
+  },
+  'classic nude 123': {
+    colorHex: '#edc8a3',
+  },
+  'light beige 235': {
+    colorHex: '#d6a461',
+  },
+  'medium sand 243': {
+    colorHex: '#c39367',
+  },
+  'classic almond 245': {
+    colorHex: '#e6a65d',
+  },
+  'rich walnut 345': {
+    colorHex: '#b58150',
+  },
+  'deep mocha 725': {
+    colorHex: '#ab6e50',
+  },
+  'nude l gance 01': {
+    colorHex: '#B66C6D',
+  },
+  'rose allure 02': {
+    colorHex: '#A85566',
+  },
+  'truffle myst re 03': {
+    colorHex: '#BC625E',
+  },
+  'caramel b b 04': {
+    colorHex: '#A94545',
+  },
+  'chic mocha 05': {
+    colorHex: '#A4493D',
+  },
+  'ruby kiss 11': {
+    colorHex: '#971B2F',
+  },
+  'french red 12': {
+    colorHex: '#93272C',
+  },
+  'rouge crush 13': {
+    colorHex: '#B83A4B',
+  },
+  'wine s duction 14': {
+    colorHex: '#890C58',
+  },
+  'berry d sir 15': {
+    colorHex: '#9C6169',
+  },
+  'belle pink 21': {
+    colorHex: '#CE0F69',
+  },
+  'pink amour 22': {
+    colorHex: '#B46B7A',
+  },
+  'mauve affaire 23': {
+    colorHex: '#8B5B6B',
+  },
+  'chocolat ch rie 31': {
+    colorHex: '#9A3324',
+  },
+  'raspberry cr pe 01': {
+    colorHex: '#ed847e',
+  },
+  'ros souffl 02': {
+    colorHex: '#e25858',
+  },
+  'french croissant 03': {
+    colorHex: '#df796c',
+  },
+  'macaron crush 04': {
+    colorHex: '#d37166',
+  },
+  'strawberry mouss 05': {
+    colorHex: '#cc7d86',
+  },
+  'sunkiss gold 01': {
+    colorHex: '#d6a38e',
+  },
 };

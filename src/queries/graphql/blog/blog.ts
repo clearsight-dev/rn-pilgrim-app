@@ -96,7 +96,7 @@ export async function fetchBlogArticle({
     GET_BLOG_ARTICLE,
     variables,
     {
-      cachePolicy: revalidateCaches ? 'network-only' : 'cache-first',
+      cachePolicy: revalidateCaches ? 'network-only' : 'network-only',
     },
   );
 
