@@ -217,9 +217,9 @@ async function main() {
     );
     const apptileConfig = JSON.parse(apptileConfigRaw);
     const success = await downloadIconAndSplash(apptileConfig);
-    if (success) {
-      await generateIconSet(path.resolve(apptileConfig.SDK_PATH, 'packages/apptile-app/devops/scripts/ios/iconset-generator.sh'));
-    }
+    // if (success) {
+    //   await generateIconSet(path.resolve(apptileConfig.SDK_PATH, 'packages/apptile-app/devops/scripts/ios/iconset-generator.sh'));
+    // }
 
     const extraModules = getExtraModules(apptileConfig);
 

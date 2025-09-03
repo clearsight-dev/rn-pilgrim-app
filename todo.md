@@ -1,0 +1,1 @@
+uncomment image generation in android & ios project setup

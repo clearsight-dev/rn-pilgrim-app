@@ -36,7 +36,7 @@ import {initCartGenerator} from '../generators';
 import {shopifyCheckout, transformPurchaseEvent} from '../checkout';
 
 import {Platform, NativeModules} from 'react-native';
-const {InAppReview} = NativeModules;
+const { InAppReview } = NativeModules;
 
 export interface pluginConfigType {
   cartPlatform: string;
@@ -529,7 +529,7 @@ const shopifyCartDS = wrapDatasourceModel({
           }
 
           // need to trigger review here
-          if (Platform.OS === 'android') {
+          if (Platform.OS === "android") {
             InAppReview?.requestFlow();
           }
         });
