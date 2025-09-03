@@ -1,6 +1,6 @@
 // This file is generated. Do not edit.
-import testnav from "./navigators/testnav/source";
-import stackwithheader from "./navigators/stackwithheader/source";
+import testnav from "./navigators/testnav/source/navigator";
+import stackwithheader from "./navigators/stackwithheader/source/navigator";
 import {registerCreator} from 'apptile-core';
 export const navs = [
   {creator: stackwithheader, name: "stackwithheader"},
